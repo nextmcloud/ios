@@ -8,7 +8,6 @@ struct NCTermOfServiceModelView: View {
     @State private var selectedLanguage = Locale.preferredLanguages.first?.components(separatedBy: "-").first ?? "en"
     @State private var termsText = "Loading terms..."
     @ObservedObject var model: NCTermOfServiceModel
-
     @Environment(\.presentationMode) var presentationMode
 
     var body: some View {
@@ -20,12 +19,14 @@ struct NCTermOfServiceModelView: View {
 
                 Picker("Select Language", selection: $selectedLanguage) {
                     ForEach(model.languages.keys.sorted(), id: \.self) { key in
-                        Text(model.languages[key] ?? "").tag(key)
+                        Text(model.languages[key] ?? "")
+                            .cappedFont(.body, maxDynamicType: .accessibility2)
+                            .tag(key)
                     }
                 }
                 .pickerStyle(MenuPickerStyle())
                 .frame(maxWidth: .infinity, alignment: .trailing)
-                .onChange(of: selectedLanguage) { newLanguage in
+                .onChange(of: selectedLanguage) { _, newLanguage in
                     if let terms = model.terms[newLanguage] {
                         termsText = terms
                     } else {
@@ -38,7 +39,7 @@ struct NCTermOfServiceModelView: View {
 
             ScrollView {
                 Text(termsText)
-                    .font(.body)
+                    .cappedFont(.body, maxDynamicType: .accessibility2)
                     .foregroundColor(.primary)
                     .frame(maxWidth: .infinity)
                     .padding(.horizontal)
@@ -49,6 +50,7 @@ struct NCTermOfServiceModelView: View {
                 model.signTermsOfService(termId: model.termsId[selectedLanguage])
             }) {
                 Text(NSLocalizedString("_terms_accept_", comment: "Accept terms"))
+                    .cappedFont(.body, maxDynamicType: .accessibility2)
                     .foregroundColor(.white)
                     .padding()
                     .background(Color.blue)

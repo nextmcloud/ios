@@ -23,7 +23,7 @@ extension NCManageDatabase {
     // MARK: - Realm write
 
     func addAvatar(fileName: String, etag: String, sync: Bool = true) {
-        performRealmWrite(sync: sync) { realm in
+        core.performRealmWrite(sync: sync) { realm in
             let addObject = tableAvatar()
             addObject.date = NSDate()
             addObject.etag = etag
@@ -39,7 +39,7 @@ extension NCManageDatabase {
     ///   - etag: The ETag associated with the avatar file.
     ///   - async: Whether the Realm write should be executed asynchronously (default is true).
     func addAvatarAsync(fileName: String, etag: String) async {
-        await performRealmWriteAsync { realm in
+        await core.performRealmWriteAsync { realm in
             let addObject = tableAvatar()
             addObject.date = NSDate()
             addObject.etag = etag
@@ -50,7 +50,7 @@ extension NCManageDatabase {
     }
 
     func clearAllAvatarLoadedAsync() async {
-        await performRealmWriteAsync { realm in
+        await core.performRealmWriteAsync { realm in
             let results = realm.objects(tableAvatar.self)
             for result in results {
                 result.loaded = false
@@ -60,10 +60,11 @@ extension NCManageDatabase {
 
     @discardableResult
     func setAvatarLoaded(fileName: String, sync: Bool = true) -> UIImage? {
-        let fileNameLocalPath = utilityFileSystem.directoryUserData + "/" + fileName
+        let directoryUserData = utilityFileSystem.directoryUserData
+        let fileNameLocalPath = utilityFileSystem.createServerUrl(serverUrl: directoryUserData, fileName: fileName)
         var image: UIImage?
 
-        performRealmWrite(sync: sync) { realm in
+        core.performRealmWrite(sync: sync) { realm in
             if let result = realm.objects(tableAvatar.self).filter("fileName == %@", fileName).first {
                 if let imageAvatar = UIImage(contentsOfFile: fileNameLocalPath) {
                     result.loaded = true
@@ -83,10 +84,11 @@ extension NCManageDatabase {
     /// - Returns: The `UIImage` if successfully loaded from disk, or `nil` if not found or deleted.
     @discardableResult
     func setAvatarLoadedAsync(fileName: String) async -> UIImage? {
-        let fileNameLocalPath = utilityFileSystem.directoryUserData + "/" + fileName
+        let directoryUserData = utilityFileSystem.directoryUserData
+        let fileNameLocalPath = utilityFileSystem.createServerUrl(serverUrl: directoryUserData, fileName: fileName)
         var image: UIImage?
 
-        await performRealmWriteAsync { realm in
+        await core.performRealmWriteAsync { realm in
             if let result = realm.objects(tableAvatar.self).filter("fileName == %@", fileName).first {
                 if let imageAvatar = UIImage(contentsOfFile: fileNameLocalPath) {
                     result.loaded = true
@@ -103,7 +105,7 @@ extension NCManageDatabase {
     // MARK: - Realm read
 
     func getTableAvatar(fileName: String) -> tableAvatar? {
-        performRealmRead { realm in
+        core.performRealmRead { realm in
             guard let result = realm.objects(tableAvatar.self)
                 .filter("fileName == %@", fileName)
                 .first else {
@@ -116,7 +118,7 @@ extension NCManageDatabase {
     func getTableAvatar(fileName: String,
                         dispatchOnMainQueue: Bool = true,
                         completion: @escaping (_ tblAvatar: tableAvatar?) -> Void) {
-        performRealmRead({ realm in
+        core.performRealmRead({ realm in
             return realm.objects(tableAvatar.self)
                 .filter("fileName == %@", fileName)
                 .first
@@ -133,7 +135,7 @@ extension NCManageDatabase {
     }
 
     func getTableAvatarAsync(fileName: String) async -> tableAvatar? {
-        return await performRealmReadAsync { realm in
+        return await core.performRealmReadAsync { realm in
             realm.objects(tableAvatar.self)
                 .filter("fileName == %@", fileName)
                 .first
@@ -142,11 +144,12 @@ extension NCManageDatabase {
     }
 
     func getImageAvatarLoaded(fileName: String) -> (image: UIImage?, tblAvatar: tableAvatar?) {
-        let fileNameLocalPath = utilityFileSystem.directoryUserData + "/" + fileName
+        let directoryUserData = utilityFileSystem.directoryUserData
+        let fileNameLocalPath = utilityFileSystem.createServerUrl(serverUrl: directoryUserData, fileName: fileName)
         let image = UIImage(contentsOfFile: fileNameLocalPath)
         var tblAvatar: tableAvatar?
 
-        performRealmRead { realm in
+        core.performRealmRead { realm in
             if let result = realm.objects(tableAvatar.self).filter("fileName == %@", fileName).first {
                 tblAvatar = tableAvatar(value: result)
             } else {
@@ -160,15 +163,16 @@ extension NCManageDatabase {
     func getImageAvatarLoaded(fileName: String,
                               dispatchOnMainQueue: Bool = true,
                               completion: @escaping (_ image: UIImage?, _ tblAvatar: tableAvatar?) -> Void) {
-        let fileNameLocalPath = utilityFileSystem.directoryUserData + "/" + fileName
-        let image = UIImage(contentsOfFile: fileNameLocalPath)
-
-        performRealmRead({ realm in
+        core.performRealmRead({ realm in
             return realm.objects(tableAvatar.self)
                 .filter("fileName == %@", fileName)
                 .first
                 .map { tableAvatar(value: $0) }
         }, sync: false) { result in
+            let directoryUserData = self.utilityFileSystem.directoryUserData
+            let fileNameLocalPath = self.utilityFileSystem.createServerUrl(serverUrl: directoryUserData, fileName: fileName)
+            let image = UIImage(contentsOfFile: fileNameLocalPath)
+
             if result == nil {
                 self.utilityFileSystem.removeFile(atPath: fileNameLocalPath)
             }

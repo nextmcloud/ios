@@ -27,7 +27,7 @@ struct SelectAlbumView: View {
         .safeAreaInset(edge: .bottom, content: {
             Spacer().frame(height: 30)
         })
-        .onChange(of: selectedAlbums) { newValue in
+        .onChange(of: selectedAlbums) { _, newValue in
             if newValue.count > 1, oldSelectedAlbums.contains(model.allPhotosCollection?.localIdentifier ?? "") {
                 selectedAlbums.remove(model.allPhotosCollection?.localIdentifier ?? "")
             } else if newValue.contains(model.allPhotosCollection?.localIdentifier ?? "") {
@@ -110,8 +110,10 @@ struct SelectionButton: View {
 
                 VStack(alignment: .leading) {
                     Text((album?.assetCollectionSubtype == .smartAlbumUserLibrary) ? NSLocalizedString("_camera_roll_", comment: "") : (album?.localizedTitle ?? ""))
+                        .cappedFont(.body, maxDynamicType: .accessibility2)
                     Text(String(assetCount))
-                        .font(.footnote).foregroundStyle(.secondary)
+                        .cappedFont(.body, maxDynamicType: .accessibility2)
+                        .foregroundStyle(.secondary)
                 }
             }
         }

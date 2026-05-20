@@ -1,25 +1,7 @@
-//
-//  NCWebBrowserView.swift
-//  Nextcloud
-//
-//  Created by Aditya Tyagi on 04/03/24.
-//  Copyright © 2024 Marino Faggiana. All rights reserved.
-//
-//  Author Aditya Tyagi <adityagi02@yahoo.com>
-//
-//  This program is free software: you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
-//  the Free Software Foundation, either version 3 of the License, or
-//  (at your option) any later version.
-//
-//  This program is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
-//
-//  You should have received a copy of the GNU General Public License
-//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-//
+// SPDX-FileCopyrightText: Nextcloud GmbH
+// SPDX-FileCopyrightText: 2024 Aditya Tyagi
+// SPDX-FileCopyrightText: 2024 Marino Faggiana
+// SPDX-License-Identifier: GPL-3.0-or-later
 
 import SwiftUI
 @preconcurrency import WebKit
@@ -31,16 +13,16 @@ import SwiftUI
 ///   - urlBase: A URL value to which our view will open initially
 ///   - browserTitle: A String value to show as the title of the webView
 struct NCBrowserWebView: View {
+    @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
     var urlBase: URL
     var browserTitle: String
-    @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 
     var body: some View {
         VStack(spacing: 0) {
             HStack {
                 HStack(alignment: .center) {
                     Text(browserTitle)
-                        .font(.title3)
+                        .cappedFont(.body, maxDynamicType: .accessibility2)
                         .foregroundColor(Color(NCBrandColor.shared.textColor))
                         .padding(.leading, 8)
                 }
@@ -54,7 +36,8 @@ struct NCBrowserWebView: View {
                             .renderingMode(.template)
                             .resizable()
                             .scaledToFit()
-                            .font(Font.system(.body).weight(.light))
+                            .cappedFont(.body, maxDynamicType: .accessibility2)
+                            .fontWeight(.light)
                             .frame(width: 14, height: 14)
                             .foregroundColor(Color(NCBrandColor.shared.iconImageColor))
                     }

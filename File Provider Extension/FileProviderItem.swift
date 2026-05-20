@@ -12,7 +12,7 @@ class FileProviderItem: NSObject, NSFileProviderItem {
 
     /// Providing Required Properties
     var itemIdentifier: NSFileProviderItemIdentifier {
-        return fileProviderUtility().getItemIdentifier(metadata: metadata)
+        return NSFileProviderItemIdentifier(metadata.ocId)
     }
     var filename: String {
         return metadata.fileNameView
@@ -58,19 +58,19 @@ class FileProviderItem: NSObject, NSFileProviderItem {
         return metadata.etag.data(using: .utf8)
     }
     var isMostRecentVersionDownloaded: Bool {
-        if NCManageDatabase.shared.getResultTableLocalFile(ocId: metadata.ocId) == nil {
-            return false
-        } else {
+        if metadata.directory {
             return true
         }
+        let path = NCUtilityFileSystem().getDirectoryProviderStorageOcId(metadata.ocId, fileName: metadata.fileName, userId: metadata.userId, urlBase: metadata.urlBase)
+        guard let attributes = try? FileManager.default.attributesOfItem(atPath: path),
+                  let fileSize = attributes[.size] as? UInt64 else {
+                return false
+            }
+        return fileSize > 0
     }
     /// Monitoring File Transfers
     var isUploading: Bool {
-        if metadata.status == NCGlobal.shared.metadataStatusWaitUpload || metadata.status == NCGlobal.shared.metadataStatusUploading {
-            return true
-        } else {
-            return false
-        }
+        return metadata.status == NCGlobal.shared.metadataStatusUploading || metadata.status == NCGlobal.shared.metadataStatusWaitUpload
     }
     var isUploaded: Bool {
         if metadata.status == NCGlobal.shared.metadataStatusWaitUpload || metadata.status == NCGlobal.shared.metadataStatusUploading || metadata.status == NCGlobal.shared.metadataStatusUploadError {
@@ -81,7 +81,7 @@ class FileProviderItem: NSObject, NSFileProviderItem {
     }
     var uploadingError: Error? {
         if metadata.status == NCGlobal.shared.metadataStatusUploadError {
-            return fileProviderData.FileProviderError.uploadError
+            return FileProviderData.FileProviderError.uploadError
         } else {
             return nil
         }
@@ -94,15 +94,19 @@ class FileProviderItem: NSObject, NSFileProviderItem {
         }
     }
     var isDownloaded: Bool {
-        if NCUtilityFileSystem().fileProviderStorageExists(metadata) {
+        if metadata.directory {
             return true
-        } else {
-            return false
         }
+        let path = NCUtilityFileSystem().getDirectoryProviderStorageOcId(metadata.ocId, fileName: metadata.fileName, userId: metadata.userId, urlBase: metadata.urlBase)
+        guard let attributes = try? FileManager.default.attributesOfItem(atPath: path),
+                  let fileSize = attributes[.size] as? UInt64 else {
+                return false
+            }
+        return fileSize > 0
     }
     var downloadingError: Error? {
         if metadata.status == NCGlobal.shared.metadataStatusDownloadError {
-            return fileProviderData.FileProviderError.downloadError
+            return FileProviderData.FileProviderError.downloadError
         } else {
             return nil
         }
@@ -110,14 +114,10 @@ class FileProviderItem: NSObject, NSFileProviderItem {
     /// Sharing
     /// Managing Metadata
     var tagData: Data? {
-        if let tableTag = NCManageDatabase.shared.getTag(predicate: NSPredicate(format: "ocId == %@", metadata.ocId)) {
-            return tableTag.tagIOS
-        } else {
-            return nil
-        }
+        return nil
     }
     var favoriteRank: NSNumber? {
-        if let rank = fileProviderData.shared.listFavoriteIdentifierRank[metadata.ocId] {
+        if let rank = FileProviderData.shared.listFavoriteIdentifierRank[metadata.ocId] {
             return rank
         } else {
             return nil
@@ -126,6 +126,10 @@ class FileProviderItem: NSObject, NSFileProviderItem {
 
     init(metadata: tableMetadata, parentItemIdentifier: NSFileProviderItemIdentifier) {
         self.metadata = metadata.detachedCopy()
-        self.parentItemIdentifier = parentItemIdentifier
+        if metadata.ocId == "root" {
+            self.parentItemIdentifier = .rootContainer
+        } else {
+            self.parentItemIdentifier = parentItemIdentifier
+        }
     }
 }

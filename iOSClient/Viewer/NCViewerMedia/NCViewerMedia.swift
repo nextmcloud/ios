@@ -1,33 +1,14 @@
-//
-//  NCViewerMedia.swift
-//  Nextcloud
-//
-//  Created by Marino Faggiana on 24/10/2020.
-//  Copyright © 2020 Marino Faggiana. All rights reserved.
-//
-//  Author Marino Faggiana <marino.faggiana@nextcloud.com>
-//
-//  This program is free software: you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
-//  the Free Software Foundation, either version 3 of the License, or
-//  (at your option) any later version.
-//
-//  This program is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
-//
-//  You should have received a copy of the GNU General Public License
-//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-//
+// SPDX-FileCopyrightText: Nextcloud GmbH
+// SPDX-FileCopyrightText: 2020 Marino Faggiana
+// SPDX-License-Identifier: GPL-3.0-or-later
 
 import UIKit
-import SVGKit
 import NextcloudKit
 import EasyTipView
 import SwiftUI
 import MobileVLCKit
 import Alamofire
+import LucidBanner
 
 public protocol NCViewerMediaViewDelegate: AnyObject {
     func didOpenDetail()
@@ -56,7 +37,7 @@ class NCViewerMedia: UIViewController {
     var ncplayer: NCPlayer?
     var image: UIImage? {
         didSet {
-            if #available(iOS 17.0, *), metadata.isImage {
+            if metadata.isImage {
                 analyzeCurrentImage()
             }
         }
@@ -73,6 +54,10 @@ class NCViewerMedia: UIViewController {
 
     var sceneIdentifier: String {
         (self.tabBarController as? NCMainTabBarController)?.sceneIdentifier ?? ""
+    }
+
+    internal var windowScene: UIWindowScene? {
+        SceneManager.shared.getWindowScene(controller: self.tabBarController as? NCMainTabBarController)
     }
 
     // MARK: - View Life Cycle
@@ -126,19 +111,28 @@ class NCViewerMedia: UIViewController {
         self.image = nil
         self.imageVideoContainer.image = nil
 
-        loadImage()
+        Task {@MainActor in
+            await loadImage()
+        }
     }
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
 
-        viewerMediaPage?.navigationController?.navigationBar.prefersLargeTitles = false
-        viewerMediaPage?.navigationItem.title = (metadata.fileNameView as NSString).deletingPathExtension
+        if #available(iOS 18.0, *) {
+            tabBarController?.setTabBarHidden(true, animated: true)
+        } else {
+            tabBarController?.tabBar.isHidden = true
+        }
+
+        viewerMediaPage?.navigationItem.setBidiSafeTitle(metadata.fileNameView)
 
         if metadata.isImage, let viewerMediaPage = self.viewerMediaPage {
             if viewerMediaPage.modifiedOcId.contains(metadata.ocId) {
                 viewerMediaPage.modifiedOcId.removeAll(where: { $0 == metadata.ocId })
-                loadImage()
+                Task {@MainActor in
+                    await loadImage()
+                }
             }
         }
     }
@@ -146,11 +140,8 @@ class NCViewerMedia: UIViewController {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
 
-        networking.addDelegate(self)
-
-        // Set Last Opening Date
         Task {
-            await self.database.setLastOpeningDateAsync(metadata: metadata)
+            await NCNetworking.shared.transferDispatcher.addDelegate(self)
         }
 
         viewerMediaPage?.clearCommandCenter()
@@ -171,30 +162,33 @@ class NCViewerMedia: UIViewController {
                                     return
                                 }
                                 var downloadRequest: DownloadRequest?
-                                let hud = NCHud(self.tabBarController?.view)
-                                hud.initHudRing(text: NSLocalizedString("_downloading_", comment: ""),
-                                                tapToCancelDetailText: true) {
+                                let (banner, token) = showHudBanner(windowScene: self.windowScene,
+                                                                    title: "_download_in_progress_",
+                                                                    stage: .button) {
                                     if let request = downloadRequest {
                                         request.cancel()
                                     }
                                 }
 
-                                self.networking.download(metadata: metadata) {
-                                } requestHandler: { request in
+                                let results = await self.networking.downloadFile(metadata: metadata) { request in
                                     downloadRequest = request
                                 } progressHandler: { progress in
-                                    hud.progress(progress.fractionCompleted)
-                                } completion: { _, error in
-                                    DispatchQueue.main.async {
-                                        if error == .success {
-                                            hud.success()
-                                            if self.utilityFileSystem.fileProviderStorageExists(self.metadata) {
-                                                let url = URL(fileURLWithPath: self.utilityFileSystem.getDirectoryProviderStorageOcId(self.metadata.ocId, fileNameView: self.metadata.fileNameView))
-                                                ncplayer.openAVPlayer(url: url, autoplay: autoplay)
-                                            }
-                                        } else {
-                                            hud.error(text: error.errorDescription)
-                                        }
+                                    Task {@MainActor in
+                                        banner?.update(
+                                            payload: LucidBannerPayload.Update(progress: progress.fractionCompleted),
+                                            for: token
+                                        )
+                                    }
+                                }
+
+                                if let banner {
+                                    banner.dismiss()
+                                }
+
+                                if results.nkError == .success {
+                                    if self.utilityFileSystem.fileProviderStorageExists(self.metadata) {
+                                        let url = URL(fileURLWithPath: self.utilityFileSystem.getDirectoryProviderStorageOcId(self.metadata.ocId, fileName: self.metadata.fileNameView, userId: self.metadata.userId, urlBase: self.metadata.urlBase))
+                                        ncplayer.openAVPlayer(url: url, autoplay: autoplay)
                                     }
                                 }
                             }
@@ -219,15 +213,18 @@ class NCViewerMedia: UIViewController {
 
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
+
         dismissTip()
     }
 
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
 
-        self.networking.removeDelegate(self)
+        Task {
+            await NCNetworking.shared.transferDispatcher.removeDelegate(self)
+        }
 
-        if let ncplayer = ncplayer, ncplayer.isPlaying() {
+        if let ncplayer, ncplayer.isPlaying() {
             ncplayer.playerPause()
         }
     }
@@ -235,27 +232,22 @@ class NCViewerMedia: UIViewController {
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         super.viewWillTransition(to: size, with: coordinator)
 
-        let wasShown = detailView.isShown
+        let wasShownDetail = detailView.isShown
 
         if UIDevice.current.orientation.isValidInterfaceOrientation {
-
-            if wasShown { closeDetail(animate: false) }
-            dismissTip()
-            if metadata.isVideo {
-                self.imageVideoContainer.isHidden = true
+            if wasShownDetail {
+                closeDetail(animate: false)
             }
+            dismissTip()
 
             coordinator.animate(alongsideTransition: { _ in
                 // back to the original size
-                self.scrollView.zoom(to: CGRect(x: 0, y: 0, width: self.scrollView.bounds.width, height: self.scrollView.bounds.height), animated: false)
-                self.view.layoutIfNeeded()
-            }, completion: { _ in
-                if self.metadata.isVideo {
-                    self.imageVideoContainer.isHidden = false
-                } else if self.metadata.isImage {
-                    self.showTip()
+                if self.scrollView.zoomScale != self.scrollView.minimumZoomScale {
+                    self.scrollView.zoom(to: CGRect(x: 0, y: 0, width: self.scrollView.bounds.width, height: self.scrollView.bounds.height), animated: false)
+                    self.view.layoutIfNeeded()
                 }
-                if wasShown {
+            }, completion: { _ in
+                if wasShownDetail {
                     self.openDetail(animate: true)
                 }
             })
@@ -264,10 +256,14 @@ class NCViewerMedia: UIViewController {
 
     // MARK: - Image
 
-    func loadImage() {
+    @MainActor
+    func loadImage() async {
         guard let metadata = self.database.getMetadataFromOcId(metadata.ocId) else { return }
         self.metadata = metadata
-        let fileNamePath = utilityFileSystem.getDirectoryProviderStorageOcId(metadata.ocId, fileNameView: metadata.fileNameView)
+        let fileNamePath = utilityFileSystem.getDirectoryProviderStorageOcId(metadata.ocId,
+                                                                             fileName: metadata.fileNameView,
+                                                                             userId: metadata.userId,
+                                                                             urlBase: metadata.urlBase)
         let fileNameExtension = (metadata.fileNameView as NSString).pathExtension.uppercased()
 
         if metadata.isLivePhoto,
@@ -278,20 +274,18 @@ class NCViewerMedia: UIViewController {
                 if let metadata = await self.database.setMetadataSessionInWaitDownloadAsync(ocId: metadata.ocId,
                                                                                             session: self.networking.sessionDownload,
                                                                                             selector: "") {
-                    self.networking.download(metadata: metadata)
+                    await self.networking.downloadFile(metadata: metadata)
                 }
             }
         }
 
         if metadata.isImage, fileNameExtension == "GIF" || fileNameExtension == "SVG", !utilityFileSystem.fileProviderStorageExists(metadata) {
-            Task {
-                await downloadImage()
-            }
+            await downloadImage()
         }
 
         if metadata.isVideo && !metadata.hasPreview {
             utility.createImageFileFrom(metadata: metadata)
-            let image = utility.getImage(ocId: metadata.ocId, etag: metadata.etag, ext: global.previewExt1024)
+            let image = utility.getImage(ocId: metadata.ocId, etag: metadata.etag, ext: global.previewExt1024, userId: metadata.userId, urlBase: metadata.urlBase)
             self.image = image
             self.imageVideoContainer.image = self.image
             return
@@ -302,7 +296,7 @@ class NCViewerMedia: UIViewController {
             return
         } else if metadata.isImage {
             if fileNameExtension == "GIF" {
-                if !NCUtility().existsImage(ocId: metadata.ocId, etag: metadata.etag, ext: global.previewExt1024) {
+                if !NCUtility().existsImage(ocId: metadata.ocId, etag: metadata.etag, ext: global.previewExt1024, userId: metadata.userId, urlBase: metadata.urlBase) {
                     utility.createImageFileFrom(metadata: metadata)
                 }
                 if let image = UIImage.animatedImage(withAnimatedGIFURL: URL(fileURLWithPath: fileNamePath)) {
@@ -314,19 +308,28 @@ class NCViewerMedia: UIViewController {
                 }
                 return
             } else if fileNameExtension == "SVG" {
-                if let svgImage = SVGKImage(contentsOfFile: fileNamePath) {
-                    svgImage.size = global.size1024
-                    if let image = svgImage.uiImage {
-                        if !NCUtility().existsImage(ocId: metadata.ocId, etag: metadata.etag, ext: global.previewExt1024), let data = image.jpegData(compressionQuality: 1.0) {
+                do {
+                    let fileNamePathPNG = utilityFileSystem.replaceExtension(fileNamePath: fileNamePath, with: "png")
+                    if FileManager.default.fileExists(atPath: fileNamePathPNG) {
+                        let data = try Data(contentsOf: URL(fileURLWithPath: fileNamePathPNG))
+                        self.image = UIImage(data: data)
+                        self.imageVideoContainer.image = self.image
+                    } else {
+                        let svgData = try Data(contentsOf: URL(fileURLWithPath: fileNamePath))
+                        if let image = try await NCSVGRenderer().renderSVGToUIImage(svgData: svgData, size: CGSize(width: 1024, height: 1024)),
+                           let data = image.pngData() {
+                            self.image = image
+                            self.imageVideoContainer.image = self.image
+                            try data.write(to: URL(fileURLWithPath: fileNamePathPNG))
                             utility.createImageFileFrom(data: data, metadata: metadata)
                         }
-                        self.image = image
-                        self.imageVideoContainer.image = self.image
-                        return
                     }
+                    return
+                } catch {
+                    print("Unsupported image format: \(error.localizedDescription)")
+                    self.image = self.utility.loadImage(named: "photo", colors: [NCBrandColor.shared.iconImageColor2])
+                    self.imageVideoContainer.image = self.image
                 }
-                self.image = self.utility.loadImage(named: "photo", colors: [NCBrandColor.shared.iconImageColor2])
-                self.imageVideoContainer.image = self.image
                 return
             } else if let image = UIImage(contentsOfFile: fileNamePath) {
                 self.image = image
@@ -335,14 +338,25 @@ class NCViewerMedia: UIViewController {
             }
         }
 
-        if let image = UIImage(contentsOfFile: utilityFileSystem.getDirectoryProviderStorageImageOcId(metadata.ocId, etag: metadata.etag, ext: global.previewExt1024)) {
+        if let image = UIImage(contentsOfFile: utilityFileSystem.getDirectoryProviderStorageImageOcId(metadata.ocId,
+                                                                                                      etag: metadata.etag,
+                                                                                                      ext: global.previewExt1024,
+                                                                                                      userId: metadata.userId,
+                                                                                                      urlBase: metadata.urlBase)) {
             self.image = image
             self.imageVideoContainer.image = self.image
         } else {
             NextcloudKit.shared.downloadPreview(fileId: metadata.fileId,
                                                 etag: metadata.etag,
                                                 account: metadata.account,
-                                                options: NKRequestOptions(queue: .main)) { _, _, _, _, responseData, error in
+                                                options: NKRequestOptions(queue: .main)) { task in
+                Task {
+                    let identifier = await NCNetworking.shared.networkingTasks.createIdentifier(account: metadata.account,
+                                                                                                path: metadata.fileId,
+                                                                                                name: "DownloadPreview")
+                    await NCNetworking.shared.networkingTasks.track(identifier: identifier, task: task)
+                }
+            } completion: { _, _, _, _, responseData, error in
                 if error == .success, let data = responseData?.data {
                     let image = UIImage(data: data)
                     self.image = image
@@ -359,13 +373,10 @@ class NCViewerMedia: UIViewController {
         if let metadata = await self.database.setMetadataSessionInWaitDownloadAsync(ocId: metadata.ocId,
                                                                                     session: self.networking.sessionDownload,
                                                                                     selector: selector) {
-
-            self.networking.download(metadata: metadata) {
-            } requestHandler: { _ in
+            await self.networking.downloadFile(metadata: metadata) { _ in
                 self.allowOpeningDetails = false
-            } completion: { _, _ in
-                self.allowOpeningDetails = true
-            }
+            } taskHandler: { _ in }
+            self.allowOpeningDetails = true
         }
     }
 
@@ -530,7 +541,6 @@ extension NCViewerMedia {
         self.detailView.show(
             metadata: self.metadata,
             image: self.image,
-            textColor: self.viewerMediaPage?.textColor,
             exif: exif,
             ncplayer: self.ncplayer,
             delegate: self)
@@ -596,9 +606,9 @@ extension NCViewerMedia: EasyTipViewDelegate {
             preferences.animating.showDuration = 0.5
             preferences.animating.dismissDuration = 0
 
-            if tipView == nil {
+            if tipView == nil, let view = detailView {
                 tipView = EasyTipView(text: NSLocalizedString("_tip_open_mediadetail_", comment: ""), preferences: preferences, delegate: self)
-                tipView?.show(forView: detailView)
+                tipView?.show(forView: view)
             }
         }
     }
@@ -619,16 +629,24 @@ extension NCViewerMedia: EasyTipViewDelegate {
 }
 
 extension NCViewerMedia: NCTransferDelegate {
-    func transferChange(status: String, metadata: tableMetadata, error: NKError) {
-        switch status {
-        /// DOWNLOAD
-        case self.global.networkingStatusDownloaded:
+    func transferReloadData(serverUrl: String?) { }
+
+    func transferReloadDataSource(serverUrl: String?, requestData: Bool, status: Int?) { }
+
+    func transferProgressDidUpdate(progress: Float, totalBytes: Int64, totalBytesExpected: Int64, fileName: String, serverUrl: String) { }
+
+    func transferChange(status: String,
+                        account: String,
+                        fileName: String,
+                        serverUrl: String,
+                        selector: String?,
+                        ocId: String,
+                        destination: String?,
+                        error: NKError) {
+        if status == self.global.networkingStatusDownloaded {
             DispatchQueue.main.async {
                 self.closeDetail()
             }
-        default:
-            break
         }
     }
-
 }

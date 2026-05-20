@@ -1,25 +1,6 @@
-//
-//  NCConfigServer.swift
-//  Nextcloud
-//
-//  Created by Marino Faggiana on 05/12/22.
-//  Copyright © 2022 Marino Faggiana. All rights reserved.
-//
-//  Author Marino Faggiana <marino.faggiana@nextcloud.com>
-//
-//  This program is free software: you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
-//  the Free Software Foundation, either version 3 of the License, or
-//  (at your option) any later version.
-//
-//  This program is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
-//
-//  You should have received a copy of the GNU General Public License
-//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-//
+// SPDX-FileCopyrightText: Nextcloud GmbH
+// SPDX-FileCopyrightText: 2022 Marino Faggiana
+// SPDX-License-Identifier: GPL-3.0-or-later
 
 import Foundation
 import UIKit
@@ -29,9 +10,18 @@ import NextcloudKit
 // Source:
 // https://stackoverflow.com/questions/2338035/installing-a-configuration-profile-on-iphone-programmatically
 
-@objc class NCConfigServer: NSObject, UIActionSheetDelegate, URLSessionDelegate {
+final class NCConfigServer: NSObject, UIActionSheetDelegate, URLSessionDelegate {
+    let controller: NCMainTabBarController?
+    var windowScene: UIWindowScene? {
+        SceneManager.shared.getWindowScene(controller: controller)
+    }
+
+    init(controller: NCMainTabBarController?) {
+        self.controller = controller
+    }
+
     // Start service
-    @objc func startService(url: URL, account: String) {
+    func startService(url: URL, account: String) {
         let defaultSessionConfiguration = URLSessionConfiguration.default
         let defaultSession = URLSession(configuration: defaultSessionConfiguration, delegate: self, delegateQueue: .main)
         var urlRequest = URLRequest(url: url)
@@ -40,8 +30,10 @@ import NextcloudKit
         }
 
         let dataTask = defaultSession.dataTask(with: urlRequest) { data, _, error in
-            if let error = error {
-                NCContentPresenter().showInfo(error: NKError(error: error))
+            if let error {
+                Task {
+                    await showErrorBanner(windowScene: self.windowScene, error: NKError(error: error))
+                }
             } else if let data = data {
                 self.start(data: data)
             }
@@ -49,7 +41,7 @@ import NextcloudKit
         dataTask.resume()
     }
 
-    func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
+    func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping @Sendable (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
         NCNetworking.shared.checkTrustedChallenge(session, didReceive: challenge, completionHandler: completionHandler)
     }
 
@@ -89,7 +81,9 @@ import NextcloudKit
                 registerForNotifications()
                 UIApplication.shared.open(url)
             } catch {
-                NCContentPresenter().showInfo(error: NKError(error: error))
+                Task {
+                    await showErrorBanner(windowScene: self.windowScene, error: NKError(error: error))
+                }
                 self.stop()
             }
         }

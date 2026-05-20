@@ -1,25 +1,6 @@
-//
-//  NCMainTabBarController.swift
-//  Nextcloud
-//
-//  Created by Marino Faggiana on 02/04/24.
-//  Copyright © 2024 Marino Faggiana. All rights reserved.
-//
-//  Author Marino Faggiana <marino.faggiana@nextcloud.com>
-//
-//  This program is free software: you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
-//  the Free Software Foundation, either version 3 of the License, or
-//  (at your option) any later version.
-//
-//  This program is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
-//
-//  You should have received a copy of the GNU General Public License
-//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-//
+// SPDX-FileCopyrightText: Nextcloud GmbH
+// SPDX-FileCopyrightText: 2024 Marino Faggiana
+// SPDX-License-Identifier: GPL-3.0-or-later
 
 import UIKit
 import SwiftUI
@@ -35,7 +16,7 @@ class NCMainTabBarController: UITabBarController {
     var sceneIdentifier: String = UUID().uuidString
     var account: String = "" {
         didSet {
-            NCImageCache.shared.controller = self
+            // NCImageCache.shared.controller = self
         }
     }
     var availableNotifications: Bool = false
@@ -43,60 +24,32 @@ class NCMainTabBarController: UITabBarController {
     let navigationCollectionViewCommon = ThreadSafeArray<NavigationCollectionViewCommon>()
     private var previousIndex: Int?
     private var checkUserDelaultErrorInProgress: Bool = false
-    private var timer: Timer?
+    private var timerTask: Task<Void, Never>?
     private let global = NCGlobal.shared
 
     var window: UIWindow? {
         return SceneManager.shared.getWindow(controller: self)
     }
 
+    var barHeightBottom: CGFloat {
+        return tabBar.frame.height - tabBar.safeAreaInsets.bottom
+    }
+
+    var barHeightTop: CGFloat {
+        return tabBar.frame.height - tabBar.safeAreaInsets.top
+    }
+
     override func viewDidLoad() {
         super.viewDidLoad()
         delegate = self
 
-        NCDownloadAction.shared.setup(sceneIdentifier: sceneIdentifier)
+        NCNetworking.shared.setupScene(sceneIdentifier: sceneIdentifier, controller: self)
 
         tabBar.tintColor = NCBrandColor.shared.getElement(account: account)
 
-        // File
-        if let item = tabBar.items?[0] {
-            item.title = NSLocalizedString("_home_", comment: "")
-            item.image = UIImage(systemName: "folder.fill")
-            item.selectedImage = item.image
-            item.tag = 100
-        }
-
-        // Favorite
-        if let item = tabBar.items?[1] {
-            item.title = NSLocalizedString("_favorites_", comment: "")
-            item.image = UIImage(systemName: "star.fill")
-            item.selectedImage = item.image
-            item.tag = 101
-        }
-
-        // Media
-        if let item = tabBar.items?[2] {
-            item.title = NSLocalizedString("_media_", comment: "")
-            item.image = UIImage(systemName: "photo")
-            item.selectedImage = item.image
-            item.tag = 102
-        }
-
-        // Activity
-        if let item = tabBar.items?[3] {
-            item.title = NSLocalizedString("_activity_", comment: "")
-            item.image = UIImage(systemName: "bolt")
-            item.selectedImage = item.image
-            item.tag = 103
-        }
-
-        // More
-        if let item = tabBar.items?[4] {
-            item.title = NSLocalizedString("_more_", comment: "")
-            item.image = UIImage(systemName: "ellipsis")
-            item.selectedImage = item.image
-            item.tag = 104
-        }
+        configureMoreController()
+        configureTabBarItems()
+        configureTabBarAppearance()
 
         NotificationCenter.default.addObserver(forName: NSNotification.Name(rawValue: self.global.notificationCenterChangeTheming), object: nil, queue: .main) { [weak self] notification in
             if let userInfo = notification.userInfo as? NSDictionary,
@@ -117,14 +70,13 @@ class NCMainTabBarController: UITabBarController {
         }
 
         NotificationCenter.default.addObserver(forName: UIApplication.didEnterBackgroundNotification, object: nil, queue: nil) { _ in
-            self.timer?.invalidate()
-            self.timer = nil
+            self.timerTask?.cancel()
         }
 
         NotificationCenter.default.addObserver(forName: UIApplication.didBecomeActiveNotification, object: nil, queue: nil) { _ in
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                if !isAppInBackground {
-                    self.timerCheck()
+            if !isAppInBackground {
+                self.timerTask = Task { @MainActor [weak self] in
+                    await self?.timerCheck()
                 }
             }
         }
@@ -134,35 +86,107 @@ class NCMainTabBarController: UITabBarController {
         super.viewDidAppear(animated)
         previousIndex = selectedIndex
 
-        if NCBrandOptions.shared.enforce_passcode_lock && NCKeychain().passcode.isEmptyOrNil {
-            let vc = UIHostingController(rootView: SetupPasscodeView(isLockActive: .constant(false)))
+        if NCBrandOptions.shared.enforce_passcode_lock && NCPreferences().passcode.isEmptyOrNil {
+            let vc = UIHostingController(rootView: SetupPasscodeView(isLockActive: .constant(false), controller: self))
             vc.isModalInPresentation = true
 
             present(vc, animated: true)
         }
     }
 
-    private func timerCheck() {
-        self.timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: false, block: { _ in
-            /// Check error
-            NCNetworking.shared.checkServerError(account: self.account, controller: self) {
-                /// Update right bar button item
-                if let navigationController = self.selectedViewController as? NCMainNavigationController {
-                    navigationController.updateRightBarButtonItems(self.tabBar.items?[0])
-                }
-                /// Update Activity tab bar
-                if let item = self.tabBar.items?[3] {
-                    let capabilities = NKCapabilities.shared.getCapabilitiesBlocking(for: self.account)
-                    item.isEnabled = capabilities.activityEnabled
-                }
+    private func configureTabBarAppearance() {
+        let appearance = UITabBarAppearance()
+        appearance.configureWithDefaultBackground()
 
-                self.timerCheck()
+        tabBar.standardAppearance = appearance
+        tabBar.scrollEdgeAppearance = appearance
+    }
+
+    private func configureMoreController() {
+        guard var controllers = viewControllers else { return }
+
+        controllers.append(makeMoreNavigationController())
+        viewControllers = controllers
+    }
+
+    private func makeMoreNavigationController() -> UIViewController {
+        let moreView = NCMoreView(account: account, controller: self)
+        let hostingController = UIHostingController(rootView: moreView)
+
+        hostingController.navigationItem.title = NSLocalizedString("_more_", comment: "")
+
+        let navigationController = NCMoreNavigationController(rootViewController: hostingController)
+
+        navigationController.tabBarItem = UITabBarItem(
+            title: NSLocalizedString("_more_", comment: ""),
+            image: UIImage(systemName: "ellipsis.circle.fill"),
+            selectedImage: UIImage(systemName: "ellipsis.circle.fill")
+        )
+        navigationController.tabBarItem.tag = 104
+
+        return navigationController
+    }
+
+    private func configureTabBarItems() {
+        configureTabBarItem(
+            at: 0,
+            title: "_home_",
+            imageName: "folder.fill",
+            tag: 100
+        )
+
+        configureTabBarItem(
+            at: 1,
+            title: "_favorites_",
+            imageName: "star.fill",
+            tag: 101
+        )
+
+        configureTabBarItem(
+            at: 2,
+            title: "_media_",
+            imageName: "photo.fill",
+            tag: 102
+        )
+
+        configureTabBarItem(
+            at: 3,
+            title: "_activity_",
+            imageName: "bolt.fill",
+            tag: 103
+        )
+    }
+
+    private func configureTabBarItem(at index: Int, title: String, imageName: String, tag: Int) {
+        guard let items = tabBar.items, items.indices.contains(index) else { return }
+
+        let item = items[index]
+        item.title = NSLocalizedString(title, comment: "")
+        item.image = UIImage(systemName: imageName)
+        item.selectedImage = item.image
+        item.tag = tag
+    }
+
+    @MainActor
+    private func timerCheck() async {
+        while !Task.isCancelled {
+            try? await Task.sleep(for: .seconds(3))
+
+            guard isViewLoaded, view.window != nil else {
+                continue
             }
-        })
+
+            // Check error
+            await NCNetworking.shared.checkServerError(account: self.account, controller: self)
+        }
     }
 
     func currentViewController() -> UIViewController? {
         return (selectedViewController as? UINavigationController)?.topViewController
+    }
+
+    func currentNavigationController() -> UINavigationController? {
+        return selectedViewController as? UINavigationController
     }
 
     func currentServerUrl() -> String {

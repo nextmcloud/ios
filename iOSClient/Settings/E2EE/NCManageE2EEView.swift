@@ -1,25 +1,6 @@
-//
-//  NCManageE2EEView.swift
-//  Nextcloud
-//
-//  Created by Marino Faggiana on 17/11/22.
-//  Copyright © 2022 Marino Faggiana. All rights reserved.
-//
-//  Author Marino Faggiana <marino.faggiana@nextcloud.com>
-//
-//  This program is free software: you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
-//  the Free Software Foundation, either version 3 of the License, or
-//  (at your option) any later version.
-//
-//  This program is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
-//
-//  You should have received a copy of the GNU General Public License
-//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-//
+// SPDX-FileCopyrightText: Nextcloud GmbH
+// SPDX-FileCopyrightText: 2024 Marino Faggiana
+// SPDX-License-Identifier: GPL-3.0-or-later
 
 import SwiftUI
 import NextcloudKit
@@ -32,14 +13,17 @@ struct NCManageE2EEView: View {
         VStack {
             if model.isEndToEndEnabled {
                 List {
-                    Section(header: Text(""), footer: Text(model.statusOfService + "\n\n" + "End-to-End Encryption " + model.capabilities.e2EEApiVersion)) {
+                    Section(header: Text("").font(.headline),
+                            footer: Text(model.statusOfService + "\n\n" + "End-to-End Encryption " + model.capabilities.e2EEApiVersion).font(.footnote)) {
                         Label {
                             Text(NSLocalizedString("_e2e_settings_activated_", comment: ""))
+                                .cappedFont(.body, maxDynamicType: .accessibility2)
                         } icon: {
                             Image(systemName: "checkmark.circle.fill")
                                 .resizable()
                                 .scaledToFit()
-                                .font(Font.system(.body).weight(.light))
+                                .cappedFont(.body, maxDynamicType: .accessibility2)
+                                .fontWeight(.light)
                                 .frame(width: 25, height: 25)
                                 .foregroundColor(.green)
                         }
@@ -47,11 +31,14 @@ struct NCManageE2EEView: View {
                     HStack {
                         Label {
                             Text(NSLocalizedString("_e2e_settings_read_passphrase_", comment: ""))
+                                .cappedFont(.body, maxDynamicType: .accessibility2)
+
                         } icon: {
                             Image(systemName: "eye")
                                 .resizable()
                                 .scaledToFit()
-                                .font(Font.system(.body).weight(.light))
+                                .cappedFont(.body, maxDynamicType: .accessibility2)
+                                .fontWeight(.light)
                                 .frame(width: 25, height: 25)
                                 .foregroundColor(Color(NCBrandColor.shared.iconImageColor))
                         }
@@ -59,20 +46,24 @@ struct NCManageE2EEView: View {
                     }
                     .contentShape(Rectangle())
                     .onTapGesture {
-                        if NCKeychain().passcode != nil {
+                        if NCPreferences().passcode != nil {
                             model.requestPasscodeType("readPassphrase")
                         } else {
-                            NCContentPresenter().showInfo(error: NKError(errorCode: 0, errorDescription: "_e2e_settings_lock_not_active_"))
+                            Task {
+                                await showInfoBanner(windowScene: model.windowScene, text: "_e2e_settings_lock_not_active_")
+                            }
                         }
                     }
                     HStack {
                         Label {
                             Text(NSLocalizedString("_e2e_settings_remove_", comment: ""))
+                                .cappedFont(.body, maxDynamicType: .accessibility2)
                         } icon: {
                             Image(systemName: "xmark")
                                 .resizable()
                                 .scaledToFit()
-                                .font(Font.system(.body).weight(.light))
+                                .cappedFont(.body, maxDynamicType: .accessibility2)
+                                .fontWeight(.light)
                                 .frame(width: 25, height: 15)
                                 .foregroundColor(Color(NCBrandColor.shared.iconImageColor))
                         }
@@ -80,10 +71,12 @@ struct NCManageE2EEView: View {
                     }
                     .contentShape(Rectangle())
                     .onTapGesture {
-                        if NCKeychain().passcode != nil {
+                        if NCPreferences().passcode != nil {
                             model.requestPasscodeType("removeLocallyEncryption")
                         } else {
-                            NCContentPresenter().showInfo(error: NKError(errorCode: 0, errorDescription: "_e2e_settings_lock_not_active_"))
+                            Task {
+                                await showInfoBanner(windowScene: model.windowScene, text: "_e2e_settings_lock_not_active_")
+                            }
                         }
                     }
 #if DEBUG
@@ -92,15 +85,18 @@ struct NCManageE2EEView: View {
                 }
             } else {
                 List {
-                    Section(header: Text(""), footer: Text(model.statusOfService + "\n\n" + "End-to-End Encryption " + model.capabilities.e2EEApiVersion)) {
+                    Section(header: Text("").font(.headline),
+                            footer: Text(model.statusOfService + "\n\n" + "End-to-End Encryption " + model.capabilities.e2EEApiVersion).font(.footnote)) {
                         HStack {
                             Label {
                                 Text(NSLocalizedString("_e2e_settings_start_", comment: ""))
+                                    .cappedFont(.body, maxDynamicType: .accessibility2)
                             } icon: {
                                 Image(systemName: "play.circle")
                                     .resizable()
                                     .scaledToFit()
-                                    .font(Font.system(.body).weight(.light))
+                                    .cappedFont(.body, maxDynamicType: .accessibility2)
+                                    .fontWeight(.light)
                                     .frame(width: 25, height: 25)
                                     .foregroundColor(.green)
                             }
@@ -108,10 +104,12 @@ struct NCManageE2EEView: View {
                         }
                         .contentShape(Rectangle())
                         .onTapGesture {
-                            if NCKeychain().passcode != nil {
+                            if NCPreferences().passcode != nil {
                                 model.requestPasscodeType("startE2E")
                             } else {
-                                NCContentPresenter().showInfo(error: NKError(errorCode: 0, errorDescription: "_e2e_settings_lock_not_active_"))
+                                Task {
+                                    await showInfoBanner(windowScene: model.windowScene, text: "_e2e_settings_lock_not_active_")
+                                }
                             }
                         }
                     }
@@ -125,7 +123,7 @@ struct NCManageE2EEView: View {
         .navigationBarTitleDisplayMode(.inline)
         .background(Color(UIColor.systemGroupedBackground))
         .defaultViewModifier(model)
-        .onChange(of: model.navigateBack) { newValue in
+        .onChange(of: model.navigateBack) { _, newValue in
             if newValue {
                 presentationMode.wrappedValue.dismiss()
             }
@@ -134,15 +132,18 @@ struct NCManageE2EEView: View {
 
     @ViewBuilder
     var deleteCerificateSection: some View {
-        Section(header: Text("Delete Server keys"), footer: Text("Available only in debug mode")) {
+        Section(header: Text("Delete Server keys").font(.headline),
+                footer: Text("Available only in debug mode").font(.footnote)) {
             HStack {
                 Label {
                     Text("Delete Certificate")
+                        .cappedFont(.body, maxDynamicType: .accessibility2)
                 } icon: {
                     Image(systemName: "exclamationmark.triangle")
                         .resizable()
                         .scaledToFit()
-                        .font(Font.system(.body).weight(.light))
+                        .cappedFont(.body, maxDynamicType: .accessibility2)
+                        .fontWeight(.light)
                         .frame(width: 25, height: 25)
                         .foregroundColor(Color(NCBrandColor.shared.textColor2))
                 }
@@ -150,22 +151,35 @@ struct NCManageE2EEView: View {
             }
             .contentShape(Rectangle())
             .onTapGesture {
-                NextcloudKit.shared.deleteE2EECertificate(account: model.session.account) { _, _, error in
-                    if error == .success {
-                        NCContentPresenter().messageNotification("E2E delete certificate", error: error, delay: NCGlobal.shared.dismissAfterSecond, type: .success)
-                    } else {
-                        NCContentPresenter().messageNotification("E2E delete certificate", error: error, delay: NCGlobal.shared.dismissAfterSecond, type: .error)
+                NextcloudKit.shared.deleteE2EECertificate(account: model.session.account) { task in
+                    Task {
+                        let identifier = await NCNetworking.shared.networkingTasks.createIdentifier(account: model.session.account,
+                                                                                                    name: "deleteE2EECertificate")
+                        await NCNetworking.shared.networkingTasks.track(identifier: identifier, task: task)
+                    }
+                } completion: { _, _, error in
+                    Task {
+                        if error == .success {
+                            await showInfoBanner(windowScene: model.windowScene,
+                                                 text: "E2E delete certificate")
+                        } else {
+                            await showErrorBanner(windowScene: model.windowScene,
+                                                  text: error.errorDescription,
+                                                  errorCode: error.errorCode)
+                        }
                     }
                 }
             }
             HStack {
                 Label {
                     Text("Delete PrivateKey")
+                        .cappedFont(.body, maxDynamicType: .accessibility2)
                 } icon: {
                     Image(systemName: "exclamationmark.triangle")
                         .resizable()
                         .scaledToFit()
-                        .font(Font.system(.body).weight(.light))
+                        .cappedFont(.body, maxDynamicType: .accessibility2)
+                        .fontWeight(.light)
                         .frame(width: 25, height: 25)
                         .foregroundColor(Color(NCBrandColor.shared.textColor2))
                 }
@@ -173,11 +187,22 @@ struct NCManageE2EEView: View {
             }
             .contentShape(Rectangle())
             .onTapGesture {
-                NextcloudKit.shared.deleteE2EEPrivateKey(account: model.session.account) { _, _, error in
-                    if error == .success {
-                        NCContentPresenter().messageNotification("E2E delete privateKey", error: error, delay: NCGlobal.shared.dismissAfterSecond, type: .success)
-                    } else {
-                        NCContentPresenter().messageNotification("E2E delete privateKey", error: error, delay: NCGlobal.shared.dismissAfterSecond, type: .error)
+                NextcloudKit.shared.deleteE2EEPrivateKey(account: model.session.account) { task in
+                    Task {
+                        let identifier = await NCNetworking.shared.networkingTasks.createIdentifier(account: model.session.account,
+                                                                                                    name: "deleteE2EEPrivateKey")
+                        await NCNetworking.shared.networkingTasks.track(identifier: identifier, task: task)
+                    }
+                } completion: { _, _, error in
+                    Task {
+                        if error == .success {
+                            await showInfoBanner(windowScene: model.windowScene,
+                                                 text: "E2E delete privateKey")
+                        } else {
+                            await showErrorBanner(windowScene: model.windowScene,
+                                                  text: error.errorDescription,
+                                                  errorCode: error.errorCode)
+                        }
                     }
                 }
             }

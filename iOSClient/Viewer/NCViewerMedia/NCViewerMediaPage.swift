@@ -1,25 +1,6 @@
-//
-//  NCViewerMediaPage.swift
-//  Nextcloud
-//
-//  Created by Marino Faggiana on 24/10/2020.
-//  Copyright © 2020 Marino Faggiana. All rights reserved.
-//
-//  Author Marino Faggiana <marino.faggiana@nextcloud.com>
-//
-//  This program is free software: you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
-//  the Free Software Foundation, either version 3 of the License, or
-//  (at your option) any later version.
-//
-//  This program is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
-//
-//  You should have received a copy of the GNU General Public License
-//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-//
+// SPDX-FileCopyrightText: Nextcloud GmbH
+// SPDX-FileCopyrightText: 2020 Marino Faggiana
+// SPDX-License-Identifier: GPL-3.0-or-later
 
 import UIKit
 import NextcloudKit
@@ -34,18 +15,16 @@ var viewerMediaScreenMode: ScreenMode = .normal
 class NCViewerMediaPage: UIViewController {
     @IBOutlet weak var progressView: UIProgressView!
 
-    /// Parameters
+    // Parameters
     var ocIds: [String] = []
     var currentIndex: Int = 0
     var delegateViewController: UIViewController?
 
-    ///
     var modifiedOcId: [String] = []
     var nextIndex: Int?
     var panGestureRecognizer: UIPanGestureRecognizer!
     var singleTapGestureRecognizer: UITapGestureRecognizer!
     var longtapGestureRecognizer: UILongPressGestureRecognizer!
-    var textColor: UIColor = NCBrandColor.shared.textColor
     var playCommand: Any?
     var pauseCommand: Any?
     var skipForwardCommand: Any?
@@ -55,7 +34,6 @@ class NCViewerMediaPage: UIViewController {
     let utilityFileSystem = NCUtilityFileSystem()
     let global = NCGlobal.shared
     let database = NCManageDatabase.shared
-    var prefersLargeTitles: Bool?
 
     // This prevents the scroll views to scroll when you drag and drop files/images/subjects (from this or other apps)
     // https://forums.developer.apple.com/forums/thread/89396 and https://forums.developer.apple.com/forums/thread/115736
@@ -64,7 +42,17 @@ class NCViewerMediaPage: UIViewController {
     var timerAutoHide: Timer?
     private var timerAutoHideSeconds: Double = 4
 
-    private lazy var moreNavigationItem = UIBarButtonItem(image: NCImageCache.shared.getImageButtonMore(), style: .plain, target: self, action: #selector(openMenuMore(_:)))
+    private lazy var moreNavigationItem = UIBarButtonItem(
+        image: NCImageCache.shared.getImageButtonMore(),
+        primaryAction: nil,
+        menu: UIMenu(title: "", children: [
+            UIDeferredMenuElement.uncached { [self] completion in
+                if let menu = NCContextMenuViewer(metadata: currentViewController.metadata, controller: self.tabBarController as? NCMainTabBarController, webView: false, sender: self).viewMenu() {
+                    completion(menu.children)
+                }
+            }
+        ]))
+
     private lazy var imageDetailNavigationItem = UIBarButtonItem(image: NCUtility().loadImage(named: "info.circle", colors: [NCBrandColor.shared.iconImageColor]), style: .plain, target: self, action: #selector(toggleDetail(_:)))
 
     // swiftlint:disable force_cast
@@ -104,10 +92,8 @@ class NCViewerMediaPage: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        prefersLargeTitles = navigationController?.navigationBar.prefersLargeTitles
-
-        navigationController?.navigationBar.tintColor = NCBrandColor.shared.iconImageColor
         let metadata = database.getMetadataFromOcId(ocIds[currentIndex])!
+        var items: [UIBarButtonItem] = []
 
         singleTapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(didSingleTapWith(gestureRecognizer:)))
         panGestureRecognizer = UIPanGestureRecognizer(target: self, action: #selector(didPanWith(gestureRecognizer:)))
@@ -129,19 +115,21 @@ class NCViewerMediaPage: UIViewController {
 
         let viewerMedia = getViewerMedia(index: currentIndex, metadata: metadata)
         pageViewController.setViewControllers([viewerMedia], direction: .forward, animated: true, completion: nil)
-        changeScreenMode(mode: viewerMediaScreenMode)
-
-        NotificationCenter.default.addObserver(self, selector: #selector(viewUnload), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterChangeUser), object: nil)
 
         NotificationCenter.default.addObserver(self, selector: #selector(pageViewController.enableSwipeGesture), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterEnableSwipeGesture), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(pageViewController.disableSwipeGesture), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterDisableSwipeGesture), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(applicationDidBecomeActive(_:)), name: UIApplication.didBecomeActiveNotification, object: nil)
 
         if currentViewController.metadata.isImage {
-            navigationItem.rightBarButtonItems = [moreNavigationItem, imageDetailNavigationItem]
-        } else {
-            navigationItem.rightBarButtonItems = [moreNavigationItem]
+            items.append(imageDetailNavigationItem)
         }
+        items.append(moreNavigationItem)
+
+        let group = UIBarButtonItemGroup(
+            barButtonItems: items,
+            representativeItem: nil
+        )
+        navigationItem.trailingItemGroups = [group]
 
         for view in self.pageViewController.view.subviews {
             if let scrollView = view as? UIScrollView {
@@ -160,10 +148,24 @@ class NCViewerMediaPage: UIViewController {
         NotificationCenter.default.removeObserver(self, name: UIApplication.didBecomeActiveNotification, object: nil)
     }
 
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+
+        changeScreenMode(mode: viewerMediaScreenMode)
+
+        if #available(iOS 18.0, *) {
+            self.tabBarController?.setTabBarHidden(true, animated: true)
+        } else {
+            self.tabBarController?.tabBar.isHidden = true
+        }
+    }
+
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
 
-        NCNetworking.shared.addDelegate(self)
+        Task {
+            await NCNetworking.shared.transferDispatcher.addDelegate(self)
+        }
 
         startTimerAutoHide()
     }
@@ -171,16 +173,21 @@ class NCViewerMediaPage: UIViewController {
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
 
-        if let prefersLargeTitles {
-            navigationController?.navigationBar.prefersLargeTitles = prefersLargeTitles
-        }
         changeScreenMode(mode: .normal)
+
+        if #available(iOS 18.0, *) {
+            self.tabBarController?.setTabBarHidden(false, animated: true)
+        } else {
+            self.tabBarController?.tabBar.isHidden = false
+        }
     }
 
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
 
-        NCNetworking.shared.removeDelegate(self)
+        Task {
+            await NCNetworking.shared.transferDispatcher.removeDelegate(self)
+        }
 
         currentViewController.ncplayer?.playerStop()
         timerAutoHide?.invalidate()
@@ -218,16 +225,6 @@ class NCViewerMediaPage: UIViewController {
         return viewerMedia
     }
 
-    @objc func viewUnload() {
-        navigationController?.popViewController(animated: true)
-    }
-
-    @objc private func openMenuMore(_ sender: Any?) {
-        let imageIcon = NCUtility().getImage(ocId: currentViewController.metadata.ocId, etag: currentViewController.metadata.etag, ext: NCGlobal.shared.previewExt512)
-
-        NCViewer().toggleMenu(controller: self.tabBarController as? NCMainTabBarController, metadata: currentViewController.metadata, webView: false, imageIcon: imageIcon, sender: sender)
-    }
-
     @objc private func toggleDetail(_ sender: Any?) {
         currentViewController.toggleDetail()
     }
@@ -249,14 +246,14 @@ class NCViewerMediaPage: UIViewController {
             }
 
             if metadata.isAudioOrVideo {
-                colorNavigationController(backgroundColor: .black, titleColor: NCBrandColor.shared.textColor, tintColor: nil, withoutShadow: false)
+                navigationController?.setNavigationBarAppearance(textColor: .white, backgroundColor: .black)
                 currentViewController.playerToolBar?.show()
                 view.backgroundColor = .black
-                textColor = .white
+                moreNavigationItem.image = NCImageCache.shared.getImageButtonMore(colors: [.white])
             } else {
-                colorNavigationController(backgroundColor: .systemBackground, titleColor: NCBrandColor.shared.textColor, tintColor: nil, withoutShadow: false)
-                view.backgroundColor = .systemGray6
-                textColor = NCBrandColor.shared.textColor
+                navigationController?.setNavigationBarAppearance()
+                view.backgroundColor = .systemBackground
+                moreNavigationItem.image = NCImageCache.shared.getImageButtonMore()
             }
 
         } else if !currentViewController.detailView.isShown {
@@ -270,7 +267,6 @@ class NCViewerMediaPage: UIViewController {
             }
 
             view.backgroundColor = .black
-            textColor = .white
         }
 
         if fullscreen {
@@ -300,28 +296,6 @@ class NCViewerMediaPage: UIViewController {
         }
     }
 
-    func colorNavigationController(backgroundColor: UIColor, titleColor: UIColor, tintColor: UIColor?, withoutShadow: Bool) {
-
-        let appearance = UINavigationBarAppearance()
-        appearance.titleTextAttributes = [.foregroundColor: titleColor]
-        appearance.largeTitleTextAttributes = [.foregroundColor: titleColor]
-
-        if withoutShadow {
-            appearance.shadowColor = .clear
-            appearance.shadowImage = UIImage()
-        }
-
-        if let tintColor = tintColor {
-            navigationController?.navigationBar.tintColor = tintColor
-        }
-
-        navigationController?.view.backgroundColor = backgroundColor
-        navigationController?.navigationBar.barTintColor = titleColor
-        navigationController?.navigationBar.standardAppearance = appearance
-        navigationController?.navigationBar.compactAppearance = appearance
-        navigationController?.navigationBar.scrollEdgeAppearance = appearance
-    }
-
     // MARK: - NotificationCenter
 
     @objc func applicationDidBecomeActive(_ notification: NSNotification) {
@@ -332,7 +306,6 @@ class NCViewerMediaPage: UIViewController {
     // MARK: - Command Center
 
     func updateCommandCenter(ncplayer: NCPlayer, title: String) {
-
         var nowPlayingInfo = [String: Any]()
 
         UIApplication.shared.beginReceivingRemoteControlEvents()
@@ -389,7 +362,7 @@ class NCViewerMediaPage: UIViewController {
     func clearCommandCenter() {
 
         UIApplication.shared.endReceivingRemoteControlEvents()
-        MPNowPlayingInfoCenter.default().nowPlayingInfo = [:]
+        MPNowPlayingInfoCenter.default().nowPlayingInfo = nil
 
         MPRemoteCommandCenter.shared().playCommand.isEnabled = false
         MPRemoteCommandCenter.shared().pauseCommand.isEnabled = false
@@ -448,14 +421,23 @@ extension NCViewerMediaPage: UIPageViewControllerDelegate, UIPageViewControllerD
     // START TRANSITION
     func pageViewController(_ pageViewController: UIPageViewController, willTransitionTo pendingViewControllers: [UIViewController]) {
 
-        guard let nextViewController = pendingViewControllers.first as? NCViewerMedia else { return }
+        guard let nextViewController = pendingViewControllers.first as? NCViewerMedia else {
+            return
+        }
+        var items: [UIBarButtonItem] = []
+
         nextIndex = nextViewController.index
 
         if nextViewController.metadata.isImage {
-            navigationItem.rightBarButtonItems = [moreNavigationItem, imageDetailNavigationItem]
-        } else {
-            navigationItem.rightBarButtonItems = [moreNavigationItem]
+            items.append(imageDetailNavigationItem)
         }
+        items.append(moreNavigationItem)
+
+        let group = UIBarButtonItemGroup(
+            barButtonItems: items,
+            representativeItem: nil
+        )
+        navigationItem.trailingItemGroups = [group]
 
         if nextViewController.detailView.isShown {
             changeScreenMode(mode: .normal)
@@ -537,7 +519,11 @@ extension NCViewerMediaPage: UIGestureRecognizerDelegate {
             if let metadataLive = NCManageDatabase.shared.getMetadataLivePhoto(metadata: currentViewController.metadata),
                utilityFileSystem.fileProviderStorageExists(metadataLive) {
                 AudioServicesPlaySystemSound(1519) // peek feedback
-                currentViewController.playLivePhoto(filePath: utilityFileSystem.getDirectoryProviderStorageOcId(metadataLive.ocId, fileNameView: metadataLive.fileName))
+                currentViewController.playLivePhoto(filePath: utilityFileSystem.getDirectoryProviderStorageOcId(
+                    metadataLive.ocId,
+                    fileName: metadataLive.fileName,
+                    userId: metadataLive.userId,
+                    urlBase: metadataLive.urlBase))
             }
         } else if gestureRecognizer.state == .ended {
             currentViewController.stopLivePhoto()
@@ -546,7 +532,6 @@ extension NCViewerMediaPage: UIGestureRecognizerDelegate {
 }
 
 extension UIPageViewController {
-
     @objc func enableSwipeGesture() {
         for view in self.view.subviews {
             if let subView = view as? UIScrollView {
@@ -599,18 +584,42 @@ extension NCViewerMediaPage: UIScrollViewDelegate {
 }
 
 extension NCViewerMediaPage: NCTransferDelegate {
-    func transferChange(status: String, metadata: tableMetadata, error: NKError) {
-        DispatchQueue.main.async {
+    func transferReloadData(serverUrl: String?) { }
+
+    func transferReloadDataSource(serverUrl: String?, requestData: Bool, status: Int?) { }
+
+    func transferChange(status: String,
+                        account: String,
+                        fileName: String,
+                        serverUrl: String,
+                        selector: String?,
+                        ocId: String,
+                        destination: String?,
+                        error: NKError) {
+        Task {@MainActor in
             switch status {
-                /// DOWNLOAD
+            // DELETE
+            case NCGlobal.shared.networkingStatusDelete:
+                if error == .success,
+                   ocId == self.currentViewController.metadata.ocId {
+                    if let ncplayer = self.currentViewController.ncplayer, ncplayer.isPlaying() {
+                        ncplayer.playerPause()
+                    }
+                    self.navigationController?.popViewController(animated: true)
+                }
+            // DOWNLOAD
             case self.global.networkingStatusDownloaded:
-                guard metadata.ocId == self.currentViewController.metadata.ocId else {
+                guard ocId == self.currentViewController.metadata.ocId,
+                      let metadata = await NCManageDatabase.shared.getMetadataFromOcIdAsync(ocId) else {
                     return
                 }
                 self.progressView.progress = 0
 
                 if metadata.isAudioOrVideo, let ncplayer = self.currentViewController.ncplayer {
-                    let url = URL(fileURLWithPath: self.utilityFileSystem.getDirectoryProviderStorageOcId(metadata.ocId, fileNameView: metadata.fileNameView))
+                    let url = URL(fileURLWithPath: self.utilityFileSystem.getDirectoryProviderStorageOcId(metadata.ocId,
+                                                                                                          fileName: metadata.fileNameView,
+                                                                                                          userId: metadata.userId,
+                                                                                                          urlBase: metadata.urlBase))
                     if ncplayer.isPlaying() {
                         ncplayer.playerPause()
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
@@ -621,35 +630,15 @@ extension NCViewerMediaPage: NCTransferDelegate {
                         ncplayer.openAVPlayer(url: url)
                     }
                 } else if metadata.isImage {
-                    self.currentViewController.loadImage()
+                    await self.currentViewController.loadImage()
                 }
-                /// UPLOAD
+            // UPLOAD
             case self.global.networkingStatusUploaded:
                 guard error == .success else { return }
-                if self.currentViewController.metadata.ocId == metadata.ocId {
-                    self.currentViewController.loadImage()
+                if self.currentViewController.metadata.ocId == ocId {
+                    await self.currentViewController.loadImage()
                 } else {
-                    self.modifiedOcId.append(metadata.ocId)
-                }
-            default:
-                break
-            }
-        }
-    }
-
-    func transferChange(status: String, metadatasError: [tableMetadata: NKError]) {
-        DispatchQueue.main.async {
-            switch status {
-                /// DELETE
-            case NCGlobal.shared.networkingStatusDelete:
-                let hasAtLeastOneSuccess = metadatasError.contains { key, value in
-                    self.ocIds.contains(key.ocId) && value == .success
-                }
-                if hasAtLeastOneSuccess {
-                    if let ncplayer = self.currentViewController.ncplayer, ncplayer.isPlaying() {
-                        ncplayer.playerPause()
-                    }
-                    self.viewUnload()
+                    self.modifiedOcId.append(ocId)
                 }
             default:
                 break

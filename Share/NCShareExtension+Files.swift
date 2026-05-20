@@ -10,13 +10,15 @@ import NextcloudKit
 
 extension NCShareExtension {
     func reloadData() async {
-        let session = self.extensionData.getSession()
-        let layoutForView = await NCManageDatabase.shared.getLayoutForViewAsync(account: session.account, key: keyLayout, serverUrl: serverUrl)
-        let predicate = NSPredicate(format: "account == %@ AND serverUrl == %@ AND directory == true", session.account, serverUrl)
-        let metadatas = await self.database.getMetadatasAsync(predicate: predicate,
-                                                              withLayout: layoutForView,
-                                                              withAccount: session.account)
-        self.dataSource = NCCollectionViewDataSource(metadatas: metadatas, layoutForView: layoutForView, account: session.account)
+        let session = NCShareExtensionData.shared.getSession()
+        let layoutForView = NCManageDatabase.shared.getLayoutForView(account: session.account, key: keyLayout, serverUrl: serverUrl)
+        let predicate = NSPredicate(format: "account == %@ AND serverUrl == %@ AND fileName != %@ AND directory == true", session.account, serverUrl, NextcloudKit.shared.nkCommonInstance.rootFileName)
+        let metadatas = await NCManageDatabase.shared.getMetadatasAsync(predicate: predicate,
+                                                                        withLayout: layoutForView,
+                                                                        withAccount: session.account)
+        self.dataSource = NCCollectionViewDataSource(metadatas: metadatas,
+                                                     layoutForView: layoutForView,
+                                                     account: session.account)
         self.collectionView.reloadData()
     }
 
@@ -24,7 +26,7 @@ extension NCShareExtension {
         Task {
             guard let userInfo = notification.userInfo as NSDictionary?,
                   let ocId = userInfo["ocId"] as? String,
-                  let metadata = await self.database.getMetadataFromOcIdAsync(ocId)
+                  let metadata = await NCManageDatabase.shared.getMetadataFromOcIdAsync(ocId)
             else { return }
 
             self.serverUrl += "/" + metadata.fileName
@@ -34,7 +36,7 @@ extension NCShareExtension {
     }
 
     func loadFolder() async {
-        let session = self.extensionData.getSession()
+        let session = NCShareExtensionData.shared.getSession()
         let resultsReadFolder = await NCNetworking.shared.readFolderAsync(serverUrl: serverUrl, account: session.account) { task in
             self.dataSourceTask = task
             self.collectionView.reloadData()
@@ -80,7 +82,7 @@ class NCFilesExtensionHandler {
                     originalName = url.lastPathComponent
 
                     if fileNames.contains(originalName) {
-                        let incrementalNumber = NCKeychain().incrementalNumber
+                        let incrementalNumber = NCPreferences().incrementalNumber
                         originalName = "\(url.deletingPathExtension().lastPathComponent) \(incrementalNumber).\(url.pathExtension)"
                     }
                 }

@@ -21,7 +21,26 @@ extension NCManageDatabase {
     // MARK: - Realm write
 
     func addChunks(account: String, ocId: String, chunkFolder: String, filesChunk: [(fileName: String, size: Int64)]) {
-        performRealmWrite { realm in
+        core.performRealmWrite { realm in
+            let results = realm.objects(tableChunk.self)
+                .filter("account == %@ AND ocId == %@", account, ocId)
+            realm.delete(results)
+
+            filesChunk.forEach { fileChunk in
+                let object = tableChunk()
+                object.account = account
+                object.chunkFolder = chunkFolder
+                object.fileName = Int(fileChunk.fileName) ?? 0
+                object.index = ocId + fileChunk.fileName
+                object.ocId = ocId
+                object.size = fileChunk.size
+                realm.add(object, update: .all)
+            }
+        }
+    }
+
+    func addChunksAsync(account: String, ocId: String, chunkFolder: String, filesChunk: [(fileName: String, size: Int64)]) async {
+        await core.performRealmWriteAsync { realm in
             let results = realm.objects(tableChunk.self)
                 .filter("account == %@ AND ocId == %@", account, ocId)
             realm.delete(results)
@@ -55,8 +74,8 @@ extension NCManageDatabase {
 
     /// Asynchronously deletes a chunk from Realm and its associated file from disk.
     func deleteChunkAsync(account: String, ocId: String, fileChunk: (fileName: String, size: Int64), directory: String) async {
-        await performRealmWriteAsync { realm in
-            let predicate = NSPredicate(format: "account == %@ AND ocId == %@ AND fileName == %@", account, ocId, fileChunk.fileName)
+        await core.performRealmWriteAsync { realm in
+            let predicate = NSPredicate(format: "account == %@ AND ocId == %@ AND fileName == %d", account, ocId, Int(fileChunk.fileName) ?? 0)
             let results = realm.objects(tableChunk.self).filter(predicate)
             realm.delete(results)
 
@@ -66,7 +85,20 @@ extension NCManageDatabase {
     }
 
     func deleteChunks(account: String, ocId: String, directory: String) {
-        performRealmWrite { realm in
+        core.performRealmWrite { realm in
+            let results = realm.objects(tableChunk.self).filter(NSPredicate(format: "account == %@ AND ocId == %@", account, ocId))
+
+            results.forEach { result in
+                let filePath = directory + "/\(result.fileName)"
+                self.utilityFileSystem.removeFile(atPath: filePath)
+            }
+
+            realm.delete(results)
+        }
+    }
+
+    func deleteChunksAsync(account: String, ocId: String, directory: String) async {
+        await core.performRealmWriteAsync { realm in
             let results = realm.objects(tableChunk.self).filter(NSPredicate(format: "account == %@ AND ocId == %@", account, ocId))
 
             results.forEach { result in
@@ -81,7 +113,7 @@ extension NCManageDatabase {
     // MARK: - Realm read
 
     func getChunkFolder(account: String, ocId: String) -> String {
-        performRealmRead { realm in
+        core.performRealmRead { realm in
             realm.objects(tableChunk.self)
                 .filter("account == %@ AND ocId == %@", account, ocId)
                 .first?.chunkFolder
@@ -89,7 +121,7 @@ extension NCManageDatabase {
     }
 
     func getChunks(account: String, ocId: String) -> [(fileName: String, size: Int64)] {
-        performRealmRead { realm in
+        core.performRealmRead { realm in
             realm.objects(tableChunk.self)
                 .filter("account == %@ AND ocId == %@", account, ocId)
                 .sorted(byKeyPath: "fileName", ascending: true)

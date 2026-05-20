@@ -1,29 +1,13 @@
-//
-//  NCDragDrop.swift
-//  Nextcloud
-//
-//  Created by Marino Faggiana on 27/04/24.
-//  Copyright © 2024 Marino Faggiana. All rights reserved.
-//
-//  Author Marino Faggiana <marino.faggiana@nextcloud.com>
-//
-//  This program is free software: you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
-//  the Free Software Foundation, either version 3 of the License, or
-//  (at your option) any later version.
-//
-//  This program is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
-//
-//  You should have received a copy of the GNU General Public License
-//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-//
+// SPDX-FileCopyrightText: Nextcloud GmbH
+// SPDX-FileCopyrightText: 2024 Marino Faggiana
+// SPDX-License-Identifier: GPL-3.0-or-later
 
 import UIKit
 import UniformTypeIdentifiers
 import NextcloudKit
+import Alamofire
+import LucidBanner
+import SwiftUI
 
 class NCDragDrop: NSObject {
     let utilityFileSystem = NCUtilityFileSystem()
@@ -81,9 +65,12 @@ class NCDragDrop: NSObject {
                 item.itemProvider.loadFileRepresentation(forTypeIdentifier: UTType.data.identifier) { url, error in
                     if error == nil, let url = url {
                         if let destinationMetadata = DragDropHover.shared.destinationMetadata, destinationMetadata.directory {
-                            serverUrl = destinationMetadata.serverUrl + "/" + destinationMetadata.fileName
+                            serverUrl = self.utilityFileSystem.createServerUrl(serverUrl: destinationMetadata.serverUrl, fileName: destinationMetadata.fileName)
                         }
-                        self.uploadFile(url: url, serverUrl: serverUrl, controller: controller)
+                        let serverUrl = serverUrl
+                        Task {
+                            await self.uploadFile(url: url, serverUrl: serverUrl, controller: controller)
+                        }
                     }
                 }
             }
@@ -91,14 +78,15 @@ class NCDragDrop: NSObject {
 
         var invalidNameIndexes: [Int] = []
         let session = NCSession.shared.getSession(controller: controller)
-        let capabilities = NKCapabilities.shared.getCapabilitiesBlocking(for: session.account)
+        let capabilities = NCNetworking.shared.capabilities[session.account] ?? NKCapabilities.Capabilities()
 
         for (index, metadata) in metadatas.enumerated() {
             if let fileNameError = FileNameValidator.checkFileName(metadata.fileName, account: session.account, capabilities: capabilities) {
                 if metadatas.count == 1 {
-                    let alert = UIAlertController.renameFile(metadata: metadata) { newFileName in
+                    let alert = UIAlertController.renameFile(fileName: metadata.fileNameView, isDirectory: metadata.directory, capabilities: capabilities, account: metadata.account) { newFileName in
                         metadatas[index].fileName = newFileName
                         metadatas[index].fileNameView = newFileName
+                        metadatas[index].serverUrlFileName = self.utilityFileSystem.createServerUrl(serverUrl: metadatas[index].serverUrl, fileName: newFileName)
                     }
 
                     controller?.present(alert, animated: true)
@@ -121,60 +109,184 @@ class NCDragDrop: NSObject {
         }
     }
 
-    func uploadFile(url: URL, serverUrl: String, controller: NCMainTabBarController?) {
+    func uploadFile(url: URL, serverUrl: String, controller: NCMainTabBarController?) async {
         do {
             let data = try Data(contentsOf: url)
-            Task {
-                let ocId = NSUUID().uuidString
-                let session = NCSession.shared.getSession(controller: controller)
-                let newFileName = FileAutoRenamer.rename(url.lastPathComponent, account: session.account)
-                let fileNamePath = utilityFileSystem.getDirectoryProviderStorageOcId(ocId, fileNameView: newFileName)
-                let capabilities = NKCapabilities.shared.getCapabilitiesBlocking(for: session.account)
+            let ocId = NSUUID().uuidString
+            let session = NCSession.shared.getSession(controller: controller)
+            let capabilities = await NKCapabilities.shared.getCapabilities(for: session.account)
+            let newFileName = FileAutoRenamer.rename(url.lastPathComponent, capabilities: capabilities)
+            let fileNamePath = utilityFileSystem.getDirectoryProviderStorageOcId(ocId, fileName: newFileName, userId: session.userId, urlBase: session.urlBase)
 
-                if let fileNameError = FileNameValidator.checkFileName(newFileName, account: session.account, capabilities: capabilities) {
-                    await controller?.present(UIAlertController.warning(message: "\(fileNameError.errorDescription) \(NSLocalizedString("_please_rename_file_", comment: ""))"), animated: true)
-                    return
-                }
-
-                let fileName = await NCNetworking.shared.createFileName(fileNameBase: newFileName, account: session.account, serverUrl: serverUrl)
-
-                try data.write(to: URL(fileURLWithPath: fileNamePath))
-
-                let metadataForUpload = await database.createMetadata(fileName: fileName,
-                                                                      ocId: ocId,
-                                                                      serverUrl: serverUrl,
-                                                                      session: session,
-                                                                      sceneIdentifier: controller?.sceneIdentifier)
-
-                metadataForUpload.session = NCNetworking.shared.sessionUploadBackground
-                metadataForUpload.sessionSelector = global.selectorUploadFile
-                metadataForUpload.size = utilityFileSystem.getFileSize(filePath: fileNamePath)
-                metadataForUpload.status = global.metadataStatusWaitUpload
-                metadataForUpload.sessionDate = Date()
-
-                database.addMetadata(metadataForUpload)
+            if let fileNameError = FileNameValidator.checkFileName(newFileName, account: session.account, capabilities: capabilities),
+                let controller {
+                let message = "\(fileNameError.errorDescription) \(NSLocalizedString("_please_rename_file_", comment: ""))"
+                await UIAlertController.warningAsync( message: message, presenter: controller)
+                return
             }
+
+            let fileName = await NCNetworking.shared.createFileName(fileNameBase: newFileName, account: session.account, serverUrl: serverUrl)
+
+            try data.write(to: URL(fileURLWithPath: fileNamePath))
+
+            let metadataForUpload = await NCManageDatabaseCreateMetadata().createMetadataAsync(
+                fileName: fileName,
+                ocId: ocId,
+                serverUrl: serverUrl,
+                session: session,
+                sceneIdentifier: controller?.sceneIdentifier)
+
+            metadataForUpload.session = NCNetworking.shared.sessionUploadBackground
+            metadataForUpload.sessionSelector = global.selectorUploadFile
+            metadataForUpload.size = utilityFileSystem.getFileSize(filePath: fileNamePath)
+            metadataForUpload.status = global.metadataStatusWaitUpload
+            metadataForUpload.sessionDate = Date()
+
+            database.addMetadata(metadataForUpload)
         } catch {
-            NCContentPresenter().showError(error: NKError(error: error))
+            Task {
+                let windowScene = await SceneManager.shared.getWindowScene(controller: controller)
+                await showErrorBanner(windowScene: windowScene, text: error.localizedDescription, errorCode: NCGlobal.shared.errorInternalError)
+            }
             return
         }
     }
 
-    func copyFile(metadatas: [tableMetadata], serverUrl: String) {
+    func copyFile(metadatas: [tableMetadata], destination: String, controller: NCMainTabBarController?) async {
         for metadata in metadatas {
-            NCNetworking.shared.copyMetadata(metadata, serverUrlTo: serverUrl, overwrite: false)
-            NCNetworking.shared.notifyAllDelegates { delete in
-                delete.transferCopy(metadata: metadata, error: .success)
+            let error = await NCNetworking.shared.setStatusWaitCopy(metadata, destination: destination, overwrite: false)
+            if error == .success {
+                await NCNetworking.shared.transferDispatcher.notifyAllDelegates { delegate in
+                    delegate.transferChange(status: self.global.networkingStatusCopyMove,
+                                            account: metadata.account,
+                                            fileName: metadata.fileName,
+                                            serverUrl: metadata.serverUrl,
+                                            selector: metadata.sessionSelector,
+                                            ocId: metadata.ocId,
+                                            destination: destination,
+                                            error: .success)
+                }
+            } else {
+                let windowScene = await SceneManager.shared.getWindowScene(controller: controller)
+                await showErrorBanner(windowScene: windowScene, error: error)
             }
         }
     }
 
-    func moveFile(metadatas: [tableMetadata], serverUrl: String) {
+    func moveFile(metadatas: [tableMetadata], destination: String, controller: NCMainTabBarController?) async {
         for metadata in metadatas {
-            NCNetworking.shared.moveMetadata(metadata, serverUrlTo: serverUrl, overwrite: false)
-            NCNetworking.shared.notifyAllDelegates { delete in
-                delete.transferMove(metadata: metadata, error: .success)
+            let error = await NCNetworking.shared.setStatusWaitMove(metadata, destination: destination, overwrite: false)
+            if error == .success {
+                await NCNetworking.shared.transferDispatcher.notifyAllDelegates { delegate in
+                    delegate.transferChange(status: self.global.networkingStatusCopyMove,
+                                            account: metadata.account,
+                                            fileName: metadata.fileName,
+                                            serverUrl: metadata.serverUrl,
+                                            selector: metadata.sessionSelector,
+                                            ocId: metadata.ocId,
+                                            destination: destination,
+                                            error: .success)
+                }
+            } else {
+                let windowScene = await SceneManager.shared.getWindowScene(controller: controller)
+                await showErrorBanner(windowScene: windowScene, error: error)
             }
+        }
+    }
+
+    @MainActor
+    func transfers(windowScene: UIWindowScene?, destination: String?, session: NCSession.Session) async {
+        var token: Int?
+        var banner: LucidBanner?
+        defer {
+            banner?.dismiss()
+        }
+        guard let metadatas = DragDropHover.shared.sourceMetadatas,
+              let windowScene else {
+            return
+        }
+        var uploadRequest: UploadRequest?
+        var downloadRequest: DownloadRequest?
+        let payload = LucidBannerPayload(blocksTouches: false,
+                                         draggable: false)
+        (banner, token) = showUploadBanner(windowScene: windowScene,
+                                           payload: payload,
+                                           allowMinimizeOnTap: false,
+                                           onButtonTap: {
+            if let downloadRequest {
+                downloadRequest.cancel()
+            } else if let uploadRequest {
+                uploadRequest.cancel()
+            }
+        })
+
+        let payloadUpdate = LucidBannerPayload.Update(
+            title: NSLocalizedString("_transfer_in_progress_", comment: ""),
+            subtitle: NSLocalizedString("_keep_active_for_transfers_", comment: ""),
+            systemImage: "arrow.left.arrow.right.circle",
+            imageAnimation: .pulsebyLayer,
+        )
+        banner?.update(payload: payloadUpdate)
+
+        for (index, metadata) in metadatas.enumerated() {
+            if metadata.directory {
+                continue
+            }
+
+            downloadRequest = nil
+            uploadRequest = nil
+
+            // DOWNLOAD
+            if !utilityFileSystem.fileProviderStorageExists(metadata) {
+                let results = await NCNetworking.shared.downloadFile(metadata: metadata) { request in
+                    downloadRequest = request
+                }
+                guard results.nkError == .success else {
+                    await showErrorBanner(windowScene: windowScene,
+                                          text: results.nkError.errorDescription,
+                                          errorCode: results.nkError.errorCode)
+                    break
+                }
+            }
+
+            // UPLOAD
+            let fileNameLocalPath = utilityFileSystem.getDirectoryProviderStorageOcId(metadata.ocId,
+                                                                                      fileName: metadata.fileName,
+                                                                                      userId: metadata.userId,
+                                                                                      urlBase: metadata.urlBase)
+            var serverUrlFileName = ""
+
+            if let destination {
+                let fileName = await NCNetworking.shared.createFileName(fileNameBase: metadata.fileName, account: session.account, serverUrl: destination)
+                serverUrlFileName = utilityFileSystem.createServerUrl(serverUrl: destination, fileName: fileName)
+            } else {
+                let home = NCUtilityFileSystem().getHomeServer(session: session)
+                let (path, _) = database.relativeDavComponents(for: metadata)
+                let serverUrl = home + path
+                let fileName = await NCNetworking.shared.createFileName(fileNameBase: metadata.fileName, account: session.account, serverUrl: serverUrl)
+                serverUrlFileName = utilityFileSystem.createServerUrl(serverUrl: serverUrl, fileName: fileName)
+            }
+
+            let results = await NCNetworking.shared.uploadFile(account: session.account,
+                                                               fileNameLocalPath: fileNameLocalPath,
+                                                               serverUrlFileName: serverUrlFileName,
+                                                               creationDate: metadata.creationDate as Date,
+                                                               dateModificationFile: metadata.date as Date) { request in
+                uploadRequest = request
+            }
+            guard results.error == .success else {
+                await showErrorBanner(windowScene: windowScene,
+                                      text: results.error.errorDescription, errorCode: results.error.errorCode)
+                break
+            }
+
+            banner?.update(
+                payload: LucidBannerPayload.Update(progress: Double(index + 1) / Double(metadatas.count)),
+                for: token)
+        }
+
+        await NCNetworking.shared.transferDispatcher.notifyAllDelegates { delegate in
+            delegate.transferReloadData(serverUrl: nil)
         }
     }
 }

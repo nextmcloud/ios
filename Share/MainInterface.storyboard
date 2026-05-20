@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="19529" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="EAU-PF-EEd">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="24123.1" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="EAU-PF-EEd">
     <device id="retina6_5" orientation="portrait" appearance="light"/>
     <dependencies>
-        <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="19519"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="24062"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -18,7 +17,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="0HI-k1-SD0">
-                                <rect key="frame" x="0.0" y="88" width="414" height="418"/>
+                                <rect key="frame" x="0.0" y="142" width="414" height="364"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="0.0" minimumInteritemSpacing="0.0" id="D7P-75-aB1">
                                     <size key="itemSize" width="0.0" height="0.0"/>
@@ -47,7 +46,7 @@
                                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                         <prototypes>
                                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" reuseIdentifier="Cell" rowHeight="50" id="6Kt-n0-i8J" customClass="NCShareCell" customModule="Share" customModuleProvider="target">
-                                                <rect key="frame" x="0.0" y="44.666666030883789" width="394" height="50"/>
+                                                <rect key="frame" x="0.0" y="50" width="394" height="50"/>
                                                 <autoresizingMask key="autoresizingMask"/>
                                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="6Kt-n0-i8J" id="WGN-Zn-lR8">
                                                     <rect key="frame" x="0.0" y="0.0" width="394" height="50"/>
@@ -60,8 +59,14 @@
                                                                 <constraint firstAttribute="height" constant="40" id="wvf-Ey-woY"/>
                                                             </constraints>
                                                         </imageView>
-                                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="filename" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="rz6-pe-DB5">
+                                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="750" verticalHuggingPriority="251" horizontalCompressionResistancePriority="250" text="filename" textAlignment="natural" lineBreakMode="middleTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="rz6-pe-DB5">
                                                             <rect key="frame" x="60" y="10" width="284" height="17"/>
+                                                            <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                                            <nil key="textColor"/>
+                                                            <nil key="highlightedColor"/>
+                                                        </label>
+                                                        <label hidden="YES" opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="1000" verticalHuggingPriority="251" horizontalCompressionResistancePriority="1000" text="" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Ext-Lb-scl">
+                                                            <rect key="frame" x="344" y="10" width="0.0" height="17"/>
                                                             <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                                             <nil key="textColor"/>
                                                             <nil key="highlightedColor"/>
@@ -93,13 +98,16 @@
                                                         <constraint firstItem="uvl-De-S9p" firstAttribute="leading" secondItem="WGN-Zn-lR8" secondAttribute="leading" constant="10" id="ko0-iM-oWa"/>
                                                         <constraint firstItem="rz6-pe-DB5" firstAttribute="top" secondItem="WGN-Zn-lR8" secondAttribute="top" constant="10" id="rF0-WD-Hfk"/>
                                                         <constraint firstAttribute="trailing" secondItem="OGY-95-ZYi" secondAttribute="trailing" constant="10" id="si1-LI-Ldn"/>
-                                                        <constraint firstItem="OGY-95-ZYi" firstAttribute="leading" secondItem="rz6-pe-DB5" secondAttribute="trailing" constant="10" id="vCb-2c-vWa"/>
+                                                        <constraint firstItem="Ext-Lb-scl" firstAttribute="leading" secondItem="rz6-pe-DB5" secondAttribute="trailing" id="ext-ld-scl"/>
+                                                        <constraint firstItem="Ext-Lb-scl" firstAttribute="firstBaseline" secondItem="rz6-pe-DB5" secondAttribute="firstBaseline" id="ext-bl-scl"/>
+                                                        <constraint firstItem="OGY-95-ZYi" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="Ext-Lb-scl" secondAttribute="trailing" constant="10" id="vCb-2c-vWa"/>
                                                         <constraint firstItem="QFh-Vy-b4Z" firstAttribute="leading" secondItem="uvl-De-S9p" secondAttribute="trailing" constant="10" id="xAp-ri-eOc"/>
                                                     </constraints>
                                                 </tableViewCellContentView>
                                                 <inset key="separatorInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
                                                 <connections>
                                                     <outlet property="fileNameCell" destination="rz6-pe-DB5" id="e8w-G7-bBe"/>
+                                                    <outlet property="fileNameExtensionCell" destination="Ext-Lb-scl" id="ext-out-scl"/>
                                                     <outlet property="imageCell" destination="uvl-De-S9p" id="S4F-TD-YGI"/>
                                                     <outlet property="moreButton" destination="OGY-95-ZYi" id="vA3-mU-S1e"/>
                                                     <outlet property="sizeCell" destination="QFh-Vy-b4Z" id="rmM-qr-QXU"/>
@@ -196,7 +204,7 @@
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" id="N5K-De-4CP">
-                        <barButtonItem key="rightBarButtonItem" title="cancel" id="qHj-AF-EN7">
+                        <barButtonItem key="rightBarButtonItem" title="Cancel" id="qHj-AF-EN7">
                             <connections>
                                 <action selector="actionCancel:" destination="VYq-xA-D35" id="LRW-H2-pbh"/>
                             </connections>
@@ -228,7 +236,7 @@
                 <navigationController automaticallyAdjustsScrollViewInsets="NO" id="EAU-PF-EEd" sceneMemberID="viewController">
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="OMR-Ah-U1w">
-                        <rect key="frame" x="0.0" y="44" width="414" height="44"/>
+                        <rect key="frame" x="0.0" y="88" width="414" height="54"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
                     <nil name="viewControllers"/>
@@ -244,7 +252,7 @@
     <resources>
         <image name="more" width="425" height="425"/>
         <systemColor name="separatorColor">
-            <color red="0.23529411764705882" green="0.23529411764705882" blue="0.2627450980392157" alpha="0.28999999999999998" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.23529411764705882" green="0.23529411764705882" blue="0.2627450980392157" alpha="0.12" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>

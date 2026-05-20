@@ -9,7 +9,7 @@
 import SwiftUI
 
 struct NCAssistantCreateNewTask: View {
-    @EnvironmentObject var model: NCAssistantModel
+    @Environment(NCAssistantModel.self) var model
     @State var text = ""
     @FocusState private var inFocus: Bool
     @Environment(\.presentationMode) var presentationMode
@@ -18,11 +18,13 @@ struct NCAssistantCreateNewTask: View {
     var body: some View {
         VStack {
             Text(model.selectedType?.description ?? "")
+                .cappedFont(.body, maxDynamicType: .accessibility2)
                 .frame(maxWidth: .infinity, alignment: .topLeading)
 
             ZStack(alignment: .topLeading) {
                 if text.isEmpty {
                     Text(NSLocalizedString("_input_", comment: ""))
+                        .cappedFont(.body, maxDynamicType: .accessibility2)
                         .padding(24)
                         .foregroundStyle(.secondary)
                 }
@@ -44,6 +46,7 @@ struct NCAssistantCreateNewTask: View {
                 presentationMode.wrappedValue.dismiss()
             }, label: {
                 Text(NSLocalizedString(editMode ? "_edit_" : "_create_", comment: ""))
+                    .cappedFont(.body, maxDynamicType: .accessibility2)
             })
             .disabled(text.isEmpty)
         }
@@ -57,10 +60,10 @@ struct NCAssistantCreateNewTask: View {
 }
 
 #Preview {
-    let model = NCAssistantModel(controller: nil)
+    let model = NCAssistantModel(controller: nil, inputModel: NCAssistantInputModel())
 
     NCAssistantCreateNewTask()
-        .environmentObject(model)
+        .environment(model)
         .onAppear {
             model.loadDummyData()
         }
@@ -68,12 +71,6 @@ struct NCAssistantCreateNewTask: View {
 
 private extension View {
     func transparentScrolling() -> some View {
-        if #available(iOS 16.0, *) {
-            return scrollContentBackground(.hidden)
-        } else {
-            return onAppear {
-                UITextView.appearance().backgroundColor = .clear
-            }
-        }
+        return scrollContentBackground(.hidden)
     }
 }

@@ -9,38 +9,38 @@ import NextcloudKit
 // MARK: - Drag
 
 extension NCMedia: NCTransferDelegate {
-    func transferReloadData(serverUrl: String?, status: Int?) {
-        self.debouncer.call {
-            Task {
+    func transferReloadData(serverUrl: String?) {
+        Task {
+            await self.debouncerSearch.call {
+                await self.loadDataSource()
+                await self.searchMediaUI()
+            }
+        }
+    }
+
+    func transferReloadDataSource(serverUrl: String?, requestData: Bool, status: Int?) {
+        Task {
+            await self.debouncerLoadDataSource.call {
                 await self.loadDataSource()
             }
         }
     }
 
-    func transferCopy(metadata: tableMetadata, error: NKError) {
-        setEditMode(false)
+    func transferProgressDidUpdate(progress: Float, totalBytes: Int64, totalBytesExpected: Int64, fileName: String, serverUrl: String) { }
 
+    func transferChange(status: String,
+                        account: String,
+                        fileName: String,
+                        serverUrl: String,
+                        selector: String?,
+                        ocId: String,
+                        destination: String?,
+                        error: NKError) {
         Task {
-            await self.loadDataSource()
-            await self.searchMediaUI()
-        }
-    }
-
-    func transferMove(metadata: tableMetadata, error: NKError) {
-        setEditMode(false)
-
-        Task {
-            await self.loadDataSource()
-            await self.searchMediaUI()
-        }
-    }
-
-    func transferFileExists(ocId: String, exists: Bool) {
-        Task {
-            if !exists {
-                await self.deleteImage(with: ocId)
+            await self.debouncerSearch.call {
+                await self.loadDataSource()
+                await self.searchMediaUI()
             }
-            ocIdVerified.append(ocId)
         }
     }
 }

@@ -7,16 +7,16 @@ import NextcloudKit
 
 /// A model that allows the user to configure the account
 class NCTermOfServiceModel: ObservableObject {
-    /// Root View Controller
+    // Root View Controller
     var controller: NCMainTabBarController?
-    /// Set true for dismiss the view
+    // Set true for dismiss the view
     @Published var dismissView = false
     // Data
     @Published var languages: [String: String] = [:]
     @Published var terms: [String: String] = [:]
     @Published var termsId: [String: Int] = [:]
 
-    /// Initialization code
+    // Initialization code
     init(controller: NCMainTabBarController?, tos: NKTermsOfService?) {
         self.controller = controller
 
@@ -46,18 +46,21 @@ class NCTermOfServiceModel: ObservableObject {
 
     func signTermsOfService(termId: Int?) {
         guard let termId,
-              let controller
-        else {
+              let controller else {
             return
         }
 
-        NCNetworking.shared.signTermsOfService(account: controller.account, termId: termId) { error in
-            if error == .success {
-                NCNetworking.shared.notifyAllDelegates { delegate in
-                    delegate.transferRequestData(serverUrl: nil)
+        Task { @MainActor in
+            let error = await  NCNetworking.shared.signTermsOfService(account: controller.account, termId: termId)
+            if let error {
+                if error == .success {
+                    await NCNetworking.shared.transferDispatcher.notifyAllDelegates { delegate in
+                        delegate.transferReloadDataSource(serverUrl: nil, requestData: true, status: nil)
+                    }
+                } else {
+                    let windowScene = SceneManager.shared.getWindowScene(controller: controller)
+                    await showErrorBanner(windowScene: windowScene, text: error.errorDescription, errorCode: error.errorCode)
                 }
-            } else {
-                NCContentPresenter().showError(error: error)
             }
             self.dismissView = true
             NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterCheckUserDelaultErrorDone, userInfo: ["account": controller.account, "controller": controller])

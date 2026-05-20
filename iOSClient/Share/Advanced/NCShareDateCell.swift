@@ -12,14 +12,13 @@ class NCShareDateCell: UITableViewCell {
     let textField = UITextField()
     var shareType: Int
     var onReload: (() -> Void)?
-    let shareCommon = NCShareCommon()
 
     init(share: Shareable) {
         self.shareType = share.shareType
         super.init(style: .value1, reuseIdentifier: "shareExpDate")
 
         picker.datePickerMode = .date
-        picker.minimumDate = Date()
+        picker.minimumDate = Calendar.current.date(byAdding: .day, value: 1, to: Date())
         picker.preferredDatePickerStyle = .wheels
         picker.action(for: .valueChanged) { datePicker in
             guard let datePicker = datePicker as? UIDatePicker else { return }
@@ -60,20 +59,20 @@ class NCShareDateCell: UITableViewCell {
     }
 
     private func isExpireDateEnforced(account: String) -> Bool {
-        let capabilities = NKCapabilities.shared.getCapabilitiesBlocking(for: account)
+        let capabilities = NCNetworking.shared.capabilities[account] ?? NKCapabilities.Capabilities()
 
         switch self.shareType {
-        case shareCommon.SHARE_TYPE_LINK,
-            shareCommon.SHARE_TYPE_EMAIL,
-            shareCommon.SHARE_TYPE_GUEST:
+        case NKShare.ShareType.publicLink.rawValue,
+            NKShare.ShareType.email.rawValue,
+            NKShare.ShareType.guest.rawValue:
             return capabilities.fileSharingPubExpireDateEnforced
-        case shareCommon.SHARE_TYPE_USER,
-            shareCommon.SHARE_TYPE_GROUP,
-            shareCommon.SHARE_TYPE_CIRCLE,
-            shareCommon.SHARE_TYPE_ROOM:
+        case NKShare.ShareType.user.rawValue,
+            NKShare.ShareType.group.rawValue,
+            NKShare.ShareType.team.rawValue,
+            NKShare.ShareType.talkConversation.rawValue:
             return capabilities.fileSharingInternalExpireDateEnforced
-        case shareCommon.SHARE_TYPE_FEDERATED,
-            shareCommon.SHARE_TYPE_FEDERATED_GROUP:
+        case NKShare.ShareType.federatedCloud.rawValue,
+            NKShare.ShareType.federatedGroup.rawValue:
             return capabilities.fileSharingRemoteExpireDateEnforced
         default:
             return false
@@ -81,20 +80,20 @@ class NCShareDateCell: UITableViewCell {
     }
 
     private func defaultExpirationDays(account: String) -> Int {
-        let capabilities = NKCapabilities.shared.getCapabilitiesBlocking(for: account)
+        let capabilities = NCNetworking.shared.capabilities[account] ?? NKCapabilities.Capabilities()
 
         switch self.shareType {
-        case shareCommon.SHARE_TYPE_LINK,
-            shareCommon.SHARE_TYPE_EMAIL,
-            shareCommon.SHARE_TYPE_GUEST:
+        case NKShare.ShareType.publicLink.rawValue,
+            NKShare.ShareType.email.rawValue,
+            NKShare.ShareType.guest.rawValue:
             return capabilities.fileSharingPubExpireDateDays
-        case shareCommon.SHARE_TYPE_USER,
-            shareCommon.SHARE_TYPE_GROUP,
-            shareCommon.SHARE_TYPE_CIRCLE,
-            shareCommon.SHARE_TYPE_ROOM:
+        case NKShare.ShareType.user.rawValue,
+            NKShare.ShareType.group.rawValue,
+            NKShare.ShareType.team.rawValue,
+            NKShare.ShareType.talkConversation.rawValue:
             return capabilities.fileSharingInternalExpireDateDays
-        case shareCommon.SHARE_TYPE_FEDERATED,
-            shareCommon.SHARE_TYPE_FEDERATED_GROUP:
+        case NKShare.ShareType.federatedCloud.rawValue,
+            NKShare.ShareType.federatedGroup.rawValue:
             return capabilities.fileSharingRemoteExpireDateDays
         default:
             return 0

@@ -7,6 +7,7 @@ import CoreLocation
 import NextcloudKit
 import Photos
 import OrderedCollections
+import LucidBanner
 
 class NCAutoUpload: NSObject {
     static let shared = NCAutoUpload()
@@ -16,75 +17,82 @@ class NCAutoUpload: NSObject {
     private let networking = NCNetworking.shared
     private var endForAssetToUpload: Bool = false
 
-    func initAutoUpload(controller: NCMainTabBarController? = nil,
-                        tblAccount: tableAccount) async -> Int {
-        guard self.networking.isOnline,
-              tblAccount.autoUploadStart,
-              tblAccount.autoUploadOnlyNew else {
+    func initAutoUpload(controller: NCMainTabBarController? = nil) async -> Int {
+        guard self.networking.isOnline else {
             return 0
         }
-        let albumIds = NCKeychain().getAutoUploadAlbumIds(account: tblAccount.account)
-        let assetCollections = PHAssetCollection.allAlbums.filter({albumIds.contains($0.localIdentifier)})
+        var counter = 0
 
-        let result = await getCameraRollAssets(controller: nil, assetCollections: assetCollections, tblAccount: tableAccount(value: tblAccount))
-
-        guard let assets = result.assets,
-              !assets.isEmpty,
-              let fileNames = result.fileNames else {
-            return 0
+        let tblAccounts = await NCManageDatabase.shared.getTableAccountsAsync(predicate: NSPredicate(format: "autoUploadStart == true"))
+        for tblAccount in tblAccounts {
+            let albumIds = NCPreferences().getAutoUploadAlbumIds(account: tblAccount.account)
+            let assetCollections = PHAssetCollection.allAlbums.filter({albumIds.contains($0.localIdentifier)})
+            let result = await getCameraRollAssets(controller: nil, assetCollections: assetCollections, tblAccount: tableAccount(value: tblAccount))
+            if let assets = result.assets, !assets.isEmpty, let fileNames = result.fileNames {
+                let item = await uploadAssets(controller: nil, tblAccount: tblAccount, assets: assets, fileNames: fileNames)
+                counter += item
+            }
         }
 
-        return await uploadAssets(controller: nil, tblAccount: tblAccount, assets: assets, fileNames: fileNames)
+        return counter
     }
 
+    @MainActor
     func startManualAutoUploadForAlbums(controller: NCMainTabBarController?,
                                         model: NCAutoUploadModel,
                                         assetCollections: [PHAssetCollection],
                                         account: String) async {
+        let windowScene = SceneManager.shared.getWindowScene(controller: controller)
+        var banner: LucidBanner?
         defer {
-            NCContentPresenter().dismiss(after: 1)
+            if let banner {
+                banner.dismiss()
+            }
         }
 
         guard let tblAccount = await self.database.getTableAccountAsync(predicate: NSPredicate(format: "account == %@", account)) else {
             return
         }
 
-        if !tblAccount.autoUploadOnlyNew {
-            await MainActor.run {
-                let image = UIImage(systemName: "photo.on.rectangle.angled")?.image(color: .white, size: 20)
-                NCContentPresenter().noteTop(text: NSLocalizedString("_creating_db_photo_progress_", comment: ""), image: image, color: .lightGray, delay: .infinity, priority: .max)
-            }
-        }
+        (banner, _) = await showBanner(windowScene: windowScene,
+                                       title: "_info_",
+                                       subtitle: "_creating_db_photo_progress_",
+                                       systemImage: "photo.on.rectangle.angled",
+                                       imageAnimation: .bounce,
+                                       imageColor: .systemBlue,
+                                       autoDismissAfter: 0,
+                                       swipeToDismiss: false
+        )
 
         let result = await getCameraRollAssets(controller: controller, assetCollections: assetCollections, tblAccount: tblAccount)
+
+        // IMPORTANT: Always set to autoUploadSinceDate to now
+        await self.database.updateAccountPropertyAsync(\.autoUploadSinceDate, value: Date.now, account: tblAccount.account)
+
+        model.onViewAppear()
 
         guard let assets = result.assets,
               !assets.isEmpty,
               let fileNames = result.fileNames else {
+            nkLog(debug: "Automatic upload 0 upload")
             return
         }
 
         let num = await uploadAssets(controller: controller, tblAccount: tblAccount, assets: assets, fileNames: fileNames)
         nkLog(debug: "Automatic upload \(num) upload")
-
-        // Automatic move to auto upload new
-        if !tblAccount.autoUploadOnlyNew {
-            await self.database.updateAccountPropertyAsync(\.autoUploadOnlyNew, value: true, account: tblAccount.account)
-            await MainActor.run {
-                model.onViewAppear()
-            }
-        }
     }
 
     private func uploadAssets(controller: NCMainTabBarController?,
                               tblAccount: tableAccount,
                               assets: [PHAsset],
                               fileNames: [String]) async -> Int {
+        let capabilities = await NKCapabilities.shared.getCapabilities(for: tblAccount.account)
+        let autoMkcol = capabilities.serverVersionMajor >= NCGlobal.shared.nextcloudVersion33
         let session = NCSession.shared.getSession(account: tblAccount.account)
         let autoUploadServerUrlBase = await self.database.getAccountAutoUploadServerUrlBaseAsync(account: tblAccount.account, urlBase: tblAccount.urlBase, userId: tblAccount.userId)
         var metadatas: [tableMetadata] = []
-        let formatCompatibility = NCKeychain().formatCompatibility
-        let keychainLivePhoto = NCKeychain().livePhoto
+        let formatCompatibility = NCPreferences().formatCompatibility
+        let keychainLivePhoto = NCPreferences().livePhoto
         let fileSystem = NCUtilityFileSystem()
         let skipFileNames = await self.database.fetchSkipFileNamesAsync(account: tblAccount.account,
                                                                         autoUploadServerUrlBase: autoUploadServerUrlBase)
@@ -107,12 +115,12 @@ class NCAutoUpload: NSObject {
             let onWWAN = (mediaType == .image && tblAccount.autoUploadWWAnPhoto) || (mediaType == .video && tblAccount.autoUploadWWAnVideo)
             let uploadSession = onWWAN ? self.networking.sessionUploadBackgroundWWan : self.networking.sessionUploadBackground
 
-            let metadata = await self.database.createMetadata(fileName: fileName,
-                                                              ocId: UUID().uuidString,
-                                                              serverUrl: serverUrl,
-                                                              session: session,
-                                                              sceneIdentifier: controller?.sceneIdentifier
-            )
+            let metadata = await NCManageDatabaseCreateMetadata().createMetadataAsync(
+                fileName: fileName,
+                ocId: UUID().uuidString,
+                serverUrl: serverUrl,
+                session: session,
+                sceneIdentifier: controller?.sceneIdentifier)
 
             if isLivePhoto {
                 metadata.livePhotoFile = (metadata.fileName as NSString).deletingPathExtension + ".mov"
@@ -155,12 +163,19 @@ class NCAutoUpload: NSObject {
         // Set last date in autoUploadOnlyNewSinceDate
         if let metadata = metadatas.last {
             let date = metadata.creationDate as Date
-            await self.database.updateAccountPropertyAsync(\.autoUploadOnlyNewSinceDate, value: date, account: session.account)
+            await self.database.updateAccountPropertyAsync(\.autoUploadSinceDate, value: date, account: session.account)
         }
 
         if !metadatas.isEmpty {
-            let metadatasFolder = await self.database.createMetadatasFolder(assets: assets, useSubFolder: tblAccount.autoUploadCreateSubfolder, session: session)
-            await self.database.addMetadatasAsync(metadatasFolder + metadatas)
+            if autoMkcol {
+                await self.database.addMetadatasAsync(metadatas)
+            } else {
+                let metadatasFolder = await NCManageDatabaseCreateMetadata().createMetadatasFolderAsync(
+                    assets: assets,
+                    useSubFolder: tblAccount.autoUploadCreateSubfolder,
+                    session: session)
+                await self.database.addMetadatasAsync(metadatasFolder + metadatas)
+            }
         }
 
         return metadatas.count
@@ -192,8 +207,8 @@ class NCAutoUpload: NSObject {
             mediaPredicates.append(NSPredicate(format: "mediaType == %i", PHAssetMediaType.video.rawValue))
         }
 
-        if tblAccount.autoUploadOnlyNew {
-            datePredicates.append(NSPredicate(format: "creationDate > %@", tblAccount.autoUploadOnlyNewSinceDate as NSDate))
+        if let autoUploadSinceDate = tblAccount.autoUploadSinceDate {
+            datePredicates.append(NSPredicate(format: "creationDate > %@", autoUploadSinceDate as NSDate))
         } else if let lastDate = await self.database.fetchLastAutoUploadedDateAsync(account: tblAccount.account, autoUploadServerUrlBase: autoUploadServerUrlBase) {
             datePredicates.append(NSPredicate(format: "creationDate > %@", lastDate as NSDate))
         }
@@ -239,5 +254,137 @@ class NCAutoUpload: NSObject {
         }
 
         return(Array(newAssets), fileNames)
+    }
+
+    // MARK: -
+
+    // Executes the background synchronization flow for Auto Upload.
+    //
+    // The function:
+    // - discovers new Auto Upload items,
+    // - fetches pending metadata,
+    // - creates missing folders when required,
+    // - checks remote existence,
+    // - expands seeds into concrete metadata items,
+    // - queues uploads sequentially.
+    //
+    // The flow cooperates with Swift task cancellation triggered by BGTask expiration.
+    func autoUploadBackgroundSync() async {
+        guard !Task.isCancelled else { return }
+
+        // Discover new items for Auto Upload.
+        let numAutoUpload = await initAutoUpload()
+        nkLog(tag: self.global.logTagBgSync, emoji: .start, message: "Auto upload found \(numAutoUpload) new items")
+
+        guard !Task.isCancelled else { return }
+
+        // Fetch pending metadata.
+        let metadatas = await NCManageDatabase.shared.getMetadataProcess()
+        guard !metadatas.isEmpty, !Task.isCancelled else {
+            return
+        }
+
+        // Create all pending Auto Upload folders (fail-fast).
+        let pendingCreateFolders = metadatas.lazy.filter {
+            $0.status == self.global.metadataStatusWaitCreateFolder &&
+            $0.sessionSelector == self.global.selectorUploadAutoUpload
+        }
+
+        // Resolve capabilities once per account.
+        let accounts = Array(Set(pendingCreateFolders.map { $0.account }))
+        var capabilitiesByAccount: [String: NKCapabilities.Capabilities] = [:]
+
+        for account in accounts {
+            guard !Task.isCancelled else { return }
+
+            let capabilities = await NKCapabilities.shared.getCapabilities(for: account)
+            capabilitiesByAccount[account] = capabilities
+        }
+
+        for metadata in pendingCreateFolders {
+            guard !Task.isCancelled else { return }
+
+            // If server supports auto MKCOL (Nextcloud >= 33), skip manual folder creation.
+            if let capabilities = capabilitiesByAccount[metadata.account] {
+                let autoMkcol = capabilities.serverVersionMajor >= NCGlobal.shared.nextcloudVersion33
+                if autoMkcol {
+                    continue
+                }
+            }
+
+            let err = await NCNetworking.shared.createFolderForAutoUpload(
+                serverUrlFileName: metadata.serverUrlFileName,
+                account: metadata.account
+            )
+
+            if err != .success {
+                nkLog(
+                    tag: self.global.logTagBgSync,
+                    emoji: .error,
+                    message: "Create folder '\(metadata.serverUrlFileName)' failed: \(err.errorCode) – aborting sync"
+                )
+                return
+            }
+        }
+
+        // Compute available capacity.
+        let downloading = metadatas.lazy.filter { $0.status == self.global.metadataStatusDownloading }.count
+        let uploading = metadatas.lazy.filter { $0.status == self.global.metadataStatusUploading }.count
+        let availableProcess = max(0, NCBrandOptions.shared.numMaximumProcess - (downloading + uploading))
+
+        // Select Auto Upload candidates.
+        let metadatasToUpload = Array(
+            metadatas.lazy.filter {
+                $0.status == self.global.metadataStatusWaitUpload &&
+                $0.sessionSelector == self.global.selectorUploadAutoUpload &&
+                $0.chunk == 0
+            }
+            .prefix(availableProcess)
+        )
+
+        let cameraRoll = NCCameraRoll()
+
+        for metadata in metadatasToUpload {
+            guard !Task.isCancelled else { return }
+
+            // Check whether the file already exists remotely.
+            let existsResult = await NCNetworking.shared.fileExists(
+                serverUrlFileName: metadata.serverUrlFileName,
+                account: metadata.account
+            )
+
+            if existsResult == .success {
+                await NCManageDatabase.shared.deleteMetadataAsync(id: metadata.ocId)
+                continue
+            } else if existsResult.errorCode != 404 {
+                continue
+            }
+
+            // Expand the seed into concrete metadata entries (for example, Live Photo pairs).
+            let extractedMetadatas = await cameraRoll.extractCameraRoll(from: metadata)
+
+            guard !Task.isCancelled else { return }
+
+            for extractedMetadata in extractedMetadatas {
+                guard !Task.isCancelled else { return }
+
+                let err = await NCNetworking.shared.uploadFileInBackground(
+                    metadata: extractedMetadata.detachedCopy()
+                )
+
+                if err == .success {
+                    nkLog(
+                        tag: self.global.logTagBgSync,
+                        message: "In queued upload \(extractedMetadata.fileName) -> \(extractedMetadata.serverUrl)"
+                    )
+                } else {
+                    nkLog(
+                        tag: self.global.logTagBgSync,
+                        emoji: .error,
+                        message: "Upload failed \(extractedMetadata.fileName) -> \(extractedMetadata.serverUrl) [\(err.errorDescription)]"
+                    )
+                }
+            }
+        }
     }
 }

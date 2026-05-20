@@ -1,20 +1,14 @@
-//
-//  FileAutoRenamer+Extensions.swift
-//  Nextcloud
-//
-//  Created by Milen Pivchev on 10.10.24.
-//  Copyright © 2024 Marino Faggiana. All rights reserved.
-//
+// SPDX-FileCopyrightText: Nextcloud GmbH
+// SPDX-FileCopyrightText: 2024 Milen Pivchev
+// SPDX-FileCopyrightText: 2024 Marino Faggiana
+// SPDX-License-Identifier: GPL-3.0-or-later
 
+import Foundation
 import NextcloudKit
 
 extension FileAutoRenamer {
-    static func rename(_ filename: String, isFolderPath: Bool = false, account: String?) -> String {
-        guard let account else {
-            return filename
-        }
-        let capabilities = NKCapabilities.shared.getCapabilitiesBlocking(for: account)
-        let autoRenamer = FileAutoRenamer(forbiddenFileNameCharacters: capabilities.forbiddenFileNameCharacters, forbiddenFileNameExtensions: capabilities.forbiddenFileNameExtensions)
+    static func rename(_ filename: String, isFolderPath: Bool = false, capabilities: NKCapabilities.Capabilities) -> String {
+        let autoRenamer = FileAutoRenamer(capabilities: capabilities)
         return autoRenamer.rename(filename: filename, isFolderPath: isFolderPath)
     }
 }

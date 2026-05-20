@@ -1,9 +1,8 @@
 // SPDX-FileCopyrightText: Nextcloud GmbH
-// SPDX-FileCopyrightText: 2023 Marino Faggiana
+// SPDX-FileCopyrightText: 2025 Marino Faggiana
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 import Foundation
-import UIKit
 import RealmSwift
 import NextcloudKit
 
@@ -18,11 +17,8 @@ class tableTag: Object {
 }
 
 extension NCManageDatabase {
-
-    // MARK: - Realm write
-
-    func addTagAsunc(_ ocId: String, tagIOS: Data?, account: String) async {
-        await performRealmWriteAsync { realm in
+    func addTagAsync(_ ocId: String, tagIOS: Data?, account: String) async {
+        await core.performRealmWriteAsync { realm in
             let addObject = tableTag()
             addObject.account = account
             addObject.ocId = ocId
@@ -31,20 +27,24 @@ extension NCManageDatabase {
         }
     }
 
-    // MARK: - Realm read
-
-    /// Asynchronously fetch an array of tableTag objects matching a predicate.
     func getTagsAsync(predicate: NSPredicate) async -> [tableTag]? {
-        await performRealmReadAsync { realm in
+        await core.performRealmReadAsync { realm in
             let results = realm.objects(tableTag.self)
                 .filter(predicate)
             return results.compactMap { tableTag(value: $0) }
         }
     }
 
-    /// Asynchronously fetch a single tableTag object matching a predicate.
+    func getTags(predicate: NSPredicate) -> [tableTag]? {
+        core.performRealmRead { realm in
+            let results = realm.objects(tableTag.self)
+                .filter(predicate)
+            return results.compactMap { tableTag(value: $0) }
+        }
+    }
+
     func getTagAsync(predicate: NSPredicate) async -> tableTag? {
-        await performRealmReadAsync { realm in
+        await core.performRealmReadAsync { realm in
             return realm.objects(tableTag.self)
                 .filter(predicate)
                 .first.map { tableTag(value: $0) }
@@ -53,8 +53,7 @@ extension NCManageDatabase {
 
     func getTag(predicate: NSPredicate) -> tableTag? {
         var tag: tableTag?
-
-        performRealmRead { realm in
+        core.performRealmRead { realm in
             tag = realm.objects(tableTag.self)
                 .filter(predicate)
                 .first.map {

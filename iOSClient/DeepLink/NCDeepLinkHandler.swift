@@ -1,23 +1,7 @@
-//
-//  DeepLinkHandler.swift
-//  Nextcloud
-//
-//  Created by Amrut Waghmare on 29/05/24.
-//  Copyright © 2024 Marino Faggiana. All rights reserved.
-//
-//  This program is free software: you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
-//  the Free Software Foundation, either version 3 of the License, or
-//  (at your option) any later version.
-//
-//  This program is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
-//
-//  You should have received a copy of the GNU General Public License
-//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-//
+// SPDX-FileCopyrightText: Nextcloud GmbH
+// SPDX-FileCopyrightText: 2024 Amrut Waghmare
+// SPDX-FileCopyrightText: 2026 Marino Faggiana
+// SPDX-License-Identifier: GPL-3.0-or-later
 
 import Foundation
 import UIKit
@@ -42,12 +26,10 @@ enum DeepLink: String {
 enum ControllerConstants {
     static let filesIndex = 0
     static let favouriteIndex = 1
-    static let mediaIndex = 3
+    static let mediaIndex = 2
+    static let activityIndex = 3
     static let moreIndex = 4
     static let notification = "NCNotification"
-    static let shares = "segueShares"
-    static let offline = "segueOffline"
-    static let delete = "segueTrash"
 }
 
 class NCDeepLinkHandler {
@@ -75,13 +57,19 @@ class NCDeepLinkHandler {
         case .openMedia:
             navigateTo(index: ControllerConstants.mediaIndex, controller: controller)
         case .openShared:
-            navigateToMore(withSegue: ControllerConstants.shares, controller: controller)
+            Task { @MainActor in
+                navigateToMore(destination: .storyboard(name: "NCShares", presentation: .push), controller: controller)
+            }
         case .openOffline:
-            navigateToMore(withSegue: ControllerConstants.offline, controller: controller)
+            Task { @MainActor in
+                navigateToMore(destination: .storyboard(name: "NCOffline", presentation: .push), controller: controller)
+            }
+        case .openDeleted:
+            Task { @MainActor in
+                navigateToMore(destination: .storyboard(name: "NCTrash", presentation: .push), controller: controller)
+            }
         case .openNotifications:
             navigateToNotification(controller: controller)
-        case .openDeleted:
-            navigateToMore(withSegue: ControllerConstants.delete, controller: controller)
         case .openSettings:
             navigateToSettings(controller: controller)
         case .openAutoUpload:
@@ -112,39 +100,49 @@ class NCDeepLinkHandler {
     }
 
     private func navigateToCreateNew(controller: NCMainTabBarController) {
-        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }
         controller.selectedIndex = ControllerConstants.filesIndex
         DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
             let serverUrl = controller.currentServerUrl()
             let session = NCSession.shared.getSession(controller: controller)
-            let fileFolderPath = NCUtilityFileSystem().getFileNamePath("", serverUrl: serverUrl, session: session)
+            let fileFolderPath = NCUtilityFileSystem().getRelativeFilePath("", serverUrl: serverUrl, session: session)
             let fileFolderName = (serverUrl as NSString).lastPathComponent
-            let capabilities = NKCapabilities.shared.getCapabilitiesBlocking(for: controller.account)
+            let capabilities = NCNetworking.shared.capabilities[controller.account] ?? NKCapabilities.Capabilities()
 
             if !FileNameValidator.checkFolderPath(fileFolderPath, account: controller.account, capabilities: capabilities) {
                 controller.present(UIAlertController.warning(message: "\(String(format: NSLocalizedString("_file_name_validator_error_reserved_name_", comment: ""), fileFolderName)) \(NSLocalizedString("_please_rename_file_", comment: ""))"), animated: true)
 
                 return
             }
-
-            appDelegate.toggleMenu(controller: controller, sender: nil)
+            // appDelegate.toggleMenu(controller: controller, sender: nil)
         }
     }
 
-    private func navigateToMore(withSegue segue: String, controller: NCMainTabBarController) {
+    @MainActor
+    private func navigateToMore(destination: NCMoreModel.Destination, controller: NCMainTabBarController) {
         controller.selectedIndex = ControllerConstants.moreIndex
-        guard let navigationController = controller.viewControllers?[controller.selectedIndex] as? UINavigationController else { return }
-        navigationController.viewControllers = navigationController.viewControllers.filter({$0.isKind(of: NCMore.self)})
-        navigationController.performSegue(withIdentifier: segue, sender: self)
+        guard let navigationController = controller.viewControllers?[controller.selectedIndex] as? UINavigationController else {
+            return
+        }
+
+        navigationController.popToRootViewController(animated: false)
+
+        let model = NCMoreModel(controller: controller)
+
+        model.perform(destination)
     }
 
     private func navigateToSettings(controller: NCMainTabBarController) {
         controller.selectedIndex = ControllerConstants.moreIndex
         guard let navigationController = controller.viewControllers?[controller.selectedIndex] as? UINavigationController else { return }
 
-        let settingsView = NCSettingsView(model: NCSettingsModel(controller: controller))
-        let settingsController = UIHostingController(rootView: settingsView)
-        navigationController.pushViewController(settingsController, animated: true)
+        Task { @MainActor in
+            navigationController.popToRootViewController(animated: false)
+
+            let settingsView = NCSettingsView(model: NCSettingsModel(controller: controller))
+            let settingsController = UIHostingController(rootView: settingsView)
+            settingsController.title = NSLocalizedString("_settings_", comment: "")
+            navigationController.pushViewController(settingsController, animated: true)
+        }
     }
 
     private func navigateToAutoUpload(controller: NCMainTabBarController) {
@@ -152,6 +150,8 @@ class NCDeepLinkHandler {
         guard let navigationController = controller.viewControllers?[controller.selectedIndex] as? UINavigationController else { return }
 
         Task { @MainActor in
+            navigationController.popToRootViewController(animated: false)
+
             let autoUploadView = NCAutoUploadView(model: NCAutoUploadModel(controller: controller), albumModel: AlbumModel(controller: controller))
             let autoUploadController = UIHostingController(rootView: autoUploadView)
             navigationController.pushViewController(autoUploadController, animated: true)

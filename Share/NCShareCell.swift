@@ -7,7 +7,6 @@ import UIKit
 import NextcloudKit
 
 protocol NCShareCellDelegate: AnyObject {
-    var uploadStarted: Bool { get }
     func removeFile(named fileName: String)
     func showRenameFileDialog(named fileName: String, account: String)
     func renameFile(oldName: String, newName: String, account: String)
@@ -16,6 +15,7 @@ protocol NCShareCellDelegate: AnyObject {
 class NCShareCell: UITableViewCell {
     @IBOutlet weak var imageCell: UIImageView!
     @IBOutlet weak var fileNameCell: UILabel!
+    @IBOutlet weak var fileNameExtensionCell: UILabel!
     @IBOutlet weak var moreButton: UIButton!
     @IBOutlet weak var sizeCell: UILabel!
     weak var delegate: (NCShareCellDelegate & UIViewController)?
@@ -42,7 +42,7 @@ class NCShareCell: UITableViewCell {
             imageCell.contentMode = .scaleAspectFit
         }
 
-        fileNameCell?.text = fileName
+        setBidiSafeFilename(fileName, isDirectory: false, titleLabel: fileNameCell, extensionLabel: fileNameExtensionCell)
 
         let fileSize = utilityFileSystem.getFileSize(filePath: (NSTemporaryDirectory() + fileName))
         sizeCell?.text = utilityFileSystem.transformedSize(fileSize)
@@ -51,8 +51,11 @@ class NCShareCell: UITableViewCell {
     }
 
     @IBAction func buttonTapped(_ sender: Any) {
-        guard !fileName.isEmpty, delegate?.uploadStarted != true else { return }
-        let alertController = UIAlertController(title: "", message: fileName, preferredStyle: .alert)
+        let nsName = fileName as NSString
+        let ext = nsName.pathExtension
+        let base = nsName.deletingPathExtension
+        let displayName = ext.isEmpty || base.isEmpty ? fileName : base + "." + ext
+        let alertController = UIAlertController(title: "", message: displayName, preferredStyle: .alert)
 
         alertController.addAction(UIAlertAction(title: NSLocalizedString("_rename_file_", comment: ""), style: .default) { _ in
             self.delegate?.showRenameFileDialog(named: self.fileName, account: self.account)

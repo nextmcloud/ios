@@ -24,8 +24,9 @@ extension NCManageDatabase {
     ///   - etag: Optional ETag string.
     ///   - errorCode: Optional error code to persist.
     /// - Returns: A detached copy of the updated `tableMetadata` object, or `nil` if not found.
-    @discardableResult
-    func setMetadataSessionAsync(ocId: String,
+    func setMetadataSessionAsync(account: String? = nil,
+                                 ocId: String? = nil,
+                                 serverUrlFileName: String? = nil,
                                  newFileName: String? = nil,
                                  session: String? = nil,
                                  sessionTaskIdentifier: Int? = nil,
@@ -33,13 +34,24 @@ extension NCManageDatabase {
                                  selector: String? = nil,
                                  status: Int? = nil,
                                  etag: String? = nil,
-                                 errorCode: Int? = nil) async -> tableMetadata? {
-        await performRealmWriteAsync { realm in
+                                 errorCode: Int? = nil) async {
+        var query: NSPredicate = NSPredicate()
+        if let ocId {
+            query = NSPredicate(format: "ocId == %@", ocId)
+        } else if let account, let serverUrlFileName {
+            query = NSPredicate(format: "account == %@ AND serverUrlFileName == %@", account, serverUrlFileName)
+        } else {
+            return
+        }
+
+        await core.performRealmWriteAsync { realm in
             guard let metadata = realm.objects(tableMetadata.self)
-                .filter("ocId == %@", ocId)
+                .filter(query)
                 .first else {
                     return
             }
+
+            metadata.sessionDate = Date()
 
             if let name = newFileName {
                 metadata.fileName = name
@@ -84,15 +96,6 @@ extension NCManageDatabase {
             if let errorCode {
                 metadata.errorCode = errorCode
             }
-
-            realm.add(metadata, update: .all)
-        }
-
-        return await performRealmReadAsync { realm in
-            realm.objects(tableMetadata.self)
-                .filter("ocId == %@", ocId)
-                .first?
-                .detachedCopy()
         }
     }
 
@@ -108,25 +111,23 @@ extension NCManageDatabase {
                                                session: String,
                                                selector: String,
                                                sceneIdentifier: String? = nil) async -> tableMetadata? {
-        await performRealmWriteAsync { realm in
+        await core.performRealmWriteAsync { realm in
             guard let metadata = realm.objects(tableMetadata.self)
                 .filter("ocId == %@", ocId)
                 .first else {
                 return
             }
 
+            metadata.sessionDate = Date()
             metadata.sceneIdentifier = sceneIdentifier
             metadata.session = session
             metadata.sessionTaskIdentifier = 0
             metadata.sessionError = ""
             metadata.sessionSelector = selector
             metadata.status = NCGlobal.shared.metadataStatusWaitDownload
-            metadata.sessionDate = Date()
-
-            realm.add(metadata, update: .all)
         }
 
-        return await performRealmReadAsync { realm in
+        return await core.performRealmReadAsync { realm in
             realm.objects(tableMetadata.self)
                 .filter("ocId == %@", ocId)
                 .first?
@@ -146,60 +147,32 @@ extension NCManageDatabase {
 
         // Apply modifications
         detachedMetadatas = detachedMetadatas.map { metadata in
+            metadata.sessionDate = nil
             metadata.sceneIdentifier = nil
             metadata.session = ""
             metadata.sessionTaskIdentifier = 0
             metadata.sessionError = ""
             metadata.sessionSelector = ""
-            metadata.sessionDate = nil
             metadata.status = NCGlobal.shared.metadataStatusNormal
             return metadata
         }
 
         // Write to Realm asynchronously
-        await performRealmWriteAsync { realm in
+        await core.performRealmWriteAsync { realm in
             detachedMetadatas.forEach { metadata in
                 realm.add(metadata, update: .all)
             }
         }
     }
 
-    // MARK: - Realm Read
+    func clearMetadatasSessionAsync(ocId: String) async {
+        await core.performRealmWriteAsync { realm in
+            guard let object = realm.object(ofType: tableMetadata.self, forPrimaryKey: ocId) else { return }
 
-    func getMetadataAsync(from url: URL?, sessionTaskIdentifier: Int) async -> tableMetadata? {
-        guard let url,
-              var serverUrl = url.deletingLastPathComponent().absoluteString.removingPercentEncoding
-        else {
-            return nil
+            object.session = ""
+            object.sessionError = ""
+            object.sessionTaskIdentifier = 0
+            object.status = NCGlobal.shared.metadataStatusNormal
         }
-        let fileName = url.lastPathComponent
-
-        if serverUrl.hasSuffix("/") {
-            serverUrl = String(serverUrl.dropLast())
-        }
-        let predicate = NSPredicate(format: "serverUrl == %@ AND fileName == %@ AND sessionTaskIdentifier == %d",
-                                    serverUrl,
-                                    fileName,
-                                    sessionTaskIdentifier)
-
-        return await performRealmReadAsync { realm in
-            realm.objects(tableMetadata.self)
-                .filter(predicate)
-                .first
-                .map { $0.detachedCopy() }
-        }
-    }
-
-    func updateBadge() async {
-        #if !EXTENSION
-        let num = await performRealmReadAsync { realm in
-            realm.objects(tableMetadata.self)
-                .filter(NSPredicate(format: "status != %i", NCGlobal.shared.metadataStatusNormal))
-                .count
-        } ?? 0
-        DispatchQueue.main.async {
-            UIApplication.shared.applicationIconBadgeNumber = num
-        }
-        #endif
     }
 }

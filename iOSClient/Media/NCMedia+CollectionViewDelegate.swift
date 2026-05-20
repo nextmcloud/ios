@@ -1,25 +1,6 @@
-//
-//  NCMedia+CollectionViewDelegate.swift
-//  Nextcloud
-//
-//  Created by Marino Faggiana on 16/07/24.
-//  Copyright © 2024 Marino Faggiana. All rights reserved.
-//
-//  Author Marino Faggiana <marino.faggiana@nextcloud.com>
-//
-//  This program is free software: you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
-//  the Free Software Foundation, either version 3 of the License, or
-//  (at your option) any later version.
-//
-//  This program is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
-//
-//  You should have received a copy of the GNU General Public License
-//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-//
+// SPDX-FileCopyrightText: Nextcloud GmbH
+// SPDX-FileCopyrightText: 2024 Marino Faggiana
+// SPDX-License-Identifier: GPL-3.0-or-later
 
 import UIKit
 import NextcloudKit
@@ -34,17 +15,19 @@ extension NCMedia: UICollectionViewDelegate {
             if isEditMode {
                 if let index = fileSelect.firstIndex(of: metadata.ocId) {
                     fileSelect.remove(at: index)
-                    cell.selected(false)
+                    cell.selected(false, color: NCBrandColor.shared.getElement(account: session.account))
                 } else {
                     fileSelect.append(metadata.ocId)
-                    cell.selected(true)
+                    cell.selected(true, color: NCBrandColor.shared.getElement(account: session.account))
                 }
                 tabBarSelect.selectCount = fileSelect.count
             } else if let metadata = await self.database.getMetadataFromOcIdAsync(metadata.ocId) {
-                let image = utility.getImage(ocId: metadata.ocId, etag: metadata.etag, ext: global.previewExt1024)
+                let image = utility.getImage(ocId: metadata.ocId, etag: metadata.etag, ext: global.previewExt1024, userId: metadata.userId, urlBase: metadata.urlBase)
                 let ocIds = dataSource.metadatas.map { $0.ocId }
 
-                NCViewer().view(viewController: self, metadata: metadata, ocIds: ocIds, image: image)
+                if let vc = await NCViewer().getViewerController(metadata: metadata, ocIds: ocIds, image: image, delegate: self) {
+                    self.navigationController?.pushViewController(vc, animated: true)
+                }
             }
         }
     }
@@ -56,12 +39,12 @@ extension NCMedia: UICollectionViewDelegate {
             return nil
         }
         let identifier = indexPath as NSCopying
-        let image = utility.getImage(ocId: metadata.ocId, etag: metadata.etag, ext: global.previewExt1024)
+        let image = utility.getImage(ocId: metadata.ocId, etag: metadata.etag, ext: global.previewExt1024, userId: metadata.userId, urlBase: metadata.urlBase)
 
         return UIContextMenuConfiguration(identifier: identifier, previewProvider: {
             return NCViewerProviderContextMenu(metadata: metadata, image: image, sceneIdentifier: self.sceneIdentifier)
         }, actionProvider: { _ in
-            let contextMenu = NCContextMenu(metadata: metadata.detachedCopy(), viewController: self, sceneIdentifier: self.sceneIdentifier, image: image)
+            let contextMenu = NCContextMenuMain(metadata: metadata.detachedCopy(), viewController: self, controller: self.controller, sender: collectionView)
             return contextMenu.viewMenu()
         })
     }

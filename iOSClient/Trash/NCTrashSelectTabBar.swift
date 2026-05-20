@@ -1,23 +1,6 @@
-//
-//  NCTrashSelectTabBar.swift
-//  Nextcloud
-//
-//  Created by Milen on 05.02.24.
-//  Copyright © 2024 Marino Faggiana. All rights reserved.
-//
-//  This program is free software: you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
-//  the Free Software Foundation, either version 3 of the License, or
-//  (at your option) any later version.
-//
-//  This program is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
-//
-//  You should have received a copy of the GNU General Public License
-//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-//
+// SPDX-FileCopyrightText: Nextcloud GmbH
+// SPDX-FileCopyrightText: 2024 Milen
+// SPDX-License-Identifier: GPL-3.0-or-later
 
 import Foundation
 import UIKit
@@ -36,43 +19,46 @@ class NCTrashSelectTabBar: ObservableObject {
 
     @Published var isSelectedEmpty = true
 
-    init(controller: UITabBarController? = nil, delegate: NCTrashSelectTabBarDelegate? = nil) {
+    init(controller: UITabBarController? = nil, viewController: UIViewController, delegate: NCTrashSelectTabBarDelegate? = nil) {
+        guard let controller else {
+            return
+        }
         let rootView = NCTrashSelectTabBarView(tabBarSelect: self)
+        let bottomAreaInsets: CGFloat = controller.tabBar.safeAreaInsets.bottom == 0 ? 34 : 0
+        let height = controller.tabBar.frame.height + bottomAreaInsets
         hostingController = UIHostingController(rootView: rootView)
+        guard let hostingController else {
+            return
+        }
 
         self.controller = controller
         self.delegate = delegate
 
-        guard let controller, let hostingController else { return }
-
-        setFrame()
-
-        hostingController.view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        hostingController.view.translatesAutoresizingMaskIntoConstraints = false
         hostingController.view.backgroundColor = .clear
         hostingController.view.isHidden = true
 
-        controller.view.addSubview(hostingController.view)
-    }
+        viewController.view.addSubview(hostingController.view)
 
-    func setFrame() {
-        guard let controller,
-              let hostingController
-        else {
-            return
-        }
-        let bottomAreaInsets: CGFloat = controller.tabBar.safeAreaInsets.bottom == 0 ? 34 : 0
-
-        hostingController.view.frame = CGRect(x: controller.tabBar.frame.origin.x,
-                                              y: controller.tabBar.frame.origin.y - bottomAreaInsets,
-                                              width: controller.tabBar.frame.width,
-                                              height: controller.tabBar.frame.height + bottomAreaInsets)
+        NSLayoutConstraint.activate([
+            hostingController.view.leadingAnchor.constraint(equalTo: viewController.view.leadingAnchor),
+            hostingController.view.trailingAnchor.constraint(equalTo: viewController.view.trailingAnchor),
+            hostingController.view.bottomAnchor.constraint(equalTo: viewController.view.bottomAnchor),
+            hostingController.view.heightAnchor.constraint(equalToConstant: height)
+        ])
     }
 
     func show() {
         guard let controller,
-              let hostingController else { return }
+              let hostingController else {
+            return
+        }
 
-        controller.tabBar.isHidden = true
+        if #available(iOS 18.0, *) {
+            controller.setTabBarHidden(true, animated: true)
+        } else {
+            controller.tabBar.isHidden = true
+        }
 
         if hostingController.view.isHidden {
             hostingController.view.isHidden = false
@@ -87,13 +73,17 @@ class NCTrashSelectTabBar: ObservableObject {
 
     func hide() {
         guard let controller,
-              let hostingController
-        else {
+              let hostingController else {
             return
         }
 
         hostingController.view.isHidden = true
-        controller.tabBar.isHidden = false
+
+        if #available(iOS 18.0, *) {
+            controller.setTabBarHidden(false, animated: true)
+        } else {
+            controller.tabBar.isHidden = false
+        }
     }
 
     func update(selectOcId: [String]) {
@@ -118,8 +108,7 @@ struct NCTrashSelectTabBarView: View {
                     tabBarSelect.delegate?.recover()
                 } label: {
                     Image(systemName: "arrow.counterclockwise")
-                        .font(Font.system(.body).weight(.light))
-                        .imageScale(sizeClass == .compact ? .medium : .large)
+                        .font(.icon())
                 }
                 .tint(Color(NCBrandColor.shared.iconImageColor))
                 .frame(maxWidth: .infinity)
@@ -129,8 +118,7 @@ struct NCTrashSelectTabBarView: View {
                     tabBarSelect.delegate?.delete()
                 } label: {
                     Image(systemName: "trash")
-                        .font(Font.system(.body).weight(.light))
-                        .imageScale(sizeClass == .compact ? .medium : .large)
+                        .font(.icon())
                 }
                 .tint(.red)
                 .frame(maxWidth: .infinity)
@@ -140,8 +128,7 @@ struct NCTrashSelectTabBarView: View {
                     tabBarSelect.delegate?.selectAll()
                 } label: {
                     Image(systemName: "checkmark")
-                        .font(Font.system(.body).weight(.light))
-                        .imageScale(sizeClass == .compact ? .medium : .large)
+                        .font(.icon())
                 }
                 .tint(Color(NCBrandColor.shared.iconImageColor))
                 .frame(maxWidth: .infinity)
@@ -154,5 +141,5 @@ struct NCTrashSelectTabBarView: View {
 }
 
 #Preview {
-    NCTrashSelectTabBarView(tabBarSelect: NCTrashSelectTabBar())
+    NCTrashSelectTabBarView(tabBarSelect: NCTrashSelectTabBar(viewController: UIViewController()))
 }

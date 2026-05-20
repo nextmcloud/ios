@@ -1,27 +1,7 @@
-//
-//  NCIntroViewController.swift
-//  Nextcloud
-//
-//  Created by Philippe Weidmann on 24.12.19.
-//  Copyright © 2019 Philippe Weidmann. All rights reserved.
-//  Copyright © 2019 Marino Faggiana All rights reserved.
-//
-//  Author Philippe Weidmann
-//  Author Marino Faggiana <marino.faggiana@nextcloud.com>
-//
-//  This program is free software: you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
-//  the Free Software Foundation, either version 3 of the License, or
-//  (at your option) any later version.
-//
-//  This program is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
-//
-//  You should have received a copy of the GNU General Public License
-//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-//
+// SPDX-FileCopyrightText: Nextcloud GmbH
+// SPDX-FileCopyrightText: 2019 Marino Faggiana
+// SPDX-FileCopyrightText: 2019 Philippe Weidmann
+// SPDX-License-Identifier: GPL-3.0-or-later
 
 import UIKit
 
@@ -33,7 +13,7 @@ class NCIntroViewController: UIViewController, UICollectionViewDataSource, UICol
     @IBOutlet weak var pageControl: UIPageControl!
 
     weak var delegate: NCIntroViewController?
-    /// Controller
+    // Controller
     var controller: NCMainTabBarController?
 
     private let appDelegate = (UIApplication.shared.delegate as? AppDelegate)!
@@ -42,6 +22,7 @@ class NCIntroViewController: UIViewController, UICollectionViewDataSource, UICol
     private var timer: Timer?
     private var textColor: UIColor = .white
     private var textColorOpponent: UIColor = .black
+    private var activeLoginProvider: NCLoginProvider?
 
     // MARK: - View Life Cycle
 
@@ -71,7 +52,7 @@ class NCIntroViewController: UIViewController, UICollectionViewDataSource, UICol
         self.navigationController?.navigationBar.tintColor = textColor
 
         if !NCManageDatabase.shared.getAllTableAccount().isEmpty {
-            let navigationItemCancel = UIBarButtonItem(image: UIImage(systemName: "xmark"), style: .done, target: self, action: #selector(actionCancel(_:)))
+            let navigationItemCancel = UIBarButtonItem(image: UIImage(systemName: "xmark"), style: .plain, target: self, action: #selector(actionCancel(_:)))
             navigationItemCancel.tintColor = textColor
             navigationItem.leftBarButtonItem = navigationItemCancel
         }
@@ -79,20 +60,15 @@ class NCIntroViewController: UIViewController, UICollectionViewDataSource, UICol
         pageControl.currentPageIndicatorTintColor = textColor
         pageControl.pageIndicatorTintColor = .lightGray
 
-        buttonLogin.layer.cornerRadius = 20
+        buttonLogin.layer.cornerRadius = 8
         buttonLogin.setTitleColor(NCBrandColor.shared.customer, for: .normal)
         buttonLogin.backgroundColor = textColor
         buttonLogin.setTitle(NSLocalizedString("_log_in_", comment: ""), for: .normal)
 
-        buttonSignUp.layer.cornerRadius = 20
-        buttonSignUp.layer.borderColor = textColor.cgColor
-        buttonSignUp.layer.borderWidth = 1.0
+        buttonSignUp.layer.cornerRadius = 8
         buttonSignUp.setTitleColor(textColor, for: .normal)
-        buttonSignUp.backgroundColor = NCBrandColor.shared.customer
+        buttonSignUp.backgroundColor = textColor.withAlphaComponent(0.2)
         buttonSignUp.titleLabel?.adjustsFontSizeToFitWidth = true
-        var configButtonSignUp = UIButton.Configuration.filled()
-        configButtonSignUp.titlePadding = 10
-        buttonSignUp.configuration = configButtonSignUp
         buttonSignUp.setTitle(NSLocalizedString("_sign_up_", comment: ""), for: .normal)
 
         buttonHost.layer.cornerRadius = 20
@@ -189,11 +165,12 @@ class NCIntroViewController: UIViewController, UICollectionViewDataSource, UICol
     }
 
     @IBAction func signupWithProvider(_ sender: Any) {
-        if let viewController = UIStoryboard(name: "NCLogin", bundle: nil).instantiateViewController(withIdentifier: "NCLoginProvider") as? NCLoginProvider {
-            viewController.controller = self.controller
-            viewController.initialURLString = NCBrandOptions.shared.linkloginPreferredProviders
-            self.navigationController?.pushViewController(viewController, animated: true)
-        }
+        let loginProvider = NCLoginProvider()
+        loginProvider.controller = self.controller
+        loginProvider.initialURLString = NCBrandOptions.shared.linkloginPreferredProviders
+        loginProvider.presentingViewController = self
+        loginProvider.startAuthentication()
+        self.activeLoginProvider = loginProvider
     }
 
     @IBAction func host(_ sender: Any) {
