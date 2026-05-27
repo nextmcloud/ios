@@ -8,7 +8,14 @@ import SwiftUI
 
 class NCMediaNavigationController: NCMainNavigationController {
 
+    static let photosAddedToAlbumNotification = Notification.Name("NCMediaPhotosAddedToAlbumNotification")
+
     // MARK: - Right
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        NotificationCenter.default.addObserver(self, selector: #selector(handlePhotosAddedToAlbumNotification(_:)), name: Self.photosAddedToAlbumNotification, object: nil)
+    }
 
     override func setNavigationRightItems() async {
         guard let media = topViewController as? NCMedia else {
@@ -267,7 +274,16 @@ class NCMediaNavigationController: NCMainNavigationController {
         return UIMenu(title: "", children: !media.isEditMode ? [select, viewFilterMenu, viewLayoutMenu, viewFolderMedia, mediaSortMenu] : [cancel, selectAll, editModeMenu])//, playFile, playURL])
 
     }
-    
+
+    @objc private func handlePhotosAddedToAlbumNotification(_ notification: Notification) {
+        guard let media = topViewController as? NCMedia else { return }
+        media.setEditMode(false)
+        Task {
+            await media.loadDataSource()
+            await media.networkRemoveAll()
+            await self.updateRightMenu()
+        }
+    }
     
     static func presentInputAlbumNameAlert(
          on viewController: UIViewController,
@@ -363,6 +379,15 @@ class NCMediaNavigationController: NCMainNavigationController {
             return
         }
         
+        var completed = 0
+        let total = selectedPhotos.count
+        func finishIfDone() {
+            completed += 1
+            if completed >= total {
+                NotificationCenter.default.post(name: NCMediaNavigationController.photosAddedToAlbumNotification, object: nil)
+            }
+        }
+        
         for photo in selectedPhotos {
             
             let metadata: tableMetadata? = NCManageDatabase.shared.getMetadataFromOcId(photo)
@@ -384,6 +409,7 @@ class NCMediaNavigationController: NCMainNavigationController {
                     // Push the album details route through AlbumsNavigator
                     AlbumsNavigator.shared.push(.albumDetails(album: album))
                     AlbumsManager.shared.syncAlbums()
+                    finishIfDone()
                 case .failure(let error):
                     let nkError = NKError(error: error)
                     if let innerError = nkError.error as? NKError, innerError.errorCode == NCGlobal.shared.errorConflict {
@@ -394,6 +420,7 @@ class NCMediaNavigationController: NCMainNavigationController {
                     } else {
                         NCContentPresenter().showError(error: nkError)
                     }
+                    finishIfDone()
                 }
             }
             
@@ -404,4 +431,9 @@ class NCMediaNavigationController: NCMainNavigationController {
         guard let tabbarController = UIApplication.shared.firstWindow?.rootViewController as? NCMainTabBarController else { return }
         tabbarController.selectedIndex = NCGlobal.shared.selectedTabIndexAlbum
     }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self, name: Self.photosAddedToAlbumNotification, object: nil)
+    }
 }
+
