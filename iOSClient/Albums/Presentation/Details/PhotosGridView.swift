@@ -114,6 +114,8 @@ struct PhotosGridView: View {
                 return
             }
 
+        viewer.hidesBottomBarWhenPushed = true
+
         // 5) Populate viewer with the complete, ordered arrays
         viewer.ocIds = ocIds
         viewer.metadatas = metadatas
