@@ -27,6 +27,8 @@ class NCMainTabBarController: UITabBarController {
     private var timerTask: Task<Void, Never>?
     private let global = NCGlobal.shared
 
+    private var isSelectionModeActive: Bool = false
+
     var window: UIWindow? {
         return SceneManager.shared.getWindow(controller: self)
     }
@@ -128,6 +130,10 @@ class NCMainTabBarController: UITabBarController {
             }
         }
         
+        // Observe selection mode changes to manage tab bar visibility and avoid overlap with action bar
+        NotificationCenter.default.addObserver(self, selector: #selector(handleSelectionModeDidBegin(_:)), name: Notification.Name("NCSelectionModeDidBegin"), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(handleSelectionModeDidEnd(_:)), name: Notification.Name("NCSelectionModeDidEnd"), object: nil)
+        
         Task { @MainActor in
             let session = NCSession.shared.getSession(controller: self)
             // Option 1: Use a preloader service
@@ -144,8 +150,6 @@ class NCMainTabBarController: UITabBarController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        // Ensure the tab bar is visible whenever the main tab bar controller is about to appear
-        show()
     }
 
     override func viewDidAppear(_ animated: Bool) {
@@ -184,13 +188,6 @@ class NCMainTabBarController: UITabBarController {
             if let navigationController = self.selectedViewController as? NCMainNavigationController {
                 await navigationController.updateRightBarButtonItems(self.tabBar.items?[0])
             }
-            // Ensure tab bar stays visible while active, especially after returning from nested flows
-            self.show()
-            
-            // Update Activity tab bar
-//            if let item = self.tabBar.items?[3] {
-//                item.isEnabled = capabilities.activityEnabled
-//            }
         }
     }
 
@@ -229,6 +226,16 @@ class NCMainTabBarController: UITabBarController {
             tabBar.isHidden = false
         }
     }
+
+    @objc private func handleSelectionModeDidBegin(_ notification: Notification) {
+        isSelectionModeActive = true
+        hide()
+    }
+
+    @objc private func handleSelectionModeDidEnd(_ notification: Notification) {
+        isSelectionModeActive = false
+        show()
+    }
 }
 
 extension NCMainTabBarController: UITabBarControllerDelegate {
@@ -238,7 +245,9 @@ extension NCMainTabBarController: UITabBarControllerDelegate {
         }
         previousIndex = tabBarController.selectedIndex
         // Always ensure the tab bar is visible when switching tabs
-        (tabBarController as? NCMainTabBarController)?.show()
+        if let main = tabBarController as? NCMainTabBarController, !main.isSelectionModeActive {
+            main.show()
+        }
     }
 
     private func scrollToTop(viewController: UIViewController) {

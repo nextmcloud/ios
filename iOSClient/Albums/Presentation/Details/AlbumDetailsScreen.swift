@@ -99,6 +99,18 @@ struct AlbumDetailsScreen: View {
                 Text(NSLocalizedString("_albums_delete_album_popup_desc_", comment: ""))
             }
         )
+        .onAppear {
+            // Force end selection mode so the tab bar remains visible on this screen
+            NotificationCenter.default.post(name: Notification.Name("NCSelectionModeDidEnd"), object: nil)
+        }
+        .onDisappear {
+            NotificationCenter.default.post(name: Notification.Name("NCSelectionModeDidEnd"), object: nil)
+        }
+        .onChange(of: viewModel.isPhotoSelectionSheetVisible) { isPresented in
+            if isPresented == false {
+                NotificationCenter.default.post(name: Notification.Name("NCSelectionModeDidEnd"), object: nil)
+            }
+        }
     }
     
     @ViewBuilder
@@ -135,3 +147,4 @@ struct AlbumDetailsScreen: View {
         showMedia = true
     }
 }
+

@@ -67,6 +67,7 @@ class NCCollectionViewCommonSelectTabBar: ObservableObject {
         }
 
         controller.hide()
+        NotificationCenter.default.post(name: Notification.Name("NCSelectionModeDidBegin"), object: nil)
 
         if hostingController.view.isHidden {
             hostingController.view.isHidden = false
@@ -84,6 +85,7 @@ class NCCollectionViewCommonSelectTabBar: ObservableObject {
         }
 
         hostingController.view.isHidden = true
+        NotificationCenter.default.post(name: Notification.Name("NCSelectionModeDidEnd"), object: nil)
         controller.show()
     }
 
@@ -189,16 +191,16 @@ struct NCCollectionViewCommonSelectTabBarView: View {
 
                     // NMC-5295 - iOS v10.2.2.3 - File Browser: Remove "file lock" feature from menu
                     // lock menu entry is not available. not supported by magentacloud
-//                    Button(action: {
-//                        tabBarSelect.delegate?.lock(isAnyLocked: tabBarSelect.isAnyLocked)
-//                    }, label: {
-//                        Label(NSLocalizedString(tabBarSelect.isAnyLocked ? "_unlock_" : "_lock_", comment: ""), systemImage: tabBarSelect.isAnyLocked ? "lock.open" : "lock")
-//
-//                        if !tabBarSelect.enableLock {
-//                            Text(NSLocalizedString("_lock_no_permissions_selected_", comment: ""))
-//                        }
-//                    })
-//                    .disabled(!tabBarSelect.enableLock || tabBarSelect.isSelectedEmpty)
+                    Button(action: {
+                        tabBarSelect.delegate?.lock(isAnyLocked: tabBarSelect.isAnyLocked)
+                    }, label: {
+                        Label(NSLocalizedString(tabBarSelect.isAnyLocked ? "_unlock_" : "_lock_", comment: ""), systemImage: tabBarSelect.isAnyLocked ? "lock.open" : "lock")
+
+                        if !tabBarSelect.enableLock {
+                            Text(NSLocalizedString("_lock_no_permissions_selected_", comment: ""))
+                        }
+                    })
+                    .disabled(!tabBarSelect.enableLock || tabBarSelect.isSelectedEmpty)
 
                     Button(action: {
                         tabBarSelect.delegate?.selectAll()
