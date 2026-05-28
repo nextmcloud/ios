@@ -477,24 +477,23 @@ class NCContextMenu: NSObject {
 
     private func buildDeleteMenu(metadata: tableMetadata) -> [UIMenuElement] {
         var deleteMenu: [UIMenuElement] = []
+
+        /*
         let deleteConfirmLocal = makeDeleteLocalAction(metadata: metadata)
         let deleteConfirmFile = makeDeleteFileAction(metadata: metadata)
 
         let deleteSubMenu = UIMenu(
             title: NSLocalizedString("_delete_", comment: ""),
-            image: utility.loadImage(named: "trashIcon", colors: [NCBrandColor.shared.iconImageColor]).withTintColor(NCBrandColor.shared.iconImageColor),
+            image: utility.loadImage(named: "trash"),
             options: .destructive,
             children: [deleteConfirmLocal, deleteConfirmFile]
         )
+        */
 
-        if metadata.directory {
-            if !metadata.isDirectoryE2EE && !metadata.e2eEncrypted {
-                deleteMenu.append(deleteSubMenu)
-            }
-        } else {
-            if !metadata.lock {
-                deleteMenu.append(deleteSubMenu)
-            }
+        deleteMenu.append(makeDeleteLocalAction(metadata: metadata))
+
+        if metadata.isDeletable {
+            deleteMenu.append(makeDeleteFileAction(metadata: metadata))
         }
 
         return deleteMenu
@@ -511,11 +510,35 @@ class NCContextMenu: NSObject {
         ) { _ in
             if let viewController = self.viewController as? NCCollectionViewCommon {
                 Task {
-                    await NCNetworking.shared.setStatusWaitDelete(
-                        metadatas: [metadata],
-                        sceneIdentifier: self.sceneIdentifier
-                    )
-                    await viewController.reloadDataSource()
+                    if metadata.isDirectoryE2EE {
+                        if NCNetworking.shared.isOffline {
+                            await showErrorBanner(windowScene: self.windowScene,
+                                                  text: "_offline_not_allowed_",
+                                                  errorCode: NCGlobal.shared.errorOfflineNotAllowed)
+                        } else {
+                            let results = await showHudBanner(windowScene: self.windowScene,
+                                                        title: "_delete_in_progress_")
+
+                            let error = await NCNetworkingE2EEDelete().delete(metadata: metadata)
+
+                            if error == .success {
+                                await completeHudBannerSuccess(token: results.token, banner: results.banner)
+                            } else {
+                                await completeHudBannerError(description: error.errorDescription, token: results.token, banner: results.banner)
+                            }
+
+                            await NCNetworking.shared.transferDispatcher.notifyAllDelegates { delegate in
+                                delegate.transferReloadDataSource(serverUrl: metadata.serverUrl, requestData: false, status: nil)
+                            }
+                        }
+                    }
+                    else {
+                        await NCNetworking.shared.setStatusWaitDelete(
+                            metadatas: [metadata],
+                            sceneIdentifier: self.sceneIdentifier
+                        )
+                        await viewController.reloadDataSource()
+                    }
                 }
             } else if let viewController = self.viewController as? NCMedia {
                 Task {
@@ -528,8 +551,7 @@ class NCContextMenu: NSObject {
     private func makeDeleteLocalAction(metadata: tableMetadata) -> UIAction {
         return UIAction(
             title: NSLocalizedString("_remove_local_file_", comment: ""),
-            image: utility.loadImage(named: "trashIcon", colors: [NCBrandColor.shared.iconImageColor]).withTintColor(NCBrandColor.shared.iconImageColor),
-            attributes: .destructive
+            image: utility.loadImage(named: "document.on.trash")
         ) { _ in
             Task {
                 let error = await NCNetworking.shared.deleteCache(

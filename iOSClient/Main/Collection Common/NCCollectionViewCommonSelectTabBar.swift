@@ -26,6 +26,7 @@ class NCCollectionViewCommonSelectTabBar: ObservableObject {
     @Published var isAnyDirectory = false
     @Published var isAllDirectory = false
     @Published var isAnyLocked = false
+    @Published var isAnyEncrypted = false
     @Published var canUnlock = true
     @Published var enableLock = false
     @Published var isSelectedEmpty = true
@@ -96,6 +97,7 @@ class NCCollectionViewCommonSelectTabBar: ObservableObject {
             isAnyDirectory = false
             isAllDirectory = true
             isAnyLocked = false
+            isAnyEncrypted = false
             canUnlock = true
             self.metadatas = metadatas
 
@@ -115,6 +117,11 @@ class NCCollectionViewCommonSelectTabBar: ObservableObject {
                     if metadata.lockOwner != userId {
                         canUnlock = false
                     }
+                }
+
+                // If any selected item is end-to-end encrypted, mark it so we can hide copy/move
+                if (metadata.responds(to: Selector(("e2eEncrypted"))) ? (metadata.value(forKey: "e2eEncrypted") as? Bool ?? false) : (metadata.value(forKey: "isEncrypted") as? Bool ?? false)) {
+                    isAnyEncrypted = true
                 }
 
                 guard !isAnyOffline else { continue }
@@ -164,7 +171,8 @@ struct NCCollectionViewCommonSelectTabBarView: View {
                 }
                 .tint(Color(NCBrandColor.shared.iconImageColor))
                 .frame(maxWidth: .infinity)
-                .disabled(tabBarSelect.isSelectedEmpty)
+                .disabled(tabBarSelect.isSelectedEmpty || tabBarSelect.isAnyEncrypted)
+//                .opacity(tabBarSelect.isAnyEncrypted ? 0 : 1)
 
                 Button {
                     tabBarSelect.delegate?.delete()
