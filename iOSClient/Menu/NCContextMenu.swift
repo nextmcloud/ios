@@ -490,7 +490,7 @@ class NCContextMenu: NSObject {
         )
         */
 
-        deleteMenu.append(makeDeleteLocalAction(metadata: metadata))
+//        deleteMenu.append(makeDeleteLocalAction(metadata: metadata))
 
         if metadata.isDeletable {
             deleteMenu.append(makeDeleteFileAction(metadata: metadata))
@@ -551,7 +551,7 @@ class NCContextMenu: NSObject {
     private func makeDeleteLocalAction(metadata: tableMetadata) -> UIAction {
         return UIAction(
             title: NSLocalizedString("_remove_local_file_", comment: ""),
-            image: utility.loadImage(named: "document.on.trash")
+            image: utility.loadImage(named: "trashIcon", colors: [NCBrandColor.shared.iconImageColor]).withTintColor(NCBrandColor.shared.iconImageColor),
         ) { _ in
             Task {
                 let error = await NCNetworking.shared.deleteCache(
