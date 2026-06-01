@@ -418,6 +418,24 @@ class ReviewManager {
 //            // Fallback: If no scene is active (rare), open the App Store directly
 //            self.forceOpenAppStore()
             return
+        let currentCount = UserDefaults.standard.integer(forKey: launchCountKey)
+        
+        guard currentCount >= minimumLaunchCount else { return }
+        
+        // 1. Try to find an active UIWindowScene
+        if let scene = UIApplication.shared.connectedScenes
+            .first(where: { $0.activationState == .foregroundActive }) as? UIWindowScene {
+            
+            // 2. Trigger the system prompt
+            SKStoreReviewController.requestReview(in: scene)
+            
+        } else {
+            // 3. Fallback: If no active scene is found, force open the App Store
+            forceOpenAppStore()
+//            let appStoreURLString = "itms-apps://://itunes.apple.com\(appID)?action=write-review"
+//            let webURLString = "https://apps.apple.com\(appID)?action=write-review"
+//            self.forceOpenAppStore(appStoreURL: appStoreURLString, webURL: webURLString)
+
         }
         
         // 2. Trigger the native system prompt overlay
@@ -436,6 +454,16 @@ class ReviewManager {
         } else if let fallbackWebUrl = URL(string: webURLString) {
             // Fallback safety layer: Opens up your App Store page inside Safari
             UIApplication.shared.open(fallbackWebUrl, options: [:], completionHandler: nil)
+        }
+    }
+    
+    private func forceOpenAppStore(appStoreURL: String, webURL: String) {
+        if let url = URL(string: appStoreURL), UIApplication.shared.canOpenURL(url) {
+            // Opens the App Store app directly to the review sheet
+            UIApplication.shared.open(url, options: [:], completionHandler: nil)
+        } else if let fallback = URL(string: webURL) {
+            // Fallback to Safari if the app protocol isn't available
+            UIApplication.shared.open(fallback, options: [:], completionHandler: nil)
         }
     }
 }
