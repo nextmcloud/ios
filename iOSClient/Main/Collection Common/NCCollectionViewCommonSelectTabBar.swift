@@ -100,27 +100,27 @@ class NCCollectionViewCommonSelectTabBar: ObservableObject {
             isAnyEncrypted = false
             canUnlock = true
             self.metadatas = metadatas
-
+            
             for metadata in metadatas {
                 if metadata.directory {
                     isAnyDirectory = true
                 } else {
                     isAllDirectory = false
                 }
-
+                
                 if !metadata.canSetAsAvailableOffline {
                     canSetAsOffline = false
                 }
-
+                
                 if metadata.lock {
                     isAnyLocked = true
                     if metadata.lockOwner != userId {
                         canUnlock = false
                     }
                 }
-
+                
                 // If any selected item is end-to-end encrypted, mark it so we can hide copy/move
-                if (metadata.responds(to: Selector(("e2eEncrypted"))) ? (metadata.value(forKey: "e2eEncrypted") as? Bool ?? false) : (metadata.value(forKey: "isEncrypted") as? Bool ?? false)) {
+                if metadata.isDirectoryE2EE || metadata.e2eEncrypted {
                     isAnyEncrypted = true
                 }
 
