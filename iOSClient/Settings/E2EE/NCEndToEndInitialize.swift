@@ -166,7 +166,7 @@ class NCEndToEndInitialize: NSObject {
                         NCPreferences().setEndToEndPrivateKey(account: account, privateKey: privateKey)
                     } else {
                         Task {
-                            await showErrorBanner(windowScene: self.windowScene, text: "E2E decrypt privateKey: serious internal error to decrypt Private Key", errorCode: error.errorCode)
+                            await showErrorBanner(windowScene: self.windowScene, text: NSLocalizedString("_e2ee_setup_passphrase_error_", comment: ""), errorCode: error.errorCode)
                         }
                         return
                     }
