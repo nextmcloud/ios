@@ -388,6 +388,7 @@ import XLForm
                                                                                  url: url,
                                                                                  session: session,
                                                                                  sceneIdentifier: controller.sceneIdentifier)
+                AnalyticsHelper.shared.trackCreateFile(metadata: metadata)
                 if let vc = await NCViewer().getViewerController(metadata: metadata, delegate: controller) {
                     controller.navigationController?.pushViewController(vc, animated: true)
                 }
