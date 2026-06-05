@@ -24,17 +24,16 @@
 import UIKit
 import Foundation
 import NextcloudKit
-import LucidBanner
 
-extension NCCollectionViewCommon: NCCollectionViewCommonSelectTabBarDelegate {
+extension NCCollectionViewCommon: NCCollectionViewCommonSelectTabBarDelegate, NCSelectableNavigationView {
+    
     func selectAll() {
-        if !fileSelect.isEmpty, self.dataSource.getMetadatas().count == fileSelect.count {
-            fileSelect = []
-        } else {
-            fileSelect = self.dataSource.getMetadatas().compactMap({ $0.ocId })
-        }
+        fileSelect = selectableDataSource.compactMap({ $0.primaryKeyValue })
         tabBarSelect?.update(fileSelect: fileSelect, metadatas: getSelectedMetadatas(), userId: session.userId)
-        self.collectionView.reloadData()
+        DispatchQueue.main.async {
+            self.collectionView.reloadData()
+            self.setNavigationRightItems(enableMenu: false)
+        }
     }
 
     func delete() {
@@ -45,93 +44,35 @@ extension NCCollectionViewCommon: NCCollectionViewCommonSelectTabBarDelegate {
         let canDeleteServer = metadatas.allSatisfy { !$0.lock }
 
         if canDeleteServer {
+//            alertController.addAction(UIAlertAction(title: NSLocalizedString("_yes_", comment: ""), style: .destructive) { [self] _ in
+//                NCNetworking.shared.deleteMetadatas(metadatas, sceneIdentifier: self.controller?.sceneIdentifier)
+//                NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterReloadDataSource)
+//                toggleSelect()
             alertController.addAction(UIAlertAction(title: NSLocalizedString("_yes_", comment: ""), style: .destructive) { _ in
+                self.networking.setStatusWaitDelete(metadatas: metadatas, sceneIdentifier: self.controller?.sceneIdentifier)
+                self.setEditMode(false)
                 Task {
-                    await self.setEditMode(false)
-                    var metadatasPlain: [tableMetadata] = []
-                    var metadatasE2EE: [tableMetadata] = []
-
-                    for metadata in metadatas {
-                        if metadata.isDirectoryE2EE {
-                            metadatasE2EE.append(metadata)
-                        } else {
-                            metadatasPlain.append(metadata)
-                        }
-                    }
-
-                    if !metadatasPlain.isEmpty {
-                        let error = await self.networking.setStatusWaitDelete(metadatas: metadatasPlain)
-                        if error != .success {
-                            await showErrorBanner(windowScene: self.windowScene, error: error)
-                        }
-                    }
-
-                    if !metadatasE2EE.isEmpty {
-                        if self.networking.isOffline {
-                            await showErrorBanner(windowScene: self.windowScene,
-                                                  text: "_offline_not_allowed_",
-                                                  errorCode: self.global.errorOfflineNotAllowed)
-                        } else {
-                            var cancelOnTap = false
-                            var num: Float = 0
-                            let total = Float(metadatasE2EE.count)
-
-                            let bannerResults = showHudBanner(
-                                windowScene: self.windowScene,
-                                title: "_delete_in_progress_",
-                                stage: .button) {
-                                    cancelOnTap = true
-                                }
-                            for metadata in metadatasE2EE {
-                                let error = await NCNetworkingE2EEDelete().delete(metadata: metadata)
-                                num += 1
-                                bannerResults.banner?.update(
-                                    payload: LucidBannerPayload.Update(progress: Double(num) / Double(total)),
-                                    for: bannerResults.token
-                                )
-                                if cancelOnTap || error != .success {
-                                    break
-                                }
-                            }
-
-                            if let banner = bannerResults.banner {
-                                banner.dismiss()
-                            }
-                        }
-                    }
                     await self.reloadDataSource()
                 }
             })
         }
 
-        alertController.addAction(UIAlertAction(title: NSLocalizedString("_remove_local_file_", comment: ""), style: .default) { (_: UIAlertAction) in
+        alertController.addAction(UIAlertAction(title: NSLocalizedString("_remove_local_file_", comment: ""), style: .destructive) { [self] (_: UIAlertAction) in
+            let copyMetadatas = metadatas
+
             Task {
-                var token: Int?
-                var banner: LucidBanner?
-                let containsDirectory = metadatas.contains { $0.isDirectory }
-                if containsDirectory {
-                    (banner, token) = showHudBanner(windowScene: self.windowScene, title: "_delete_in_progress_")
-                }
-
-                for metadata in metadatas {
-                    await self.networking.deleteCache(metadata, progress: { progress in
-                        Task {
-                            if let token {
-                                banner?.update(
-                                    payload: LucidBannerPayload.Update(progress: progress),
-                                    for: token
-                                )
-                            }
-                        }
-
-                    })
-
-                    if let banner {
-                        banner.dismiss()
+                var error = NKError()
+                var ocId: [String] = []
+                for metadata in copyMetadatas where error == .success {
+                    error = await NCNetworking.shared.deleteCache(metadata, sceneIdentifier: self.controller?.sceneIdentifier)
+                    if error == .success {
+                        ocId.append(metadata.ocId)
                     }
+                    error = await self.networking.deleteCache(metadata, sceneIdentifier: self.controller?.sceneIdentifier)
                 }
-                await self.setEditMode(false)
+                NotificationCenter.default.postOnMainThread(name: self.global.notificationCenterDeleteFile, userInfo: ["ocId": ocId, "error": error])
             }
+            toggleSelect()
         })
 
         alertController.addAction(UIAlertAction(title: NSLocalizedString("_cancel_", comment: ""), style: .cancel) { (_: UIAlertAction) in })
@@ -139,23 +80,24 @@ extension NCCollectionViewCommon: NCCollectionViewCommonSelectTabBarDelegate {
     }
 
     func move() {
-        Task {
-            let metadatas = getSelectedMetadatas()
-            await setEditMode(false)
+        let metadatas = getSelectedMetadatas()
 
-            NCSelectOpen.shared.openView(items: metadatas, controller: self.controller)
-        }
+        NCActionCenter.shared.openSelectView(items: metadatas, controller: self.controller)
+        toggleSelect()
+        NCDownloadAction.shared.openSelectView(items: metadatas, controller: self.controller)
+        setEditMode(false)
+//        NCActionCenter.shared.openSelectView(items: metadatas, controller: self.controller)
+//        toggleSelect()
     }
 
     func share() {
-        Task {
-            let metadatas = getSelectedMetadatas()
-            await setEditMode(false)
-            await NCCreate().createActivityViewController(
-                selectedMetadata: metadatas,
-                controller: self.controller,
-                sender: nil)
-        }
+        let metadatas = getSelectedMetadatas()
+        NCActionCenter.shared.openActivityViewController(selectedMetadata: metadatas, controller: self.controller)
+        toggleSelect()
+        NCDownloadAction.shared.openActivityViewController(selectedMetadata: metadatas, controller: self.controller, sender: nil)
+        setEditMode(false)
+//        NCActionCenter.shared.openActivityViewController(selectedMetadata: metadatas, controller: self.controller)
+//        toggleSelect()
     }
 
     func saveAsAvailableOffline(isAnyOffline: Bool) {
@@ -168,35 +110,33 @@ extension NCCollectionViewCommon: NCCollectionViewCommonSelectTabBarDelegate {
             alert.addAction(UIAlertAction(title: NSLocalizedString("_continue_", comment: ""), style: .default, handler: { _ in
                 Task {
                     for metadata in metadatas {
-                        await NCNetworking.shared.setMetadataAvalableOffline(metadata, isOffline: isAnyOffline)
+                        await NCDownloadAction.shared.setMetadataAvalableOffline(metadata, isOffline: isAnyOffline)
                     }
-                    await  self.setEditMode(false)
                 }
+                self.setEditMode(false)
 
             }))
             alert.addAction(UIAlertAction(title: NSLocalizedString("_cancel_", comment: ""), style: .cancel))
             self.present(alert, animated: true)
         } else {
+//            metadatas.forEach { NCActionCenter.shared.setMetadataAvalableOffline($0, isOffline: isAnyOffline) }
+//            toggleSelect()
             Task {
                 for metadata in metadatas {
-                    await NCNetworking.shared.setMetadataAvalableOffline(metadata, isOffline: isAnyOffline)
+                    await NCDownloadAction.shared.setMetadataAvalableOffline(metadata, isOffline: isAnyOffline)
                 }
-                await setEditMode(false)
             }
+            setEditMode(false)
+
         }
     }
 
     func lock(isAnyLocked: Bool) {
-        Task {
-            let metadatas = getSelectedMetadatas()
-            for metadata in metadatas where metadata.lock == isAnyLocked {
-                let error = await self.networking.lockUnlockFile(metadata, shouldLock: !isAnyLocked)
-                if error != .success {
-                    await showErrorBanner(windowScene: self.windowScene, error: error)
-                }
-            }
-            await setEditMode(false)
+        let metadatas = getSelectedMetadatas()
+        for metadata in metadatas where metadata.lock == isAnyLocked {
+            self.networking.lockUnlockFile(metadata, shoulLock: !isAnyLocked)
         }
+        toggleSelect()
     }
 
     func getSelectedMetadatas() -> [tableMetadata] {
@@ -208,8 +148,7 @@ extension NCCollectionViewCommon: NCCollectionViewCommonSelectTabBarDelegate {
         return selectedMetadatas
     }
 
-    @MainActor
-    func setEditMode(_ editMode: Bool) async {
+    func setEditMode(_ editMode: Bool) {
         isEditMode = editMode
         fileSelect.removeAll()
 
@@ -217,17 +156,17 @@ extension NCCollectionViewCommon: NCCollectionViewCommonSelectTabBarDelegate {
         navigationController?.interactivePopGestureRecognizer?.isEnabled = !editMode
         searchController(enabled: !editMode)
 
-        // (+)
-        mainNavigationController?.menuPlus?.hiddenPlusButton(editMode)
-
         if editMode {
             navigationItem.leftBarButtonItems = nil
         } else {
            ///Magentacloud branding changes hide user account button on left navigation bar
-//            setNavigationLeftItems()
+            setNavigationLeftItems()
         }
-        (self.navigationController as? NCMainNavigationController)?.setNavigationRightItems()
 
+        navigationController?.interactivePopGestureRecognizer?.isEnabled = !editMode
+        navigationItem.hidesBackButton = editMode
+        searchController(enabled: !editMode)
+        self.setNavigationRightItems(enableMenu: true)
         self.collectionView.reloadData()
     }
 
@@ -248,10 +187,8 @@ extension NCCollectionViewCommon: NCCollectionViewCommonSelectTabBarDelegate {
             self.setNavigationLeftItems()
             self.setNavigationRightItems()
             self.collectionView.reloadData()
+            self.setEditMode(self.isEditMode)
         }
-        await (self.navigationController as? NCMainNavigationController)?.setNavigationRightItems()
-
-        self.collectionView.reloadData()
     }
 
     func createMenuActions() -> [NCMenuAction] {
@@ -260,11 +197,16 @@ extension NCCollectionViewCommon: NCCollectionViewCommonSelectTabBarDelegate {
         actions.append(.cancelAction {
             self.toggleSelect()
         })
-        if selectOcId.count != dataSource.getMetadataSourceForAllSections().count {
+//        if selectOcId.count != dataSource.getMetadataSourceForAllSections().count {
+//            actions.append(.selectAllAction(action: selectAll))
+//        }
+//
+//        guard !selectOcId.isEmpty else { return actions }
+        if fileSelect.count != selectableDataSource.count {
             actions.append(.selectAllAction(action: selectAll))
         }
 
-        guard !selectOcId.isEmpty else { return actions }
+        guard !fileSelect.isEmpty else { return actions }
 
         actions.append(.seperator(order: 0))
 
@@ -277,10 +219,14 @@ extension NCCollectionViewCommon: NCCollectionViewCommonSelectTabBarDelegate {
         var canOpenIn = false
         var isDirectoryE2EE = false
 
-        for ocId in selectOcId {
+//        for ocId in selectOcId {
+//            guard let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId) else { continue }
+//            if metadata.e2eEncrypted {
+//                selectOcId.removeAll(where: {$0 == metadata.ocId})
+        for ocId in fileSelect {
             guard let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId) else { continue }
             if metadata.e2eEncrypted {
-                selectOcId.removeAll(where: {$0 == metadata.ocId})
+                fileSelect.removeAll(where: {$0 == metadata.ocId})
             } else {
                 selectedMetadatas.append(metadata)
             }
@@ -291,14 +237,14 @@ extension NCCollectionViewCommon: NCCollectionViewCommonSelectTabBarDelegate {
             if metadata.directory { isAnyFolder = true }
             if metadata.lock {
                 isAnyLocked = true
-                if metadata.lockOwner != appDelegate.userId {
+                if metadata.lockOwner != session.userId {
                     canUnlock = false
                 }
             }
 
             guard !isAnyOffline else { continue }
             if metadata.directory,
-               let directory = NCManageDatabase.shared.getTableDirectory(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@", appDelegate.account, metadata.serverUrl + "/" + metadata.fileName)) {
+               let directory = NCManageDatabase.shared.getTableDirectory(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@", session.account, metadata.serverUrl + "/" + metadata.fileName)) {
                 isAnyOffline = directory.offline
             } else if let localFile = NCManageDatabase.shared.getTableLocalFile(predicate: NSPredicate(format: "ocId == %@", metadata.ocId)) {
                 isAnyOffline = localFile.offline
@@ -318,6 +264,10 @@ extension NCCollectionViewCommon: NCCollectionViewCommonSelectTabBarDelegate {
         }
 
         if !isAnyFolder, canUnlock, !NCGlobal.shared.capabilityFilesLockVersion.isEmpty {
+            actions.append(.openInAction(selectedMetadatas: selectedMetadatas, controller: self.controller, completion: { self.toggleSelect() }))
+        }
+
+        if !isAnyFolder, canUnlock, !NCCapabilities.shared.getCapabilities(account: controller?.account).capabilityFilesLockVersion.isEmpty {
             actions.append(.lockUnlockFiles(shouldLock: !isAnyLocked, metadatas: selectedMetadatas, completion: { self.toggleSelect() }))
         }
 
@@ -351,6 +301,7 @@ extension NCCollectionViewCommon: NCCollectionViewCommonSelectTabBarDelegate {
                 }
             )
             )
+            actions.append(.saveMediaAction(selectedMediaMetadatas: selectedMediaMetadatas, controller: self.controller, completion: { self.toggleSelect() }))
         }
         actions.append(.setAvailableOfflineAction(selectedMetadatas: selectedMetadatas, isAnyOffline: isAnyOffline, viewController: self, completion: {
             self.reloadDataSource()
@@ -365,4 +316,66 @@ extension NCCollectionViewCommon: NCCollectionViewCommonSelectTabBarDelegate {
         return actions
     }
 
+    func setNavigationRightItems(enableMenu: Bool = false) {
+        DispatchQueue.main.async {
+            if self.isEditMode {
+                let more = UIBarButtonItem(image: UIImage(systemName: "ellipsis"), style: .plain) { self.presentMenu(with: self.createMenuActions())}
+                self.navigationItem.rightBarButtonItems = [more]
+            } else {
+                let select = UIBarButtonItem(title: NSLocalizedString("_select_", comment: ""), style: UIBarButtonItem.Style.plain) { self.toggleSelect() }
+                let notification = UIBarButtonItem(image: UIImage(systemName: "bell"), style: .plain, action: self.tapNotification)
+                if self.layoutKey == NCGlobal.shared.layoutViewFiles {
+                    self.navigationItem.rightBarButtonItems = [select, notification]
+                } else {
+                    self.navigationItem.rightBarButtonItems = [select]
+                }
+                let transfer = UIBarButtonItem(image: UIImage(systemName: "arrow.left.arrow.right.circle.fill"), style: .plain, action: self.tapTransfer)
+                let resultsCount = self.database.getResultsMetadatas(predicate: NSPredicate(format: "status != %i", NCGlobal.shared.metadataStatusNormal))?.count ?? 0
+
+                if self.layoutKey == NCGlobal.shared.layoutViewFiles {
+                    self.navigationItem.rightBarButtonItems = resultsCount > 0 ? [select, notification, transfer] : [select, notification]
+                } else {
+                    self.navigationItem.rightBarButtonItems = [select]
+                }
+            }
+            guard self.layoutKey == NCGlobal.shared.layoutViewFiles else { return }
+            self.navigationItem.title = self.titleCurrentFolder
+        }
+    }
+    
+    func onListSelected() {
+        if layoutForView?.layout == NCGlobal.shared.layoutGrid {
+            headerMenu?.buttonSwitch.accessibilityLabel = NSLocalizedString("_grid_view_", comment: "")
+            layoutForView?.layout = NCGlobal.shared.layoutList
+            NCManageDatabase.shared.setLayoutForView(account: session.account, key: layoutKey, serverUrl: serverUrl, layout: layoutForView?.layout)
+            self.groupByField = "name"
+            if self.dataSource.groupByField != self.groupByField {
+                self.dataSource.changeGroupByField(self.groupByField)
+            }
+            self.saveLayout(layoutForView!)
+            self.collectionView.reloadData()
+            self.collectionView.collectionViewLayout.invalidateLayout()
+            self.collectionView.setCollectionViewLayout(self.listLayout, animated: true) {_ in self.isTransitioning = false }
+        }
+    }
+
+    func onGridSelected() {
+        if layoutForView?.layout == NCGlobal.shared.layoutList {
+            headerMenu?.buttonSwitch.accessibilityLabel = NSLocalizedString("_list_view_", comment: "")
+            layoutForView?.layout = NCGlobal.shared.layoutGrid
+            NCManageDatabase.shared.setLayoutForView(account: session.account, key: layoutKey, serverUrl: serverUrl, layout: layoutForView?.layout)
+            if isSearchingMode {
+                self.groupByField = "name"
+            } else {
+                self.groupByField = "classFile"
+            }
+            if self.dataSource.groupByField != self.groupByField {
+                self.dataSource.changeGroupByField(self.groupByField)
+            }
+            self.saveLayout(layoutForView!)
+            self.collectionView.reloadData()
+            self.collectionView.collectionViewLayout.invalidateLayout()
+            self.collectionView.setCollectionViewLayout(self.gridLayout, animated: true) {_ in self.isTransitioning = false }
+        }
+    }
 }
