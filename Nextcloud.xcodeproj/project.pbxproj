@@ -1,3 +1,4 @@
+
 // !$*UTF8*$!
 {
 	archiveVersion = 1;
@@ -95,6 +96,8 @@
 		B5D45E602DA50C8500773929 /* AdjustHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = B5D45E5C2DA50C8500773929 /* AdjustHelper.m */; };
 		B5D45E632DA50D6A00773929 /* CCManageAutoUpload.m in Sources */ = {isa = PBXBuildFile; fileRef = B5D45E622DA50D6A00773929 /* CCManageAutoUpload.m */; };
 		B5D45E642DA50D6A00773929 /* CCAdvanced.m in Sources */ = {isa = PBXBuildFile; fileRef = B5D45E612DA50D6A00773929 /* CCAdvanced.m */; };
+		B5D45E732DA5172900773929 /* AppUpdater.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5D45E712DA5172900773929 /* AppUpdater.swift */; };
+		C04E2F232A17BB4D001BAD85 /* FilesIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C04E2F222A17BB4D001BAD85 /* FilesIntegrationTests.swift */; };
 		D575039F27146F93008DC9DC /* String+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7A0D1342591FBC5008F8A13 /* String+Extension.swift */; };
 		D5B6AA7827200C7200D49C24 /* NCActivityTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5B6AA7727200C7200D49C24 /* NCActivityTableViewCell.swift */; };
 		F310B1EF2BA862F1001C42F5 /* NCViewerMedia+VisionKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = F310B1EE2BA862F1001C42F5 /* NCViewerMedia+VisionKit.swift */; };		F317C82E2E844C5300761AEA /* ClientIntegrationUIViewer.swift in Sources */ = {isa = PBXBuildFile; fileRef = F317C82D2E844C5300761AEA /* ClientIntegrationUIViewer.swift */; };
@@ -1289,6 +1292,7 @@
 		B5D45E5D2DA50C8500773929 /* TealiumHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TealiumHelper.swift; sourceTree = "<group>"; };
 		B5D45E612DA50D6A00773929 /* CCAdvanced.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CCAdvanced.m; sourceTree = "<group>"; };
 		B5D45E622DA50D6A00773929 /* CCManageAutoUpload.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CCManageAutoUpload.m; sourceTree = "<group>"; };
+		B5D45E712DA5172900773929 /* AppUpdater.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppUpdater.swift; sourceTree = "<group>"; };
 		C0046CDA2A17B98400D87C9D /* NextcloudUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NextcloudUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		C04E2F202A17BB4D001BAD85 /* NextcloudIntegrationTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NextcloudIntegrationTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		D5B6AA7727200C7200D49C24 /* NCActivityTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCActivityTableViewCell.swift; sourceTree = "<group>"; };
@@ -2166,6 +2170,12 @@
 				B5D45E5D2DA50C8500773929 /* TealiumHelper.swift */,
 			);
 			path = Helper;
+		B5D45E722DA5172900773929 /* AppUpdate */ = {
+			isa = PBXGroup;
+			children = (
+				B5D45E712DA5172900773929 /* AppUpdater.swift */,
+			);
+			path = AppUpdate;
 			sourceTree = "<group>";
 		};
 		C0046CDB2A17B98400D87C9D /* NextcloudUITests */ = {
@@ -3365,6 +3375,7 @@
 			children = (
 				AA517BB42D66149900F8D37C /* .tx */,
 				B5D45E5E2DA50C8500773929 /* Helper */,
+				B5D45E722DA5172900773929 /* AppUpdate */,
 				F702F2CC25EE5B4F008F8E80 /* AppDelegate.swift */,
 				F7110ADF2F9773210095AA5C /* AppDelegate+AppRefresh.swift */,
 				F7110AE32F9774130095AA5C /* AppDelegate+AppProcessing.swift */,
@@ -4713,6 +4724,7 @@
 				F70898692EDDB51700EF85BD /* NCSelectOpen+SelectDelegate.swift in Sources */,
 				F7D4BF412CA2E8D800A5E746 /* TOPasscodeViewControllerAnimatedTransitioning.m in Sources */,
 				F7D4BF422CA2E8D800A5E746 /* TOPasscodeSettingsViewController.m in Sources */,
+				B5D45E732DA5172900773929 /* AppUpdater.swift in Sources */,
 				F7D4BF432CA2E8D800A5E746 /* TOPasscodeCircleImage.m in Sources */,
 				F78026102E9CFA3700B63436 /* NCTransfersView.swift in Sources */,
 				F7D4BF442CA2E8D800A5E746 /* TOPasscodeView.m in Sources */,
