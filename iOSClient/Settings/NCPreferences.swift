@@ -225,6 +225,36 @@ final class NCPreferences: NSObject {
         }
     }
 
+    var mediaColumnCount: Int {
+        get {
+            let value = getIntPreference(key: "mediaColumnCount", defaultValue: 3)
+            return value
+        }
+        set {
+            setUserDefaults(newValue, forKey: "mediaColumnCount")
+        }
+    }
+
+    var mediaTypeLayout: String {
+        get {
+            let value = getStringPreference(key: "mediaTypeLayout", defaultValue: NCGlobal.shared.mediaLayoutRatio)
+            return value
+        }
+        set {
+            setUserDefaults(newValue, forKey: "mediaTypeLayout")
+        }
+    }
+    
+    var mediaSortDate: String {
+        get {
+            let value = getStringPreference(key: "mediaSortDate", defaultValue: "date")
+            return value
+        }
+        set {
+            setUserDefaults(newValue, forKey: "mediaSortDate")
+        }
+    }
+    
     var textRecognitionStatus: Bool {
         get {
             return getBoolPreference(key: "textRecognitionStatus", defaultValue: false)
@@ -445,10 +475,12 @@ final class NCPreferences: NSObject {
     }
 
     func isEndToEndEnabled(account: String) -> Bool {
-        guard let certificate = getEndToEndCertificate(account: account), !certificate.isEmpty,
+        guard let capabilities = NCNetworking.shared.capabilities[account],
+              let certificate = getEndToEndCertificate(account: account), !certificate.isEmpty,
               let publicKey = getEndToEndPublicKey(account: account), !publicKey.isEmpty,
               let privateKey = getEndToEndPrivateKey(account: account), !privateKey.isEmpty,
-              let passphrase = getEndToEndPassphrase(account: account), !passphrase.isEmpty else {
+              let passphrase = getEndToEndPassphrase(account: account), !passphrase.isEmpty,
+              NCGlobal.shared.e2eeVersions.contains(capabilities.e2EEApiVersion) else {
             return false
         }
         return true
