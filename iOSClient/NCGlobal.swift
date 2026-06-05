@@ -326,7 +326,6 @@ final class NCGlobal: Sendable {
     let metadataStatusForScreenAwake            = [-1, -2, 1, 2]
     let metadataStatusHideInView                = [1, 2, 3, 11]
     let metadataStatusWaitWebDav                = [10, 11, 12, 13, 14, 15]
-    let metadataStatusTransfers                 = [-2, -3, 2, 3, 10, 11, 12, 13, 14, 15]
 
     let metadatasStatusInWaiting                = [-1, 1, 10, 11, 12, 13, 14, 15]
     let metadatasStatusInProgress               = [-2, 2]
@@ -412,6 +411,8 @@ final class NCGlobal: Sendable {
     let notificationCenterFavoriteFile                          = "favoriteFile"                    // userInfo: ocId, serverUrl
     let notificationCenterFileExists                            = "fileExists"                      // userInfo: ocId, fileExists
     
+    let notificationCenterRenameFile                            = "renameFile"                      // userInfo: serverUrl, account, error
+
     let notificationCenterMenuSearchTextPDF                     = "menuSearchTextPDF"
     let notificationCenterMenuGotToPageInPDF                    = "menuGotToPageInPDF"
 
