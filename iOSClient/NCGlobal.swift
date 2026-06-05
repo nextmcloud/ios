@@ -40,16 +40,36 @@ final class NCGlobal: Sendable {
     let twoFactorNotificatioName                    = "twofactor_nextcloud_notification"
     let termsOfServiceName                          = "terms_of_service"
 
+    // Nextcloud version
+    //
+    let nextcloudVersion18: Int                     = 18
+    let nextcloudVersion20: Int                     = 20
+    let nextcloudVersion23: Int                     = 23
+    let nextcloudVersion24: Int                     = 24
+    let nextcloudVersion25: Int                     = 25
+    let nextcloudVersion26: Int                     = 26
+    let nextcloudVersion27: Int                     = 27
+    let nextcloudVersion28: Int                     = 28
+    let nextcloudVersion30: Int                     = 30
+    let nextcloudVersion31: Int                     = 31
+
+    // Nextcloud unsupported
+    //
+    let nextcloud_unsupported_version: Int          = 20
+
+//    let nextcloud_unsupported_version: Int = 17
+    
     // Intro selector
     //
     let introLogin: Int                             = 0
+    let introSignup: Int                            = 1
     let introSignUpWithProvider: Int                = 1
 
     // Avatar
     //
     let avatarSize: Int                             = 128 * Int(UIScreen.main.scale)
     let avatarSizeRounded: Int                      = 128
-
+    
     // Preview size
     //
     let size1024: CGSize                            = CGSize(width: 1024, height: 1024)
@@ -77,6 +97,10 @@ final class NCGlobal: Sendable {
     // E2EE
     //
     let e2eePassphraseTest                          = "more over television factory tendency independence international intellectual impress interest sentence pony"
+    let e2eeVersions                                = ["1.1", "1.2", "2.0"]
+    let e2eeVersionV11                              = "1.1"
+    let e2eeVersionV12                              = "1.2"
+    let e2eeVersionV20                              = "2.0"
 
     // CHUNK
     let chunkSizeMBCellular                         = 10000000
@@ -113,7 +137,35 @@ final class NCGlobal: Sendable {
     //
     let buttonMoreMore                              = "more"
     let buttonMoreLock                              = "moreLock"
+    let buttonMoreStop                              = "stop"
 
+    // Standard height sections header/footer
+    //
+    let heightButtonsView: CGFloat                  = 50
+    let heightHeaderTransfer: CGFloat               = 50
+    let heightSection: CGFloat                      = 30
+    let heightFooter: CGFloat                       = 1
+    let heightFooterButton: CGFloat                 = 30
+    let endHeightFooter: CGFloat                    = 85
+    
+
+    // Text -  OnlyOffice - Collabora - QuickLook
+    //
+    let editorText                                  = "text"
+    let editorOnlyoffice                            = "onlyoffice"
+    let editorCollabora                             = "collabora"
+    let editorQuickLook                             = "quicklook"
+    
+    let onlyofficeDocx                              = "onlyoffice_docx"
+    let onlyofficeXlsx                              = "onlyoffice_xlsx"
+    let onlyofficePptx                              = "onlyoffice_pptx"
+    
+    // Template
+    //
+    let templateDocument                            = "document"
+    let templateSpreadsheet                         = "spreadsheet"
+    let templatePresentation                        = "presentation"
+    
     // Rich Workspace
     //
     let fileNameRichWorkspace                       = "Readme.md"
@@ -135,6 +187,7 @@ final class NCGlobal: Sendable {
     let errorPreconditionFailed: Int            = 412
     let errorUnsupportedMediaType: Int          = 415
     let errorExpectationFailed: Int             = 417
+    let errorWebDAVLocked: Int                  = 423
     let errorInternalServerError: Int           = 500
     let errorMaintenance: Int                   = 503
     let errorQuota: Int                         = 507
@@ -198,6 +251,8 @@ final class NCGlobal: Sendable {
     let selectorSaveAsScan                      = "saveAsScan"
     let selectorOpenDetail                      = "openDetail"
     let selectorSynchronizationOffline          = "synchronizationOffline"
+    let selectorPrint                           = "print"
+    let selectorDeleteFile                      = "deleteFile"
 
     // Metadata : Status
     //
@@ -228,12 +283,15 @@ final class NCGlobal: Sendable {
     let metadataStatusForScreenAwake            = [-1, -2, 1, 2]
     let metadataStatusHideInView                = [1, 2, 3, 11]
     let metadataStatusWaitWebDav                = [10, 11, 12, 13, 14, 15]
-    let metadataStatusTransfers                 = [-2, -3, 2, 3, 10, 11, 12, 13, 14, 15]
 
     let metadatasStatusInWaiting                = [-1, 1, 10, 11, 12, 13, 14, 15]
     let metadatasStatusInWaitingDownloadUpload  = [-1, 1]
     let metadatasStatusDownloadingUploading     = [-2, 2]
 
+    //  Hidden files included in the read
+    //
+    let includeHiddenFiles: [String] = [".LivePhoto"]
+    
     // Auto upload subfolder granularity
     //
     let subfolderGranularityDaily               = 2
@@ -246,6 +304,8 @@ final class NCGlobal: Sendable {
     let notificationCenterChangeTheming                         = "changeTheming"                   // userInfo: account
     let notificationCenterRichdocumentGrabFocus                 = "richdocumentGrabFocus"
     let notificationCenterReloadDataNCShare                     = "reloadDataNCShare"
+    let notificationCenterDidCreateShareLink                    = "didCreateShareLink"
+
     let notificationCenterCloseRichWorkspaceWebView             = "closeRichWorkspaceWebView"
     let notificationCenterReloadAvatar                          = "reloadAvatar"
     let notificationCenterClearCache                            = "clearCache"
@@ -253,18 +313,23 @@ final class NCGlobal: Sendable {
     let notificationCenterServerDidUpdate                       = "serverDidUpdate"                 // userInfo: account
     let notificationCenterNetworkReachability                   = "networkReachability"
 
+    let notificationCenterRenameFile                            = "renameFile"                      // userInfo: serverUrl, account, error
+
     let notificationCenterMenuSearchTextPDF                     = "menuSearchTextPDF"
     let notificationCenterMenuGotToPageInPDF                    = "menuGotToPageInPDF"
 
     let notificationCenterOpenMediaDetail                       = "openMediaDetail"                 // userInfo: ocId
 
     let notificationCenterDismissScanDocument                   = "dismissScanDocument"
+    let notificationCenterDismissUploadAssets                   = "dismissUploadAssets"
 
     let notificationCenterEnableSwipeGesture                    = "enableSwipeGesture"
     let notificationCenterDisableSwipeGesture                   = "disableSwipeGesture"
 
     let notificationCenterPlayerIsPlaying                       = "playerIsPlaying"
     let notificationCenterPlayerStoppedPlaying                  = "playerStoppedPlaying"
+
+    let notificationCenterFavoriteStatusChanged                  = "favoriteStatusChanged"
 
     let notificationCenterUserInteractionMonitor                = "serInteractionMonitor"
 
@@ -285,6 +350,7 @@ final class NCGlobal: Sendable {
     let networkingStatusUploaded                                = "statusUploaded"
 
     let networkingStatusReloadAvatar                            = "statusReloadAvatar"
+    let notificationCenterUpdateIcons                           = "updateIcons"
 
     // TIP
     //
@@ -367,6 +433,20 @@ final class NCGlobal: Sendable {
     //
     let taskDescriptionRetrievesProperties  = "retrievesProperties"
     let taskDescriptionSynchronization      = "synchronization"
+    let taskDescriptionDeleteFileOrFolder   = "deleteFileOrFolder"
+    
+    // MoEngage App Version
+    //
+    let moEngageAppVersion                  = 854
+    
+    // Filename Mask and Type
+    //
+    let keyFileNameMask                             = "fileNameMask"
+    let keyFileNameType                             = "fileNameType"
+    let keyFileNameAutoUploadMask                   = "fileNameAutoUploadMask"
+    let keyFileNameAutoUploadType                   = "fileNameAutoUploadType"
+    let keyFileNameOriginal                         = "fileNameOriginal"
+    let keyFileNameOriginalAutoUpload               = "fileNameOriginalAutoUpload"
 
     // LOG TAG
     //
