@@ -144,6 +144,13 @@ class NCScan: UIViewController, NCScanCellCellDelegate {
 
     override var canBecomeFirstResponder: Bool { return true }
 
+    override func canPerformAction(_ action: Selector, withSender sender: Any?) -> Bool {
+        if action == #selector(pasteImage(_:)) {
+            return true
+        }
+        return false
+    }
+
     @objc func dismiss(_ notification: NSNotification) {
         self.dismiss(animated: true, completion: nil)
     }
@@ -292,6 +299,14 @@ class NCScan: UIViewController, NCScanCellCellDelegate {
 
         guard let recognizerView = recognizer.view,
               UIPasteboard.general.hasImages else {
+//        if recognizer.state == UIGestureRecognizer.State.began {
+//            self.becomeFirstResponder()
+//            let pasteboard = UIPasteboard.general
+//            if let recognizerView = recognizer.view, let recognizerSuperView = recognizerView.superview, pasteboard.hasImages {
+//                UIMenuController.shared.menuItems = [UIMenuItem(title: "Paste", action: #selector(pasteImage))]
+//                UIMenuController.shared.showMenu(from: recognizerSuperView, rect: recognizerView.frame)
+//            }
+            // TIP
             dismissTip()
             return
         }
