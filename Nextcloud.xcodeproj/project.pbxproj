@@ -7602,6 +7602,8 @@
 			requirement = {
 				kind = exactVersion;
 				version = 7.3.1;
+				branch = main;
+				kind = branch;
 			};
 		};
 		F788ECC5263AAAF900ADC67F /* XCRemoteSwiftPackageReference "MarkdownKit" */ = {
