@@ -35,6 +35,7 @@ on:
           - 4.9.6
           - 4.9.5
         default: stable-6.6.3
+        default: stable-6.6.0
 
 jobs:
   backport-custom:
