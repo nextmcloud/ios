@@ -279,6 +279,15 @@ extension tableMetadata {
 
     var imageSize: CGSize {
         CGSize(width: width, height: height)
+    // Return if is sharable
+    func isSharable() -> Bool {
+        guard let capabilities = NCNetworking.shared.capabilities[account] else {
+            return false
+        }
+        if !capabilities.fileSharingApiEnabled || (capabilities.e2EEEnabled && isDirectoryE2EE) {
+            return false
+        }
+        return !e2eEncrypted
     }
 
     var hasPreviewBorder: Bool {
@@ -549,6 +558,19 @@ extension NCManageDatabase {
             if let object = realm.object(ofType: tableMetadata.self, forPrimaryKey: ocId) {
                 realm.delete(object)
             }
+        }
+    }
+    
+    func deleteMetadataOcIds(_ ocIds: [String]) {
+        do {
+            let realm = try Realm()
+            try realm.write {
+                let results = realm.objects(tableMetadata.self).filter("ocId IN %@", ocIds)
+                realm.delete(results)
+            }
+        } catch let error as NSError {
+            nkLog(error: "Could not access database: \(error)")
+
         }
     }
 
