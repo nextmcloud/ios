@@ -52,6 +52,9 @@ final class NCGlobal: Sendable {
     let nextcloudVersion28: Int                     = 28
     let nextcloudVersion30: Int                     = 30
     let nextcloudVersion31: Int                     = 31
+    let nextcloudVersion32: Int                     = 32
+    let nextcloudVersion33: Int                     = 33
+    let nextcloudVersionFuture: Int                 = 99999
 
     // Nextcloud unsupported
     //
@@ -188,6 +191,7 @@ final class NCGlobal: Sendable {
     let errorUnsupportedMediaType: Int          = 415
     let errorExpectationFailed: Int             = 417
     let errorWebDAVLocked: Int                  = 423
+
     let errorInternalServerError: Int           = 500
     let errorMaintenance: Int                   = 503
     let errorQuota: Int                         = 507
@@ -277,11 +281,12 @@ final class NCGlobal: Sendable {
     let metadataStatusWaitFavorite: Int         = 13
     let metadataStatusWaitCopy: Int             = 14
     let metadataStatusWaitMove: Int             = 15
-
+    
     let metadataStatusUploadingAllMode          = [1,2,3]
-    let metadataStatusDownloadingAllMode        = [-1, -2, -3]
-    let metadataStatusForScreenAwake            = [-1, -2, 1, 2]
+    let metadataStatusInTransfer                = [-1, -2, 1, 2]
+    let metadataStatusFileDown                  = [-1, -2, -3]
     let metadataStatusHideInView                = [1, 2, 3, 11]
+    let metadataStatusHideInFileExtension       = [1, 2, 3, 10, 11]
     let metadataStatusWaitWebDav                = [10, 11, 12, 13, 14, 15]
 
     let metadatasStatusInWaiting                = [-1, 1, 10, 11, 12, 13, 14, 15]
@@ -292,6 +297,30 @@ final class NCGlobal: Sendable {
     //
     let includeHiddenFiles: [String] = [".LivePhoto"]
     
+    
+    let metadataStatusObserveNetworkingProcess  = [-1, 1, 10, 11, 12, 13, 14, 15]
+    let metadataStatusObserveTrasfers           = [-2, 2, 10, 11, 12, 13, 14, 15]
+
+    let metadataStatusUploadingAllMode          = [1,2,3]
+    let metadataStatusInTransfer                = [-1, -2, 1, 2]
+    let metadataStatusFileDown                  = [-1, -2, -3]
+    let metadataStatusHideInView                = [1, 2, 3, 11]
+    let metadataStatusHideInFileExtension       = [1, 2, 3, 10, 11]
+    let metadataStatusWaitWebDav                = [10, 11, 12, 13, 14, 15]
+
+    let metadatasStatusInWaiting                = [-1, 1, 10, 11, 12, 13, 14, 15]
+    let metadatasStatusInProgress               = [-2, 2]
+
+    
+    let metadataStatusObserveNetworkingProcess  = [-1, 1, 10, 11, 12, 13, 14, 15]
+    let metadataStatusObserveTrasfers           = [-2, 2, 10, 11, 12, 13, 14, 15]
+
+    let metadataStatusUploadingAllMode          = [1,2,3]
+    let metadataStatusDownloadingAllMode        = [-1, -2, -3]
+    let metadataStatusForScreenAwake            = [-1, -2, 1, 2]
+    let metadataStatusHideInView                = [1, 2, 3, 11]
+    let metadataStatusWaitWebDav                = [10, 11, 12, 13, 14, 15]
+
     // Auto upload subfolder granularity
     //
     let subfolderGranularityDaily               = 2
@@ -334,6 +363,7 @@ final class NCGlobal: Sendable {
     let notificationCenterUserInteractionMonitor                = "serInteractionMonitor"
 
     let notificationCenterNetworkingProcess                     = "networkingProcess"
+    let notificationCenterFavoriteStatusChanged                  = "favoriteStatusChanged"
 
     // Networking Status
     let networkingStatusCreateFolder                            = "statusCreateFolder"
@@ -349,6 +379,7 @@ final class NCGlobal: Sendable {
     let networkingStatusUploading                               = "statusUploading"
     let networkingStatusUploaded                                = "statusUploaded"
 
+
     let networkingStatusReloadAvatar                            = "statusReloadAvatar"
     let notificationCenterUpdateIcons                           = "updateIcons"
 
@@ -359,7 +390,8 @@ final class NCGlobal: Sendable {
     let tipScanAddImage                                         = "tipScanAddImage"
     let tipMediaDetailView                                      = "tipMediaDetailView"
     let tipAutoUploadButton                                     = "tipAutoUploadButton"
-
+    let tipAutoUpload                                           = "tipAutoUpload"
+    
     // ACTION
     //
     let actionNoAction                                          = "no-action"
@@ -461,6 +493,37 @@ final class NCGlobal: Sendable {
     let logTagSpeedUpSyncMetadata           = "SYNC METADATA"
     let logTagNetworkingTasks               = "NETWORKING TASKS"
     let logTagMetadataTransfers             = "METADATA TRANSFERS"
+
+    // USER DEFAULTS
+    //
+    let udMigrationMultiDomains             = "migrationMultiDomains"
+    let udLastVersion                       = "lastVersion"
+
+    // MoEngage App Version
+    //
+    let moEngageAppVersion                  = 854
+    
+    // Filename Mask and Type
+    //
+    let keyFileNameMask                             = "fileNameMask"
+    let keyFileNameType                             = "fileNameType"
+    let keyFileNameAutoUploadMask                   = "fileNameAutoUploadMask"
+    let keyFileNameAutoUploadType                   = "fileNameAutoUploadType"
+    let keyFileNameOriginal                         = "fileNameOriginal"
+    let keyFileNameOriginalAutoUpload               = "fileNameOriginalAutoUpload"
+
+    // LOG TAG
+    //
+    let logTagTask                          = "BGT"
+    let logTagLocation                      = "LOCATION"
+    let logTagBgSync                        = "BGSYNC"
+    let logTagE2EE                          = "E2EE"
+    let logTagPN                            = "PUSH NOTIFICATION"
+    let logTagSync                          = "SYNC"
+    let logTagServiceProficer               = "SERVICE PROVIDER"
+    let logTagDatabase                      = "DB"
+    let logSpeedUpSyncMetadata              = "SYNC METADATA"
+    let logNetworkingTasks                  = "NETWORKING TASKS"
 
     // USER DEFAULTS
     //
