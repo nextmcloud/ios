@@ -41,6 +41,7 @@ struct NCManageE2EEView: View {
                                 .fontWeight(.light)
                                 .frame(width: 25, height: 25)
                                 .foregroundColor(Color(NCBrandColor.shared.iconImageColor))
+
                         }
                         Spacer()
                     }
@@ -145,7 +146,7 @@ struct NCManageE2EEView: View {
                         .cappedFont(.body, maxDynamicType: .accessibility2)
                         .fontWeight(.light)
                         .frame(width: 25, height: 25)
-                        .foregroundColor(Color(NCBrandColor.shared.textColor2))
+                        .foregroundColor(Color(UIColor.systemGray))
                 }
                 Spacer()
             }
@@ -181,7 +182,7 @@ struct NCManageE2EEView: View {
                         .cappedFont(.body, maxDynamicType: .accessibility2)
                         .fontWeight(.light)
                         .frame(width: 25, height: 25)
-                        .foregroundColor(Color(NCBrandColor.shared.textColor2))
+                        .foregroundColor(Color(UIColor.systemGray))
                 }
                 Spacer()
             }
