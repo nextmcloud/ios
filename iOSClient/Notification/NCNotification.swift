@@ -97,7 +97,16 @@ class NCNotification: UITableViewController, NCNotificationCellDelegate {
     }
 
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+//        let notification = notifications[indexPath.row]
+        
         let notification = notifications[indexPath.row]
+
+        if notification.app == "files_sharing" {
+            NCActionCenter.shared.viewerFile(account: session.account, fileId: notification.objectId, viewController: self)
+        } else {
+            NCApplicationHandle().didSelectNotification(notification, viewController: self)
+        }
+        guard let notification = NCApplicationHandle().didSelectNotification(notifications[indexPath.row], viewController: self) else { return }
 
         do {
             if let subjectRichParameters = notification.subjectRichParameters,
@@ -322,6 +331,10 @@ class NCNotification: UITableViewController, NCNotificationCellDelegate {
         }
     }
 
+    func tapMore(with notification: NKNotifications, sender: Any?) {
+       toggleMenu(notification: notification, sender: sender)
+    }
+
     // MARK: - Load notification networking
 
     @MainActor
@@ -400,9 +413,15 @@ class NCNotificationCell: UITableViewCell {
         else { return }
         delegate?.tapAction(with: notification, label: label, sender: sender)
     }
+
+    @IBAction func touchUpInsideMore(_ sender: Any) {
+        guard let notification = notification else { return }
+        delegate?.tapMore(with: notification, sender: sender)
+    }
 }
 
 protocol NCNotificationCellDelegate: AnyObject {
     func tapRemove(with notification: NKNotifications, sender: Any?)
     func tapAction(with notification: NKNotifications, label: String, sender: Any?)
+    func tapMore(with notification: NKNotifications, sender: Any?)
 }
