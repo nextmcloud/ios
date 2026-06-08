@@ -51,72 +51,9 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
            self.networking.downloadThumbnailQueue.operations.filter({ ($0 as? NCMediaDownloadThumbnail)?.metadata.ocId == metadata.ocId }).isEmpty {
             self.networking.downloadThumbnailQueue.addOperation(NCCollectionViewDownloadThumbnail(metadata: metadata, collectionView: collectionView, ext: ext))
         }
-
-    }
-
-    private func photoCell(cell: NCPhotoCell, indexPath: IndexPath, metadata: tableMetadata, ext: String) -> NCPhotoCell {
-        let width = UIScreen.main.bounds.width / CGFloat(self.numberOfColumns)
-
-        cell.ocId = metadata.ocId
-        cell.ocIdTransfer = metadata.ocIdTransfer
-        cell.hideButtonMore(true)
-        cell.hideImageStatus(true)
-
-        // Image
-        //
-        if let image = NCImageCache.shared.getImageCache(ocId: metadata.ocId, etag: metadata.etag, ext: ext) {
-
-            cell.filePreviewImageView?.image = image
-            cell.filePreviewImageView?.contentMode = .scaleAspectFill
-
-        } else {
-
-            if isPinchGestureActive || ext == global.previewExt512 || ext == global.previewExt1024 {
-                cell.filePreviewImageView?.image = self.utility.getImage(ocId: metadata.ocId, etag: metadata.etag, ext: ext, userId: metadata.userId, urlBase: metadata.urlBase)
-            }
-
-            DispatchQueue.global(qos: .userInteractive).async {
-                let image = self.utility.getImage(ocId: metadata.ocId, etag: metadata.etag, ext: ext, userId: metadata.userId, urlBase: metadata.urlBase)
-                if let image {
-                    self.imageCache.addImageCache(ocId: metadata.ocId, etag: metadata.etag, image: image, ext: ext, cost: indexPath.row)
-                    DispatchQueue.main.async {
-                        cell.filePreviewImageView?.image = image
-                        cell.filePreviewImageView?.contentMode = .scaleAspectFill
-                    }
-                } else {
-                    DispatchQueue.main.async {
-                        cell.filePreviewImageView?.contentMode = .scaleAspectFit
-                        if metadata.iconName.isEmpty {
-                            cell.filePreviewImageView?.image = NCImageCache.shared.getImageFile()
-                        } else {
-                            cell.filePreviewImageView?.image = self.utility.loadImage(named: metadata.iconName, useTypeIconFile: true, account: metadata.account)
-                        }
-                    }
-                }
-            }
-        }
-
-        // Edit mode
-        //
-        if fileSelect.contains(metadata.ocId) {
-            cell.selected(true, isEditMode: isEditMode)
-        } else {
-            cell.selected(false, isEditMode: isEditMode)
-        }
-
-        if width > 100 {
-            cell.hideButtonMore(false)
-            cell.hideImageStatus(false)
-        }
-
-        return cell
     }
 
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        var cell: NCCellProtocol & UICollectionViewCell
-        var isShare = false
-        var isMounted = false
-        var a11yValues: [String] = []
         let metadata = self.dataSource.getMetadata(indexPath: indexPath) ?? tableMetadata()
         let existsImagePreview = utilityFileSystem.fileProviderStorageImageExists(metadata.ocId, etag: metadata.etag, userId: metadata.userId, urlBase: metadata.urlBase)
         let ext = global.getSizeExtension(column: self.numberOfColumns)
@@ -140,24 +77,22 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
         if isLayoutPhoto {
             if metadata.isImageOrVideo {
                 let photoCell = (collectionView.dequeueReusableCell(withReuseIdentifier: "photoCell", for: indexPath) as? NCPhotoCell)!
-                photoCell.photoCellDelegate = self
-                cell = photoCell
-                return self.photoCell(cell: photoCell, indexPath: indexPath, metadata: metadata, ext: ext)
+                return self.photoCell(cell: photoCell, indexPath: indexPath, metadata: metadata)
             } else {
                 let gridCell = (collectionView.dequeueReusableCell(withReuseIdentifier: "gridCell", for: indexPath) as? NCGridCell)!
-                gridCell.gridCellDelegate = self
-                cell = gridCell
+                gridCell.delegate = self
+                return self.gridCell(cell: gridCell, indexPath: indexPath, metadata: metadata)
             }
         } else if isLayoutGrid {
             // LAYOUT GRID
             let gridCell = (collectionView.dequeueReusableCell(withReuseIdentifier: "gridCell", for: indexPath) as? NCGridCell)!
-            gridCell.gridCellDelegate = self
-            cell = gridCell
+            gridCell.delegate = self
+            return self.gridCell(cell: gridCell, indexPath: indexPath, metadata: metadata)
         } else {
             // LAYOUT LIST
             let listCell = (collectionView.dequeueReusableCell(withReuseIdentifier: "listCell", for: indexPath) as? NCListCell)!
-            listCell.listCellDelegate = self
-            cell = listCell
+            listCell.delegate = self
+            return self.listCell(cell: listCell, indexPath: indexPath, metadata: metadata)
         }
 
         // CONTENT MODE
@@ -501,7 +436,7 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
 
                 if isSearchingMode {
                     emptyImage = utility.loadImage(named: "magnifyingglass", colors: [NCBrandColor.shared.getElement(account: session.account)])
-                    if self.searchDataSourceTask?.state == .running {
+                    if self.searchTask?.state == .running {
                         emptyTitle = NSLocalizedString("_search_in_progress_", comment: "")
                     } else {
                         emptyTitle = NSLocalizedString("_search_no_record_found_", comment: "")
@@ -509,6 +444,7 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
                     emptyDescription = NSLocalizedString("_search_instruction_", comment: "")
                 } else if self.searchDataSourceTask?.state == .running || !self.dataSource.getGetServerData(){
                 } else if self.searchDataSourceTask?.state == .running || !self.dataSource.getGetServerData() {
+                } else if self.searchTask?.state == .running || !self.dataSource.getGetServerData() {
                     emptyImage = utility.loadImage(named: "wifi", colors: [NCBrandColor.shared.getElement(account: session.account)])
                     emptyTitle = NSLocalizedString("_request_in_progress_", comment: "")
                     emptyDescription = ""
@@ -538,8 +474,7 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
 
                 header.setContent(emptyImage: emptyImage,
                                   emptyTitle: emptyTitle,
-                                  emptyDescription: emptyDescription,
-                                  delegate: self)
+                                  emptyDescription: emptyDescription)
 
             } else if let header = header as? NCSectionHeader {
                 let text = self.dataSource.getSectionValueLocalization(indexPath: indexPath)
@@ -577,8 +512,6 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
             let sections = self.dataSource.numberOfSections()
             let section = indexPath.section
             let metadataForSection = self.dataSource.getMetadataForSection(indexPath.section)
-            let isPaginated = metadataForSection?.lastSearchResult?.isPaginated ?? false
-            let metadatasCount: Int = metadataForSection?.metadatas.count ?? 0
             let unifiedSearchInProgress = metadataForSection?.unifiedSearchInProgress ?? false
 
             footer.delegate = self
@@ -590,15 +523,9 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
             footer.hideActivityIndicatorSection()
 
             if isSearchingMode {
-                // If the number of entries(metadatas) is lower than the cursor, then there are no more entries.
-                // The blind spot in this is when the number of entries is the same as the cursor. If so, we don't have a way of knowing if there are no more entries.
-                // This is as good as it gets for determining last page without server-side flag.
-                let isLastPage = (metadatasCount < metadataForSection?.lastSearchResult?.cursor ?? 0) || metadataForSection?.lastSearchResult?.entries.isEmpty == true
-
-                if isSearchingMode && isPaginated && metadatasCount > 0 && !isLastPage {
+                if metadataForSection?.lastSearchResult?.cursor != nil {
                     footer.buttonIsHidden(false)
                 }
-
                 if unifiedSearchInProgress {
                     footer.showActivityIndicatorSection()
                 }

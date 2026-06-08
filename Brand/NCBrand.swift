@@ -165,6 +165,8 @@ final class NCBrandOptions: @unchecked Sendable {
     }
 
     func isServerVersion(_ capabilities: NKCapabilities.Capabilities,
+                         greaterOrEqualTo version: NextcloudVersion) -> Bool {
+        return NextcloudVersion(capabilities) >= version
                          greaterOrEqualTo major: Int,
                          _ minor: Int,
                          _ micro: Int) -> Bool {
@@ -379,12 +381,14 @@ final class NCBrandColor: @unchecked Sendable {
         return false
     }
 
+    /*
     public func getTheming(account: String?) -> UIColor {
         if let account, let color = self.themingColor[account] {
             return color
         }
         return customer
     }
+    */
 
     public func getElement(account: String?) -> UIColor {
         if let account, let color = self.themingColorElement[account] {

@@ -57,11 +57,13 @@ final class TransfersViewModel: ObservableObject, NCMetadataTransfersSuccessDele
                 }
 
                 // inWaitingCount
-                inWaitingCount = await NCNetworkingProcess.shared.getInWaitingCount()
+                let countTransfersSuccess = await NCNetworking.shared.metadataTranfersSuccess.count()
+                let countWaiting = await NCManageDatabase.shared.getMetadatasStatusCountAsync(status: NCGlobal.shared.metadatasStatusInWaiting)
+                inWaitingCount = max(0, countWaiting - countTransfersSuccess)
 
                 // inProgressCount
                 inProgressCount = metadatas.compactMap(\.status)
-                    .filter { NCGlobal.shared.metadatasStatusInProgress.contains($0) }
+                    .filter { NCGlobal.shared.metadatasStatusDownloadingUploading.contains($0) }
                     .count
 
                 // inErrorCount
@@ -71,7 +73,7 @@ final class TransfersViewModel: ObservableObject, NCMetadataTransfersSuccessDele
 
                 isLoading = false
             }
-            try? await Task.sleep(nanoseconds: 500_000_000)
+            try? await Task.sleep(for: .seconds(0.5))
         }
     }
 
@@ -173,6 +175,12 @@ final class TransfersViewModel: ObservableObject, NCMetadataTransfersSuccessDele
 }
 
 extension TransfersViewModel: NCTransferDelegate {
+    func transferReloadData(serverUrl: String?) { }
+
+    func transferReloadDataSource(serverUrl: String?, requestData: Bool, status: Int?) { }
+
+    func transferChange(status: String, account: String, fileName: String, serverUrl: String, selector: String?, ocId: String, destination: String?, error: NKError) { }
+
     func transferProgressDidUpdate(progress: Float, totalBytes: Int64, totalBytesExpected: Int64, fileName: String, serverUrl: String) {
         Task { @MainActor in
             let key = "\(serverUrl)|\(fileName)"

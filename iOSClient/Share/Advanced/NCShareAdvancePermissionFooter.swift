@@ -23,7 +23,7 @@
 
 import UIKit
 
-protocol NCShareAdvanceFotterDelegate: AnyObject {
+protocol NCShareAdvanceFooterDelegate: AnyObject {
     var isNewShare: Bool { get }
     func dismissShareAdvanceView(shouldSave: Bool)
 }
@@ -31,9 +31,9 @@ protocol NCShareAdvanceFotterDelegate: AnyObject {
 class NCShareAdvancePermissionFooter: UIView {
     @IBOutlet weak var buttonCancel: UIButton!
     @IBOutlet weak var buttonNext: UIButton!
-    weak var delegate: NCShareAdvanceFotterDelegate?
+    weak var delegate: NCShareAdvanceFooterDelegate?
 
-    func setupUI(delegate: NCShareAdvanceFotterDelegate?, account: String) {
+    func setupUI(delegate: NCShareAdvanceFooterDelegate?, account: String) {
         self.delegate = delegate
         buttonCancel.addTarget(self, action: #selector(cancelClicked), for: .touchUpInside)
         buttonNext.addTarget(self, action: #selector(nextClicked), for: .touchUpInside)
@@ -51,6 +51,10 @@ class NCShareAdvancePermissionFooter: UIView {
         buttonNext.layer.masksToBounds = true
         buttonNext.backgroundColor = NCBrandColor.shared.getElement(account: account)
         buttonNext.addTarget(self, action: #selector(nextClicked(_:)), for: .touchUpInside)
+        buttonNext.setTitle(NSLocalizedString(delegate?.isNewShare == true ? "_next_" : "_apply_changes_", comment: ""), for: .normal)
+        buttonCancel.layer.cornerRadius = 10
+        buttonCancel.layer.masksToBounds = true
+        buttonCancel.layer.borderWidth = 1
         buttonNext.setTitle(NSLocalizedString(delegate?.isNewShare == true ? "_next_" : "_apply_changes_", comment: ""), for: .normal)
         buttonCancel.layer.cornerRadius = 10
         buttonCancel.layer.masksToBounds = true

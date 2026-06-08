@@ -20,11 +20,17 @@ extension NCNetworking {
               ocId: String?,
               etag: String?,
               date: Date?,
-              size: Int64,
-              response: AFDataResponse<Data>?,
+              ownerId: String?,
+              permissions: String?,
               error: NKError) {
-        let options = NKRequestOptions(customHeader: customHeaders, queue: NextcloudKit.shared.nkCommonInstance.backgroundQueue)
-        let results = await NextcloudKit.shared.uploadAsync(serverUrlFileName: serverUrlFileName, fileNameLocalPath: fileNameLocalPath, dateCreationFile: creationDate, dateModificationFile: dateModificationFile, account: account, options: options) { request in
+        let options = NKRequestOptions(customHeader: customHeaders, queue: nkComm.backgroundQueue)
+        let results = await NextcloudKit.shared.uploadAsync(serverUrlFileName: serverUrlFileName,
+                                                            fileNameLocalPath: fileNameLocalPath,
+                                                            dateCreationFile: creationDate,
+                                                            dateModificationFile: dateModificationFile,
+                                                            autoMkcol: true,
+                                                            account: account,
+                                                            options: options) { request in
             requestHandler(request)
         } taskHandler: { task in
             Task {
@@ -54,7 +60,21 @@ extension NCNetworking {
             progressHandler(progress.completedUnitCount, progress.totalUnitCount, progress.fractionCompleted)
         }
 
-        return results
+        let allHeaderFields = results.response?.response?.allHeaderFields
+
+        let ocId = nkComm.findHeader("oc-fileid", allHeaderFields: allHeaderFields)
+        let etag = nkComm.normalizedETag(nkComm.findHeader("oc-etag", allHeaderFields: allHeaderFields))
+        let date = nkComm.findHeader("date", allHeaderFields: allHeaderFields)?.parsedDate(using: "EEE, dd MMM y HH:mm:ss zzz")
+        let ownerId = nkComm.findHeader("x-nc-ownerid", allHeaderFields: allHeaderFields)
+        let permissions = nkComm.findHeader("x-nc-permissions", allHeaderFields: allHeaderFields)
+
+        return (results.account,
+                ocId,
+                etag,
+                date,
+                ownerId,
+                permissions,
+                results.error)
     }
 
     // MARK: - Upload chunk file in foreground
@@ -78,7 +98,7 @@ extension NCNetworking {
         if networkReachability == NKTypeReachability.reachableEthernetOrWiFi {
             chunkSize = self.global.chunkSizeMBEthernetOrWiFi
         }
-        let options = NKRequestOptions(customHeader: customHeaders, queue: NextcloudKit.shared.nkCommonInstance.backgroundQueue)
+        let options = NKRequestOptions(customHeader: customHeaders, queue: nkComm.backgroundQueue)
         var backupError = NKError()
         var backupFile: NKFile?
 
@@ -154,7 +174,12 @@ extension NCNetworking {
                                                             directory: directory)
 
             if performPostProcessing, let file {
-                await uploadSuccess(withMetadata: metadata, ocId: file.ocId, etag: file.etag, date: file.date)
+                await uploadSuccess(withMetadata: metadata,
+                                    ocId: file.ocId,
+                                    etag: file.etag,
+                                    date: file.date,
+                                    ownerId: file.ownerId,
+                                    permissions: file.permissions)
             }
 
             backupFile = file
@@ -204,6 +229,7 @@ extension NCNetworking {
                                                                     fileNameLocalPath: fileNameLocalPath,
                                                                     dateCreationFile: metadata.creationDate as Date,
                                                                     dateModificationFile: metadata.date as Date,
+                                                                    autoMkcol: true,
                                                                     account: metadata.account,
                                                                     sessionIdentifier: metadata.session)
 
@@ -243,7 +269,9 @@ extension NCNetworking {
     func uploadSuccess(withMetadata metadata: tableMetadata,
                        ocId: String,
                        etag: String?,
-                       date: Date?) async {
+                       date: Date?,
+                       ownerId: String? = nil,
+                       permissions: String? = nil) async {
         nkLog(success: "Uploaded file: " + metadata.serverUrlFileName)
 
         metadata.uploadDate = (date as? NSDate) ?? NSDate()
@@ -253,6 +281,17 @@ extension NCNetworking {
 
         if let fileId = NCUtility().ocIdToFileId(ocId: ocId) {
             metadata.fileId = fileId
+        }
+
+        if let ownerId = ownerId.isNotEmpty {
+            metadata.ownerId = ownerId
+            if let ownerDisplayName = await NCManageDatabase.shared.getOwnerDisplayName(account: metadata.account, ownerId: ownerId) {
+                metadata.ownerDisplayName = ownerDisplayName
+            }
+        }
+
+        if let permissions = permissions.isNotEmpty {
+            metadata.permissions = permissions
         }
 
         metadata.session = ""
@@ -277,7 +316,11 @@ extension NCNetworking {
 #if !EXTENSION
             await NCNetworking.shared.setLivePhoto(account: metadata.account)
 #endif
-        }
+        } else {
+#if !EXTENSION
+                AnalyticsHelper.shared.trackEventWithMetadata(eventName: .EVENT__UPLOAD_FILE ,metadata: metadata)
+#endif
+            }
 
             await NCManageDatabase.shared.replaceMetadataAsync(id: metadata.ocIdTransfer, metadata: metadata)
 
@@ -395,15 +438,18 @@ extension NCNetworking {
     // MARK: - UPLOAD ERROR
 
     func uploadError(withMetadata metadata: tableMetadata, error: NKError) async {
-        await NextcloudKit.shared.nkCommonInstance.appendServerErrorAccount(metadata.account, errorCode: error.errorCode)
+        await nkComm.appendServerErrorAccount(metadata.account, errorCode: error.errorCode)
 
         nkLog(error: "Upload file: " + metadata.serverUrlFileName + ", result: error \(error.errorCode)")
 
-        if error.errorCode == NSURLErrorCancelled || error.errorCode == self.global.errorRequestExplicityCancelled {
+        if error.errorCode == NSURLErrorCancelled {
             await uploadCancelFile(metadata: metadata)
         } else if (error.errorCode == self.global.errorBadRequest || error.errorCode == self.global.errorUnsupportedMediaType) && error.errorDescription.localizedCaseInsensitiveContains("virus") {
             await uploadCancelFile(metadata: metadata)
-            NCContentPresenter().showError(error: NKError(errorCode: error.errorCode, errorDescription: "_virus_detect_"))
+            #if !EXTENSION
+            let windowScene = await SceneManager.shared.getWindow(sceneIdentifier: metadata.sceneIdentifier)?.windowScene
+            await showErrorBanner(windowScene: windowScene, text: "_virus_detect_", errorCode: self.global.errorBadRequest)
+            #endif
             // Client Diagnostic
             await NCManageDatabase.shared.addDiagnosticAsync(account: metadata.account, issue: self.global.diagnosticIssueVirusDetected)
         } else if error.errorCode == self.global.errorForbidden {
@@ -639,4 +685,5 @@ extension NCNetworking {
 
         return (localFile: localFile, livePhoto: livePhoto, autoUpload: autoUpload)
     }
+
 }

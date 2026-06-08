@@ -30,7 +30,7 @@ struct MigrationMultiDomains: View {
                     .foregroundColor(.white)
 
                 Text(progressText)
-                    .font(.headline)
+                    .cappedFont(.body, maxDynamicType: .accessibility2)
                     .multilineTextAlignment(.center)
                     .padding(.horizontal)
                     .foregroundColor(.white)
@@ -41,7 +41,7 @@ struct MigrationMultiDomains: View {
                     .padding(.bottom, 4)
 
                 Text(String(format: "%.0f%%", progress * 100))
-                    .font(.subheadline)
+                    .cappedFont(.body, maxDynamicType: .accessibility2)
                     .foregroundColor(.white)
 
                 Spacer()
@@ -64,7 +64,7 @@ struct MigrationMultiDomains: View {
             await performMigrationLogic(ocIds: ocIds)
 
             progressText = NSLocalizedString("_finishing_up_", comment: "")
-            try await Task.sleep(nanoseconds: 500_000_000)
+            try await Task.sleep(for: .seconds(0.5))
         } catch {
             print("Migration failed: \(error.localizedDescription)")
         }

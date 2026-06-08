@@ -20,7 +20,7 @@ extension NCMedia {
 
         if let visibleCells = collectionView?.indexPathsForVisibleItems.compactMap({ collectionView?.cellForItem(at: $0) }) {
             for case let cell as NCMediaCell in visibleCells {
-                cell.selected(false)
+                cell.selected(false, color: NCBrandColor.shared.getElement(account: session.account))
             }
         }
 
@@ -37,7 +37,7 @@ extension NCMedia {
             let sortedAttributes = layoutAttributes.sorted { $0.frame.minY < $1.frame.minY || ($0.frame.minY == $1.frame.minY && $0.frame.minX < $1.frame.minX) }
 
             if let firstAttribute = sortedAttributes.first, let metadata = dataSource.getMetadata(indexPath: firstAttribute.indexPath) {
-                titleDate?.text = utility.getTitleFromDate(metadata.datePhotosOriginal as Date)
+                titleDate?.text = utility.getTitleFromDate(metadata.date)
                 return
             }
         }
@@ -75,6 +75,30 @@ extension NCMedia {
 }
 
 extension NCMedia: NCMediaSelectTabBarDelegate {
+    func move() {
+        Task {
+            let ocIds = self.fileSelect.map { $0 }
+            let metadatas = await database.getMetadatasFromOcIdsAsync(ocIds)
+
+            setEditMode(false)
+
+            NCSelectOpen.shared.openView(items: metadatas, controller: self.controller)
+        }
+    }
+
+    func share() {
+        Task {
+            let ocIds = self.fileSelect.map { $0 }
+            let metadatas = await database.getMetadatasFromOcIdsAsync(ocIds)
+
+            setEditMode(false)
+            await NCCreate().createActivityViewController(
+                selectedMetadata: metadatas,
+                controller: self.controller,
+                sender: nil)
+        }
+    }
+
     func delete() {
         let ocIds = self.fileSelect.map { $0 }
         var alertStyle = UIAlertController.Style.actionSheet
@@ -140,5 +164,4 @@ extension NCMedia: NCMediaSelectTabBarDelegate {
             }
         }
     }
-
 }

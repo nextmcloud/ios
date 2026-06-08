@@ -29,7 +29,10 @@ class NCNetworkingE2EE: NSObject {
     }
 
     func getOptions(account: String, capabilities: NKCapabilities.Capabilities) -> NKRequestOptions {
-        let version = capabilities.e2EEApiVersion == NCGlobal.shared.e2eeVersionV20 ? e2EEApiVersion2 : e2EEApiVersion1
+        var version = e2EEApiVersion1
+        if capabilities.e2EEApiVersion.hasPrefix("2.") {
+            version = e2EEApiVersion2
+        }
         return NKRequestOptions(version: version)
     }
 
@@ -44,7 +47,7 @@ class NCNetworkingE2EE: NSObject {
         let capabilities = await NKCapabilities.shared.getCapabilities(for: account)
 
         switch capabilities.e2EEApiVersion {
-        case NCGlobal.shared.e2eeVersionV11, NCGlobal.shared.e2eeVersionV12:
+        case let v where v.hasPrefix("1."):
             let options = NKRequestOptions(version: e2EEApiVersion1)
             let results = await NextcloudKit.shared.getE2EEMetadataAsync(fileId: fileId, e2eToken: e2eToken, account: account, options: options) { task in
                 Task {
@@ -55,7 +58,7 @@ class NCNetworkingE2EE: NSObject {
                 }
             }
             return (results.account, self.e2EEApiVersion1, results.e2eMetadata, results.signature, results.responseData, results.error)
-        case NCGlobal.shared.e2eeVersionV20:
+        case let v where v.hasPrefix("2."):
             var options = NKRequestOptions(version: e2EEApiVersion2)
             let results = await NextcloudKit.shared.getE2EEMetadataAsync(fileId: fileId, e2eToken: e2eToken, account: account, options: options) { task in
                 Task {
@@ -99,6 +102,7 @@ class NCNetworkingE2EE: NSObject {
 
     // MARK: -
 
+    @discardableResult
     func uploadMetadata(serverUrl: String,
                         addUserId: String? = nil,
                         removeUserId: String? = nil,
@@ -109,7 +113,8 @@ class NCNetworkingE2EE: NSObject {
         let session = NCSession.shared.getSession(account: account)
         let capabilities = await NKCapabilities.shared.getCapabilities(for: account)
         guard let directory = self.database.getTableDirectory(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@", session.account, serverUrl)) else {
-            return NKError(errorCode: NCGlobal.shared.errorUnexpectedResponseFromDB, errorDescription: "_e2e_error_")
+            return NKError(errorCode: NCGlobal.shared.errorUnexpectedResponseFromDB,
+                           errorDescription: NSLocalizedString("_e2ee_no_dir_", comment: ""))
         }
 
         if let addUserId {
@@ -204,9 +209,7 @@ class NCNetworkingE2EE: NSObject {
 
         // COUNTER
         //
-        if capabilities.e2EEApiVersion == NCGlobal.shared.e2eeVersionV20 {
-            await self.database.updateCounterE2eMetadataAsync(account: session.account, ocIdServerUrl: ocIdServerUrl, counter: resultsEncodeMetadata.counter)
-        }
+        await self.database.updateCounterE2eMetadataAsync(account: session.account, ocIdServerUrl: ocIdServerUrl, counter: resultsEncodeMetadata.counter)
 
         return NKError()
     }
@@ -239,7 +242,8 @@ class NCNetworkingE2EE: NSObject {
         var e2eToken: String?
         var e2eCounter = "1"
         guard let directory = self.database.getTableDirectory(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@", account, serverUrl)) else {
-            return (nil, nil, NKError(errorCode: NCGlobal.shared.errorUnexpectedResponseFromDB, errorDescription: "_e2e_error_"))
+            return (nil, nil, NKError(errorCode: NCGlobal.shared.errorUnexpectedResponseFromDB,
+                                      errorDescription: NSLocalizedString("_e2ee_no_dir_", comment: "")))
         }
         let capabilities = await NKCapabilities.shared.getCapabilities(for: account)
 
@@ -247,8 +251,7 @@ class NCNetworkingE2EE: NSObject {
             e2eToken = tableLock.e2eToken
         }
 
-        if capabilities.e2EEApiVersion == NCGlobal.shared.e2eeVersionV20,
-           var counter = await self.database.getCounterE2eMetadataAsync(account: account, ocIdServerUrl: directory.ocId) {
+        if var counter = await self.database.getCounterE2eMetadataAsync(account: account, ocIdServerUrl: directory.ocId) {
             counter += 1
             e2eCounter = "\(counter)"
         }

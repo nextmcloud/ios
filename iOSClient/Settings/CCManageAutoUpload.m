@@ -72,6 +72,8 @@
     row.hidden = [NSString stringWithFormat:@"$%@==0", @"autoUpload"];
     [row.cellConfig setObject:[[UIImage imageNamed:@"foldersOnTop"] imageWithColor:NCBrandColor.shared.iconImageColor size:25] forKey:@"imageView.image"];
     [row.cellConfig setObject:[[UIImage imageNamed:@"foldersOnTop"] imageWithColor:NCBrandColor.shared.iconColor size:25] forKey:@"imageView.image"];
+    [row.cellConfig setObject:[[UIImage imageNamed:@"foldersOnTop"] imageWithColor:NCBrandColor.shared.iconColor size:25] forKey:@"imageView.image"];
+    [row.cellConfig setObject:[[UIImage imageNamed:@"foldersOnTop"] imageWithColor:NCBrandColor.shared.iconImageColor size:25] forKey:@"imageView.image"];
     [row.cellConfig setObject:[[UIImage imageNamed:@"foldersOnTop"] imageWithColor:UIColor.systemGrayColor size:25] forKey:@"imageView.image"];
     [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"textLabel.font"];
     [row.cellConfig setObject:UIColor.labelColor forKey:@"textLabel.textColor"];
@@ -502,6 +504,8 @@
 
 - (void)dismissSelectWithServerUrl:(NSString * _Nullable)serverUrl metadata:(tableMetadata * _Nullable)metadata type:(NSString * _Nonnull)type items:(NSArray * _Nonnull)items overwrite:(BOOL)overwrite copy:(BOOL)copy move:(BOOL)move 
 - (void)dismissSelectWithServerUrl:(NSString * _Nullable)serverUrl metadata:(tableMetadata * _Nullable)metadata type:(NSString * _Nonnull)type items:(NSArray * _Nonnull)items overwrite:(BOOL)overwrite copy:(BOOL)copy move:(BOOL)move
+- (void)dismissSelectWithServerUrl:(NSString * _Nullable)serverUrl metadata:(tableMetadata * _Nullable)metadata type:(NSString * _Nonnull)type items:(NSArray * _Nonnull)items overwrite:(BOOL)overwrite copy:(BOOL)copy move:(BOOL)move
+- (void)dismissSelectWithServerUrl:(NSString * _Nullable)serverUrl metadata:(tableMetadata * _Nullable)metadata type:(NSString * _Nonnull)type items:(NSArray * _Nonnull)items overwrite:(BOOL)overwrite copy:(BOOL)copy move:(BOOL)move 
 - (void)dismissSelectWithServerUrl:(NSString * _Nullable)serverUrl metadata:(tableMetadata * _Nullable)metadata type:(NSString * _Nonnull)type items:(NSArray * _Nonnull)items overwrite:(BOOL)overwrite copy:(BOOL)copy move:(BOOL)move
 {
     if (serverUrl != nil) {

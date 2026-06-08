@@ -120,6 +120,19 @@ class NCBackgroundLocationUploadManager: NSObject, CLLocationManagerDelegate {
                 if let tblAccount = await self.database.getActiveTableAccountAsync() {
                     await appDelegate.backgroundSync(tblAccount: tblAccount)
                 }
+        let appDelegate = (UIApplication.shared.delegate as? AppDelegate)!
+        let location = locations.last
+        nkLog(tag: self.global.logTagLocation, emoji: .start, message: "Triggered by location change: \(location?.coordinate.latitude ?? 0), \(location?.coordinate.longitude ?? 0)")
+
+        Task.detached {
+            await NCAutoUpload.shared.autoUploadBackgroundSync()
+        if database.openRealmBackground() {
+            let appDelegate = (UIApplication.shared.delegate as? AppDelegate)!
+            let location = locations.last
+            nkLog(tag: self.global.logTagLocation, emoji: .start, message: "Triggered by location change: \(location?.coordinate.latitude ?? 0), \(location?.coordinate.longitude ?? 0)")
+            
+            Task.detached {
+                await NCAutoUpload.shared.autoUploadBackgroundSync()
             }
         }
     }

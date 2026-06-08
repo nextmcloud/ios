@@ -23,11 +23,12 @@
 
 import UIKit
 import NextcloudKit
-import SVGKit
 import CloudKit
 import XLForm
 
 class NCShareAdvancePermission: XLFormViewController, NCShareAdvanceFotterDelegate, NCShareNavigationTitleSetting {
+class NCShareAdvancePermission: UITableViewController, NCShareAdvanceFooterDelegate, NCShareNavigationTitleSetting {
+//class NCShareAdvancePermission: XLFormViewController, NCShareAdvanceFotterDelegate, NCShareDetail {
     func dismissShareAdvanceView(shouldSave: Bool) {
         
         guard shouldSave else {
@@ -152,6 +153,12 @@ class NCShareAdvancePermission: XLFormViewController, NCShareAdvanceFotterDelega
 
     var shareConfig: NCShareConfig!
     var networking: NCShareNetworking?
+
+    var controller: NCMainTabBarController?
+    var windowScene: UIWindowScene? {
+        SceneManager.shared.getWindowScene(controller: controller)
+    }
+
     let tableViewBottomInset: CGFloat = 80.0
     lazy var shareType: Int = {
         isNewShare ? share.shareType : oldTableShare?.shareType ?? NCShareCommon().SHARE_TYPE_USER
@@ -291,6 +298,10 @@ class NCShareAdvancePermission: XLFormViewController, NCShareAdvanceFotterDelega
     func setupHeaderView() {
         guard let headerView = (Bundle.main.loadNibNamed("NCShareAdvancePermissionHeader", owner: self, options: nil)?.first as? NCShareAdvancePermissionHeader) else { return }
         headerView.setupUI(with: metadata)
+
+        let container = UIView(frame: CGRect(x: 0, y: 0, width: view.frame.width, height: 200))
+        container.addSubview(headerView)
+        tableView.tableHeaderView = container
         headerView.ocId = metadata.ocId
         headerView.frame = CGRect(x: 0, y: 0, width: self.view.frame.size.width, height: 190)
         self.tableView.tableHeaderView = headerView
@@ -1058,20 +1069,19 @@ class NCShareAdvancePermission: XLFormViewController, NCShareAdvanceFotterDelega
             }
 
             if isNewShare {
-                let capabilities = await NKCapabilities.shared.getCapabilities(for: metadata.account)
-
-                if share.shareType != NKShare.ShareType.publicLink.rawValue, metadata.e2eEncrypted,
-                   capabilities.e2EEApiVersion == NCGlobal.shared.e2eeVersionV20 {
+                if share.shareType != NKShare.ShareType.publicLink.rawValue, metadata.e2eEncrypted {
 
                     if await NCNetworkingE2EE().isInUpload(account: metadata.account, serverUrl: metadata.serverUrlFileName) {
-                        let error = NKError(errorCode: NCGlobal.shared.errorE2EEUploadInProgress, errorDescription: NSLocalizedString("_e2e_in_upload_", comment: ""))
-                        return NCContentPresenter().showInfo(error: error)
+                        await showErrorBanner(windowScene: windowScene,
+                                              text: "_e2e_in_upload_",
+                                              errorCode: NCGlobal.shared.errorE2EEUploadInProgress)
+                        return
                     }
 
                     let error = await NCNetworkingE2EE().uploadMetadata(serverUrl: metadata.serverUrlFileName, addUserId: share.shareWith, removeUserId: nil, account: metadata.account)
 
                     if error != .success {
-                        return NCContentPresenter().showError(error: error)
+                        await showErrorBanner(windowScene: windowScene, error: error)
                     }
                 }
 

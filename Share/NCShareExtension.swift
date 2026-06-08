@@ -4,8 +4,10 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 import UIKit
+import UniformTypeIdentifiers
 import NextcloudKit
 import LucidBanner
+import SwiftUI
 
 enum NCShareExtensionError: Error {
     case cancel, fileUpload, noAccount, noFiles, versionMismatch
@@ -49,6 +51,8 @@ class NCShareExtension: UIViewController {
     let global = NCGlobal.shared
     var maintenanceMode: Bool = false
     var token: Int?
+    var banner: LucidBanner?
+    var sceneIdentifier: String = UUID().uuidString
 
     let database = NCManageDatabase.shared
     var account: String = ""
@@ -105,6 +109,13 @@ class NCShareExtension: UIViewController {
         NCBrandColor.shared.createUserColors()
         NCImageCache.shared.createImagesCache()
 
+        registerForTraitChanges([UITraitUserInterfaceStyle.self]) { (self: Self, _) in
+            guard !self.maintenanceMode else {
+                return
+            }
+            self.updateAppearance()
+        }
+
         NotificationCenter.default.addObserver(forName: UIApplication.willEnterForegroundNotification, object: nil, queue: nil) { _ in
             if NCPreferences().presentPasscode {
                 NCPasscode.shared.presentPasscode(viewController: self, delegate: self) {
@@ -126,6 +137,15 @@ class NCShareExtension: UIViewController {
         if let account = NCShareExtensionData.shared.getTblAccoun()?.account {
             accountRequestChangeAccount(account: account, controller: nil)
         }
+
+        NCNetworking.shared.setupScene(sceneIdentifier: sceneIdentifier, controller: self)
+
+        if let windowScene = view.window?.windowScene {
+            banner = LucidBannerRegistry.shared.banner(for: windowScene)
+        }
+        NCImageCache.shared.createImagesCache()
+
+        NotificationCenter.default.addObserver(self, selector: #selector(didCreateFolder(_:)), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterCreateFolder), object: nil)
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -150,20 +170,33 @@ class NCShareExtension: UIViewController {
             return
         }
 
-        NCFilesExtensionHandler(items: inputItems) { fileNames in
-            self.filesName = fileNames
-            DispatchQueue.main.async {
-                self.setCommandView()
-            }
-        }
+        // Keep the Share extension visually hidden until we know whether this is
+        // an Assistant text handoff or a normal file upload flow. This avoids the
+        // visible open-and-close flash when the extension only needs to redirect text.
+        view.alpha = 0
 
-        if NCPreferences().presentPasscode {
-            NCPasscode.shared.presentPasscode(viewController: self, delegate: self) {
-                NCPasscode.shared.enableTouchFaceID()
+        Task { @MainActor in
+            if await handleAssistantSharedTextIfNeeded(inputItems: inputItems) {
+                return
             }
-        }
 
-        self.collectionView.reloadData()
+            self.view.alpha = 1
+
+            NCFilesExtensionHandler(items: inputItems) { fileNames in
+                self.filesName = fileNames
+                DispatchQueue.main.async {
+                    self.setCommandView()
+                }
+            }
+
+            if NCPreferences().presentPasscode {
+                NCPasscode.shared.presentPasscode(viewController: self, delegate: self) {
+                    NCPasscode.shared.enableTouchFaceID()
+                }
+            }
+
+            self.collectionView.reloadData()
+        }
     }
 
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
@@ -174,20 +207,19 @@ class NCShareExtension: UIViewController {
         }
     }
 
-    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        super.traitCollectionDidChange(previousTraitCollection)
-
-        if !maintenanceMode {
-            collectionView.reloadData()
-            tableView.reloadData()
-        }
+    private func updateAppearance() {
+        collectionView.visibleCells.forEach { $0.setNeedsLayout() }
+        tableView.visibleCells.forEach { $0.setNeedsLayout() }
     }
 
     // MARK: -
 
-    func cancel(with error: NCShareExtensionError) {
-        // make sure no uploads are continued
-        extensionContext?.cancelRequest(withError: error)
+    func cancel(with error: NCShareExtensionError? = nil) {
+        if let error {
+            extensionContext?.cancelRequest(withError: error)
+        } else {
+            extensionContext?.completeRequest(returningItems: extensionContext?.inputItems, completionHandler: nil)
+        }
     }
 
     func showAlert(title: String = "_error_", description: String, onDismiss: (() -> Void)? = nil) {
@@ -276,7 +308,7 @@ class NCShareExtension: UIViewController {
     // MARK: ACTION
 
     @IBAction func actionCancel(_ sender: UIBarButtonItem) {
-        cancel(with: .cancel)
+        cancel()
     }
 
     @objc func actionCreateFolder(_ sender: Any?) {
@@ -284,7 +316,7 @@ class NCShareExtension: UIViewController {
         guard let capabilities = NCNetworking.shared.capabilities[session.account] else {
             return
         }
-        let alertController = UIAlertController.createFolder(serverUrl: serverUrl, session: session, capabilities: capabilities) { error in
+        let alertController = UIAlertController.createFolderWith(serverUrl: serverUrl, session: session, capabilities: capabilities) { error in
             if error == .success {
                 Task {
                     await self.loadFolder()
@@ -346,7 +378,7 @@ extension NCShareExtension {
                     ocId: ocId,
                     serverUrl: serverUrl,
                     session: session,
-                    sceneIdentifier: nil)
+                    sceneIdentifier: self.sceneIdentifier)
 
                 metadataForUpload.session = NCNetworking.shared.sessionUpload
                 metadataForUpload.sessionSelector = NCGlobal.shared.selectorUploadFileShareExtension
@@ -380,16 +412,27 @@ extension NCShareExtension {
     @MainActor
     func uploadAndExit() async {
         var error: NKError?
-        token = showUploadBanner(scene: self.view.window?.windowScene, blocksTouches: true)
+        guard let window = self.view.window else {
+            return
+        }
+        let payload = LucidBannerPayload(stage: .button,
+                                         vPosition: .center,
+                                         blocksTouches: true)
+        (banner, token) = showUploadBanner(windowScene: window.windowScene,
+                                           payload: payload,
+                                           allowMinimizeOnTap: false,
+                                           onButtonTap: {
+            self.cancel()
+        })
 
         for metadata in self.uploadMetadata {
             // BANNER
-            LucidBanner.shared.update(
+            let payloadUpdate = LucidBannerPayload.Update(
                 title: NSLocalizedString("_upload_file_", comment: "") + " \(self.counterUploaded + 1) " + NSLocalizedString("_of_", comment: "") + " \(self.filesName.count)",
                 systemImage: "arrowshape.up.circle",
                 imageAnimation: .breathe,
-                progress: 0
-            )
+                progress: 0)
+            banner?.update(payload: payloadUpdate)
 
             error = await self.upload(metadata: metadata)
             if error != .success {
@@ -398,13 +441,15 @@ extension NCShareExtension {
         }
 
         if error == .success {
-            LucidBanner.shared.update(stage: .success, for: self.token)
+            banner?.update(payload: LucidBannerPayload.Update(stage: .success, horizontalLayout: .centered(width: 100)), for: self.token)
         } else {
-            LucidBanner.shared.update(subtitle: error?.errorDescription, stage: .error, for: self.token)
+            banner?.update(payload: LucidBannerPayload.Update(subtitle: error?.errorDescription, stage: .error), for: self.token)
         }
 
-        LucidBanner.shared.dismiss(after: 2) {
-            self.extensionContext?.completeRequest(returningItems: self.extensionContext?.inputItems, completionHandler: nil)
+        Task { @MainActor in
+            try? await Task.sleep(for: .seconds(2))
+            banner?.dismiss()
+            extensionContext?.completeRequest(returningItems: extensionContext?.inputItems, completionHandler: nil)
         }
     }
 
@@ -436,34 +481,40 @@ extension NCShareExtension {
         self.counterUploaded += 1
 
         if metadata.isDirectoryE2EE {
-            error = await NCNetworkingE2EEUpload().upload(metadata: metadata, session: session, controller: self, stageBanner: nil, tokenBanner: self.token)
+            error = await NCNetworkingE2EEUpload().upload(metadata: metadata,
+                                                          session: session,
+                                                          controller: self,
+                                                          banner: banner,
+                                                          stageBanner: nil,
+                                                          tokenBanner: self.token)
         } else if metadata.chunk > 0 {
-            LucidBanner.shared.update(
-                systemImage: "gearshape.arrow.triangle.2.circlepath",
-                imageAnimation: .rotate,
-                for: self.token)
+            banner?.update(payload: LucidBannerPayload.Update(systemImage: "gearshape.arrow.triangle.2.circlepath",
+                                                              imageAnimation: .rotate),
+                                      for: self.token)
             let task = Task { () -> (account: String, file: NKFile?, error: NKError) in
                 let results = await NCNetworking.shared.uploadChunkFile(metadata: metadata) { total, counter in
                     Task {@MainActor in
-                        LucidBanner.shared.update(progress: Double(counter / total), for: self.token)
+                        self.banner?.update(payload: LucidBannerPayload.Update(progress: Double(counter) / Double(total)), for: self.token)
                     }
                 } uploadStart: { _ in
                     Task {@MainActor in
-                        LucidBanner.shared.update(
+                        let payload = LucidBannerPayload.Update(
                             systemImage: "arrowshape.up.circle",
-                            imageAnimation: .breathe,
-                            for: self.token)
+                            imageAnimation: .breathe
+                        )
+                        self.banner?.update(payload: payload, for: self.token)
                     }
                 } uploadProgressHandler: { _, _, progress in
                     Task {@MainActor in
-                        LucidBanner.shared.update(progress: progress, for: self.token)
+                        self.banner?.update(payload: LucidBannerPayload.Update(progress: progress), for: self.token)
                     }
                 } assembling: {
                     Task {@MainActor in
-                        LucidBanner.shared.update(
+                        let payload = LucidBannerPayload.Update(
                             systemImage: "gearshape.arrow.triangle.2.circlepath",
-                            imageAnimation: .rotate,
-                            for: self.token)
+                            imageAnimation: .rotate
+                        )
+                        self.banner?.update(payload: payload, for: self.token)
                     }
                 }
 
@@ -485,7 +536,8 @@ extension NCShareExtension {
                                                                dateModificationFile: metadata.date as Date) { _ in
             } progressHandler: { _, _, fractionCompleted in
                 Task {@MainActor in
-                    LucidBanner.shared.update(progress: fractionCompleted, for: self.token)
+                    self.banner?.update(payload: LucidBannerPayload.Update(progress: fractionCompleted),
+                                        for: self.token)
                 }
             }
             error = results.error

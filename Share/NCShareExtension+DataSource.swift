@@ -19,6 +19,7 @@ extension NCShareExtension: UICollectionViewDelegate {
 
             if metadata.e2eEncrypted && !NCPreferences().isEndToEndEnabled(account: tblAccount.account) {
                 self.showAlert(title: "_info_", description: "_e2e_goto_settings_for_enable_")
+                return
             }
             let capabilities = await NKCapabilities.shared.getCapabilities(for: tblAccount.account)
 
@@ -81,19 +82,11 @@ extension NCShareExtension: UICollectionViewDataSource {
             return cell
         }
 
-        cell.fileOcId = metadata.ocId
-        cell.fileOcIdTransfer = metadata.ocIdTransfer
-        cell.fileUser = metadata.ownerId
-        cell.labelTitle.text = metadata.fileNameView
+        cell.metadata = metadata
+        cell.setBidiSafeFilename(metadata.fileNameView, isDirectory: metadata.directory, titleLabel: cell.labelTitle, extensionLabel: cell.labelExtension)
         cell.labelTitle.textColor = NCBrandColor.shared.textColor
-        cell.imageSelect.image = nil
-        cell.imageStatus.image = nil
-        cell.imageLocal.image = nil
-        cell.imageFavorite.image = nil
-        cell.imageShared.image = nil
-        cell.imageMore.image = nil
-        cell.imageItem.image = nil
-        cell.imageItem.backgroundColor = nil
+        cell.labelExtension?.textColor = NCBrandColor.shared.textColor
+        cell.setButtonsHidden(true)
 
         if metadata.directory {
             setupDirectoryCell(cell, indexPath: indexPath, with: metadata)
@@ -103,17 +96,20 @@ extension NCShareExtension: UICollectionViewDataSource {
             cell.imageFavorite.image = NCImageCache.shared.getImageFavorite()
         }
 
-        cell.imageSelect.isHidden = true
-        cell.backgroundView = nil
-        cell.hideButtonMore(true)
-        cell.hideButtonShare(true)
-        cell.selected(false, isEditMode: false)
+        cell.writeInfoDateSize(date: metadata.date, size: metadata.size)
 
         if metadata.isLivePhoto {
             cell.imageStatus.image = utility.loadImage(named: "livephoto", colors: [NCBrandColor.shared.iconImageColor2])
         }
 
         cell.setTags(tags: Array(metadata.tags))
+
+        let accessibilityLabel = [metadata.fileNameView, cell.labelInfo.text, cell.labelSubinfo.text]
+            .compactMap { $0?.trimmingCharacters(in: .whitespacesAndNewlines) }
+            .filter { !$0.isEmpty }
+            .joined(separator: ", ")
+        cell.setAccessibility(label: accessibilityLabel, value: "")
+        cell.accessibilityTraits = .button
 
         cell.separator.isHidden = collectionView.numberOfItems(inSection: indexPath.section) == indexPath.row + 1
 
@@ -156,6 +152,7 @@ extension NCShareExtension: UICollectionViewDataSource {
             cell.imageLocal.image = NCImageCache.shared.getImageOfflineFlag(colors: [.systemBackground, .systemGreen])
         } else if utilityFileSystem.fileProviderStorageExists(metadata) {
             cell.imageLocal.image = NCImageCache.shared.getImageLocal(colors: [.systemBackground, .systemGreen])
+            cell.imageLocal?.image = NCImageCache.shared.getImageOfflineFlag()
         }
     }
 }

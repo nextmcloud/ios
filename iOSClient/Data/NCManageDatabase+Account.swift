@@ -402,6 +402,15 @@ extension NCManageDatabase {
         } ?? []
     }
 
+    func getTableAccounts(predicate: NSPredicate) -> [tableAccount] {
+        core.performRealmRead { realm in
+           realm.objects(tableAccount.self)
+                .filter(predicate)
+                .sorted(byKeyPath: "active", ascending: false)
+                .map { tableAccount(value: $0) }
+        } ?? []
+    }
+
     func getAllTableAccount() -> [tableAccount] {
         core.performRealmRead { realm in
             let sorted = [SortDescriptor(keyPath: "active", ascending: false),

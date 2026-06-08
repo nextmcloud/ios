@@ -3,33 +3,66 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 import UIKit
+import NextcloudKit
 
 class NCMediaNavigationController: NCMainNavigationController {
-
-    // MARK: - Right
-
     override func setNavigationRightItems() async {
         guard let media = topViewController as? NCMedia else {
             return
         }
 
         if media.isEditMode {
-            let select = UIBarButtonItem(title: NSLocalizedString("_cancel_", comment: ""), style: .plain) {
+            let cancel = UIBarButtonItem(
+                title: NSLocalizedString("_cancel_", comment: ""),
+                style: .plain
+            ) {
                 media.setEditMode(false)
             }
-            media.navigationItem.rightBarButtonItems = [select]
+
+            let group = UIBarButtonItemGroup(
+                barButtonItems: [cancel],
+                representativeItem: nil
+            )
+            media.navigationItem.trailingItemGroups = [group]
             media.tabBarSelect.show()
         } else {
             media.tabBarSelect.hide()
-            await self.updateRightBarButtonItems()
+            await mediaTrailingItemGroups()
         }
     }
 
-    override func createRightMenu() async -> UIMenu? {
+    private func mediaTrailingItemGroups() async {
+        let capabilities = await NKCapabilities.shared.getCapabilities(for: session.account)
+        var desiredItems: [UIBarButtonItem] = []
+
+        if controller?.availableNotifications ?? false {
+            desiredItems.append(notificationsButtonItem)
+        }
+
+        if capabilities.assistantEnabled {
+            desiredItems.append(assistantButtonItem)
+        }
+
+        desiredItems.append(transfersButtonItem)
+
+        if let optionMenu = await self.createOptionMenu() {
+            optionButtonItem.menu = optionMenu
+            desiredItems.append(optionButtonItem)
+        }
+
+        let group = UIBarButtonItemGroup(
+            barButtonItems: desiredItems,
+            representativeItem: nil
+        )
+
+        topViewController?.navigationItem.trailingItemGroups = [group]
+    }
+
+    override func createOptionMenu() async -> UIMenu? {
         guard let media = topViewController as? NCMedia else {
             return nil
         }
-        let layoutForView = database.getLayoutForView(account: session.account, key: global.layoutViewMedia, serverUrl: "", layout: global.mediaLayoutRatio)
+        let layoutForView = database.getLayoutForView(account: session.account, key: global.layoutViewMedia, serverUrl: "", layoutType: global.mediaLayoutRatio)
         var layout = layoutForView.layout
         // Overwrite default value
         if layout == global.layoutList {
@@ -92,7 +125,7 @@ class NCMediaNavigationController: NCMainNavigationController {
                         self.database.setLayoutForView(account: self.session.account, key: self.global.layoutViewMedia, serverUrl: "", layout: self.global.mediaLayoutRatio)
                         media.layoutType = self.global.mediaLayoutRatio
                     }
-                    await self.updateRightMenu()
+                    await self.updateMenuOption()
                     media.collectionViewReloadData()
                 }
             }
@@ -107,6 +140,7 @@ class NCMediaNavigationController: NCMainNavigationController {
                 viewController.typeOfCommandView = .select
                 viewController.type = "mediaFolder"
                 viewController.session = self.session
+                viewController.controller = self.controller
                 self.present(navigationController, animated: true)
             })
         ])

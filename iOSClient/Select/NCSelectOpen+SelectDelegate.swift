@@ -3,24 +3,32 @@ import NextcloudKit
 final class NCSelectOpen: NCSelectDelegate {
     static let shared = NCSelectOpen()
 
-    func dismissSelect(serverUrl: String?, metadata: tableMetadata?, type: String, items: [Any], overwrite: Bool, copy: Bool, move: Bool, session: NCSession.Session) {
-        if let destination = serverUrl, !items.isEmpty {
-            if copy {
-                for case let metadata as tableMetadata in items {
-                    if metadata.status != NCGlobal.shared.metadataStatusNormal, metadata.status != NCGlobal.shared.metadataStatusWaitCopy {
-                        continue
+    func dismissSelect(serverUrl: String?, metadata: tableMetadata?, type: String, items: [Any], overwrite: Bool, copy: Bool, move: Bool, session: NCSession.Session, controller: NCMainTabBarController?) {
+        Task {
+            if let destination = serverUrl, !items.isEmpty {
+                if copy {
+                    for case let metadata as tableMetadata in items {
+                        if metadata.status != NCGlobal.shared.metadataStatusNormal, metadata.status != NCGlobal.shared.metadataStatusWaitCopy {
+                            continue
+                        }
+                        let error = await NCNetworking.shared.setStatusWaitCopy(metadata, destination: destination, overwrite: overwrite)
+                        if error != .success {
+                            let windowScene = await SceneManager.shared.getWindowScene(controller: controller)
+                            await showErrorBanner(windowScene: windowScene, error: error)
+                        }
                     }
 
-                    NCNetworking.shared.setStatusWaitCopy(metadata, destination: destination, overwrite: overwrite)
-                }
-
-            } else if move {
-                for case let metadata as tableMetadata in items {
-                    if metadata.status != NCGlobal.shared.metadataStatusNormal, metadata.status != NCGlobal.shared.metadataStatusWaitMove {
-                        continue
+                } else if move {
+                    for case let metadata as tableMetadata in items {
+                        if metadata.status != NCGlobal.shared.metadataStatusNormal, metadata.status != NCGlobal.shared.metadataStatusWaitMove {
+                            continue
+                        }
+                        let error = await NCNetworking.shared.setStatusWaitMove(metadata, destination: destination, overwrite: overwrite)
+                        if error != .success {
+                            let windowScene = await SceneManager.shared.getWindowScene(controller: controller)
+                            await showErrorBanner(windowScene: windowScene, error: error)
+                        }
                     }
-
-                    NCNetworking.shared.setStatusWaitMove(metadata, destination: destination, overwrite: overwrite)
                 }
             }
         }
@@ -67,6 +75,7 @@ final class NCSelectOpen: NCSelectDelegate {
             vc.items = copyItems
             vc.serverUrl = serverUrl
             vc.session = session
+            vc.controller = controller
 
             vc.navigationItem.backButtonTitle = vc.titleCurrentFolder
             listViewController.insert(vc, at: 0)

@@ -16,14 +16,15 @@ class NCEndToEndMetadata: NSObject {
     func encodeMetadata(serverUrl: String, addUserId: String? = nil, addCertificate: String? = nil, removeUserId: String? = nil, session: NCSession.Session) async -> (metadata: String?, signature: String?, counter: Int, error: NKError) {
 
         guard let directory = self.database.getTableDirectory(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@", session.account, serverUrl)) else {
-            return (nil, nil, 0, NKError(errorCode: NCGlobal.shared.errorUnexpectedResponseFromDB, errorDescription: "_e2e_error_"))
+            return (nil, nil, 0, NKError(errorCode: NCGlobal.shared.errorUnexpectedResponseFromDB,
+                                         errorDescription: NSLocalizedString("_e2ee_no_session_", comment: "")))
         }
         let capabilities = await NKCapabilities.shared.getCapabilities(for: session.account)
 
-        if capabilities.e2EEApiVersion == NCGlobal.shared.e2eeVersionV12 && NCGlobal.shared.e2eeVersions.contains(NCGlobal.shared.e2eeVersionV12) {
-            return await encodeMetadataV12(account: session.account, serverUrl: serverUrl, ocIdServerUrl: directory.ocId)
-        } else if capabilities.e2EEApiVersion == NCGlobal.shared.e2eeVersionV20 && NCGlobal.shared.e2eeVersions.contains(NCGlobal.shared.e2eeVersionV20) {
-            return await encodeMetadataV20(serverUrl: serverUrl, ocIdServerUrl: directory.ocId, addUserId: addUserId, addCertificate: addCertificate, removeUserId: removeUserId, session: session)
+        if capabilities.e2EEApiVersion.hasPrefix("1.") {
+            return await encodeMetadataV1(account: session.account, serverUrl: serverUrl, ocIdServerUrl: directory.ocId)
+        } else if capabilities.e2EEApiVersion.hasPrefix("2.") {
+            return await encodeMetadataV2(serverUrl: serverUrl, ocIdServerUrl: directory.ocId, addUserId: addUserId, addCertificate: addCertificate, removeUserId: removeUserId, session: session)
         } else {
             return (nil, nil, 0, NKError(errorCode: NCGlobal.shared.errorE2EEVersion, errorDescription: "Server E2EE version " + capabilities.e2EEApiVersion + ", not compatible"))
         }
@@ -35,17 +36,17 @@ class NCEndToEndMetadata: NSObject {
 
     func decodeMetadata(_ metadata: String, signature: String?, serverUrl: String, session: NCSession.Session) async -> NKError {
         guard let data = metadata.data(using: .utf8), let directory = self.database.getTableDirectory(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@", session.account, serverUrl)) else {
-            return (NKError(errorCode: NCGlobal.shared.errorE2EEJSon, errorDescription: "_e2e_error_"))
+            return (NKError(errorCode: NCGlobal.shared.errorE2EEJSon, errorDescription: "Unable to decode the metadata file"))
         }
 
         data.printJson()
 
-        if (try? JSONDecoder().decode(E2eeV1.self, from: data)) != nil && NCGlobal.shared.e2eeVersions.contains(NCGlobal.shared.e2eeVersionV11) {
+        if (try? JSONDecoder().decode(E2eeV1.self, from: data)) != nil {
             return await decodeMetadataV1(metadata, serverUrl: serverUrl, ocIdServerUrl: directory.ocId, session: session)
-        } else if (try? JSONDecoder().decode(E2eeV12.self, from: data)) != nil && NCGlobal.shared.e2eeVersions.contains(NCGlobal.shared.e2eeVersionV12) {
+        } else if (try? JSONDecoder().decode(E2eeV12.self, from: data)) != nil {
             return await decodeMetadataV12(metadata, serverUrl: serverUrl, ocIdServerUrl: directory.ocId, session: session)
-        } else if (try? JSONDecoder().decode(E2eeV20.self, from: data)) != nil && NCGlobal.shared.e2eeVersions.contains(NCGlobal.shared.e2eeVersionV20) {
-            return await decodeMetadataV20(metadata, signature: signature, serverUrl: serverUrl, ocIdServerUrl: directory.ocId, session: session)
+        } else if (try? JSONDecoder().decode(E2eeV2.self, from: data)) != nil {
+            return await decodeMetadataV2(metadata, signature: signature, serverUrl: serverUrl, ocIdServerUrl: directory.ocId, session: session)
         } else {
             return NKError(errorCode: NCGlobal.shared.errorE2EEVersion, errorDescription: "Unable to decode the metadata file")
         }

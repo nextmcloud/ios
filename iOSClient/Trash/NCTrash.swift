@@ -1,27 +1,6 @@
-//
-//  NCTrash.swift
-//  Nextcloud
-//
-//  Created by Marino Faggiana on 02/10/2018.
-//  Copyright © 2018 Marino Faggiana. All rights reserved.
-//  Copyright © 2022 Henrik Storch. All rights reserved.
-//
-//  Author Henrik Storch <henrik.storch@nextcloud.com>
-//  Author Marino Faggiana <marino.faggiana@nextcloud.com>
-//
-//  This program is free software: you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
-//  the Free Software Foundation, either version 3 of the License, or
-//  (at your option) any later version.
-//
-//  This program is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
-//
-//  You should have received a copy of the GNU General Public License
-//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-//
+// SPDX-FileCopyrightText: Nextcloud GmbH
+// SPDX-FileCopyrightText: 2018 Marino Faggiana
+// SPDX-License-Identifier: GPL-3.0-or-later
 
 import UIKit
 import NextcloudKit
@@ -51,9 +30,25 @@ class NCTrash: UIViewController, NCTrashListCellDelegate, NCTrashGridCellDelegat
     var session: NCSession.Session {
         NCSession.shared.getSession(controller: tabBarController)
     }
+    
+    var serverUrl = ""
+    var selectableDataSource: [RealmSwiftObject] { datasource }
+    private let appDelegate = (UIApplication.shared.delegate as? AppDelegate)!
+    var emptyDataSet: NCEmptyDataSet?
 
+    @MainActor
     var controller: NCMainTabBarController? {
         self.tabBarController as? NCMainTabBarController
+    }
+
+    @MainActor
+    internal var windowScene: UIWindowScene? {
+       SceneManager.shared.getWindowScene(controller: self.tabBarController as? NCMainTabBarController)
+    }
+
+    @MainActor
+    var mainNavigationController: NCMainNavigationController? {
+        self.navigationController as? NCMainNavigationController
     }
 
     // MARK: - View Life Cycle
@@ -140,23 +135,34 @@ class NCTrash: UIViewController, NCTrashListCellDelegate, NCTrashGridCellDelegat
     }
 
     func tapMoreListItem(with objectId: String, image: UIImage?, sender: Any) {
-        if !isEditMode {
-            toggleMenuMore(with: objectId, image: image, isGridCell: false, sender: sender)
-        } else if let button = sender as? UIView {
-            let buttonPosition = button.convert(CGPoint.zero, to: collectionView)
-            let indexPath = collectionView.indexPathForItem(at: buttonPosition)
-            collectionView(self.collectionView, didSelectItemAt: indexPath!)
-        } // else: undefined sender
-    }
-
-    func tapMoreGridItem(with objectId: String, image: UIImage?, sender: Any) {
-        if !isEditMode {
-            toggleMenuMore(with: objectId, image: image, isGridCell: true, sender: sender)
-        } else if let button = sender as? UIView {
+        // Menu is now shown via native context menu on the button
+        if isEditMode, let button = sender as? UIView {
             let buttonPosition = button.convert(CGPoint.zero, to: collectionView)
             let indexPath = collectionView.indexPathForItem(at: buttonPosition)
             collectionView(self.collectionView, didSelectItemAt: indexPath!)
         }
+    }
+
+    func tapMoreGridItem(with objectId: String, image: UIImage?, sender: Any) {
+        if isEditMode, let button = sender as? UIView {
+            let buttonPosition = button.convert(CGPoint.zero, to: collectionView)
+            let indexPath = collectionView.indexPathForItem(at: buttonPosition)
+            collectionView(self.collectionView, didSelectItemAt: indexPath!)
+        }
+    }
+    func tapButtonSwitch(_ sender: Any) {
+        if layoutForView?.layout == NCGlobal.shared.layoutGrid {
+            onListSelected()
+        } else {
+            onGridSelected()
+        }
+    }
+    
+    func tapButtonOrder(_ sender: Any) {
+
+        let sortMenu = NCSortMenu()
+//        sortMenu.toggleMenu(viewController: self, account: appDelegate.account, key: layoutKey, sortButton: sender as? UIButton, serverUrl: serverUrl)
+        sortMenu.toggleMenu(viewController: self, account: session.account, key: layoutKey, sortButton: sender as? UIButton, serverUrl: serverUrl)
     }
 
     func longPressGridItem(with objectId: String, gestureRecognizer: UILongPressGestureRecognizer) { }
@@ -168,7 +174,14 @@ class NCTrash: UIViewController, NCTrashListCellDelegate, NCTrashGridCellDelegat
     func reloadDataSource(withQueryDB: Bool = true) async {
         let results = await self.database.getTableTrashAsync(filePath: getFilePath(), account: session.account)
 
-        await (self.navigationController as? NCMainNavigationController)?.updateRightMenu()
+        await mainNavigationController?.updateMenuOption()
+//            // Switch back to main thread for UI updates
+//            await MainActor.run {
+//                self.datasource = results
+//                self.collectionView.reloadData()
+//                setNavigationRightItems()
+////                (self.navigationController as? NCMainNavigationController)?.updateRightMenu()
+//        await (self.navigationController as? NCMainNavigationController)?.updateRightMenu()
 
         await MainActor.run {
             self.datasource = results

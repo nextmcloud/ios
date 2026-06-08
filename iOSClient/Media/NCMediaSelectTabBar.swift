@@ -6,6 +6,8 @@ import UIKit
 import SwiftUI
 
 protocol NCMediaSelectTabBarDelegate: AnyObject {
+    func move()
+    func share()
     func delete()
 }
 
@@ -86,29 +88,37 @@ struct MediaTabBarSelectView: View {
     var body: some View {
         VStack {
             Spacer().frame(height: sizeClass == .compact ? 5 : 10)
+
             HStack {
-                Spacer().frame(maxWidth: .infinity)
-                Group {
-                    if tabBarSelect.selectCount == 0 {
-                        Text(NSLocalizedString("_select_photos_", comment: ""))
-                    } else if tabBarSelect.selectCount == 1 {
-                        Text(String(tabBarSelect.selectCount) + " " + NSLocalizedString("_selected_photo_", comment: ""))
-                    } else {
-                        Text(String(tabBarSelect.selectCount) + " " + NSLocalizedString("_selected_photos_", comment: ""))
-                    }
+                Button {
+                  tabBarSelect.delegate?.share()
+                } label: {
+                    Image(systemName: "square.and.arrow.up")
+                        .font(.icon(23))
                 }
-                .frame(minWidth: 250, maxWidth: .infinity)
+                .tint(Color(NCBrandColor.shared.iconImageColor))
+                .frame(maxWidth: .infinity)
+                .disabled(tabBarSelect.selectCount == 0)
+
+                Button {
+                    tabBarSelect.delegate?.move()
+                } label: {
+                    Image(systemName: "rectangle.portrait.and.arrow.right")
+                        .font(.icon(23))
+                }
+                .tint(Color(NCBrandColor.shared.iconImageColor))
+                .frame(maxWidth: .infinity)
+                .disabled(tabBarSelect.selectCount == 0)
 
                 Button {
                     tabBarSelect.delegate?.delete()
                 } label: {
                     Image(systemName: "trash")
-                    .font(Font.system(.body).weight(.light))
-                    .imageScale(sizeClass == .compact ? .medium : .large)
+                        .font(.icon(23))
                 }
                 .tint(.red)
-                .disabled(tabBarSelect.selectCount == 0)
                 .frame(maxWidth: .infinity)
+                .disabled(tabBarSelect.selectCount == 0)
             }
             .frame(maxWidth: .infinity)
         }

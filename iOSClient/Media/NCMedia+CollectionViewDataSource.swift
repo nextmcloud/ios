@@ -62,7 +62,7 @@ extension NCMedia: UICollectionViewDataSource {
         let imageCache = imageCache.getImageCache(ocId: metadata.ocId, etag: metadata.etag, ext: ext)
 
         cell.imageItem.image = imageCache
-        cell.datePhotosOriginal = metadata.datePhotosOriginal as Date
+        cell.date = metadata.date
         cell.ocId = metadata.ocId
         cell.imageStatus.image = nil
 
@@ -76,17 +76,18 @@ extension NCMedia: UICollectionViewDataSource {
         cell.imageSelect.isHidden = !isEditMode ? true : false
 
         if isEditMode, fileSelect.contains(metadata.ocId) {
-            cell.selected(true)
+            cell.selected(true, color: NCBrandColor.shared.getElement(account: session.account))
         } else {
-            cell.selected(false)
+            cell.selected(false, color: NCBrandColor.shared.getElement(account: session.account))
         }
 
         if cell.imageItem.image == nil {
             if isPinchGestureActive || ext == global.previewExt512 || ext == global.previewExt1024 {
                 cell.imageItem.image = utility.getImage(ocId: metadata.ocId, etag: metadata.etag, ext: ext, userId: self.session.userId, urlBase: self.session.urlBase)
             } else {
+                let session = self.session
                 DispatchQueue.global(qos: .userInteractive).async {
-                    let image = self.utility.getImage(ocId: metadata.ocId, etag: metadata.etag, ext: ext, userId: self.session.userId, urlBase: self.session.urlBase)
+                    let image = self.utility.getImage(ocId: metadata.ocId, etag: metadata.etag, ext: ext, userId: session.userId, urlBase: session.urlBase)
                     DispatchQueue.main.async {
                         if let currentCell = collectionView.cellForItem(at: indexPath) as? NCMediaCell,
                            currentCell.ocId == metadata.ocId, let image {

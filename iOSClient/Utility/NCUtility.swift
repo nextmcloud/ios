@@ -119,6 +119,20 @@ final class NCUtility: NSObject, Sendable {
         return String(intFileId)
     }
 
+    func splitOcId(_ ocId: String) -> (fileId: String?, instanceId: String?) {
+        let parts = ocId.components(separatedBy: "oc")
+        guard parts.count == 2 else {
+            return (nil, nil)
+        }
+        return (parts[0], "oc" + parts[1])
+    }
+
+    /// Pads a numeric fileId with leading zeros to reach 8 characters.
+    func paddedFileId(_ fileId: String) -> String {
+        if fileId.count >= 8 { return fileId }
+        let zeros = String(repeating: "0", count: 8 - fileId.count)
+        return zeros + fileId
+    }
 //    func getVersionApp(withBuild: Bool = true) -> String {
 //        if let dictionary = Bundle.main.infoDictionary {
 //            if let version = dictionary["CFBundleShortVersionString"], let build = dictionary["CFBundleVersion"] {

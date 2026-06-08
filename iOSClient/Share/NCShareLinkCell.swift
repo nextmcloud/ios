@@ -35,6 +35,10 @@ class NCShareLinkCell: UITableViewCell {
     @IBOutlet weak var imageAllowedPermission: UIImageView!
     @IBOutlet weak var imageRightArrow: UIImageView!
     @IBOutlet weak var labelQuickStatus: UILabel!
+    @IBOutlet weak var statusStackView: UIStackView!
+    @IBOutlet weak var menuButton: UIButton!
+    @IBOutlet private weak var copyButton: UIButton!
+    @IBOutlet weak var imageDownArrow: UIImageView!
     @IBOutlet weak var leadingContraintofImageRightArrow: NSLayoutConstraint!
 
     private let iconShareSize: CGFloat = 200
@@ -124,6 +128,9 @@ class NCShareLinkCell: UITableViewCell {
         statusStackView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(openQuickStatus)))
         labelQuickStatus.textColor = NCBrandColor.shared.customer
         imageDownArrow.image = utility.loadImage(named: "arrowtriangle.down.circle", colors: [NCBrandColor.shared.customer])
+
+        menuButton.menu = nil
+        menuButton.showsMenuAsPrimaryAction = true
     }
 
     override func awakeFromNib() {
@@ -206,6 +213,10 @@ class NCShareLinkCell: UITableViewCell {
         delegate?.tapMenu(with: tableShare, sender: sender)
     }
 
+    @objc func openQuickStatus(_ sender: UITapGestureRecognizer) {
+        delegate?.tapQuickStatus(with: tableShare, sender: sender.view ?? sender)
+    }
+    
     @IBAction func quickStatusClicked(_ sender: UIButton) {
         delegate?.quickStatus(with: tableShare, sender: sender)
     }
@@ -214,5 +225,5 @@ class NCShareLinkCell: UITableViewCell {
 protocol NCShareLinkCellDelegate: AnyObject {
     func tapCopy(with tableShare: tableShare?, sender: Any)
     func tapMenu(with tableShare: tableShare?, sender: Any)
-    func quickStatus(with tableShare: tableShare?, sender: Any)
+    func tapQuickStatus(with tableShare: tableShare?, sender: Any)
 }

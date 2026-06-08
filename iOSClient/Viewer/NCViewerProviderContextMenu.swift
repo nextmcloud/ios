@@ -4,7 +4,6 @@
 
 import UIKit
 import NextcloudKit
-import SVGKit
 import MobileVLCKit
 
 class NCViewerProviderContextMenu: UIViewController {
@@ -47,7 +46,9 @@ class NCViewerProviderContextMenu: UIViewController {
             }
             // VIEW IMAGE
             if metadata.isImage && utilityFileSystem.fileProviderStorageExists(metadata) {
-                viewImage(metadata: metadata)
+                Task {@MainActor in
+                    await viewImage(metadata: metadata)
+                }
             }
             // VIEW LIVE PHOTO
             if let metadataLivePhoto = metadataLivePhoto, utilityFileSystem.fileProviderStorageExists(metadataLivePhoto) {
@@ -144,7 +145,7 @@ class NCViewerProviderContextMenu: UIViewController {
 
     // MARK: - Viewer
 
-    private func viewImage(metadata: tableMetadata) {
+    private func viewImage(metadata: tableMetadata) async {
         var image: UIImage?
         let filePath = utilityFileSystem.getDirectoryProviderStorageOcId(metadata.ocId,
                                                                          fileName: metadata.fileNameView,
@@ -158,9 +159,16 @@ class NCViewerProviderContextMenu: UIViewController {
                                                                               fileName: metadata.fileNameView,
                                                                               userId: metadata.userId,
                                                                               urlBase: metadata.urlBase)
-            if let svgImage = SVGKImage(contentsOfFile: imagePath) {
-                svgImage.size = NCGlobal.shared.size1024
-                image = svgImage.uiImage
+            do {
+                let url = URL(fileURLWithPath: imagePath)
+                let data = try Data(contentsOf: url)
+                image = try await NCSVGRenderer().renderSVGToUIImage(
+                    svgData: data,
+                    size: CGSize(width: 1024, height: 1024),
+                    backgroundColor: .clear
+                )
+            } catch {
+                print("SVG render error: \(error.localizedDescription)")
             }
         } else {
             image = UIImage(contentsOfFile: filePath)
@@ -227,8 +235,10 @@ extension NCViewerProviderContextMenu: VLCMediaPlayerDelegate {
             print("Played mode: ENDED")
         case .error:
             NCActivityIndicator.shared.stop()
-            let error = NKError(errorCode: NCGlobal.shared.errorInternalError, errorDescription: "_error_something_wrong_")
-            NCContentPresenter().showError(error: error, priority: .max)
+            Task {
+                let windowScene = SceneManager.shared.getWindow(sceneIdentifier: self.sceneIdentifier)?.windowScene
+                await showErrorBanner(windowScene: windowScene, text: "_error_something_wrong_", errorCode: NCGlobal.shared.errorInternalError)
+            }
             print("Played mode: ERROR")
         case .playing:
             NCActivityIndicator.shared.stop()
@@ -269,6 +279,12 @@ extension NCViewerProviderContextMenu: VLCMediaPlayerDelegate {
 }
 
 extension NCViewerProviderContextMenu: NCTransferDelegate {
+    func transferReloadData(serverUrl: String?) { }
+
+    func transferReloadDataSource(serverUrl: String?, requestData: Bool, status: Int?) { }
+
+    func transferProgressDidUpdate(progress: Float, totalBytes: Int64, totalBytesExpected: Int64, fileName: String, serverUrl: String) { }
+
     func transferChange(status: String,
                         account: String,
                         fileName: String,
@@ -278,7 +294,10 @@ extension NCViewerProviderContextMenu: NCTransferDelegate {
                         destination: String?,
                         error: NKError) {
         if error != .success {
-            NCContentPresenter().showError(error: error)
+            Task {
+                let windowScene = SceneManager.shared.getWindow(sceneIdentifier: self.sceneIdentifier)?.windowScene
+                await showErrorBanner(windowScene: windowScene, text: error.errorDescription, errorCode: error.errorCode)
+            }
         }
 
         Task {@MainActor in
@@ -293,7 +312,7 @@ extension NCViewerProviderContextMenu: NCTransferDelegate {
                    ocId == self.metadata?.ocId,
                    let metadata = await NCManageDatabase.shared.getMetadataFromOcIdAsync(ocId) {
                     if metadata.isImage {
-                        self.viewImage(metadata: metadata)
+                        await self.viewImage(metadata: metadata)
                     } else if metadata.isVideo || metadata.isAudio {
                         self.viewVideo(metadata: metadata)
                     }

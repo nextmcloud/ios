@@ -1,33 +1,69 @@
 // SPDX-FileCopyrightText: Nextcloud GmbH
-// SPDX-FileCopyrightText: 2025 Marino Faggiana
+// SPDX-FileCopyrightText: 2026 Marino Faggiana
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 import SwiftUI
 import LucidBanner
+import NextcloudKit
+import Alamofire
 
 @MainActor
-func showErrorBanner(controller: UITabBarController?, errorDescription: String, errorCode: Int, sleepBefore: Double = 1) async {
-    let scene = SceneManager.shared.getWindow(controller: controller)?.windowScene
-    await showErrorBanner(scene: scene, errorDescription: errorDescription, errorCode: errorCode, sleepBefore: sleepBefore)
+func showErrorBanner(windowScene: UIWindowScene?,
+                     error: NKError) async {
+    await showErrorBanner(windowScene: windowScene,
+                          title: "_error_",
+                          text: error.errorDescription,
+                          errorCode: error.errorCode)
 }
 
 @MainActor
-func showErrorBanner(scene: UIWindowScene?, errorDescription: String, errorCode: Int, sleepBefore: Double = 1) async {
-    try? await Task.sleep(nanoseconds: UInt64(sleepBefore * 1e9))
-    var scene = scene
-    if scene == nil {
-        scene = UIApplication.shared.mainAppWindow?.windowScene
+func showErrorBanner(windowScene: UIWindowScene?,
+                     title: String = "_error_",
+                     text: String,
+                     footnote: String? = nil,
+                     errorCode: Int? = nil,
+                     afError: AFError? = nil) async {
+    guard let windowScene,
+          let window = windowScene.windows.first(where: \.isKeyWindow) else {
+        return
     }
 
-    LucidBanner.shared.show(
-        scene: scene,
-        subtitle: errorDescription,
-        footnote: "(Code: \(errorCode))",
+#if !EXTENSION
+    if let errorCode,
+       let controller = SceneManager.shared.getController(scene: windowScene) {
+        if await !ErrorBannerGate.shared.shouldShow(errorCode: errorCode, account: controller.account) {
+            return
+        }
+    }
+#endif
+
+    let banner = LucidBannerRegistry.shared.banner(for: windowScene)
+    let horizontalLayout = horizontalLayoutBanner(bounds: window.bounds,
+                                                  safeAreaInsets: window.safeAreaInsets,
+                                                  idiom: window.traitCollection.userInterfaceIdiom)
+
+    try? await Task.sleep(for: .seconds(0.5))
+
+    let payload = LucidBannerPayload(
+        title: NSLocalizedString(title, comment: ""),
+        subtitle: NSLocalizedString(text, comment: ""),
+        footnote: NSLocalizedString(footnote ?? "", comment: ""),
+        systemImage: "xmark.circle.fill",
+        backgroundColor: Color(.systemBackground).opacity(0.4),
+        textColor: Color(uiColor: .label),
+        imageColor: Color(uiColor: .red),
         vPosition: .top,
+        verticalMargin: 10,
+        horizontalLayout: horizontalLayout,
         autoDismissAfter: NCGlobal.shared.dismissAfterSecond,
         swipeToDismiss: true,
+    )
+
+    banner.show(
+        payload: payload,
+        policy: .replace,
         onTap: { _, _ in
-            LucidBanner.shared.dismiss()
+            banner.dismiss()
         }
     ) { state in
         ErrorBannerView(state: state)
@@ -38,39 +74,43 @@ func showErrorBanner(scene: UIWindowScene?, errorDescription: String, errorCode:
 
 struct ErrorBannerView: View {
     @ObservedObject var state: LucidBannerState
-    let textColor = Color(.label)
 
     var body: some View {
-        let showSubtitle = !(state.subtitle?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ?? true)
-        let showFootnote = !(state.footnote?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ?? true)
+        let showTitle = !(state.payload.title?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ?? true)
+        let showSubtitle = !(state.payload.subtitle?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ?? true)
+        let showFootnote = !(state.payload.footnote?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ?? true)
 
-        containerView {
+        containerView(state: state, coordinator: nil, allowMinimizeOnTap: false) {
             VStack(spacing: 15) {
                 HStack(alignment: .top, spacing: 10) {
-                    Image(systemName: "xmark.circle.fill")
-                        .font(.system(size: 30, weight: .bold))
-                        .foregroundStyle(.white)
+                    Image(systemName: state.payload.systemImage ?? "info.circle")
+                        .applyBannerAnimation(state.payload.imageAnimation)
+                        .font(.icon(26))
+                        .foregroundStyle(state.payload.imageColor)
 
                     VStack(alignment: .leading, spacing: 7) {
-                        Text("_error_")
-                            .font(.subheadline.weight(.bold))
-                            .multilineTextAlignment(.leading)
-                            .truncationMode(.tail)
-                            .foregroundStyle(textColor)
-
-                        if showSubtitle, let subtitle = state.subtitle {
-                            Text(subtitle)
-                                .font(.subheadline)
+                        if showTitle, let title = state.payload.title {
+                            Text(title)
+                                .cappedFont(.headline, maxDynamicType: .accessibility2)
+                                .fontWeight(.semibold)
                                 .multilineTextAlignment(.leading)
                                 .truncationMode(.tail)
-                                .foregroundStyle(textColor)
+                                .foregroundStyle(state.payload.textColor)
                         }
-                        if showFootnote, let footnote = state.footnote {
-                            Text(footnote)
-                                .font(.caption)
+
+                        if showSubtitle, let subtitle = state.payload.subtitle {
+                            Text(subtitle)
+                                .cappedFont(.subheadline, maxDynamicType: .accessibility1)
                                 .multilineTextAlignment(.leading)
                                 .truncationMode(.tail)
-                                .foregroundStyle(textColor)
+                                .foregroundStyle(state.payload.textColor)
+                        }
+                        if showFootnote, let footnote = state.payload.footnote {
+                            Text(footnote)
+                                .cappedFont(.footnote, maxDynamicType: .xxxLarge)
+                                .multilineTextAlignment(.leading)
+                                .truncationMode(.tail)
+                                .foregroundStyle(state.payload.textColor)
                         }
                     }
                 }
@@ -78,36 +118,6 @@ struct ErrorBannerView: View {
             .padding(.horizontal, 12)
             .padding(.vertical, 12)
             .frame(maxWidth: .infinity, alignment: .leading)
-        }
-    }
-
-    // MARK: - Container
-
-    @ViewBuilder
-    func containerView<Content: View>(@ViewBuilder _ content: () -> Content) -> some View {
-        let cornerRadius: CGFloat = 22
-        let errorColor = Color.red.opacity(0.75)
-        let contentBase = content()
-            .contentShape(Rectangle())
-            .frame(maxWidth: 500)
-
-        if #available(iOS 26, *) {
-            contentBase
-                .background(
-                    RoundedRectangle(cornerRadius: cornerRadius)
-                        .fill(errorColor)
-                )
-                .glassEffect(.clear, in: RoundedRectangle(cornerRadius: 22))
-                .frame(maxWidth: .infinity, alignment: .center)
-        } else {
-            contentBase
-                .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: cornerRadius))
-                .overlay(
-                    RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
-                        .stroke(.white.opacity(0.9), lineWidth: 0.6)
-                )
-                .shadow(color: .black.opacity(0.5), radius: 10, x: 0, y: 4)
-                .frame(maxWidth: .infinity, alignment: .center)
         }
     }
 }
@@ -125,13 +135,19 @@ struct ErrorBannerView: View {
             .foregroundStyle(.primary)
             .padding()
 
-        ErrorBannerView(
-            state: LucidBannerState(
+        let state = LucidBannerState(
+            payload: LucidBannerPayload(
                 title: "Error",
-                subtitle: "Not avalilable",
-                footnote: "ErroCode. 12",
-                imageAnimation: .breathe)
+                subtitle: "Subtitle",
+                footnote: "footnote",
+                systemImage: "xmark.circle.fill",
+                backgroundColor: Color(UIColor.red.withAlphaComponent(0.12)),
+                textColor: Color(uiColor: .label),
+                imageColor: Color(uiColor: .red)
+            )
         )
+
+        ErrorBannerView(state: state)
         .padding()
     }
 }

@@ -25,6 +25,7 @@
 import Foundation
 import UIKit
 import NextcloudKit
+import SwiftUI
 
 @available(*, deprecated, message: "Change to using iOS native context menus, as well as using ContextMenuActions and NCViewerContextMenu")
 class NCMenuAction {
@@ -90,7 +91,7 @@ extension NCMenuAction {
     static func selectAllAction(sender: Any?, action: @escaping () -> Void) -> NCMenuAction {
         NCMenuAction(
             title: NSLocalizedString("_select_all_", comment: ""),
-            icon: NCUtility().loadImage(named: "checkmark.circle.fill", colors: [NCBrandColor.shared.iconImageColor]),
+            icon: NCUtility().loadImage(named: "checkmark.circle.fill", colors: [NCBrandColor.shared.iconImageColor]).withTintColor(NCBrandColor.shared.iconImageColor),
             sender: sender,
             action: { _ in action() }
         )
@@ -100,7 +101,7 @@ extension NCMenuAction {
     static func cancelAction(sender: Any?, action: @escaping () -> Void) -> NCMenuAction {
         NCMenuAction(
             title: NSLocalizedString("_cancel_", comment: ""),
-            icon: NCUtility().loadImage(named: "xmark", colors: [NCBrandColor.shared.iconImageColor]),
+            icon: NCUtility().loadImage(named: "xmark", colors: [NCBrandColor.shared.iconImageColor]).withTintColor(NCBrandColor.shared.iconImageColor),
             sender: sender,
             action: { _ in action() }
         )
@@ -151,11 +152,11 @@ extension NCMenuAction {
         return NCMenuAction(
             title: titleDelete,
             destructive: destructive,
-            icon: NCUtility().loadImage(named: icon, colors: [color]),
+            icon: NCUtility().loadImage(named: icon, colors: [color]).withTintColor(NCBrandColor.shared.iconImageColor),
             order: order,
             sender: sender,
             action: { _ in
-                let alertController = UIAlertController.deleteFileOrFolder(titleString: titleDelete + "?", message: message + fileList, canDeleteServer: canDeleteServer, selectedMetadatas: selectedMetadatas, sceneIdentifier: controller?.sceneIdentifier) { _ in
+                let alertController = UIAlertController.deleteFileOrFolder(titleString: titleDelete + "?", message: message + fileList, canDeleteServer: canDeleteServer, selectedMetadatas: selectedMetadatas, sceneIdentifier: controller?.sceneIdentifier, controller: controller) { _ in
                     completion?()
                 }
 
@@ -170,6 +171,7 @@ extension NCMenuAction {
 //            icon: NCUtility().loadImage(named: "share", colors: [NCBrandColor.shared.iconImageColor]),
             title: NSLocalizedString("_open_in_", comment: ""),
             icon: NCUtility().loadImage(named: "open_file",colors: [NCBrandColor.shared.iconImageColor]),
+            icon: NCUtility().loadImage(named: "open_file",colors: [NCBrandColor.shared.iconImageColor]).withTintColor(NCBrandColor.shared.iconImageColor),
             order: order,
             sender: sender,
             action: { _ in
@@ -186,6 +188,7 @@ extension NCMenuAction {
         NCMenuAction(
             title: isAnyOffline ? NSLocalizedString("_remove_available_offline_", comment: "") : NSLocalizedString("_set_available_offline_", comment: ""),
             icon: NCUtility().loadImage(named: "cloudDownload", colors: [NCBrandColor.shared.iconImageColor]),
+            icon: NCUtility().loadImage(named: "cloudDownload", colors: [NCBrandColor.shared.iconImageColor]).withTintColor(NCBrandColor.shared.iconImageColor),
             order: order,
             sender: sender,
             action: { _ in
@@ -227,6 +230,11 @@ extension NCMenuAction {
             sender: sender,
             action: { _ in
                 NCDownloadAction.shared.copyPasteboard(pasteboardOcIds: fileSelect, controller: controller)
+            icon: NCUtility().loadImage(named: "copy", colors: [NCBrandColor.shared.iconColor]),
+            order: order,
+            sender: sender,
+            action: { _ in
+//                NCActionCenter.shared.copyPasteboard(pasteboardOcIds: fileSelect, controller: controller)
                 completion?()
             }
         )
@@ -237,6 +245,7 @@ extension NCMenuAction {
         NCMenuAction(
             title: NSLocalizedString("_move_or_copy_", comment: ""),
             icon: NCUtility().loadImage(named: "move", colors: [NCBrandColor.shared.iconImageColor]),
+            icon: NCUtility().loadImage(named: "move", colors: [NCBrandColor.shared.iconImageColor]).withTintColor(NCBrandColor.shared.iconImageColor),
             order: order,
             sender: sender,
             action: { _ in
@@ -278,7 +287,7 @@ extension NCMenuAction {
         let imageName = !shouldLock ? "lock_open" : "lock"
         return NCMenuAction(
             title: NSLocalizedString(titleKey, comment: ""),
-            icon: NCUtility().loadImage(named: imageName, colors: [NCBrandColor.shared.iconImageColor]),
+            icon: NCUtility().loadImage(named: imageName, colors: [NCBrandColor.shared.iconImageColor]).withTintColor(NCBrandColor.shared.iconImageColor),
             order: order,
             sender: sender,
             action: { _ in

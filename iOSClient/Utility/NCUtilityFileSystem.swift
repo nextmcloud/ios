@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 import Foundation
+import NextcloudKit
 import PhotosUI
 
 final class NCUtilityFileSystem: NSObject, @unchecked Sendable {
@@ -127,15 +128,21 @@ final class NCUtilityFileSystem: NSObject, @unchecked Sendable {
     }
 
     func getHomeServer(urlBase: String, userId: String) -> String {
-        return urlBase + "/remote.php/dav/files/" + userId
+        return NKDav.homeURLStringNoSlash(urlBase: urlBase, userId: userId)
     }
 
     func getPath(path: String, user: String, fileName: String? = nil) -> String {
-        var path = path.replacingOccurrences(of: "/remote.php/dav/files/" + user, with: "")
-        if let fileName = fileName {
-            path += fileName
+        let prefix = NKDav.userPathNoSlash(userId: user)
+
+        var result = path.hasPrefix(prefix)
+            ? String(path.dropFirst(prefix.count))
+            : path
+
+        if let fileName {
+            result += fileName
         }
-        return path
+
+        return result
     }
 
     func createServerUrl(serverUrl: String, fileName: String) -> String {
@@ -148,7 +155,22 @@ final class NCUtilityFileSystem: NSObject, @unchecked Sendable {
         }
     }
 
-    func getFileNamePath(_ fileName: String, serverUrl: String, session: NCSession.Session) -> String {
+    /// Constructs the relative path of a file by removing the home server URL prefix.
+    ///
+    /// - Parameters:
+    ///   - fileName: The name of the file
+    ///   - serverUrl: The full server URL where the file is located.
+    ///   - session: The user NCSession.
+    /// - Returns: The relative path from the user's home directory (e.g., `"someFolder/Image.png"`).
+    ///
+    /// Example:
+    /// ```swift
+    /// // Input: fileName = "Image.png"
+    /// //        serverUrl = "https://instance.com/remote.php/dav/files/user1/someFolder"
+    /// // Output: "someFolder/Image.png"
+    /// let path = getRelativeFilePath("Image.png", serverUrl: serverUrl, session: session)
+    /// ```
+    func getRelativeFilePath(_ fileName: String, serverUrl: String, session: NCSession.Session) -> String {
         let home = getHomeServer(session: session)
         var fileNamePath = serverUrl.replacingOccurrences(of: home, with: "") + "/" + fileName
         if fileNamePath.first == "/" {
@@ -157,7 +179,23 @@ final class NCUtilityFileSystem: NSObject, @unchecked Sendable {
         return fileNamePath
     }
 
-    func getFileNamePath(_ fileName: String, serverUrl: String, urlBase: String, userId: String) -> String {
+    /// Constructs the relative path of a file by removing the home server URL prefix.
+    ///
+    /// - Parameters:
+    ///   - fileName: The name of the file
+    ///   - serverUrl: The full server URL where the file is located.
+    ///   - urlBase: The base URL of the server instance.
+    ///   - userId: The user identifier.
+    /// - Returns: The relative path from the user's home directory (e.g., `"someFolder/Image.png"`).
+    ///
+    /// Example:
+    /// ```swift
+    /// // Input: fileName = "Image.png"
+    /// //        serverUrl = "https://instance.com/remote.php/dav/files/user1/someFolder"
+    /// // Output: "someFolder/Image.png"
+    /// let path = getRelativeFilePath("Image.png", serverUrl: serverUrl, urlBase: urlBase, userId: userId)
+    /// ```
+    func getRelativeFilePath(_ fileName: String, serverUrl: String, urlBase: String, userId: String) -> String {
         let home = getHomeServer(urlBase: urlBase, userId: userId)
         var fileNamePath = serverUrl.replacingOccurrences(of: home, with: "") + "/" + fileName
         if fileNamePath.first == "/" {
@@ -321,6 +359,20 @@ final class NCUtilityFileSystem: NSObject, @unchecked Sendable {
                 print(error)
             }
         }
+    }
+
+    func replaceExtension(fileName: String, with newExtension: String) -> String {
+        URL(fileURLWithPath: fileName)
+            .deletingPathExtension()
+            .appendingPathExtension(newExtension)
+            .lastPathComponent
+    }
+
+    func replaceExtension(fileNamePath: String, with newExtension: String) -> String {
+        let url = URL(fileURLWithPath: fileNamePath)
+            .deletingPathExtension()
+            .appendingPathExtension(newExtension)
+        return url.path
     }
 
     func getFileCreationDate(filePath: String) -> NSDate? {
@@ -791,5 +843,17 @@ final class NCUtilityFileSystem: NSObject, @unchecked Sendable {
         } else {
             return (serverUrl as NSString).lastPathComponent
         }
+
+    func extractFileIdFromFPath(from urlString: String?) -> String? {
+        guard let urlString,
+              var url = URL(string: urlString) else {
+            return nil
+        }
+        if url.lastPathComponent.isEmpty {
+            url.deleteLastPathComponent()
+        }
+        let id = url.lastPathComponent
+        let parent = url.deletingLastPathComponent().lastPathComponent
+        return parent == "f" ? id : nil
     }
 }

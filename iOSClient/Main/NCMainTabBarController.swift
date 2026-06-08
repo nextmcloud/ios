@@ -43,8 +43,7 @@ class NCMainTabBarController: UITabBarController {
         super.viewDidLoad()
         delegate = self
 
-        NCNetworking.shared.controller = self
-        NCImageCache.shared.controller = self
+        NCNetworking.shared.setupScene(sceneIdentifier: sceneIdentifier, controller: self)
 
         tabBar.tintColor = NCBrandColor.shared.getElement(account: account)
 
@@ -89,6 +88,9 @@ class NCMainTabBarController: UITabBarController {
             item.selectedImage = item.image
             item.tag = 104
         }
+        configureMoreController()
+        configureTabBarItems()
+        configureTabBarAppearance()
 
         NotificationCenter.default.addObserver(forName: NSNotification.Name(rawValue: self.global.notificationCenterChangeTheming), object: nil, queue: .main) { [weak self] notification in
             if let userInfo = notification.userInfo as? NSDictionary,
@@ -126,25 +128,94 @@ class NCMainTabBarController: UITabBarController {
         previousIndex = selectedIndex
 
         if NCBrandOptions.shared.enforce_passcode_lock && NCPreferences().passcode.isEmptyOrNil {
-            let vc = UIHostingController(rootView: SetupPasscodeView(isLockActive: .constant(false)))
+            let vc = UIHostingController(rootView: SetupPasscodeView(isLockActive: .constant(false), controller: self))
             vc.isModalInPresentation = true
 
             present(vc, animated: true)
         }
     }
 
+    private func configureTabBarAppearance() {
+        let appearance = UITabBarAppearance()
+        appearance.configureWithDefaultBackground()
+
+        tabBar.standardAppearance = appearance
+        tabBar.scrollEdgeAppearance = appearance
+    }
+
+    private func configureMoreController() {
+        guard var controllers = viewControllers else { return }
+
+        controllers.append(makeMoreNavigationController())
+        viewControllers = controllers
+    }
+
+    private func makeMoreNavigationController() -> UIViewController {
+        let moreView = NCMoreView(account: account, controller: self)
+        let hostingController = UIHostingController(rootView: moreView)
+
+        hostingController.navigationItem.title = NSLocalizedString("_more_", comment: "")
+
+        let navigationController = NCMoreNavigationController(rootViewController: hostingController)
+
+        navigationController.tabBarItem = UITabBarItem(
+            title: NSLocalizedString("_more_", comment: ""),
+            image: UIImage(systemName: "ellipsis.circle.fill"),
+            selectedImage: UIImage(systemName: "ellipsis.circle.fill")
+        )
+        navigationController.tabBarItem.tag = 104
+
+        return navigationController
+    }
+
+    private func configureTabBarItems() {
+        configureTabBarItem(
+            at: 0,
+            title: "_home_",
+            imageName: "folder.fill",
+            tag: 100
+        )
+
+        configureTabBarItem(
+            at: 1,
+            title: "_favorites_",
+            imageName: "star.fill",
+            tag: 101
+        )
+
+        configureTabBarItem(
+            at: 2,
+            title: "_media_",
+            imageName: "photo.fill",
+            tag: 102
+        )
+
+        configureTabBarItem(
+            at: 3,
+            title: "_activity_",
+            imageName: "bolt.fill",
+            tag: 103
+        )
+    }
+
+    private func configureTabBarItem(at index: Int, title: String, imageName: String, tag: Int) {
+        guard let items = tabBar.items, items.indices.contains(index) else { return }
+
+        let item = items[index]
+        item.title = NSLocalizedString(title, comment: "")
+        item.image = UIImage(systemName: imageName)
+        item.selectedImage = item.image
+        item.tag = tag
+    }
+
     @MainActor
     private func timerCheck() async {
-        let nanoseconds: UInt64 = 3_000_000_000
-
         while !Task.isCancelled {
-            try? await Task.sleep(nanoseconds: nanoseconds)
+            try? await Task.sleep(for: .seconds(3))
 
             guard isViewLoaded, view.window != nil else {
                 continue
             }
-
-            let capabilities = await NKCapabilities.shared.getCapabilities(for: self.account)
 
             // Check error
             await NCNetworking.shared.checkServerError(account: self.account, controller: self)

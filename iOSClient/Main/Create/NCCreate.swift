@@ -25,12 +25,8 @@ class NCCreate: NSObject {
         var options = NKRequestOptions()
         let serverUrl = controller.currentServerUrl()
 
-        if let creatorId, editorId == "text" || editorId == "onlyoffice" {
-            if editorId == "onlyoffice" {
-                options = NKRequestOptions(customUserAgent: NCUtility().getCustomUserAgentOnlyOffice())
-            } else if editorId == "text" {
-                options = NKRequestOptions(customUserAgent: NCUtility().getCustomUserAgentNCText())
-            }
+        if let creatorId, let adapter = NCDirectEditorAdapter.resolve(from: [editorId]) {
+            options = NKRequestOptions(customUserAgent: adapter.userAgent(utility))
             let results = await NextcloudKit.shared.textCreateFileAsync(fileNamePath: fileNamePath, editorId: editorId, creatorId: creatorId, templateId: templateId, account: account, options: options) { task in
                 Task {
                     let identifier = await NCNetworking.shared.networkingTasks.createIdentifier(account: account,
@@ -40,12 +36,9 @@ class NCCreate: NSObject {
                 }
             }
             guard results.error == .success, let url = results.url else {
-                Task {@MainActor in
-                    await showErrorBanner(
-                        controller: controller,
-                        errorDescription: results.error.errorDescription,
-                        errorCode: results.error.errorCode
-                    )
+                Task {
+                    let windowScene = SceneManager.shared.getWindowScene(controller: controller)
+                    await showErrorBanner(windowScene: windowScene, text: results.error.errorDescription, errorCode: results.error.errorCode)
                 }
                 return
             }
@@ -71,12 +64,9 @@ class NCCreate: NSObject {
                 }
             }
             guard results.error == .success, let url = results.url else {
-                Task {@MainActor in
-                    await showErrorBanner(
-                        controller: controller,
-                        errorDescription: results.error.errorDescription,
-                        errorCode: results.error.errorCode
-                    )
+                Task {
+                    let windowScene = SceneManager.shared.getWindowScene(controller: controller)
+                    await showErrorBanner(windowScene: windowScene, text: results.error.errorDescription, errorCode: results.error.errorCode)
                 }
                 return
             }
@@ -100,13 +90,8 @@ class NCCreate: NSObject {
         var selectedTemplate = NKEditorTemplate()
         var ext: String = ""
 
-        if editorId == "text" || editorId == "onlyoffice" {
-            var options = NKRequestOptions()
-            if editorId == "onlyoffice" {
-                options = NKRequestOptions(customUserAgent: NCUtility().getCustomUserAgentOnlyOffice())
-            } else if editorId == "text" {
-                options = NKRequestOptions(customUserAgent: NCUtility().getCustomUserAgentNCText())
-            }
+        if let adapter = NCDirectEditorAdapter.resolve(from: [editorId]) {
+            let options = NKRequestOptions(customUserAgent: adapter.userAgent(NCUtility()))
 
             let results = await NextcloudKit.shared.textGetListOfTemplatesAsync(account: account, options: options) { task in
                 Task {
@@ -134,15 +119,7 @@ class NCCreate: NSObject {
             if templates.isEmpty {
                 var temp = NKEditorTemplate()
                 temp.identifier = ""
-                if editorId == "text" {
-                    temp.ext = "md"
-                } else if editorId == "onlyoffice" && templateId == "document" {
-                    temp.ext = "docx"
-                } else if editorId == "onlyoffice" && templateId == "spreadsheet" {
-                    temp.ext = "xlsx"
-                } else if editorId == "onlyoffice" && templateId == "presentation" {
-                    temp.ext = "pptx"
-                }
+                temp.ext = adapter.defaultExt(templateId)
                 temp.name = "Empty"
                 temp.preview = ""
                 templates.append(temp)
@@ -180,15 +157,14 @@ class NCCreate: NSObject {
         return (templates, selectedTemplate, ext)
     }
 
-    func createShare(viewController: UIViewController, metadata: tableMetadata, page: NCBrandOptions.NCInfoPagingTab) {
-        var page = page
+    func createShare(controller: NCMainTabBarController?, metadata: tableMetadata, page: NCBrandOptions.NCInfoPagingTab) {
+        guard let controller else {
+            return
+        }
         let capabilities = NCNetworking.shared.capabilities[metadata.account] ?? NKCapabilities.Capabilities()
 
-        NCActivityIndicator.shared.start(backgroundView: viewController.view)
         NCNetworking.shared.readFile(serverUrlFileName: metadata.serverUrlFileName, account: metadata.account) { _, metadata, file, error in
             Task { @MainActor in
-                NCActivityIndicator.shared.stop()
-
                 if let metadata = metadata, let file = file, error == .success {
                     // Remove all known download limits from shares related to the given file.
                     // This avoids obsolete download limit objects to stay around.
@@ -221,10 +197,9 @@ class NCCreate: NSObject {
                         pages.remove(at: idx)
                     }
 
-                    (pages, page) = NCApplicationHandle().filterPages(pages: pages, page: page, metadata: metadata)
-
                     shareViewController?.pages = pages
                     shareViewController?.metadata = metadata
+                    shareViewController?.controller = controller
 
                     if pages.contains(page) {
                         shareViewController?.page = page
@@ -236,7 +211,7 @@ class NCCreate: NSObject {
 
                     shareNavigationController?.modalPresentationStyle = .formSheet
                     if let shareNavigationController = shareNavigationController {
-                        viewController.present(shareNavigationController, animated: true, completion: nil)
+                        controller.present(shareNavigationController, animated: true, completion: nil)
                     }
                 }
             }
@@ -257,7 +232,7 @@ class NCCreate: NSObject {
         let metadatas = selectedMetadata.filter { !$0.directory }
         var exportURLs: [URL] = []
         var downloadMetadata: [(tableMetadata, URL)] = []
-        let scene = SceneManager.shared.getWindow(controller: controller)?.windowScene
+        let windowScene = SceneManager.shared.getWindowScene(controller: controller)
         var downloadRequest: DownloadRequest?
 
         for metadata in metadatas {
@@ -277,9 +252,9 @@ class NCCreate: NSObject {
         }
 
         if !downloadMetadata.isEmpty {
-            let token = showHudBanner(scene: scene,
-                                      title: NSLocalizedString("_download_in_progress_", comment: ""),
-                                      stage: .button) {
+            let bannerResults = showHudBanner(windowScene: windowScene,
+                                              title: "_download_in_progress_",
+                                              stage: .button) {
                 if let downloadRequest {
                     downloadRequest.cancel()
                 }
@@ -292,7 +267,9 @@ class NCCreate: NSObject {
                     selector: "",
                     sceneIdentifier: controller.sceneIdentifier
                 ) else {
-                    LucidBanner.shared.dismiss()
+                    if let banner = bannerResults.banner {
+                        banner.dismiss()
+                    }
                     return
                 }
 
@@ -302,10 +279,9 @@ class NCCreate: NSObject {
                     downloadRequest = request
                 } progressHandler: { progress in
                     Task { @MainActor in
-                        LucidBanner.shared.update(
-                            progress: progress.fractionCompleted,
-                            for: token
-                        )
+                        bannerResults.banner?.update(
+                            payload: LucidBannerPayload.Update(progress: progress.fractionCompleted),
+                            for: bannerResults.token)
                     }
                 }
 
@@ -316,7 +292,9 @@ class NCCreate: NSObject {
                 }
             }
 
-            LucidBanner.shared.dismiss()
+            if let banner = bannerResults.banner {
+                banner.dismiss()
+            }
         }
 
         guard !exportURLs.isEmpty else { return }

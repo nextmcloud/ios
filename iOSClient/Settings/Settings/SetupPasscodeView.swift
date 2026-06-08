@@ -11,8 +11,9 @@ import PopupView
 
 struct SetupPasscodeView: UIViewControllerRepresentable {
     @Binding var isLockActive: Bool
+    weak var controller: NCMainTabBarController?
     var changePasscode: Bool = false
-    let maxFailedAttempts = 2 // + 1 = 3... The lib failed attempt counter starts at 0. Why? Who knows.
+    let maxFailedAttempts = 2 // + 1 = 3... The lib's failed attempt counter starts at 0. Why? Who knows.
 
     func makeUIViewController(context: Context) -> UIViewController {
         let laContext = LAContext()
@@ -68,8 +69,10 @@ struct SetupPasscodeView: UIViewControllerRepresentable {
                 context.evaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, localizedReason: NCBrandOptions.shared.brand) { success, _ in
                     DispatchQueue.main.async {
                         if success {
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [self] in
+                                parent.isLockActive = false
                                 NCPreferences().passcode = nil
+
                                 passcodeViewController.dismiss(animated: true)
                             }
                         }
@@ -83,7 +86,14 @@ struct SetupPasscodeView: UIViewControllerRepresentable {
                 return true
             } else if passcodeSettingsViewController.failedPasscodeAttemptCount == parent.maxFailedAttempts {
                 passcodeSettingsViewController.dismiss(animated: true)
-                NCContentPresenter().showCustomMessage(message: NSLocalizedString("_too_many_failed_passcode_attempts_error_", comment: ""), type: .error)
+                Task {
+                    let windowScene = await SceneManager.shared.getWindowScene(controller: parent.controller)
+                    await showErrorBanner(
+                        windowScene: windowScene,
+                        text: "_too_many_failed_passcode_attempts_error_",
+                        errorCode: NCGlobal.shared.errorInternalError
+                    )
+                }
             }
 
             return false

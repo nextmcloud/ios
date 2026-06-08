@@ -95,6 +95,8 @@ enum NCUserPermission: CaseIterable, NCPermission {
 
     static func forDirectoryE2EE(account: String) -> [NCPermission] {
         if NCCapabilities.shared.getCapabilities(account: account).capabilityE2EEApiVersion == NCGlobal.shared.e2eeVersionV20 {
+        let capabilities = NCNetworking.shared.capabilities[account] ?? NKCapabilities.Capabilities()
+        if capabilities.e2EEApiVersion.hasPrefix("2.") {
             return NCUserPermission.allCases
         }
         return []
@@ -120,7 +122,7 @@ enum NCUserPermission: CaseIterable, NCPermission {
 enum NCLinkEmailPermission: CaseIterable, NCPermission {
     static func forDirectoryE2EE(account: String) -> [any NCPermission] {
         let capabilities = NCNetworking.shared.capabilities[account] ?? NKCapabilities.Capabilities()
-        if capabilities.e2EEApiVersion == NCGlobal.shared.e2eeVersionV20 {
+        if capabilities.e2EEApiVersion.hasPrefix("2.") {
             return NCUserPermission.allCases
         }
         return []
@@ -233,6 +235,14 @@ enum NCLinkEmailPermission: CaseIterable, NCPermission {
         }
     }
 
+        case .allowEdit: return NSLocalizedString("_share_can_change_", comment: "")
+        case .viewOnly: return NSLocalizedString("_share_read_only_", comment: "")
+        case .uploadEdit: return NSLocalizedString("_share_allow_upload_", comment: "")
+        case .fileDrop: return NSLocalizedString("_share_file_drop_", comment: "")
+        case .secureFileDrop: return NSLocalizedString("_share_secure_file_drop_", comment: "")
+        }
+    }
+
     case allowEdit, viewOnly, uploadEdit, fileDrop, secureFileDrop
     static let forDirectory: [NCLinkPermission] = [.viewOnly, .uploadEdit, .fileDrop]
     static let forFile: [NCLinkPermission] = [.allowEdit]
@@ -291,6 +301,14 @@ enum NCShareDetails: CaseIterable, NCShareCellConfig {
     case label, hideDownload, limitDownload, expirationDate, password, note
     static let forLink: [NCShareDetails] = NCShareDetails.allCases
     static let forUser: [NCShareDetails] = [.expirationDate, .note]
+    case label, hideDownload, limitDownload, expirationDate, password, note, downloadAndSync
+
+    static let forLink: [NCAdvancedPermission] = [.expirationDate, .hideDownload, .label, .limitDownload, .note, .password]
+    static let forEmail: [NCAdvancedPermission] = [.expirationDate, .note, .downloadAndSync, .password]
+    static let forUser: [NCAdvancedPermission] = [.expirationDate, .note, .downloadAndSync]
+//    case label, hideDownload, limitDownload, expirationDate, password, note
+//    static let forLink: [NCShareDetails] = NCShareDetails.allCases
+//    static let forUser: [NCShareDetails] = [.expirationDate, .note]
 }
 
 struct NCShareConfig {
@@ -306,7 +324,8 @@ struct NCShareConfig {
         let type: NCPermission.Type = (share.shareType == NKShare.ShareType.publicLink.rawValue || share.shareType == NKShare.ShareType.email.rawValue) ? NCLinkEmailPermission.self : NCUserPermission.self
         self.permissions = parentMetadata.directory ? (parentMetadata.e2eEncrypted ? type.forDirectoryE2EE(account: parentMetadata.account) : type.forDirectory) : type.forFile
 
-        if share.shareType == NKShare.ShareType.publicLink.rawValue {
+        switch share.shareType {
+        case NKShare.ShareType.publicLink.rawValue:
             let capabilities = NCNetworking.shared.capabilities[parentMetadata.account] ?? NKCapabilities.Capabilities()
             let hasDownloadLimitCapability = capabilities.fileSharingDownloadLimit
 
@@ -317,6 +336,10 @@ struct NCShareConfig {
             }
         } else {
             self.advanced = NCShareDetails.forUser
+        case NKShare.ShareType.email.rawValue:
+            self.advanced = NCAdvancedPermission.forEmail
+        default:
+            self.advanced = NCAdvancedPermission.forUser
         }
     }
 

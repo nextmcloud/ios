@@ -31,7 +31,7 @@ import UIKit
 import NextcloudKit
 import Alamofire
 
-@objc protocol ClientCertificateDelegate {
+protocol ClientCertificateDelegate: AnyObject {
     func onIncorrectPassword()
     func didAskForClientCertificate()
 }
@@ -47,7 +47,8 @@ protocol NCTransferDelegate: AnyObject {
                         ocId: String,
                         destination: String?,
                         error: NKError)
-    func transferReloadData(serverUrl: String?, requestData: Bool, status: Int?)
+    func transferReloadDataSource(serverUrl: String?, requestData: Bool, status: Int?)
+    func transferReloadData(serverUrl: String?)
     func transferProgressDidUpdate(progress: Float,
                                    totalBytes: Int64,
                                    totalBytesExpected: Int64,
@@ -272,15 +273,16 @@ class NCNetworking: @unchecked Sendable, NextcloudKitDelegate {
     let utilityFileSystem = NCUtilityFileSystem()
     let global = NCGlobal.shared
     let backgroundSession = NKBackground(nkCommonInstance: NextcloudKit.shared.nkCommonInstance)
+    let nkComm = NextcloudKit.shared.nkCommonInstance
 
-    let sceneIdentifier: String = ""
-    var requestsUnifiedSearch: [DataRequest] = []
     var lastReachability: Bool = true
     var networkReachability: NKTypeReachability?
     weak var certificateDelegate: ClientCertificateDelegate?
     var p12Data: Data?
     var p12Password: String?
-    var controller: UIViewController?
+
+    internal var sceneIdentifier: String = ""
+    internal var controller: UIViewController?
 
     var isOffline: Bool {
         return networkReachability == NKTypeReachability.notReachable || networkReachability == NKTypeReachability.unknown
@@ -304,15 +306,20 @@ class NCNetworking: @unchecked Sendable, NextcloudKitDelegate {
     let downloadThumbnailQueue = Queuer(name: "downloadThumbnailQueue", maxConcurrentOperationCount: 10, qualityOfService: .default)
     let downloadThumbnailActivityQueue = Queuer(name: "downloadThumbnailActivityQueue", maxConcurrentOperationCount: 10, qualityOfService: .default)
     let downloadThumbnailTrashQueue = Queuer(name: "downloadThumbnailTrashQueue", maxConcurrentOperationCount: 10, qualityOfService: .default)
-    let unifiedSearchQueue = Queuer(name: "unifiedSearchQueue", maxConcurrentOperationCount: 1, qualityOfService: .default)
     let saveLivePhotoQueue = Queuer(name: "saveLivePhotoQueue", maxConcurrentOperationCount: 1, qualityOfService: .default)
     let downloadAvatarQueue = Queuer(name: "downloadAvatarQueue", maxConcurrentOperationCount: 10, qualityOfService: .default)
+    let fileExistsQueue = Queuer(name: "fileExistsQueue", maxConcurrentOperationCount: 10, qualityOfService: .default)
 #endif
     let downloadQueue = Queuer(name: "downloadQueue", maxConcurrentOperationCount: NCBrandOptions.shared.httpMaximumConnectionsPerHostInDownload, qualityOfService: .default)
 
     // MARK: - init
 
     init() { }
+
+    func setupScene(sceneIdentifier: String, controller: UIViewController?) {
+        self.sceneIdentifier = sceneIdentifier
+        self.controller = controller
+    }
 
     func authenticationChallenge(_ session: URLSession,
                                  didReceive challenge: URLAuthenticationChallenge,

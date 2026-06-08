@@ -53,11 +53,12 @@ struct NCAccountSettingsView: View {
                                     .offset(x: 30, y: -30)
                                 }
                                 Text(model.getUserName())
+                                    .cappedFont(.subheadline, maxDynamicType: .xxxLarge)
                                     .font(.subheadline)
                                 Spacer()
                                     .frame(height: 10)
                                 Text(status.statusMessage)
-                                    .font(.caption)
+                                    .cappedFont(.caption, maxDynamicType: .xxxLarge)
                                 Spacer()
                                     .frame(height: 20)
                                 //
@@ -66,11 +67,9 @@ struct NCAccountSettingsView: View {
                                     if !tblAccount.email.isEmpty {
                                         HStack {
                                             Image(systemName: "mail")
-                                                .resizable()
-                                                .scaledToFit()
-                                                .font(Font.system(.body).weight(.light))
-                                                .frame(width: 20, height: 20)
+                                                .font(.icon())
                                             Text(tblAccount.email)
+                                                .cappedFont(.body, maxDynamicType: .xxxLarge)
                                                 .lineLimit(1)
                                                 .truncationMode(.middle)
                                                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -81,11 +80,9 @@ struct NCAccountSettingsView: View {
                                     if !tblAccount.phone.isEmpty {
                                         HStack {
                                             Image(systemName: "phone")
-                                                .resizable()
-                                                .scaledToFit()
-                                                .font(Font.system(.body).weight(.light))
-                                                .frame(width: 20, height: 20)
+                                                .font(.icon())
                                             Text(tblAccount.phone)
+                                                .cappedFont(.body, maxDynamicType: .xxxLarge)
                                                 .lineLimit(1)
                                                 .truncationMode(.middle)
                                                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -95,11 +92,9 @@ struct NCAccountSettingsView: View {
                                     if !tblAccount.address.isEmpty {
                                         HStack {
                                             Image(systemName: "house")
-                                                .resizable()
-                                                .scaledToFit()
-                                                .font(Font.system(.body).weight(.light))
-                                                .frame(width: 20, height: 20)
+                                                .font(.icon())
                                             Text(tblAccount.address)
+                                                .cappedFont(.body, maxDynamicType: .xxxLarge)
                                                 .lineLimit(1)
                                                 .truncationMode(.middle)
                                                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -110,7 +105,7 @@ struct NCAccountSettingsView: View {
                             }
                         }
                     }
-                    .font(.subheadline)
+                    .cappedFont(.subheadline, maxDynamicType: .accessibility1)
                     .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
                     .frame(height: model.getTableViewHeight())
                     .animation(.easeIn(duration: 0.3), value: animation)
@@ -123,20 +118,19 @@ struct NCAccountSettingsView: View {
                     VStack {
                         HStack {
                             Text(NSLocalizedString("_alias_", comment: "") + ":")
-                                .fontWeight(.medium)
+                                .cappedFont(.body, maxDynamicType: .accessibility2)
                             Spacer()
                             TextField(NSLocalizedString("_alias_placeholder_", comment: ""), text: $model.alias)
-                                .font(.callout)
+                                .cappedFont(.body, maxDynamicType: .accessibility2)
                                 .multilineTextAlignment(.trailing)
                                 .onChange(of: model.alias) { _, newValue in
                                     model.setAlias(newValue)
                                 }
                         }
                         Text(NSLocalizedString("_alias_footer_", comment: ""))
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .font(.caption)
-                            .lineLimit(2)
+                            .font(.footnote)
                             .foregroundStyle(Color(UIColor.lightGray))
+                            .frame(maxWidth: .infinity, alignment: .leading)
                     }
                     //
                     // User Status
@@ -162,6 +156,31 @@ struct NCAccountSettingsView: View {
                         .sheet(isPresented: $showUserStatus) {
                             if let account = model.tblAccount?.account {
                                 UserStatusView(showUserStatus: $showUserStatus, account: account)
+                        if let account = model.tblAccount?.account {
+                            NavigationLink(destination: NCUserStatusView(account: account, controller: model.controller)) {
+                                HStack {
+                                    Image(systemName: "moon")
+                                        .font(.icon())
+                                        .foregroundStyle(Color(NCBrandColor.shared.iconImageColor))
+                                        .frame(width: 26)
+                                    Text(NSLocalizedString("_set_user_status_", comment: ""))
+                                        .cappedFont(.body, maxDynamicType: .accessibility2)
+                                        .foregroundStyle(Color(NCBrandColor.shared.textColor))
+                                }
+                            }
+                        }
+
+                        if let account = model.tblAccount?.account {
+                            NavigationLink(destination: NCStatusMessageView(account: account, controller: model.controller)) {
+                                HStack {
+                                    Image(systemName: "message")
+                                        .font(.icon())
+                                        .foregroundStyle(Color(NCBrandColor.shared.iconImageColor))
+                                        .frame(width: 26)
+                                    Text(NSLocalizedString("_set_user_status_message_", comment: ""))
+                                        .cappedFont(.body, maxDynamicType: .accessibility2)
+                                        .foregroundStyle(Color(NCBrandColor.shared.textColor))
+                                }
                             }
                         }
                         .onChange(of: showUserStatus) { }
@@ -173,17 +192,13 @@ struct NCAccountSettingsView: View {
                             showServerCertificate.toggle()
                         }, label: {
                             HStack {
-                                Image(systemName: "lock")
-                                    .resizable()
-                                    .scaledToFit()
-                                    .font(Font.system(.body).weight(.light))
-                                    .frame(width: 20, height: 20)
+                                Image(systemName: "network.badge.shield.half.filled")
+                                    .font(.icon())
                                     .foregroundStyle(Color(NCBrandColor.shared.iconImageColor))
+                                    .frame(width: 26)
                                 Text(NSLocalizedString("_certificate_details_", comment: ""))
-                                    .lineLimit(1)
-                                    .truncationMode(.middle)
+                                    .cappedFont(.body, maxDynamicType: .accessibility2)
                                     .foregroundStyle(Color(NCBrandColor.shared.textColor))
-                                    .padding(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 20))
                             }
                             .font(.subheadline)
                         })
@@ -198,17 +213,13 @@ struct NCAccountSettingsView: View {
                             showPushCertificate.toggle()
                         }, label: {
                             HStack {
-                                Image(systemName: "lock")
-                                    .resizable()
-                                    .scaledToFit()
-                                    .font(Font.system(.body).weight(.light))
-                                    .frame(width: 20, height: 20)
+                                Image(systemName: "network.badge.shield.half.filled")
+                                    .font(.icon())
                                     .foregroundStyle(Color(NCBrandColor.shared.iconImageColor))
+                                    .frame(width: 26)
                                 Text(NSLocalizedString("_certificate_pn_details_", comment: ""))
-                                    .lineLimit(1)
-                                    .truncationMode(.middle)
+                                    .cappedFont(.body, maxDynamicType: .accessibility2)
                                     .foregroundStyle(Color(NCBrandColor.shared.textColor))
-                                    .padding(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 20))
                             }
                             .font(.subheadline)
                         })
@@ -239,16 +250,12 @@ struct NCAccountSettingsView: View {
                     }, label: {
                         HStack {
                             Image(systemName: "trash")
-                                .resizable()
-                                .scaledToFit()
-                                .font(Font.system(.body).weight(.light))
-                                .frame(width: 20, height: 20)
+                                .font(.icon())
                                 .foregroundStyle(.red)
+                                .frame(width: 26)
                             Text(NSLocalizedString("_remove_local_account_", comment: ""))
-                                .lineLimit(1)
-                                .truncationMode(.middle)
+                                .cappedFont(.body, maxDynamicType: .accessibility2)
                                 .foregroundStyle(.red)
-                                .padding(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 20))
                         }
                         .font(.callout)
                     })
@@ -266,7 +273,6 @@ struct NCAccountSettingsView: View {
                 presentationMode.wrappedValue.dismiss()
             }) {
                 Image(systemName: "xmark")
-                    .font(Font.system(.body).weight(.light))
                     .foregroundStyle(Color(NCBrandColor.shared.iconImageColor))
             })
         }

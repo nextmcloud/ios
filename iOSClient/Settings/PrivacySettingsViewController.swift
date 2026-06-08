@@ -117,6 +117,9 @@ class PrivacySettingsViewController: XLFormViewController{
     }
     
     
+        self.form = form
+    }
+    
     override func formRowDescriptorValueHasChanged(_ formRow: XLFormRowDescriptor!, oldValue: Any!, newValue: Any!) {
         super.formRowDescriptorValueHasChanged(formRow, oldValue: oldValue, newValue: newValue)
         

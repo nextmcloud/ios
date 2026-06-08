@@ -32,8 +32,14 @@ class NCNotification: UITableViewController, NCNotificationCellDelegate {
     var notifications: [NKNotifications] = []
     var session: NCSession.Session!
 
+    @MainActor
     var controller: NCMainTabBarController? {
         self.tabBarController as? NCMainTabBarController
+    }
+
+    @MainActor
+    internal var windowScene: UIWindowScene? {
+        SceneManager.shared.getWindowScene(controller: self.tabBarController as? NCMainTabBarController)
     }
 
     // MARK: - View Life Cycle
@@ -96,6 +102,15 @@ class NCNotification: UITableViewController, NCNotificationCellDelegate {
     }
 
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+//        let notification = notifications[indexPath.row]
+        
+        let notification = notifications[indexPath.row]
+
+        if notification.app == "files_sharing" {
+            NCActionCenter.shared.viewerFile(account: session.account, fileId: notification.objectId, viewController: self)
+        } else {
+            NCApplicationHandle().didSelectNotification(notification, viewController: self)
+        }
         guard let notification = NCApplicationHandle().didSelectNotification(notifications[indexPath.row], viewController: self) else { return }
 
         do {
@@ -119,7 +134,7 @@ class NCNotification: UITableViewController, NCNotificationCellDelegate {
         guard let cell = self.tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath) as? NCNotificationCell else { return UITableViewCell() }
         cell.delegate = self
         cell.selectionStyle = .none
-        cell.indexPath = indexPath
+        cell.index = indexPath
 
         let notification = notifications[indexPath.row]
         let urlIcon = URL(string: notification.icon)
@@ -147,9 +162,9 @@ class NCNotification: UITableViewController, NCNotificationCellDelegate {
             let results = NCManageDatabase.shared.getImageAvatarLoaded(fileName: fileName)
 
             if results.image == nil {
-                cell.fileAvatarImageView?.image = utility.loadUserImage(for: user, displayName: json["user"]?["name"].string, urlBase: session.urlBase)
+                cell.avatar?.image = utility.loadUserImage(for: user, displayName: json["user"]?["name"].string, urlBase: session.urlBase)
             } else {
-                cell.fileAvatarImageView?.image = results.image
+                cell.avatar?.image = results.image
             }
 
             if !(results.tblAvatar?.loaded ?? false),
@@ -229,6 +244,13 @@ class NCNotification: UITableViewController, NCNotificationCellDelegate {
                 cell.more.isEnabled = true
                 cell.more.isHidden = false
                 cell.more.setTitle("…", for: .normal)
+
+                let contextMenu = NCContextMenuNotification(
+                    notification: notification,
+                    delegate: self
+                )
+                cell.more.menu = contextMenu.viewMenu()
+                cell.more.showsMenuAsPrimaryAction = true
             }
 
             var buttonWidth = max(cell.primary.intrinsicContentSize.width, cell.secondary.intrinsicContentSize.width)
@@ -258,7 +280,9 @@ class NCNotification: UITableViewController, NCNotificationCellDelegate {
                 }
                 self.tableView.reloadData()
             } else if error != .success {
-                NCContentPresenter().showError(error: error)
+                Task {
+                    await showErrorBanner(windowScene: self.windowScene, text: error.errorDescription, errorCode: error.errorCode)
+                }
             } else {
                 print("[Error] The user has been changed during networking process.")
             }
@@ -303,7 +327,9 @@ class NCNotification: UITableViewController, NCNotificationCellDelegate {
                     self.dismiss(animated: true)
                 }
             } else if error != .success {
-                NCContentPresenter().showError(error: error)
+                Task {
+                    await showErrorBanner(windowScene: self.windowScene, text: error.errorDescription, errorCode: error.errorCode)
+                }
             } else {
                 print("[Error] The user has been changed during networking process.")
             }
@@ -338,7 +364,7 @@ class NCNotification: UITableViewController, NCNotificationCellDelegate {
         let sortedNotifications = notifications.sorted { $0.date > $1.date }
         for notification in sortedNotifications {
             if let icon = notification.icon {
-                self.utility.convertSVGtoPNGWriteToUserData(svgUrlString: icon, width: 25, rewrite: false, account: session.account) { _, _ in
+                if await self.utility.convertSVGtoPNGWriteToUserData(serverUrl: icon, rewrite: false, account: session.account).image != nil {
                     self.tableView.reloadData()
                 }
             }
@@ -351,7 +377,7 @@ class NCNotification: UITableViewController, NCNotificationCellDelegate {
 
 // MARK: -
 
-class NCNotificationCell: UITableViewCell, NCCellProtocol {
+class NCNotificationCell: UITableViewCell {
 
     @IBOutlet weak var icon: UIImageView!
     @IBOutlet weak var avatar: UIImageView!
@@ -366,23 +392,11 @@ class NCNotificationCell: UITableViewCell, NCCellProtocol {
     @IBOutlet weak var primaryWidth: NSLayoutConstraint!
     @IBOutlet weak var secondaryWidth: NSLayoutConstraint!
 
-    private var user = ""
-    private var index = IndexPath()
+    var user = ""
+    var index = IndexPath()
 
     weak var delegate: NCNotificationCellDelegate?
     var notification: NKNotifications?
-
-    var indexPath: IndexPath {
-        get { return index }
-        set { index = newValue }
-    }
-    var fileAvatarImageView: UIImageView? {
-        return avatar
-    }
-    var fileUser: String? {
-        get { return user }
-        set { user = newValue ?? "" }
-    }
 
     @IBAction func touchUpInsideRemove(_ sender: Any) {
         guard let notification = notification else { return }

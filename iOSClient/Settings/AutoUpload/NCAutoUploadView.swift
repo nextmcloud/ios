@@ -35,7 +35,7 @@ struct NCAutoUploadView: View {
             Button(NSLocalizedString("_ok_", comment: ""), role: .cancel) { }
         }
         .sheet(isPresented: $showUploadFolder) {
-            SelectView(serverUrl: $model.serverUrl, includeDirectoryE2EEncryption: false, session: model.session)
+            SelectView(serverUrl: $model.serverUrl, includeDirectoryE2EEncryption: false, session: model.session, controller: model.controller)
                 .onDisappear {
                     model.setAutoUploadDirectory(serverUrl: model.serverUrl)
                 }
@@ -79,15 +79,16 @@ struct NCAutoUploadView: View {
                     }, label: {
                         HStack {
                             Image(systemName: "folder")
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 25, height: 25)
+                                .font(.icon())
+                                .frame(width: 26)
                                 .foregroundColor(Color(NCBrandColor.shared.iconImageColor))
                                 .opacity(model.autoUploadStart ? 0.15 : 1)
                             Text(NSLocalizedString("_destination_", comment: ""))
+                                .font(.body)
                                 .opacity(model.autoUploadStart ? 0.5 : 1)
                                 .tint(.primary)
                             Text(model.returnPath())
+                                .font(.body)
                                 .tint(.primary)
                                 .frame(maxWidth: .infinity, alignment: .trailing)
                                 .opacity(model.autoUploadStart ? 0.5 : 1)
@@ -102,14 +103,15 @@ struct NCAutoUploadView: View {
                         }, label: {
                             HStack {
                                 Image(systemName: "person.2.crop.square.stack")
-                                    .resizable()
-                                    .scaledToFit()
-                                    .frame(width: 25, height: 25)
+                                    .font(.icon())
+                                    .frame(width: 26)
                                     .foregroundColor(Color(NCBrandColor.shared.iconImageColor))
                                     .opacity(model.autoUploadStart ? 0.3 : 1)
                                 Text(NSLocalizedString("_upload_from_", comment: ""))
+                                    .font(.body)
                                     .tint(.primary)
                                 Text(NSLocalizedString(model.createAlbumTitle(autoUploadAlbumIds: albumModel.autoUploadAlbumIds), comment: ""))
+                                    .font(.body)
                                     .frame(maxWidth: .infinity, alignment: .trailing)
                                     .tint(.primary)
                             }
@@ -123,15 +125,22 @@ struct NCAutoUploadView: View {
                             model.handleAutoUploadOnlyNew(newValue: newValue)
                         }
                         .accessibilityIdentifier("NewPhotosToggle")
+                    ))
+                    .font(.body)
+                    .tint(Color(NCBrandColor.shared.getElement(account: model.session.account)))
+                    .opacity(model.autoUploadStart ? 0.15 : 1)
+                    .accessibilityIdentifier("NewPhotosToggle")
                 }, footer: {
                     if model.autoUploadOnlyNew == true, let date = model.autoUploadOnlyNewSinceDate {
                         Text(String(format: NSLocalizedString("_new_photos_starting_", comment: ""), NCUtility().longDate(date)))
+                            .font(.footnote)
                     }
                 })
 
                 // Auto Upload Photo
                 Section(content: {
                     Toggle(NSLocalizedString("_autoupload_photos_", comment: ""), isOn: $model.autoUploadImage)
+                        .font(.body)
                         .tint(Color(NCBrandColor.shared.getElement(account: model.session.account)))
                         .opacity(model.autoUploadStart ? 0.15 : 1)
                         .onChange(of: model.autoUploadImage) { _, newValue in
@@ -141,6 +150,7 @@ struct NCAutoUploadView: View {
 
                     if model.autoUploadImage {
                         Toggle(NSLocalizedString("_wifi_only_", comment: ""), isOn: $model.autoUploadWWAnPhoto)
+                            .font(.body)
                             .tint(Color(NCBrandColor.shared.getElement(account: model.session.account)))
                             .opacity(model.autoUploadStart ? 0.15 : 1)
                             .onChange(of: model.autoUploadWWAnPhoto) { _, newValue in
@@ -152,6 +162,7 @@ struct NCAutoUploadView: View {
                 // Auto Upload Video
                 Section(content: {
                     Toggle(NSLocalizedString("_autoupload_videos_", comment: ""), isOn: $model.autoUploadVideo)
+                        .font(.body)
                         .tint(Color(NCBrandColor.shared.getElement(account: model.session.account)))
                         .opacity(model.autoUploadStart ? 0.15 : 1)
                         .onChange(of: model.autoUploadVideo) { _, newValue in
@@ -161,6 +172,7 @@ struct NCAutoUploadView: View {
 
                     if model.autoUploadVideo {
                         Toggle(NSLocalizedString("_wifi_only_", comment: ""), isOn: $model.autoUploadWWAnVideo)
+                            .font(.body)
                             .tint(Color(NCBrandColor.shared.getElement(account: model.session.account)))
                             .opacity(model.autoUploadStart ? 0.15 : 1)
                             .onChange(of: model.autoUploadWWAnVideo) { _, newValue in
@@ -172,6 +184,7 @@ struct NCAutoUploadView: View {
                 // Auto Upload create subfolder
                 Section(content: {
                     Toggle(NSLocalizedString("_autoupload_create_subfolder_", comment: ""), isOn: $model.autoUploadCreateSubfolder)
+                        .font(.body)
                         .tint(Color(NCBrandColor.shared.getElement(account: model.session.account)))
                         .opacity(model.autoUploadStart ? 0.15 : 1)
                         .onChange(of: model.autoUploadCreateSubfolder) { _, newValue in
@@ -181,8 +194,11 @@ struct NCAutoUploadView: View {
                     if model.autoUploadCreateSubfolder {
                         Picker(NSLocalizedString("_autoupload_subfolder_granularity_", comment: ""), selection: $model.autoUploadSubfolderGranularity) {
                             Text(NSLocalizedString("_daily_", comment: "")).tag(Granularity.daily)
+                                .font(.body)
                             Text(NSLocalizedString("_monthly_", comment: "")).tag(Granularity.monthly)
+                                .font(.body)
                             Text(NSLocalizedString("_yearly_", comment: "")).tag(Granularity.yearly)
+                                .font(.body)
                         }
                         .opacity(model.autoUploadStart ? 0.15 : 1)
                         .onChange(of: model.autoUploadSubfolderGranularity) { _, newValue in
@@ -191,11 +207,13 @@ struct NCAutoUploadView: View {
                     }
                 }, footer: {
                     Text(NSLocalizedString("_autoupload_create_subfolder_footer_", comment: ""))
+                        .font(.footnote)
                 })
 
                 // Location
                 Section(content: {
                     Toggle(NSLocalizedString("_enable_background_location_title_", comment: ""), isOn: $model.permissionGranted)
+                        .font(.body)
                         .tint(Color(NCBrandColor.shared.getElement(account: model.session.account)))
                         .opacity(model.autoUploadStart ? 0.15 : 1)
                         .onChange(of: model.permissionGranted) { _, newValue in
@@ -203,6 +221,7 @@ struct NCAutoUploadView: View {
                         }
                 }, footer: {
                     Text(NSLocalizedString("_enable_background_location_footer_", comment: ""))
+                        .font(.footnote)
                 })
             }
             .disabled(model.autoUploadStart)
@@ -231,19 +250,164 @@ struct NCAutoUploadView: View {
             .listRowInsets(EdgeInsets())
             .background(Color(UIColor.systemGroupedBackground))
         }
+    @ViewBuilder
+    var autoUploadStartButton: some View {
+        Section(content: {
+            let toggle = Toggle(isOn: model.autoUploadSinceDate != nil || model.autoUploadStart ? $model.autoUploadStart : $showUploadAllPhotosWarning) {
+                Text(model.autoUploadStart ? "_stop_autoupload_" : "_start_autoupload_")
+                    .font(.body)
+                    .padding(.horizontal, 20)
+                    .padding(.vertical, 10)
+            }
+            .cappedFont(.body, maxDynamicType: .accessibility2)
+            .tint(Color(NCBrandColor.shared.getElement(account: model.session.account)))
+            .onChange(of: model.autoUploadStart) { _, newValue in
+                    albumModel.populateSelectedAlbums()
+                    model.handleAutoUploadChange(newValue: newValue, assetCollections: albumModel.selectedAlbums)
+            }
+            .font(.headline)
+
+            if #available(iOS 26.0, *) {
+                toggle
+                    .font(.body)
+                    .toggleStyle(.button)
+                    .buttonStyle(.glass)
+            } else {
+                toggle
+                    .font(.body)
+                    .toggleStyle(AutoUploadProminentButtonStyle(model: model))
+            }
+        })
     }
 }
 
 @ViewBuilder
 var noPermissionsView: some View {
     VStack {
-        Text("_access_photo_not_enabled_").font(.title3)
+        Text("_access_photo_not_enabled_")
             .padding()
+            .font(.body)
         Text("_access_photo_not_enabled_msg_")
+            .font(.body)
     }
     .padding(16)
     .frame(maxWidth: .infinity, maxHeight: .infinity)
     .background(Color(UIColor.systemGroupedBackground))
+}
+
+// Custom prominent brand button style used for Toggle-as-Button
+private struct AutoUploadProminentButtonStyle: ToggleStyle {
+    let model: NCAutoUploadModel
+    private var onBackground: Color { Color(NCBrandColor.shared.getElement(account: model.session.account)) }
+    private let offBackground = Color(UIColor.systemGray5)
+    private let onForeground = Color.white
+    private let offForeground = Color.primary
+    private let cornerRadius: CGFloat = 40
+
+    func makeBody(configuration: Configuration) -> some View {
+        Button {
+            configuration.isOn.toggle()
+        } label: {
+            configuration.label
+                .foregroundColor(configuration.isOn ? onForeground : offForeground)
+                .padding(.vertical, 10)
+                .contentShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
+        }
+        .buttonStyle(.plain)
+        .background(
+            RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+                .fill((configuration.isOn ? onBackground : offBackground))
+        )
+        .animation(.easeOut(duration: 0.15), value: configuration.isOn)
+        .shadow(color: .black.opacity(0.2), radius: 10, x: 0, y: 3)
+    }
+}
+
+struct ConfirmAutoUploadSheet: View {
+    @ObservedObject var model: NCAutoUploadModel
+    @Binding var isPresented: Bool
+
+    var body: some View {
+        VStack(spacing: 16) {
+            // Title
+            Text(NSLocalizedString("_auto_upload_all_photos_warning_title_", comment: ""))
+                .font(.headline)
+                .multilineTextAlignment(.center)
+
+            // Message
+            Text(NSLocalizedString("_auto_upload_all_photos_warning_message_", comment: ""))
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+
+            Spacer().frame(height: 20)
+
+            if model.existsAutoUpload() {
+                Button {
+                    model.autoUploadStart = true
+                    isPresented = false
+                } label: {
+                    Text(NSLocalizedString("_confirm_continue_", comment: ""))
+                        .font(.body)
+                        .multilineTextAlignment(.center)
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.borderedProminent)
+
+                Button {
+                    model.deleteAutoUploadTransfer()
+                    model.autoUploadStart = true
+                    isPresented = false
+                } label: {
+                    Text(NSLocalizedString("_confirm_resetting_", comment: ""))
+                        .font(.body)
+                        .multilineTextAlignment(.center)
+                        .frame(maxWidth: .infinity)
+
+                }
+                .buttonStyle(.bordered)
+
+                Spacer().frame(height: 20)
+
+                Button(role: .cancel) {
+                    model.autoUploadStart = false
+                    isPresented = false
+                } label: {
+                    Text(NSLocalizedString("_cancel_", comment: ""))
+                        .font(.body)
+                        .multilineTextAlignment(.center)
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.bordered)
+
+            } else {
+                Button {
+                    model.autoUploadStart = true
+                    isPresented = false
+                } label: {
+                    Text(NSLocalizedString("_confirm_", comment: ""))
+                        .font(.body)
+                        .multilineTextAlignment(.center)
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.borderedProminent)
+
+                Spacer().frame(height: 20)
+
+                Button(role: .cancel) {
+                    model.autoUploadStart = false
+                    isPresented = false
+                } label: {
+                    Text(NSLocalizedString("_cancel_", comment: ""))
+                        .font(.body)
+                        .multilineTextAlignment(.center)
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.bordered)
+            }
+        }
+        .padding(.horizontal, 20)
+    }
 }
 
 #Preview {

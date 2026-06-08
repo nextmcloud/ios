@@ -25,6 +25,7 @@ import UIKit
 import Foundation
 import NextcloudKit
 import Realm
+import LucidBanner
 
 extension NCCollectionViewCommon: NCCollectionViewCommonSelectTabBarDelegate, NCSelectableNavigationView {
     
@@ -54,7 +55,57 @@ extension NCCollectionViewCommon: NCCollectionViewCommonSelectTabBarDelegate, NC
             alertController.addAction(UIAlertAction(title: NSLocalizedString("_yes_", comment: ""), style: .destructive) { _ in
                 Task {
                     await self.setEditMode(false)
-                    await self.networking.setStatusWaitDelete(metadatas: metadatas, sceneIdentifier: self.controller?.sceneIdentifier)
+                    var metadatasPlain: [tableMetadata] = []
+                    var metadatasE2EE: [tableMetadata] = []
+
+                    for metadata in metadatas {
+                        if metadata.isDirectoryE2EE {
+                            metadatasE2EE.append(metadata)
+                        } else {
+                            metadatasPlain.append(metadata)
+                        }
+                    }
+
+                    if !metadatasPlain.isEmpty {
+                        let error = await self.networking.setStatusWaitDelete(metadatas: metadatasPlain)
+                        if error != .success {
+                            await showErrorBanner(windowScene: self.windowScene, error: error)
+                        }
+                    }
+
+                    if !metadatasE2EE.isEmpty {
+                        if self.networking.isOffline {
+                            await showErrorBanner(windowScene: self.windowScene,
+                                                  text: "_offline_not_allowed_",
+                                                  errorCode: self.global.errorOfflineNotAllowed)
+                        } else {
+                            var cancelOnTap = false
+                            var num: Float = 0
+                            let total = Float(metadatasE2EE.count)
+
+                            let bannerResults = showHudBanner(
+                                windowScene: self.windowScene,
+                                title: "_delete_in_progress_",
+                                stage: .button) {
+                                    cancelOnTap = true
+                                }
+                            for metadata in metadatasE2EE {
+                                let error = await NCNetworkingE2EEDelete().delete(metadata: metadata)
+                                num += 1
+                                bannerResults.banner?.update(
+                                    payload: LucidBannerPayload.Update(progress: Double(num) / Double(total)),
+                                    for: bannerResults.token
+                                )
+                                if cancelOnTap || error != .success {
+                                    break
+                                }
+                            }
+
+                            if let banner = bannerResults.banner {
+                                banner.dismiss()
+                            }
+                        }
+                    }
                     await self.reloadDataSource()
                 }
             })
@@ -71,6 +122,30 @@ extension NCCollectionViewCommon: NCCollectionViewCommonSelectTabBarDelegate, NC
                     error = await NCNetworking.shared.deleteCache(metadata, sceneIdentifier: self.controller?.sceneIdentifier)
                     if error == .success {
                         ocId.append(metadata.ocId)
+        alertController.addAction(UIAlertAction(title: NSLocalizedString("_remove_local_file_", comment: ""), style: .default) { (_: UIAlertAction) in
+            Task {
+                var token: Int?
+                var banner: LucidBanner?
+                let containsDirectory = metadatas.contains { $0.isDirectory }
+                if containsDirectory {
+                    (banner, token) = showHudBanner(windowScene: self.windowScene, title: "_delete_in_progress_")
+                }
+
+                for metadata in metadatas {
+                    await self.networking.deleteCache(metadata, progress: { progress in
+                        Task {
+                            if let token {
+                                banner?.update(
+                                    payload: LucidBannerPayload.Update(progress: progress),
+                                    for: token
+                                )
+                            }
+                        }
+
+                    })
+
+                    if let banner {
+                        banner.dismiss()
                     }
                 }
                 await self.setEditMode(false)
@@ -88,7 +163,6 @@ extension NCCollectionViewCommon: NCCollectionViewCommonSelectTabBarDelegate, NC
 
             NCSelectOpen.shared.openView(items: metadatas, controller: self.controller)
         }
-
     }
 
     func share() {
@@ -133,7 +207,10 @@ extension NCCollectionViewCommon: NCCollectionViewCommonSelectTabBarDelegate, NC
         Task {
             let metadatas = getSelectedMetadatas()
             for metadata in metadatas where metadata.lock == isAnyLocked {
-                self.networking.lockUnlockFile(metadata, shoulLock: !isAnyLocked)
+                let error = await self.networking.lockUnlockFile(metadata, shouldLock: !isAnyLocked)
+                if error != .success {
+                    await showErrorBanner(windowScene: self.windowScene, error: error)
+                }
             }
             await setEditMode(false)
         }
@@ -161,7 +238,9 @@ extension NCCollectionViewCommon: NCCollectionViewCommonSelectTabBarDelegate, NC
         navigationItem.hidesBackButton = editMode
         navigationController?.interactivePopGestureRecognizer?.isEnabled = !editMode
         searchController(enabled: !editMode)
-        mainNavigationController?.hiddenPlusButton(editMode)
+
+        // (+)
+        mainNavigationController?.menuPlus?.hiddenPlusButton(editMode)
 
         if editMode {
             navigationItem.leftBarButtonItems = nil
@@ -174,6 +253,10 @@ extension NCCollectionViewCommon: NCCollectionViewCommonSelectTabBarDelegate, NC
         navigationItem.hidesBackButton = editMode
         searchController(enabled: !editMode)
         self.setNavigationRightItems(enableMenu: true)
+//            setNavigationLeftItems()
+        }
+        (self.navigationController as? NCMainNavigationController)?.setNavigationRightItems()
+
         self.collectionView.reloadData()
     }
 
@@ -184,6 +267,7 @@ extension NCCollectionViewCommon: NCCollectionViewCommonSelectTabBarDelegate, NC
                                                "account": metadataFirst.account]
 
                 await NCNetworking.shared.setLivePhoto(metadataFirst: metadataFirst, metadataLast: metadataLast, userInfo: userInfo)
+                await self.networking.setLivePhoto(metadataFirst: metadataFirst, metadataLast: metadataLast)
             }
         }
         setEditMode(false)
@@ -194,6 +278,10 @@ extension NCCollectionViewCommon: NCCollectionViewCommonSelectTabBarDelegate, NC
         DispatchQueue.main.async {
             self.isEditMode = isOn ?? !self.isEditMode
             self.setEditMode(self.isEditMode)
+            self.selectOcId.removeAll()
+            self.setNavigationLeftItems()
+            self.setNavigationRightItems()
+            self.collectionView.reloadData()
         }
         await (self.navigationController as? NCMainNavigationController)?.setNavigationRightItems()
 
@@ -211,6 +299,11 @@ extension NCCollectionViewCommon: NCCollectionViewCommonSelectTabBarDelegate, NC
         }
 
         guard !fileSelect.isEmpty else { return actions }
+        if selectOcId.count != dataSource.getMetadataSourceForAllSections().count {
+            actions.append(.selectAllAction(action: selectAll))
+        }
+
+        guard !selectOcId.isEmpty else { return actions }
 
         actions.append(.seperator(order: 0))
 
@@ -227,6 +320,10 @@ extension NCCollectionViewCommon: NCCollectionViewCommonSelectTabBarDelegate, NC
             guard let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId) else { continue }
             if metadata.e2eEncrypted {
                 fileSelect.removeAll(where: {$0 == metadata.ocId})
+        for ocId in selectOcId {
+            guard let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId) else { continue }
+            if metadata.e2eEncrypted {
+                selectOcId.removeAll(where: {$0 == metadata.ocId})
             } else {
                 selectedMetadatas.append(metadata)
             }
@@ -238,6 +335,7 @@ extension NCCollectionViewCommon: NCCollectionViewCommonSelectTabBarDelegate, NC
             if metadata.lock {
                 isAnyLocked = true
                 if metadata.lockOwner != session.userId {
+                if metadata.lockOwner != appDelegate.userId {
                     canUnlock = false
                 }
             }
@@ -245,6 +343,7 @@ extension NCCollectionViewCommon: NCCollectionViewCommonSelectTabBarDelegate, NC
             guard !isAnyOffline else { continue }
             if metadata.directory,
                let directory = NCManageDatabase.shared.getTableDirectory(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@", session.account, metadata.serverUrl + "/" + metadata.fileName)) {
+               let directory = NCManageDatabase.shared.getTableDirectory(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@", appDelegate.account, metadata.serverUrl + "/" + metadata.fileName)) {
                 isAnyOffline = directory.offline
             } else if let localFile = NCManageDatabase.shared.getTableLocalFile(predicate: NSPredicate(format: "ocId == %@", metadata.ocId)) {
                 isAnyOffline = localFile.offline
@@ -264,6 +363,10 @@ extension NCCollectionViewCommon: NCCollectionViewCommonSelectTabBarDelegate, NC
         }
 
        if !isAnyFolder, canUnlock, !NCCapabilities.shared.getCapabilities(account: controller?.account).capabilityFilesLockVersion.isEmpty {
+            actions.append(.share(selectedMetadatas: selectedMetadatas, viewController: self, completion: { self.toggleSelect() }))
+        }
+
+        if !isAnyFolder, canUnlock, !NCGlobal.shared.capabilityFilesLockVersion.isEmpty {
             actions.append(.lockUnlockFiles(shouldLock: !isAnyLocked, metadatas: selectedMetadatas, completion: { self.toggleSelect() }))
         }
 
@@ -298,6 +401,35 @@ extension NCCollectionViewCommon: NCCollectionViewCommonSelectTabBarDelegate, NC
 //            )
 //            )
             actions.append(.saveMediaAction(selectedMediaMetadatas: selectedMediaMetadatas, controller: self.controller, completion: { self.toggleSelect() }))
+            var title: String = NSLocalizedString("_save_selected_files_", comment: "")
+            var icon = NCUtility().loadImage(named: "save_files",colors: [NCBrandColor.shared.iconImageColor])
+            if selectedMediaMetadatas.allSatisfy({ NCManageDatabase.shared.getMetadataLivePhoto(metadata: $0) != nil }) {
+                title = NSLocalizedString("_livephoto_save_", comment: "")
+                icon = NCUtility().loadImage(named: "livephoto")
+            }
+
+            actions.append(NCMenuAction(
+                title: title,
+                icon: icon,
+                order: 0,
+                action: { _ in
+                    for metadata in selectedMediaMetadatas {
+                        if let metadataMOV = NCManageDatabase.shared.getMetadataLivePhoto(metadata: metadata) {
+                            NCNetworking.shared.saveLivePhotoQueue.addOperation(NCOperationSaveLivePhoto(metadata: metadata, metadataMOV: metadataMOV, hudView: self.view))
+                        } else {
+                            if NCUtilityFileSystem().fileProviderStorageExists(metadata) {
+                                NCActionCenter.shared.saveAlbum(metadata: metadata, controller: self.tabBarController as? NCMainTabBarController)
+                            } else {
+                                if NCNetworking.shared.downloadQueue.operations.filter({ ($0 as? NCOperationDownload)?.metadata.ocId == metadata.ocId }).isEmpty {
+                                    NCNetworking.shared.downloadQueue.addOperation(NCOperationDownload(metadata: metadata, selector: NCGlobal.shared.selectorSaveAlbum))
+                                }
+                            }
+                        }
+                    }
+                    self.toggleSelect()
+                }
+            )
+            )
         }
         actions.append(.setAvailableOfflineAction(selectedMetadatas: selectedMetadatas, isAnyOffline: isAnyOffline, viewController: self, completion: {
             self.reloadDataSource()
@@ -374,6 +506,13 @@ extension NCCollectionViewCommon: NCCollectionViewCommonSelectTabBarDelegate, NC
             self.collectionView.setCollectionViewLayout(self.gridLayout, animated: true) {_ in self.isTransitioning = false }
         }
     }
+            actions.append(.moveOrCopyAction(selectedMetadatas: selectedMetadatas, viewController: self, indexPath: [], completion: { self.toggleSelect() }))
+            actions.append(.copyAction(selectOcId: selectOcId, viewController: self, completion: { self.toggleSelect() }))
+        }
+        actions.append(.deleteAction(selectedMetadatas: selectedMetadatas, indexPaths: [], viewController: self, completion: { self.toggleSelect() }))
+        return actions
+    }
+
 }
 
 //extension RealmSwiftObject {

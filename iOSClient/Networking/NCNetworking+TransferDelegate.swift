@@ -13,6 +13,12 @@ extension NCNetworking: NCTransferDelegate {
         }
     }
 
+    func transferReloadData(serverUrl: String?) { }
+
+    func transferReloadDataSource(serverUrl: String?, requestData: Bool, status: Int?) { }
+
+    func transferProgressDidUpdate(progress: Float, totalBytes: Int64, totalBytesExpected: Int64, fileName: String, serverUrl: String) { }
+
     func transferChange(status: String,
                         account: String,
                         fileName: String,
@@ -48,7 +54,7 @@ extension NCNetworking: NCTransferDelegate {
                 }
             }
             guard let controller else { return }
-            let scene = SceneManager.shared.getWindow(controller: controller)?.windowScene
+            let windowScene = SceneManager.shared.getWindowScene(controller: controller)
 
             switch selector {
             case NCGlobal.shared.selectorLoadFileQuickLook:
@@ -115,15 +121,12 @@ extension NCNetworking: NCTransferDelegate {
                 NCAskAuthorization().askAuthorizationPhotoLibrary(controller: controller) { hasPermission in
                     guard hasPermission else {
                         Task {@MainActor in
-                            let error = NKError(errorCode: NCGlobal.shared.errorFileNotSaved, errorDescription: "_access_photo_not_enabled_msg_")
-                            await showErrorBanner(scene: scene,
-                                                  errorDescription: error.errorDescription,
-                                                  errorCode: error.errorCode)
+                            await showErrorBanner(windowScene: windowScene,
+                                                  text: "_access_photo_not_enabled_msg_",
+                                                  errorCode: NCGlobal.shared.errorInternalError)
                         }
                         return
                     }
-
-                    let errorSave = NKError(errorCode: NCGlobal.shared.errorFileNotSaved, errorDescription: "_file_not_saved_cameraroll_")
 
                     do {
                         if metadata.isImage {
@@ -133,10 +136,10 @@ extension NCNetworking: NCTransferDelegate {
                                 assetRequest.addResource(with: .photo, data: data, options: nil)
                             }) { success, _ in
                                 if !success {
-                                    Task {@MainActor in
-                                        await showErrorBanner(scene: scene,
-                                                              errorDescription: errorSave.errorDescription,
-                                                              errorCode: errorSave.errorCode)
+                                    Task {
+                                        await showErrorBanner(windowScene: windowScene,
+                                                              text: "_file_not_saved_cameraroll_",
+                                                              errorCode: NCGlobal.shared.errorInternalError)
                                     }
                                 }
                             }
@@ -145,26 +148,26 @@ extension NCNetworking: NCTransferDelegate {
                                 PHAssetChangeRequest.creationRequestForAssetFromVideo(atFileURL: URL(fileURLWithPath: fileNamePath))
                             }) { success, _ in
                                 if !success {
-                                    Task {@MainActor in
-                                        await showErrorBanner(scene: scene,
-                                                              errorDescription: errorSave.errorDescription,
-                                                              errorCode: errorSave.errorCode)
+                                    Task {
+                                        await showErrorBanner(windowScene: windowScene,
+                                                              text: "_file_not_saved_cameraroll_",
+                                                              errorCode: NCGlobal.shared.errorInternalError)
                                     }
                                 }
                             }
                         } else {
-                            Task {@MainActor in
-                                await showErrorBanner(scene: scene,
-                                                      errorDescription: errorSave.errorDescription,
-                                                      errorCode: errorSave.errorCode)
+                            Task {
+                                await showErrorBanner(windowScene: windowScene,
+                                                      text: "_file_not_saved_cameraroll_",
+                                                      errorCode: NCGlobal.shared.errorInternalError)
                             }
                             return
                         }
                     } catch {
-                        Task {@MainActor in
-                            await showErrorBanner(scene: scene,
-                                                  errorDescription: errorSave.errorDescription,
-                                                  errorCode: errorSave.errorCode)
+                        Task {
+                            await showErrorBanner(windowScene: windowScene,
+                                                  text: "_file_not_saved_cameraroll_",
+                                                  errorCode: NCGlobal.shared.errorInternalError)
                         }
                     }
                 }
@@ -194,14 +197,14 @@ extension NCNetworking: NCTransferDelegate {
                 NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterOpenMediaDetail, userInfo: ["ocId": metadata.ocId])
 
             default:
-                let applicationHandle = NCApplicationHandle()
-                applicationHandle.downloadedFile(selector: metadata.sessionSelector, metadata: metadata)
+               break
             }
         }
     }
 
     @MainActor
     func viewerFile(account: String, fileId: String, viewController: UIViewController) async {
+        let windowScene = SceneManager.shared.getWindowScene(controller: viewController.tabBarController)
         if let metadata = await NCManageDatabase.shared.getMetadataFromFileIdAsync(fileId) {
             do {
                 let attr = try FileManager.default.attributesOfItem(atPath: utilityFileSystem.getDirectoryProviderStorageOcId(
@@ -233,9 +236,9 @@ extension NCNetworking: NCTransferDelegate {
             }
         }
         guard resultsFile.error == .success, let file = resultsFile.file else {
-            Task {@MainActor in
-                await showErrorBanner(controller: viewController.tabBarController,
-                                      errorDescription: resultsFile.error.errorDescription,
+            Task {
+                await showErrorBanner(windowScene: windowScene,
+                                      text: resultsFile.error.errorDescription,
                                       errorCode: resultsFile.error.errorCode)
             }
             return
@@ -258,7 +261,7 @@ extension NCNetworking: NCTransferDelegate {
             return
         }
 
-        let download = await NextcloudKit.shared.downloadAsync(
+        let results = await NextcloudKit.shared.downloadAsync(
             serverUrlFileName: metadata.serverUrlFileName,
             fileNameLocalPath: fileNameLocalPath,
             account: account) { _ in
@@ -278,14 +281,17 @@ extension NCNetworking: NCTransferDelegate {
 
         }
 
+        let allHeaderFields = results.response?.response?.allHeaderFields
+        let etag = nkComm.findHeader("oc-etag", allHeaderFields: allHeaderFields)
+
         await NCManageDatabase.shared.setMetadataSessionAsync(ocId: metadata.ocId,
                                                               session: "",
                                                               sessionTaskIdentifier: 0,
                                                               sessionError: "",
                                                               status: self.global.metadataStatusNormal,
-                                                              etag: download.etag)
+                                                              etag: etag)
 
-        if download.nkError == .success {
+        if results.nkError == .success {
             await NCManageDatabase.shared.addLocalFilesAsync(metadatas: [metadata])
             if let vc = await NCViewer().getViewerController(metadata: metadata, delegate: viewController) {
                 viewController.navigationController?.pushViewController(vc, animated: true)
@@ -295,54 +301,67 @@ extension NCNetworking: NCTransferDelegate {
 
     // MARK: -
 
-    func openFileViewInFolder(serverUrl: String, fileNameBlink: String?, fileNameOpen: String?, sceneIdentifier: String) {
+    @MainActor
+    func openFileView(serverUrl: String,
+                      metadata: tableMetadata? = nil,
+                      sceneIdentifier: String) async {
+        guard let controller = SceneManager.shared.getController(sceneIdentifier: sceneIdentifier),
+              let navigationController = controller.viewControllers?.first as? UINavigationController
+        else { return }
+        controller.selectedIndex = 0
+
+        if let viewController = navigationController.topViewController as? NCFiles {
+            await viewController.open(metadata: metadata)
+        }
+    }
+
+    @MainActor
+    func blinkInFolder(serverUrl: String,
+                       fileName: String,
+                       sceneIdentifier: String) async {
         guard let controller = SceneManager.shared.getController(sceneIdentifier: sceneIdentifier),
               let navigationController = controller.viewControllers?.first as? UINavigationController
         else { return }
         let session = NCSession.shared.getSession(controller: controller)
         var serverUrlPush = self.utilityFileSystem.getHomeServer(session: session)
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-            navigationController.popToRootViewController(animated: false)
-            controller.selectedIndex = 0
-            if serverUrlPush == serverUrl,
-               let viewController = navigationController.topViewController as? NCFiles {
-                viewController.blinkCell(fileName: fileNameBlink)
-                viewController.openFile(fileName: fileNameOpen)
+        navigationController.popToRootViewController(animated: false)
+        controller.selectedIndex = 0
+        if serverUrlPush == serverUrl,
+            let viewController = navigationController.topViewController as? NCFiles {
+            Task {
+                viewController.blinkCell(fileName: fileName)
+            }
+            return
+        }
+
+        let diffDirectory = serverUrl.replacingOccurrences(of: serverUrlPush, with: "")
+        var subDirs = diffDirectory.split(separator: "/")
+
+        while serverUrlPush != serverUrl, !subDirs.isEmpty {
+            guard let dir = subDirs.first else {
                 return
             }
+            serverUrlPush = self.utilityFileSystem.createServerUrl(serverUrl: serverUrlPush, fileName: String(dir))
 
-            let diffDirectory = serverUrl.replacingOccurrences(of: serverUrlPush, with: "")
-            var subDirs = diffDirectory.split(separator: "/")
+            if let viewController = controller.navigationCollectionViewCommon.first(where: { $0.navigationController == navigationController && $0.serverUrl == serverUrlPush})?.viewController as? NCFiles, viewController.isViewLoaded {
+                viewController.fileNameBlink = fileName
+                navigationController.pushViewController(viewController, animated: false)
+            } else {
+                if let viewController: NCFiles = UIStoryboard(name: "NCFiles", bundle: nil).instantiateInitialViewController() as? NCFiles {
+                    viewController.serverUrl = serverUrlPush
+                    viewController.titleCurrentFolder = String(dir)
+                    viewController.navigationItem.backButtonTitle = viewController.titleCurrentFolder
 
-            while serverUrlPush != serverUrl, !subDirs.isEmpty {
+                    controller.navigationCollectionViewCommon.append(NavigationCollectionViewCommon(serverUrl: serverUrlPush, navigationController: navigationController, viewController: viewController))
 
-                guard let dir = subDirs.first else {
-                    return
-                }
-                serverUrlPush = self.utilityFileSystem.createServerUrl(serverUrl: serverUrlPush, fileName: String(dir))
-
-                if let viewController = controller.navigationCollectionViewCommon.first(where: { $0.navigationController == navigationController && $0.serverUrl == serverUrlPush})?.viewController as? NCFiles, viewController.isViewLoaded {
-                    viewController.fileNameBlink = fileNameBlink
-                    viewController.fileNameOpen = fileNameOpen
-                    navigationController.pushViewController(viewController, animated: false)
-                } else {
-                    if let viewController: NCFiles = UIStoryboard(name: "NCFiles", bundle: nil).instantiateInitialViewController() as? NCFiles {
-                        viewController.serverUrl = serverUrlPush
-                        viewController.titleCurrentFolder = String(dir)
-                        viewController.navigationItem.backButtonTitle = viewController.titleCurrentFolder
-
-                        controller.navigationCollectionViewCommon.append(NavigationCollectionViewCommon(serverUrl: serverUrlPush, navigationController: navigationController, viewController: viewController))
-
-                        if serverUrlPush == serverUrl {
-                            viewController.fileNameBlink = fileNameBlink
-                            viewController.fileNameOpen = fileNameOpen
-                        }
-                        navigationController.pushViewController(viewController, animated: false)
+                    if serverUrlPush == serverUrl {
+                        viewController.fileNameBlink = fileName
                     }
+                    navigationController.pushViewController(viewController, animated: false)
                 }
-                subDirs.remove(at: 0)
             }
+            subDirs.remove(at: 0)
         }
     }
 }

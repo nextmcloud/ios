@@ -35,49 +35,34 @@ class NCMainNavigationController: UINavigationController, UINavigationController
         NCSession.shared.getSession(controller: controller)
     }
 
-    let menuButtonTag = 100
+    let menuNavigation = NCContextMenuNavigation()
+    var menuPlus: NCContextMenuPlus?
+
+    let optionButtonTag = 100
     let assistantButtonTag = 101
     let notificationsButtonTag = 102
     let transfersButtonTag = 103
 
-    lazy var menuButton: UIButton = {
-        let button = UIButton(type: .system)
-        return button
-    }()
-    var menuBarButtonItem: UIBarButtonItem {
-        let item = UIBarButtonItem(customView: menuButton)
-        item.tag = menuButtonTag
+    lazy var optionButtonItem: UIBarButtonItem = {
+        let item = UIBarButtonItem()
+        item.tag = optionButtonTag
         return item
-    }
-    lazy var assistantButton: UIButton = {
-        let button = UIButton(type: .system)
-        return button
     }()
-    var assistantButtonItem: UIBarButtonItem {
-        let item = UIBarButtonItem(customView: assistantButton)
+    lazy var assistantButtonItem: UIBarButtonItem = {
+        let item = UIBarButtonItem()
         item.tag = assistantButtonTag
         return item
-    }
-
-    lazy var notificationsButton: UIButton = {
-        let button = UIButton(type: .system)
-        return button
     }()
-    var notificationsButtonItem: UIBarButtonItem {
-        let item = UIBarButtonItem(customView: notificationsButton)
+    lazy var notificationsButtonItem: UIBarButtonItem = {
+        let item = UIBarButtonItem()
         item.tag = notificationsButtonTag
         return item
-    }
-
-    lazy var transfersButton: UIButton = {
-        let button = UIButton(type: .system)
-        return button
     }()
-    var transfersButtonItem: UIBarButtonItem {
-        let item = UIBarButtonItem(customView: transfersButton)
+    lazy var transfersButtonItem: UIBarButtonItem = {
+        let item = UIBarButtonItem()
         item.tag = transfersButtonTag
         return item
-    }
+    }()
 
     // MARK: - View Life Cycle
 
@@ -100,20 +85,35 @@ class NCMainNavigationController: UINavigationController, UINavigationController
         assistantButton.addAction(UIAction(handler: { _ in
             let assistant = NCAssistant()
                 .environmentObject(NCAssistantModel(controller: self.controller))
+            optionButtonItem.image = UIImage(systemName: "ellipsis")
+            optionButtonItem.tintColor = NCBrandColor.shared.iconImageColor
+            optionButtonItem.menu = await createOptionMenu()
+        }
+
+        assistantButtonItem.image = UIImage(systemName: "sparkles")
+        assistantButtonItem.title = NSLocalizedString("_assistant_", comment: "")
+        assistantButtonItem.tintColor = NCBrandColor.shared.iconImageColor
+        assistantButtonItem.primaryAction = UIAction(handler: { _ in
+            let inputModel = NCAssistantInputModel()
+            let assistant = NCAssistant(assistantModel: NCAssistantModel(controller: self.controller, inputModel: inputModel), chatModel: NCAssistantChatModel(controller: self.controller, inputModel: inputModel), conversationsModel: NCAssistantChatConversationsModel(controller: self.controller))
             let hostingController = UIHostingController(rootView: assistant)
             self.present(hostingController, animated: true, completion: nil)
-        }), for: .touchUpInside)
+        })
 
         notificationsButton.setImage(UIImage(systemName: "bell.fill"), for: .normal)
 //        notificationsButton.tintColor = NCBrandColor.shared.iconImageColor
         notificationsButton.addAction(UIAction(handler: { _ in
+        notificationsButtonItem.image = UIImage(systemName: "bell.fill")
+        notificationsButtonItem.title = NSLocalizedString("_notifications_", comment: "")
+        notificationsButtonItem.tintColor = NCBrandColor.shared.iconImageColor
+        notificationsButtonItem.primaryAction = UIAction(handler: { _ in
             if let navigationController = UIStoryboard(name: "NCNotification", bundle: nil).instantiateInitialViewController() as? UINavigationController,
                let viewController = navigationController.topViewController as? NCNotification {
                 viewController.modalPresentationStyle = .pageSheet
                 viewController.session = self.session
                 self.present(navigationController, animated: true, completion: nil)
             }
-        }), for: .touchUpInside)
+        })
 
         transfersButton.setImage(UIImage(systemName: "arrow.left.arrow.right.circle.fill"), for: .normal)
 //        transfersButton.tintColor = NCBrandColor.shared.iconImageColor
@@ -130,6 +130,10 @@ class NCMainNavigationController: UINavigationController, UINavigationController
 //            hosting.modalPresentationStyle = .pageSheet
 //
 //            self.present(hosting, animated: true)
+        transfersButtonItem.image = UIImage(systemName: "arrow.left.arrow.right.circle.fill")
+        transfersButtonItem.title = NSLocalizedString("_transfers_", comment: "")
+        transfersButtonItem.tintColor = NCBrandColor.shared.iconImageColor
+        transfersButtonItem.primaryAction = UIAction(handler: { _ in
             let rootView = TransfersView(session: self.session, onClose: { [weak self] in
                 self?.dismiss(animated: true)
             })
@@ -137,9 +141,9 @@ class NCMainNavigationController: UINavigationController, UINavigationController
             hosting.modalPresentationStyle = .pageSheet
 
             self.present(hosting, animated: true)
-        }), for: .touchUpInside)
+        })
 
-        // PLUS BUTTON ONLY IN FILES
+        // PLUS BUTTON MENU
         let widthAnchor: CGFloat
         let trailingAnchor: CGFloat
         let trailingAnchorPad: CGFloat
@@ -182,6 +186,10 @@ class NCMainNavigationController: UINavigationController, UINavigationController
             ])
         }
 
+        menuPlus = NCContextMenuPlus(menuToolbar: menuToolbar, controller: controller)
+
+        // CAPABILITIES UPDATE
+        //
         NotificationCenter.default.addObserver(forName: NSNotification.Name(rawValue: self.global.notificationCenterServerDidUpdate), object: nil, queue: nil) { notification in
             guard let userInfo = notification.userInfo,
                   let account = userInfo["account"] as? String else {
@@ -190,34 +198,23 @@ class NCMainNavigationController: UINavigationController, UINavigationController
 
             Task { @MainActor in
                 let capabilities = await NKCapabilities.shared.getCapabilities(for: account)
-                guard capabilities.notification.count > 0 else {
-                    if self.isNotificationsButtonVisible() {
-                        self.controller?.availableNotifications = false
-                        await self.updateRightBarButtonItems()
-                    }
-                    return
-                }
+                let session = NCSession.shared.getSession(account: account)
 
                 // Notification
-                let resultsNotification = await NextcloudKit.shared.getNotificationsAsync(account: account) { task in
-                    Task {
-                        let identifier = await NCNetworking.shared.networkingTasks.createIdentifier(account: account,
-                                                                                                    name: "getNotifications")
-                        await NCNetworking.shared.networkingTasks.track(identifier: identifier, task: task)
-                    }
-                }
-                if resultsNotification.error == .success,
-                    let notifications = resultsNotification.notifications,
-                    notifications.count > 0 {
-                    if !self.isNotificationsButtonVisible() {
-                        self.controller?.availableNotifications = true
-                        await self.updateRightBarButtonItems()
-                    }
+                //
+                if capabilities.notification.count == 0 {
+                    self.controller?.availableNotifications = false
                 } else {
-                    if self.isNotificationsButtonVisible() {
-                        self.controller?.availableNotifications = false
-                        await self.updateRightBarButtonItems()
+                    _ = await NextcloudKit.shared.getNotificationsAsync(account: account) { task in
+                        Task {
+                            let identifier = await NCNetworking.shared.networkingTasks.createIdentifier(
+                                account: account,
+                                name: "getNotifications"
+                            )
+                            await NCNetworking.shared.networkingTasks.track(identifier: identifier, task: task)
+                        }
                     }
+                    self.controller?.availableNotifications = true
                 }
 
                 // Menu Plus
@@ -227,6 +224,13 @@ class NCMainNavigationController: UINavigationController, UINavigationController
             }
         }
         
+                await self.collectionViewCommonTrailingItemGroups()
+                await self.menuPlus?.create(session: session)
+            }
+        }
+
+        // REACHABILITY
+        //
         NotificationCenter.default.addObserver(forName: NSNotification.Name(rawValue: self.global.notificationCenterNetworkReachability), object: nil, queue: .main) { [weak self] _ in
             Task { @MainActor [weak self] in
                 guard let self else { return }
@@ -235,6 +239,7 @@ class NCMainNavigationController: UINavigationController, UINavigationController
                 let capabilities = await NKCapabilities.shared.getCapabilities(for: session.account)
                 await self.createPlusMenu(session: session, capabilities: capabilities)
                 AnalyticsHelper.shared.trackEvent(eventName: .EVENT__ACTION_BUTTON)
+                await self.menuPlus?.create(session: session)
             }
         }
     }
@@ -248,12 +253,15 @@ class NCMainNavigationController: UINavigationController, UINavigationController
                 } else {
                     hiddenPlusButton(true, animation: false)
                 }
+            // PLUS BUTTON ONLY IN FILES
+            if viewController is NCFiles {
+                self.menuPlus?.hiddenPlusButton(false)
             } else {
-                hiddenPlusButton(false)
+                self.menuPlus?.hiddenPlusButton(true, animation: false)
             }
             // MENU
             setNavigationBarAppearance()
-            await updateRightBarButtonItems()
+            await collectionViewCommonTrailingItemGroups()
         }
     }
 
@@ -675,79 +683,121 @@ class NCMainNavigationController: UINavigationController, UINavigationController
     
     // MARK: - Right
 
+    @MainActor
     func setNavigationRightItems() async {
-        if let collectionViewCommon, collectionViewCommon.isEditMode {
-            collectionViewCommon.tabBarSelect?.update(fileSelect: collectionViewCommon.fileSelect,
-                                                      metadatas: collectionViewCommon.getSelectedMetadatas(),
-                                                      userId: session.userId)
-            collectionViewCommon.tabBarSelect?.show()
 
-            let select = UIBarButtonItem(title: NSLocalizedString("_cancel_", comment: ""), style: .plain) {
+        // COLLECTION EDIT MODE
+        if let collectionViewCommon, collectionViewCommon.isEditMode {
+
+            collectionViewCommon.tabBarSelect?.update(
+                fileSelect: collectionViewCommon.fileSelect,
+                metadatas: collectionViewCommon.getSelectedMetadatas(),
+                userId: session.userId
+            )
+            collectionViewCommon.tabBarSelect?.show()
+            // SEARCH (OFF)
+            collectionViewCommon.navigationItem.searchController = nil
+
+            let cancel = UIBarButtonItem(
+                title: NSLocalizedString("_cancel_", comment: ""),
+                style: .plain
+            ) {
                 Task {
                     await collectionViewCommon.setEditMode(false)
                 }
             }
 
-            collectionViewCommon.navigationItem.rightBarButtonItems = [select]
+            let group = UIBarButtonItemGroup(
+                barButtonItems: [cancel],
+                representativeItem: nil
+            )
 
-        } else if let trashViewController, trashViewController.isEditMode {
+            collectionViewCommon.navigationItem.trailingItemGroups = [group]
+            return
+        }
+
+        // TRASH EDIT MODE
+        if let trashViewController, trashViewController.isEditMode {
+
             trashViewController.tabBarSelect.update(selectOcId: [])
             trashViewController.tabBarSelect.show()
 
-            let select = UIBarButtonItem(title: NSLocalizedString("_cancel_", comment: ""), style: .plain) {
+            let cancel = UIBarButtonItem(
+                title: NSLocalizedString("_cancel_", comment: ""),
+                style: .plain
+            ) {
                 trashViewController.setEditMode(false)
             }
 
-            trashViewController.navigationItem.rightBarButtonItems = [select]
+            let group = UIBarButtonItemGroup(
+                barButtonItems: [cancel],
+                representativeItem: nil
+            )
 
-        } else {
-            trashViewController?.tabBarSelect?.hide()
-            collectionViewCommon?.tabBarSelect?.hide()
-            await self.updateRightBarButtonItems()
+            trashViewController.navigationItem.trailingItemGroups = [group]
+            return
         }
+
+        // NORMAL MODE
+        trashViewController?.tabBarSelect?.hide()
+        collectionViewCommon?.tabBarSelect?.hide()
+        // SEARCH (ON)
+        collectionViewCommon?.navigationItem.searchController = collectionViewCommon?.searchController
+        await collectionViewCommonTrailingItemGroups()
     }
 
     @MainActor
-    func updateRightBarButtonItems(_ fileItem: UITabBarItem? = nil) async {
+    private func collectionViewCommonTrailingItemGroups() async {
+        guard let topViewController else {
+            return
+        }
+
         guard !(collectionViewCommon?.isEditMode ?? false),
               !(trashViewController?.isEditMode ?? false),
               !(mediaViewController?.isEditMode ?? false),
               !(topViewController is NCViewerMediaPage),
               !(topViewController is NCViewerPDF),
               !(topViewController is NCViewerRichDocument),
-              !(topViewController is NCViewerNextcloudText)
+              !(topViewController is NCViewerDirectEditing)
         else {
             return
         }
 
         let capabilities = await NKCapabilities.shared.getCapabilities(for: session.account)
-        let rightmenu = await createRightMenu()
-        var tempRightBarButtonItems: [UIBarButtonItem] = rightmenu == nil ? [self.transfersButtonItem] : [self.menuBarButtonItem, self.transfersButtonItem]
-        var tempTotalTags = 0
-        var totalTags = 0
 
-        for item in tempRightBarButtonItems {
-            tempTotalTags = tempTotalTags + item.tag
-        }
+        // ---------------------------------------------------------
+        // Build desired items
+        // ---------------------------------------------------------
 
-        if let rightBarButtonItems = topViewController?.navigationItem.rightBarButtonItems {
-            for item in rightBarButtonItems {
-                totalTags += item.tag
-            }
+        var desiredItems: [UIBarButtonItem] = []
+
+        if controller?.availableNotifications ?? false {
+            desiredItems.append(notificationsButtonItem)
         }
 
         if capabilities.assistantEnabled {
-            tempRightBarButtonItems.append(self.assistantButtonItem)
-            tempTotalTags += self.assistantButtonItem.tag
+            desiredItems.append(assistantButtonItem)
         }
 
-        if let controller, controller.availableNotifications {
-            tempRightBarButtonItems.append(self.notificationsButtonItem)
-            tempTotalTags += self.notificationsButtonItem.tag
+        desiredItems.append(transfersButtonItem)
+
+        if let optionMenu = await createOptionMenu() {
+            optionButtonItem.menu = optionMenu
+            desiredItems.append(optionButtonItem)
         }
 
-        if totalTags != tempTotalTags {
-            topViewController?.navigationItem.rightBarButtonItems = tempRightBarButtonItems
+        // ---------------------------------------------------------
+        // Read current items from trailingItemGroups
+        // ---------------------------------------------------------
+
+        let currentItems: [UIBarButtonItem] = topViewController.navigationItem.trailingItemGroups.flatMap { $0.barButtonItems }
+
+        let currentTags = currentItems.map { $0.tag }
+        let desiredTags = desiredItems.map { $0.tag }
+
+        // If nothing changed → exit
+        guard currentTags != desiredTags else {
+            return
         }
 
         // Update App Icon badge / File Icon badge
@@ -765,17 +815,23 @@ class NCMainNavigationController: UINavigationController, UINavigationController
 #endif
 
         return transferCount
+        let group = UIBarButtonItemGroup(
+            barButtonItems: desiredItems,
+            representativeItem: nil
+        )
+
+        topViewController.navigationItem.trailingItemGroups = [group]
     }
 
-    func createRightMenu() async -> UIMenu? { return nil }
+    func createOptionMenu() async -> UIMenu? { return nil }
 
-    func updateRightMenu() async {
-        if let rightBarButtonItems = topViewController?.navigationItem.rightBarButtonItems,
-            let menuBarButtonItem = rightBarButtonItems.first(where: { $0.tag == menuButtonTag }),
-            let menuButton = menuBarButtonItem.customView as? UIButton {
-            menuButton.menu = await createRightMenu()
+    func updateMenuOption() async {
+        guard let topViewController else {
+            return
         }
-    }
+        let hasOptionButton = topViewController.navigationItem.trailingItemGroups
+            .flatMap { $0.barButtonItems }
+            .contains(where: { $0.tag == optionButtonTag })
 
     func createRightMenuActions() async -> (select: UIAction,
                                             viewStyleSubmenu: UIMenu,
@@ -1049,6 +1105,16 @@ class NCMainNavigationController: UINavigationController, UINavigationController
             if let button = item.customView as? UIButton {
                 applyTint(button, color: color)
             }
+        guard hasOptionButton else {
+            return
+        }
+
+        optionButtonItem.menu = await createOptionMenu()
+
+        // Force refresh of the bar button group if the menu instance changed.
+        let currentGroups = topViewController.navigationItem.trailingItemGroups
+        if !currentGroups.isEmpty {
+            topViewController.navigationItem.trailingItemGroups = currentGroups
         }
     }
 
@@ -1064,11 +1130,10 @@ class NCMainNavigationController: UINavigationController, UINavigationController
     func setLeftItemColor(tag: Int, to color: UIColor) {
         guard
             let items = topViewController?.navigationItem.leftBarButtonItems,
-            let item = items.first(where: { $0.tag == tag }),
-            let button = item.customView as? UIButton
+            let item = items.first(where: { $0.tag == tag })
         else { return }
 
-        applyTint(button, color: color)
+        applyTint(item, color: color)
     }
 
     /// Changes the tint color of all left bar button items currently visible
@@ -1079,9 +1144,7 @@ class NCMainNavigationController: UINavigationController, UINavigationController
         guard let items = topViewController?.navigationItem.leftBarButtonItems else { return }
 
         for item in items {
-            if let button = item.customView as? UIButton {
-                applyTint(button, color: color)
-            }
+            applyTint(item, color: color)
         }
     }
 
@@ -1105,35 +1168,33 @@ class NCMainNavigationController: UINavigationController, UINavigationController
         }
     }
 
+    @MainActor
+    private func applyTint(_ item: UIBarButtonItem, color: UIColor) {
+        if let button = item.customView as? UIButton {
+            applyTint(button, color: color)
+        } else {
+            item.tintColor = color
+        }
+    }
+
     /// Updates the tint color of all preloaded and currently visible right bar buttons.
     /// - Parameter color: The UIColor to be applied to all right bar button items.
     @MainActor
     func updateRightBarButtonsTint(to color: UIColor) {
-        let rightButtons: [UIButton] = [
-            menuButton,
-            assistantButton,
-            notificationsButton,
-            transfersButton
+        let rightItems: [UIBarButtonItem] = [
+            optionButtonItem,
+            assistantButtonItem,
+            notificationsButtonItem,
+            transfersButtonItem
         ]
 
-        // Apply color to preloaded button instances
-        for button in rightButtons {
-            if var cfg = button.configuration {
-                cfg.baseForegroundColor = color
-                button.configuration = cfg
-            } else {
-                button.tintColor = color
-                button.setTitleColor(color, for: .normal)
-            }
+        for item in rightItems {
+            applyTint(item, color: color)
         }
 
-        // Update also those already visible in the navigation bar
-        if let rightItems = topViewController?.navigationItem.rightBarButtonItems {
-            for item in rightItems {
-                if let button = item.customView as? UIButton {
-                    button.tintColor = color
-                    button.setTitleColor(color, for: .normal)
-                }
+        if let visibleItems = topViewController?.navigationItem.rightBarButtonItems {
+            for item in visibleItems {
+                applyTint(item, color: color)
             }
         }
     }

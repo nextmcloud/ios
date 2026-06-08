@@ -1,70 +1,29 @@
-//
-//  NCPhotoCell.swift
-//  Nextcloud
-//
-//  Created by Marino Faggiana on 13/07/2024.
-//  Copyright © 2024 Marino Faggiana. All rights reserved.
-//
-//  Author Marino Faggiana <marino.faggiana@nextcloud.com>
-//
-//  This program is free software: you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
-//  the Free Software Foundation, either version 3 of the License, or
-//  (at your option) any later version.
-//
-//  This program is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
-//
-//  You should have received a copy of the GNU General Public License
-//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-//
+// SPDX-FileCopyrightText: Nextcloud GmbH
+// SPDX-FileCopyrightText: 2024 Marino Faggiana
+// SPDX-License-Identifier: GPL-3.0-or-later
 
 import UIKit
 
-class NCPhotoCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProtocol {
-
+class NCPhotoCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellMainProtocol {
     @IBOutlet weak var imageItem: UIImageView!
     @IBOutlet weak var imageSelect: UIImageView!
-    @IBOutlet weak var imageStatus: UIImageView!
-    @IBOutlet weak var buttonMore: UIButton!
     @IBOutlet weak var imageVisualEffect: UIVisualEffectView!
 
-    var ocId = ""
-    var ocIdTransfer = ""
-    var user = ""
-
-    weak var photoCellDelegate: NCPhotoCellDelegate?
-
-    var fileOcId: String? {
-        get { return ocId }
-        set { ocId = newValue ?? "" }
-    }
-    var fileOcIdTransfer: String? {
-        get { return ocIdTransfer }
-        set { ocIdTransfer = newValue ?? "" }
-    }
-    var filePreviewImageView: UIImageView? {
+    var metadata: tableMetadata?
+    var previewImg: UIImageView? {
         get { return imageItem }
         set { imageItem = newValue }
-    }
-    var fileUser: String? {
-        get { return user }
-        set { user = newValue ?? "" }
-    }
-    var fileStatusImage: UIImageView? {
-        get { return imageStatus }
-        set { imageStatus = newValue }
     }
 
     override func awakeFromNib() {
         super.awakeFromNib()
+
         initCell()
     }
 
     override func prepareForReuse() {
         super.prepareForReuse()
+
         initCell()
     }
 
@@ -74,47 +33,32 @@ class NCPhotoCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProt
         accessibilityValue = nil
 
         imageItem.image = nil
-        imageSelect.isHidden = true
-        imageSelect.image = NCImageCache.shared.getImageCheckedYes()
-        imageStatus.image = nil
-        imageVisualEffect.clipsToBounds = true
-        imageVisualEffect.alpha = 0.5
 
-        let longPressedGesture = UILongPressGestureRecognizer(target: self, action: #selector(longPress(gestureRecognizer:)))
-        longPressedGesture.minimumPressDuration = 0.5
-        longPressedGesture.delegate = self
-        longPressedGesture.delaysTouchesBegan = true
-        self.addGestureRecognizer(longPressedGesture)
+        imageVisualEffect.isHidden = false
+        imageVisualEffect.effect = nil
+        imageVisualEffect.alpha = 0
+        imageVisualEffect.isUserInteractionEnabled = false
+        imageVisualEffect.backgroundColor = UIColor.white.withAlphaComponent(0.2)
     }
 
     override func snapshotView(afterScreenUpdates afterUpdates: Bool) -> UIView? {
         return nil
     }
 
-    @IBAction func touchUpInsideMore(_ sender: Any) {
-        photoCellDelegate?.tapMorePhotoItem(with: ocId, ocIdTransfer: ocIdTransfer, image: imageItem.image, sender: sender)
-    }
+    @objc private func handleTapObserver(_ g: UITapGestureRecognizer) {
+        let location = g.location(in: contentView)
 
-    @objc func longPress(gestureRecognizer: UILongPressGestureRecognizer) {
-        photoCellDelegate?.longPressPhotoItem(with: ocId, ocIdTransfer: ocIdTransfer, gestureRecognizer: gestureRecognizer)
-    }
-
-    fileprivate func setA11yActions() {
-        self.accessibilityCustomActions = [
-            UIAccessibilityCustomAction(
-                name: NSLocalizedString("_more_", comment: ""),
-                target: self,
-                selector: #selector(touchUpInsideMore(_:)))
-        ]
+        if buttonMore.frame.contains(location) {
+            delegate?.onMenuIntent(with: metadata)
+        }
     }
 
     func setButtonMore(image: UIImage) {
         buttonMore.setImage(image, for: .normal)
-        setA11yActions()
     }
 
     func hideButtonMore(_ status: Bool) {
-        buttonMore.isHidden = status
+       // buttonMore.isHidden = status NO MORE USED
     }
 
     func hideImageStatus(_ status: Bool) {
@@ -124,6 +68,12 @@ class NCPhotoCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProt
     func selected(_ status: Bool, isEditMode: Bool) {
         // E2EE - remove encrypt folder selection
         if let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId), metadata.e2eEncrypted {
+    func selected(_ status: Bool, isEditMode: Bool, color: UIColor) {
+        imageVisualEffect.alpha = status ? 1 : 0
+        imageSelect.alpha = status ? 1 : 0
+        imageSelect.image = NCImageCache.shared.getImageCheckedYes(color: color)
+        // E2EE - remove encrypt folder selection
+        if let metadata = NCManageDatabase.shared.getMetadataFromOcId(self.metadata?.ocId), metadata.e2eEncrypted {
             imageSelect.isHidden = true
         } else {
             imageSelect.isHidden = isEditMode ? false : true
@@ -145,7 +95,53 @@ class NCPhotoCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProt
     }
 }
 
-protocol NCPhotoCellDelegate: AnyObject {
-    func tapMorePhotoItem(with ocId: String, ocIdTransfer: String, image: UIImage?, sender: Any)
-    func longPressPhotoItem(with objectId: String, ocIdTransfer: String, gestureRecognizer: UILongPressGestureRecognizer)
+extension NCCollectionViewCommon {
+    // MARK: - LAYOUT PHOTO
+    //
+    func photoCell(cell: NCPhotoCell, indexPath: IndexPath, metadata: tableMetadata) -> NCPhotoCell {
+        let ext = global.getSizeExtension(column: self.numberOfColumns)
+
+        cell.metadata = metadata
+
+        // Image
+        //
+        if let image = NCImageCache.shared.getImageCache(ocId: metadata.ocId, etag: metadata.etag, ext: ext) {
+            cell.previewImg?.image = image
+            cell.previewImg?.contentMode = .scaleAspectFill
+        } else {
+            if isPinchGestureActive || ext == global.previewExt512 || ext == global.previewExt1024 {
+                cell.previewImg?.image = self.utility.getImage(ocId: metadata.ocId, etag: metadata.etag, ext: ext, userId: metadata.userId, urlBase: metadata.urlBase)
+            }
+
+            DispatchQueue.global(qos: .userInteractive).async {
+                let image = self.utility.getImage(ocId: metadata.ocId, etag: metadata.etag, ext: ext, userId: metadata.userId, urlBase: metadata.urlBase)
+                if let image {
+                    self.imageCache.addImageCache(ocId: metadata.ocId, etag: metadata.etag, image: image, ext: ext, cost: indexPath.row)
+                    DispatchQueue.main.async {
+                        cell.previewImg?.image = image
+                        cell.previewImg?.contentMode = .scaleAspectFill
+                    }
+                } else {
+                    DispatchQueue.main.async {
+                        cell.previewImg?.contentMode = .scaleAspectFit
+                        if metadata.iconName.isEmpty {
+                            cell.previewImg?.image = NCImageCache.shared.getImageFile()
+                        } else {
+                            cell.previewImg?.image = self.utility.loadImage(named: metadata.iconName, useTypeIconFile: true, account: metadata.account)
+                        }
+                    }
+                }
+            }
+        }
+
+        // Edit mode
+        //
+        if fileSelect.contains(metadata.ocId) {
+            cell.selected(true, isEditMode: isEditMode, color: NCBrandColor.shared.getElement(account: session.account))
+        } else {
+            cell.selected(false, isEditMode: isEditMode, color: NCBrandColor.shared.getElement(account: session.account))
+        }
+
+        return cell
+    }
 }
