@@ -3046,32 +3046,6 @@
 			path = "NMC Views";
 			sourceTree = "<group>";
 		};
-		566EB8122B3D861400FB7CAD /* NMC Custom Views */ = {
-        566EB7E92B3D7B5F00FB7CAD /* NMC Views */ = {
-            isa = PBXGroup;
-            children = (
-                566EB7F32B3D7B5F00FB7CAD /* FileNameInputTextField.swift */,
-                566EB7F62B3D7B5F00FB7CAD /* FileNameInputTextField.xib */,
-                566EB7EE2B3D7B5F00FB7CAD /* JPGImageSaveSwitchView.swift */,
-                566EB7F02B3D7B5F00FB7CAD /* JPGImageSaveSwitchView.xib */,
-                566EB7EA2B3D7B5F00FB7CAD /* PNGImageSaveSwitchView.swift */,
-                566EB7FA2B3D7B5F00FB7CAD /* PNGImageSaveSwitchView.xib */,
-                566EB7F12B3D7B5F00FB7CAD /* PasswordInputField.swift */,
-                566EB7F92B3D7B5F00FB7CAD /* PasswordInputField.xib */,
-                566EB7F42B3D7B5F00FB7CAD /* PdfWithOcrSwitchView.swift */,
-                566EB7F52B3D7B5F00FB7CAD /* PdfWithOcrSwitchView.xib */,
-                566EB7F72B3D7B5F00FB7CAD /* PdfWithoutOcrSwitchView.swift */,
-                566EB7FB2B3D7B5F00FB7CAD /* PdfWithoutOcrSwitchView.xib */,
-                566EB7F22B3D7B5F00FB7CAD /* ScanDocumentPathView.swift */,
-                566EB7EB2B3D7B5F00FB7CAD /* ScanDocumentPathView.xib */,
-                566EB7EC2B3D7B5F00FB7CAD /* SetPDFPasswordSwitchView.swift */,
-                566EB7ED2B3D7B5F00FB7CAD /* SetPDFPasswordSwitchView.xib */,
-                566EB7F82B3D7B5F00FB7CAD /* TextFileWithOcrSwitchView.swift */,
-                566EB7EF2B3D7B5F00FB7CAD /* TextFileWithOcrSwitchView.xib */,
-            );
-            path = "NMC Views";
-            sourceTree = "<group>";
-        };
         566EB8122B3D861400FB7CAD /* NMC Custom Views */ = {
             isa = PBXGroup;
             children = (
@@ -3272,13 +3246,6 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		B556D5B92E97EE57009F6F35 /* Account Request */ = {
-			isa = PBXGroup;
-			children = (
-				B556D5B52E97EE57009F6F35 /* NCAccountRequest.storyboard */,
-				B556D5B62E97EE57009F6F35 /* NCAccountRequest.swift */,
-				B556D5B72E97EE57009F6F35 /* NCShareAccounts.storyboard */,
-				B556D5B82E97EE57009F6F35 /* NCShareAccounts.swift */,
 		B5D45E6C2DA510E000773929 /* Rename file */ = {
 			isa = PBXGroup;
 			children = (
@@ -3286,6 +3253,8 @@
 				B5D45E6B2DA510E000773929 /* NCRenameFile.swift */,
 			);
 			path = "Rename file";
+			sourceTree = "<group>";
+		};
 		B5D45E5E2DA50C8500773929 /* Helper */ = {
 			isa = PBXGroup;
 			children = (
@@ -3294,12 +3263,16 @@
 				B5D45E5D2DA50C8500773929 /* TealiumHelper.swift */,
 			);
 			path = Helper;
+			sourceTree = "<group>";
+		};
 		B5D45E722DA5172900773929 /* AppUpdate */ = {
 			isa = PBXGroup;
 			children = (
 				B5D45E712DA5172900773929 /* AppUpdater.swift */,
 			);
 			path = AppUpdate;
+			sourceTree = "<group>";
+		};
 		B52FAE9B2DA8DED9001AB1BD /* NMC Custom Views */ = {
 			isa = PBXGroup;
 			children = (
@@ -3309,27 +3282,8 @@
 				B52FAE9A2DA8DED9001AB1BD /* NCCreateDocumentCustomTextField.xib */,
 			);
 			path = "NMC Custom Views";
-		B52FAEBF2DA8EF84001AB1BD /* NMC Views */ = {
-			isa = PBXGroup;
-			children = (
-				B52FAEAD2DA8EF84001AB1BD /* FileNameInputTextField.swift */,
-				B52FAEAE2DA8EF84001AB1BD /* FileNameInputTextField.xib */,
-				B52FAEAF2DA8EF84001AB1BD /* JPGImageSaveSwitchView.swift */,
-				B52FAEB02DA8EF84001AB1BD /* JPGImageSaveSwitchView.xib */,
-				B52FAEB12DA8EF84001AB1BD /* PasswordInputField.swift */,
-				B52FAEB22DA8EF84001AB1BD /* PasswordInputField.xib */,
-				B52FAEB32DA8EF84001AB1BD /* PdfWithOcrSwitchView.swift */,
-				B52FAEB42DA8EF84001AB1BD /* PdfWithOcrSwitchView.xib */,
-				B52FAEB52DA8EF84001AB1BD /* PdfWithoutOcrSwitchView.swift */,
-				B52FAEB62DA8EF84001AB1BD /* PdfWithoutOcrSwitchView.xib */,
-				B52FAEB72DA8EF84001AB1BD /* PNGImageSaveSwitchView.swift */,
-				B52FAEB82DA8EF84001AB1BD /* PNGImageSaveSwitchView.xib */,
-				B52FAEB92DA8EF84001AB1BD /* ScanDocumentPathView.swift */,
-				B52FAEBA2DA8EF84001AB1BD /* ScanDocumentPathView.xib */,
-				B52FAEBB2DA8EF84001AB1BD /* SetPDFPasswordSwitchView.swift */,
-				B52FAEBC2DA8EF84001AB1BD /* SetPDFPasswordSwitchView.xib */,
-				B52FAEBD2DA8EF84001AB1BD /* TextFileWithOcrSwitchView.swift */,
-				B52FAEBE2DA8EF84001AB1BD /* TextFileWithOcrSwitchView.xib */,
+			sourceTree = "<group>";
+		};
 		B560B9542EF5597A00E55904 /* Account Request */ = {
 			isa = PBXGroup;
 			children = (
@@ -3341,11 +3295,6 @@
 			path = "Account Request";
 			sourceTree = "<group>";
 		};
-		B556D5BC2E97EE57009F6F35 /* Account Settings */ = {
-			isa = PBXGroup;
-			children = (
-				B556D5BA2E97EE57009F6F35 /* NCAccountSettingsModel.swift */,
-				B556D5BB2E97EE57009F6F35 /* NCAccountSettingsView.swift */,
 		B560B9572EF5597A00E55904 /* Account Settings */ = {
 			isa = PBXGroup;
 			children = (
@@ -3355,12 +3304,6 @@
 			path = "Account Settings";
 			sourceTree = "<group>";
 		};
-		B556D5BE2E97EE57009F6F35 /* Account */ = {
-			isa = PBXGroup;
-			children = (
-				B556D5B92E97EE57009F6F35 /* Account Request */,
-				B556D5BC2E97EE57009F6F35 /* Account Settings */,
-				B556D5BD2E97EE57009F6F35 /* NCAccount.swift */,
 		B560B9592EF5597A00E55904 /* Account */ = {
 			isa = PBXGroup;
 			children = (
@@ -3419,10 +3362,6 @@
 			path = Analytics;
 			sourceTree = "<group>";
 		};
-		B5BEBD932E93AED80002C9E5 /* AppUpdate */ = {
-			isa = PBXGroup;
-			children = (
-				B5BEBD922E93AED80002C9E5 /* AppUpdater.swift */,
 		B5D45E722DA5172900773929 /* AppUpdate */ = {
 			isa = PBXGroup;
 			children = (
@@ -3440,12 +3379,6 @@
 			path = EmptyView;
 			sourceTree = "<group>";
 		};
-		B5BEBDA22E93AF010002C9E5 /* Helper */ = {
-			isa = PBXGroup;
-			children = (
-				B5BEBD9F2E93AF010002C9E5 /* AdjustHelper.h */,
-				B5BEBDA02E93AF010002C9E5 /* AdjustHelper.m */,
-				B5BEBDA12E93AF010002C9E5 /* TealiumHelper.swift */,
 		B5D45E5E2DA50C8500773929 /* Helper */ = {
 			isa = PBXGroup;
 			children = (
@@ -3456,13 +3389,6 @@
 			path = Helper;
 			sourceTree = "<group>";
 		};
-		B5BEBDE82E93BDB40002C9E5 /* NMC Custom Views */ = {
-			isa = PBXGroup;
-			children = (
-				B5BEBDE42E93BDB40002C9E5 /* FolderPathCustomCell.swift */,
-				B5BEBDE52E93BDB40002C9E5 /* FolderPathCustomCell.xib */,
-				B5BEBDE62E93BDB40002C9E5 /* NCCreateDocumentCustomTextField.swift */,
-				B5BEBDE72E93BDB40002C9E5 /* NCCreateDocumentCustomTextField.xib */,
 		B52FAE9B2DA8DED9001AB1BD /* NMC Custom Views */ = {
 			isa = PBXGroup;
 			children = (
@@ -3474,50 +3400,6 @@
 			path = "NMC Custom Views";
 			sourceTree = "<group>";
 		};
-		B5BEBE192E93BE200002C9E5 /* NMC Views */ = {
-			isa = PBXGroup;
-			children = (
-				B5BEBE072E93BE200002C9E5 /* FileNameInputTextField.swift */,
-				B5BEBE082E93BE200002C9E5 /* FileNameInputTextField.xib */,
-				B5BEBE092E93BE200002C9E5 /* JPGImageSaveSwitchView.swift */,
-				B5BEBE0A2E93BE200002C9E5 /* JPGImageSaveSwitchView.xib */,
-				B5BEBE0B2E93BE200002C9E5 /* PasswordInputField.swift */,
-				B5BEBE0C2E93BE200002C9E5 /* PasswordInputField.xib */,
-				B5BEBE0D2E93BE200002C9E5 /* PdfWithOcrSwitchView.swift */,
-				B5BEBE0E2E93BE200002C9E5 /* PdfWithOcrSwitchView.xib */,
-				B5BEBE0F2E93BE200002C9E5 /* PdfWithoutOcrSwitchView.swift */,
-				B5BEBE102E93BE200002C9E5 /* PdfWithoutOcrSwitchView.xib */,
-				B5BEBE112E93BE200002C9E5 /* PNGImageSaveSwitchView.swift */,
-				B5BEBE122E93BE200002C9E5 /* PNGImageSaveSwitchView.xib */,
-				B5BEBE132E93BE200002C9E5 /* ScanDocumentPathView.swift */,
-				B5BEBE142E93BE200002C9E5 /* ScanDocumentPathView.xib */,
-				B5BEBE152E93BE200002C9E5 /* SetPDFPasswordSwitchView.swift */,
-				B5BEBE162E93BE200002C9E5 /* SetPDFPasswordSwitchView.xib */,
-				B5BEBE172E93BE200002C9E5 /* TextFileWithOcrSwitchView.swift */,
-				B5BEBE182E93BE200002C9E5 /* TextFileWithOcrSwitchView.xib */,
-		B52FAEBF2DA8EF84001AB1BD /* NMC Views */ = {
-			isa = PBXGroup;
-			children = (
-				B52FAEAD2DA8EF84001AB1BD /* FileNameInputTextField.swift */,
-				B52FAEAE2DA8EF84001AB1BD /* FileNameInputTextField.xib */,
-				B52FAEAF2DA8EF84001AB1BD /* JPGImageSaveSwitchView.swift */,
-				B52FAEB02DA8EF84001AB1BD /* JPGImageSaveSwitchView.xib */,
-				B52FAEB12DA8EF84001AB1BD /* PasswordInputField.swift */,
-				B52FAEB22DA8EF84001AB1BD /* PasswordInputField.xib */,
-				B52FAEB32DA8EF84001AB1BD /* PdfWithOcrSwitchView.swift */,
-				B52FAEB42DA8EF84001AB1BD /* PdfWithOcrSwitchView.xib */,
-				B52FAEB52DA8EF84001AB1BD /* PdfWithoutOcrSwitchView.swift */,
-				B52FAEB62DA8EF84001AB1BD /* PdfWithoutOcrSwitchView.xib */,
-				B52FAEB72DA8EF84001AB1BD /* PNGImageSaveSwitchView.swift */,
-				B52FAEB82DA8EF84001AB1BD /* PNGImageSaveSwitchView.xib */,
-				B52FAEB92DA8EF84001AB1BD /* ScanDocumentPathView.swift */,
-				B52FAEBA2DA8EF84001AB1BD /* ScanDocumentPathView.xib */,
-				B52FAEBB2DA8EF84001AB1BD /* SetPDFPasswordSwitchView.swift */,
-				B52FAEBC2DA8EF84001AB1BD /* SetPDFPasswordSwitchView.xib */,
-				B52FAEBD2DA8EF84001AB1BD /* TextFileWithOcrSwitchView.swift */,
-				B52FAEBE2DA8EF84001AB1BD /* TextFileWithOcrSwitchView.xib */,
-			);
-			path = "NMC Views";
 		B5D45E6C2DA510E000773929 /* Rename file */ = {
 			isa = PBXGroup;
 			children = (
@@ -9100,6 +8982,7 @@
 			isa = XCSwiftPackageProductDependency;
 			package = F73ADD1A265546880069EA0D /* XCRemoteSwiftPackageReference "SwiftEntryKit" */;
 			productName = SwiftEntryKit;
+		};
 		F7490E7129882BB4009DCE94 /* RealmSwift */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = F710FC78277B7CFF00AA9FBF /* XCRemoteSwiftPackageReference "realm-swift" */;
@@ -9179,6 +9062,7 @@
 			isa = XCSwiftPackageProductDependency;
 			package = F75E57A725BF0D61002B72C2 /* XCRemoteSwiftPackageReference "SVGKit" */;
 			productName = SVGKitSwift;
+		};
 		F783034328B5142B00B84583 /* NextcloudKit */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = F783034028B511D200B84583 /* XCRemoteSwiftPackageReference "NextcloudKit" */;
