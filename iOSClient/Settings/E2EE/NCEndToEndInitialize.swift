@@ -166,7 +166,7 @@ class NCEndToEndInitialize: NSObject {
                         NCPreferences().setEndToEndPrivateKey(account: account, privateKey: privateKey)
                     } else {
                         Task {
-                            await showErrorBanner(windowScene: self.windowScene, text: "E2E decrypt privateKey: serious internal error to decrypt Private Key", errorCode: error.errorCode)
+                            await showErrorBanner(windowScene: self.windowScene, text: NSLocalizedString("_e2ee_setup_passphrase_error_", comment: ""), errorCode: error.errorCode)
                         }
                         return
                     }
@@ -182,17 +182,17 @@ class NCEndToEndInitialize: NSObject {
                     } completion: { account, publicKey, _, error in
                         if error == .success, let publicKey {
 
-                            // Verify Certificate
-                            var verifyCertificate: Bool = false
-                            if let certificate = NCPreferences().getEndToEndCertificate(account: account) {
-                                verifyCertificate = NCEndToEndEncryption.shared().verifyCertificate(certificate, publicKey: publicKey)
-                            }
-                            if verifyCertificate == false {
-                                Task {
-                                    await showErrorBanner(windowScene: self.windowScene, text: "E2E verify certificate server: serious internal error to verify certificate", errorCode: error.errorCode)
-                                }
-                                return
-                            }
+//                            // Verify Certificate
+//                            var verifyCertificate: Bool = false
+//                            if let certificate = NCPreferences().getEndToEndCertificate(account: account) {
+//                                verifyCertificate = NCEndToEndEncryption.shared().verifyCertificate(certificate, publicKey: publicKey)
+//                            }
+//                            if verifyCertificate == false {
+//                                Task {
+//                                    await showErrorBanner(windowScene: self.windowScene, text: "E2E verify certificate server: serious internal error to verify certificate", errorCode: error.errorCode)
+//                                }
+//                                return
+//                            }
 
                             NCPreferences().setEndToEndPublicKey(account: account, publicKey: publicKey)
                             NCManageDatabase.shared.clearTablesE2EE(account: account)
@@ -294,16 +294,16 @@ class NCEndToEndInitialize: NSObject {
                 } completion: { account, publicKey, _, error in
                     if error == .success, let publicKey {
 
-                        var verifyCertificate: Bool = false
-                        if let certificate = NCPreferences().getEndToEndCertificate(account: account) {
-                            verifyCertificate = NCEndToEndEncryption.shared().verifyCertificate(certificate, publicKey: publicKey)
-                        }
-                        if verifyCertificate == false {
-                            Task {
-                                await showErrorBanner(windowScene: self.windowScene, text: "E2E verify certificate server: serious internal error to verify certificate", errorCode: error.errorCode)
-                            }
-                            return
-                        }
+//                        var verifyCertificate: Bool = false
+//                        if let certificate = NCPreferences().getEndToEndCertificate(account: account) {
+//                            verifyCertificate = NCEndToEndEncryption.shared().verifyCertificate(certificate, publicKey: publicKey)
+//                        }
+//                        if verifyCertificate == false {
+//                            Task {
+//                                await showErrorBanner(windowScene: self.windowScene, text: "E2E verify certificate server: serious internal error to verify certificate", errorCode: error.errorCode)
+//                            }
+//                            return
+//                        }
 
                         NCPreferences().setEndToEndPublicKey(account: account, publicKey: publicKey)
                         NCManageDatabase.shared.clearTablesE2EE(account: account)
