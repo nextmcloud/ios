@@ -19,6 +19,7 @@ class NCViewerMediaPage: UIViewController {
     var ocIds: [String] = []
     var currentIndex: Int = 0
     var delegateViewController: UIViewController?
+    var metadatas: [tableMetadata] = []
 
     var modifiedOcId: [String] = []
     var nextIndex: Int?
@@ -34,6 +35,7 @@ class NCViewerMediaPage: UIViewController {
     let utilityFileSystem = NCUtilityFileSystem()
     let global = NCGlobal.shared
     let database = NCManageDatabase.shared
+    var textColor: UIColor = NCBrandColor.shared.textColor
 
     // This prevents the scroll views to scroll when you drag and drop files/images/subjects (from this or other apps)
     // https://forums.developer.apple.com/forums/thread/89396 and https://forums.developer.apple.com/forums/thread/115736
@@ -42,12 +44,16 @@ class NCViewerMediaPage: UIViewController {
     var timerAutoHide: Timer?
     private var timerAutoHideSeconds: Double = 4
 
+    var albumName: String?
+    var albumServerUrl: String?
+    var albumPhoto: AlbumPhoto?
+
     private lazy var moreNavigationItem = UIBarButtonItem(
         image: NCImageCache.shared.getImageButtonMore(),
         primaryAction: nil,
         menu: UIMenu(title: "", children: [
             UIDeferredMenuElement.uncached { [self] completion in
-                if let menu = NCContextMenuViewer(metadata: currentViewController.metadata, controller: self.tabBarController as? NCMainTabBarController, webView: false, sender: self).viewMenu() {
+                if let menu = NCViewerContextMenu.makeContextMenu(controller: self.tabBarController as? NCMainTabBarController, metadata: currentViewController.metadata, webView: false, sender: self) {
                     completion(menu.children)
                 }
             }
@@ -93,7 +99,6 @@ class NCViewerMediaPage: UIViewController {
         super.viewDidLoad()
 
         let metadata = database.getMetadataFromOcId(ocIds[currentIndex])!
-        var items: [UIBarButtonItem] = []
 
         singleTapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(didSingleTapWith(gestureRecognizer:)))
         panGestureRecognizer = UIPanGestureRecognizer(target: self, action: #selector(didPanWith(gestureRecognizer:)))
@@ -121,15 +126,10 @@ class NCViewerMediaPage: UIViewController {
         NotificationCenter.default.addObserver(self, selector: #selector(applicationDidBecomeActive(_:)), name: UIApplication.didBecomeActiveNotification, object: nil)
 
         if currentViewController.metadata.isImage {
-            items.append(imageDetailNavigationItem)
+            navigationItem.rightBarButtonItems = [moreNavigationItem, imageDetailNavigationItem]
+        } else {
+            navigationItem.rightBarButtonItems = [moreNavigationItem]
         }
-        items.append(moreNavigationItem)
-
-        let group = UIBarButtonItemGroup(
-            barButtonItems: items,
-            representativeItem: nil
-        )
-        navigationItem.trailingItemGroups = [group]
 
         for view in self.pageViewController.view.subviews {
             if let scrollView = view as? UIScrollView {
@@ -162,6 +162,9 @@ class NCViewerMediaPage: UIViewController {
 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+
+        // Re-evaluate in-app messages after viewDidAppear
+        MoEngageAnalytics.shared.displayInAppNotificationSafely(reason: "viewDidAppear")
 
         Task {
             await NCNetworking.shared.transferDispatcher.addDelegate(self)
@@ -249,10 +252,12 @@ class NCViewerMediaPage: UIViewController {
                 navigationController?.setNavigationBarAppearance(textColor: .white, backgroundColor: .black)
                 currentViewController.playerToolBar?.show()
                 view.backgroundColor = .black
+                textColor = .white
                 moreNavigationItem.image = NCImageCache.shared.getImageButtonMore(colors: [.white])
             } else {
                 navigationController?.setNavigationBarAppearance()
                 view.backgroundColor = .systemBackground
+                textColor = NCBrandColor.shared.textColor
                 moreNavigationItem.image = NCImageCache.shared.getImageButtonMore()
             }
 
@@ -267,6 +272,7 @@ class NCViewerMediaPage: UIViewController {
             }
 
             view.backgroundColor = .black
+            textColor = .white
         }
 
         if fullscreen {
@@ -421,23 +427,14 @@ extension NCViewerMediaPage: UIPageViewControllerDelegate, UIPageViewControllerD
     // START TRANSITION
     func pageViewController(_ pageViewController: UIPageViewController, willTransitionTo pendingViewControllers: [UIViewController]) {
 
-        guard let nextViewController = pendingViewControllers.first as? NCViewerMedia else {
-            return
-        }
-        var items: [UIBarButtonItem] = []
-
+        guard let nextViewController = pendingViewControllers.first as? NCViewerMedia else { return }
         nextIndex = nextViewController.index
 
         if nextViewController.metadata.isImage {
-            items.append(imageDetailNavigationItem)
+            navigationItem.rightBarButtonItems = [moreNavigationItem, imageDetailNavigationItem]
+        } else {
+            navigationItem.rightBarButtonItems = [moreNavigationItem]
         }
-        items.append(moreNavigationItem)
-
-        let group = UIBarButtonItemGroup(
-            barButtonItems: items,
-            representativeItem: nil
-        )
-        navigationItem.trailingItemGroups = [group]
 
         if nextViewController.detailView.isShown {
             changeScreenMode(mode: .normal)
@@ -630,13 +627,13 @@ extension NCViewerMediaPage: NCTransferDelegate {
                         ncplayer.openAVPlayer(url: url)
                     }
                 } else if metadata.isImage {
-                    await self.currentViewController.loadImage()
+                    self.currentViewController.loadImage()
                 }
             // UPLOAD
             case self.global.networkingStatusUploaded:
                 guard error == .success else { return }
                 if self.currentViewController.metadata.ocId == ocId {
-                    await self.currentViewController.loadImage()
+                    self.currentViewController.loadImage()
                 } else {
                     self.modifiedOcId.append(ocId)
                 }
