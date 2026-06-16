@@ -19,12 +19,13 @@ class NCIntroViewController: UIViewController, UICollectionViewDataSource, UICol
     var controller: NCMainTabBarController?
 
     private let appDelegate = (UIApplication.shared.delegate as? AppDelegate)!
+//    private let titles = [NSLocalizedString("_intro_1_title_", comment: ""), NSLocalizedString("_intro_2_title_", comment: ""), NSLocalizedString("_intro_3_title_", comment: ""), NSLocalizedString("_intro_4_title_", comment: "")]
+//    private var images = [UIImage(named: "intro1"), UIImage(named: "intro2"), UIImage(named: "intro3"), UIImage(named: "intro4")]
     private let titles = [NSLocalizedString("", comment: ""), NSLocalizedString("", comment: ""), NSLocalizedString("", comment: "")]
     private var images: [UIImage?] = []
     private var timer: Timer?
     private var textColor: UIColor = .white
     private var textColorOpponent: UIColor = .black
-    private var activeLoginProvider: NCLoginProvider?
     private let imagesLandscape = [UIImage(named: "introSlideLand1"), UIImage(named: "introSlideLand2"), UIImage(named: "introSlideLand3")]
     private let imagesPortrait = [UIImage(named: "introSlide1"), UIImage(named: "introSlide2"), UIImage(named: "introSlide3")]
     private let imagesEightPortrait = [UIImage(named: "introSlideEight1"), UIImage(named: "introSlideEight2"), UIImage(named: "introSlideEight3")]
@@ -185,6 +186,10 @@ class NCIntroViewController: UIViewController, UICollectionViewDataSource, UICol
     }
 
     @IBAction func login(_ sender: Any) {
+//        if let viewController = UIStoryboard(name: "NCLogin", bundle: nil).instantiateViewController(withIdentifier: "NCLogin") as? NCLogin {
+//            viewController.controller = self.controller
+//            self.navigationController?.pushViewController(viewController, animated: true)
+//        }
         if NCBrandOptions.shared.use_AppConfig {
             if let viewController = UIStoryboard(name: "NCLogin", bundle: nil).instantiateViewController(withIdentifier: "NCLogin") as? NCLogin {
                 viewController.controller = self.controller
@@ -200,17 +205,11 @@ class NCIntroViewController: UIViewController, UICollectionViewDataSource, UICol
     }
 
     @IBAction func signupWithProvider(_ sender: Any) {
-        let loginProvider = NCLoginProvider()
-        loginProvider.controller = self.controller
-        loginProvider.initialURLString = NCBrandOptions.shared.linkloginPreferredProviders
-        loginProvider.presentingViewController = self
-        loginProvider.startAuthentication()
-        self.activeLoginProvider = loginProvider
-//        if let viewController = UIStoryboard(name: "NCLogin", bundle: nil).instantiateViewController(withIdentifier: "NCLoginProvider") as? NCLoginProvider {
-//            viewController.controller = self.controller
-//            viewController.initialURLString = NCBrandOptions.shared.linkloginPreferredProviders
-//            self.navigationController?.pushViewController(viewController, animated: true)
-//        }
+        if let viewController = UIStoryboard(name: "NCLogin", bundle: nil).instantiateViewController(withIdentifier: "NCLoginProvider") as? NCLoginProvider {
+            viewController.controller = self.controller
+            viewController.initialURLString = NCBrandOptions.shared.linkloginPreferredProviders
+            self.navigationController?.pushViewController(viewController, animated: true)
+        }
     }
 
     @IBAction func host(_ sender: Any) {
