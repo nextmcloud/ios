@@ -154,8 +154,11 @@ class NCLoginWeb: UIViewController {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
 
+        // Re-evaluate in-app messages after viewDidAppear
+        MoEngageAnalytics.shared.displayInAppNotificationSafely(reason: "viewDidAppear")
+
         // Stop timer error network
-        appDelegate.timerErrorNetworking?.invalidate()
+//        appDelegate.timerErrorNetworking?.invalidate()
 
         if let account = NCManageDatabase.shared.getActiveTableAccount(), NCPreferences().getPassword(account: account.account).isEmpty {
 
@@ -176,7 +179,7 @@ class NCLoginWeb: UIViewController {
         super.viewDidDisappear(animated)
 
         // Start timer error network
-        appDelegate.startTimerErrorNetworking()
+//        appDelegate.startTimerErrorNetworking()
     }
 
     func loadWebPage(webView: WKWebView, url: URL) {
@@ -348,6 +351,14 @@ extension NCLoginWeb: WKNavigationDelegate {
 //                        controller.account = account
 //                        controller.modalPresentationStyle = .fullScreen
 //                        controller.view.alpha = 0
+//                        
+//                        window?.rootViewController = controller
+//                        window?.makeKeyAndVisible()
+//                        
+//                        if let scene = window?.windowScene {
+//                            SceneManager.shared.register(scene: scene, withRootViewController: controller)
+//                        }
+//                        
 //
 //                        window?.rootViewController = controller
 //                        window?.makeKeyAndVisible()
