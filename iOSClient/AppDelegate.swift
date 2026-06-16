@@ -13,6 +13,7 @@ import Queuer
 import EasyTipView
 import SwiftUI
 import RealmSwift
+import MoEngageInApps
 
 class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterDelegate {
     var backgroundSessionCompletionHandler: (() -> Void)?
@@ -35,6 +36,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
 
     var bgTask: UIBackgroundTaskIdentifier = .invalid
     var pushSubscriptionTask: Task<Void, Never>?
+
+    let database = NCManageDatabase.shared
+
     var window: UIWindow?
     var sceneIdentifier: String = ""
     var activeViewController: UIViewController?
@@ -44,7 +48,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     var userId: String = ""
     var password: String = ""
     var timerErrorNetworking: Timer?
-    
+    var tipView: EasyTipView?
+
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         if isUiTestingEnabled {
             Task {
@@ -68,11 +73,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
 
         UserDefaults.standard.register(defaults: ["UserAgent": userAgent])
 
-        if !NCPreferences().disableCrashservice, !NCBrandOptions.shared.disable_crash_service {
-            FirebaseApp.configure()
-        }
+//        #if !DEBUG
+//        if !NCPreferences().disableCrashservice, !NCBrandOptions.shared.disable_crash_service {
+//            FirebaseApp.configure()
+//        }
+//        #endif
 
         NCBrandColor.shared.createUserColors()
+        NCImageCache.shared.createImagesCache()
 
         // Setup Networking
         //
@@ -110,6 +118,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         review.showStoreReview()
 #endif
 
+        // BACKGROUND TASK
+        //
         BGTaskScheduler.shared.register(forTaskWithIdentifier: global.refreshTask, using: backgroundQueue) { task in
             guard let appRefreshTask = task as? BGAppRefreshTask else {
                 task.setTaskCompleted(success: false)
@@ -131,18 +141,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         if NCBrandOptions.shared.enforce_passcode_lock {
             NCPreferences().requestPasscodeAtStart = true
         }
-        
-//        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene {
-//            for window in windowScene.windows {
-//                let imageViews = window.allImageViews()
-//                // Do something with the imageViews
-//                for imageView in imageViews {
-//                    print("Found image view: \(imageView)")
-//                    imageView.tintColor = UITraitCollection.current.userInterfaceStyle == .dark  ? .white : .black
-//                }
-//            }
-//        }
 
+        adjust.configAdjust()
+        adjust.subsessionStart()
+        TealiumHelper.shared.start()
+        FirebaseApp.configure()
+        
+        // Initialize MoEngage early in app lifecycle
+        MoEngageAnalytics.setupIfNeeded()
+                
         return true
     }
 
@@ -223,12 +230,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
                 task.setTaskCompleted(success: true)
             }
 
-            guard let tblAccount = await NCManageDatabase.shared.getActiveTableAccountAsync() else {
-                nkLog(tag: self.global.logTagTask, emoji: .info, message: "No active account or background task already running")
-                return
-            }
-
-            await backgroundSync(tblAccount: tblAccount, task: task)
+            await backgroundSync(task: task)
         }
     }
 
@@ -309,12 +311,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
             guard !expired else { return }
 
             let err = await NCNetworking.shared.createFolderForAutoUpload(
-                serverUrlFileName: meta.serverUrlFileName,
-                account: meta.account
+                serverUrlFileName: metadata.serverUrlFileName,
+                account: metadata.account
             )
             // Fail-fast: abort the whole sync on first failure
             if err != .success {
-                nkLog(tag: self.global.logTagBgSync, emoji: .error, message: "Create folder '\(meta.serverUrlFileName)' failed: \(err.errorCode) – aborting sync")
+                nkLog(tag: self.global.logTagBgSync, emoji: .error, message: "Create folder '\(metadata.serverUrlFileName)' failed: \(err.errorCode) – aborting sync")
                 return
             }
         }
@@ -397,11 +399,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     }
 
     func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
-        guard !isXcodeRunningForPreviews,
-              application.applicationState != .background else {
-            return
-        }
-
         if let deviceToken = NCPushNotificationEncryption.shared().string(withDeviceToken: deviceToken) {
             NCPreferences().deviceTokenPushNotification = deviceToken
             pushSubscriptionTask = Task.detached {
@@ -412,7 +409,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
                     return
                 }
 
-                try? await Task.sleep(for: .seconds(1))
+                try? await Task.sleep(nanoseconds: 1_000_000_000)
 
                 let tblAccounts = await NCManageDatabase.shared.getAllTableAccountAsync()
                 for tblAccount in tblAccounts {
@@ -429,6 +426,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     }
 
     func nextcloudPushNotificationAction(data: [String: AnyObject]) {
+        guard let data = NCApplicationHandle().nextcloudPushNotificationAction(data: data)
+        else {
+            return
+        }
         let account = data["account"] as? String ?? "unavailable"
         let app = data["app"] as? String
 
@@ -436,7 +437,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
             if app == NCGlobal.shared.termsOfServiceName {
                 Task {
                     await NCNetworking.shared.transferDispatcher.notifyAllDelegatesAsync { delegate in
-                        try? await Task.sleep(for: .seconds(0.5))
+                        try? await Task.sleep(nanoseconds: 500_000_000)
                         delegate.transferReloadDataSource(serverUrl: nil, requestData: true, status: nil)
                     }
                 }
@@ -459,18 +460,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
                 openNotification(controller: controller)
             }
         } else {
-            let message = String(
-                format: NSLocalizedString("account_does_not_exist", comment: ""),
-                account
-            )
-
+            let message = NSLocalizedString("_the_account_", comment: "") + " " + account + " " + NSLocalizedString("_does_not_exist_", comment: "")
             let alertController = UIAlertController(title: NSLocalizedString("_info_", comment: ""), message: message, preferredStyle: .alert)
             alertController.addAction(UIAlertAction(title: NSLocalizedString("_ok_", comment: ""), style: .default, handler: { _ in }))
             UIApplication.shared.mainAppWindow?.rootViewController?.present(alertController, animated: true, completion: { })
         }
     }
 
-    // MARK: - Trust Certificate Error
+    // MARK: -
 
     func trustCertificateError(host: String) {
         guard let activeTblAccount = NCManageDatabase.shared.getActiveTableAccount(),
@@ -499,11 +496,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
                let viewController = navigationController.topViewController as? NCViewCertificateDetails {
                 viewController.delegate = self
                 viewController.host = host
-                UIApplication.shared.firstWindow?.rootViewController?.present(navigationController, animated: true)
+                UIApplication.shared.mainAppWindow?.rootViewController?.present(navigationController, animated: true)
             }
         }))
 
-        UIApplication.shared.firstWindow?.rootViewController?.present(alertController, animated: true)
+        UIApplication.shared.mainAppWindow?.rootViewController?.present(alertController, animated: true)
     }
 
     // MARK: - Reset Application
@@ -680,90 +677,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         guard !account.isEmpty, NCKeychain().getPassword(account: account).isEmpty else { return }
         openLogin(viewController: window?.rootViewController, selector: NCGlobal.shared.introLogin, openLoginWeb: true)
     }
-    
-    // MARK: -
-
-    func trustCertificateError(host: String) {
-        guard let activeTblAccount = NCManageDatabase.shared.getActiveTableAccount(),
-              let currentHost = URL(string: activeTblAccount.urlBase)?.host,
-              let pushNotificationServerProxyHost = URL(string: NCBrandOptions.shared.pushNotificationServerProxy)?.host,
-              host != pushNotificationServerProxyHost,
-              host == currentHost
-        else { return }
-        let certificateHostSavedPath = NCUtilityFileSystem().directoryCertificates + "/" + host + ".der"
-        var title = NSLocalizedString("_ssl_certificate_changed_", comment: "")
-
-        if !FileManager.default.fileExists(atPath: certificateHostSavedPath) {
-            title = NSLocalizedString("_connect_server_anyway_", comment: "")
-        }
-
-        let alertController = UIAlertController(title: title, message: NSLocalizedString("_server_is_trusted_", comment: ""), preferredStyle: .alert)
-
-        alertController.addAction(UIAlertAction(title: NSLocalizedString("_yes_", comment: ""), style: .default, handler: { _ in
-            NCNetworking.shared.writeCertificate(host: host)
-        }))
-
-        alertController.addAction(UIAlertAction(title: NSLocalizedString("_no_", comment: ""), style: .default, handler: { _ in }))
-
-        alertController.addAction(UIAlertAction(title: NSLocalizedString("_certificate_details_", comment: ""), style: .default, handler: { _ in
-            if let navigationController = UIStoryboard(name: "NCViewCertificateDetails", bundle: nil).instantiateInitialViewController() as? UINavigationController,
-               let viewController = navigationController.topViewController as? NCViewCertificateDetails {
-                viewController.delegate = self
-                viewController.host = host
-                UIApplication.shared.mainAppWindow?.rootViewController?.present(navigationController, animated: true)
-            }
-        }))
-
-        UIApplication.shared.mainAppWindow?.rootViewController?.present(alertController, animated: true)
-    }
-    
-    // MARK: - Account
-
-    @objc func changeAccount(_ account: String, userProfile: NKUserProfile?) {
-//        NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterChangeUser)
-    }
-
-    @objc func deleteAccount(_ account: String, wipe: Bool) {
-        NCAccount().deleteAccount(account, wipe: wipe)
-    }
-
-    func deleteAllAccounts() {
-        let accounts = NCManageDatabase.shared.getAccounts()
-        accounts?.forEach({ account in
-            deleteAccount(account, wipe: true)
-        })
-    }
-
-    func updateShareAccounts() -> Error? {
-        return NCAccount().updateAppsShareAccounts()
-    }
-
-    // MARK: - Reset Application
-
-    @objc func resetApplication() {
-        let utilityFileSystem = NCUtilityFileSystem()
-
-        NCNetworking.shared.cancelAllTask()
-
-        URLCache.shared.removeAllCachedResponses()
-
-        utilityFileSystem.removeGroupDirectoryProviderStorage()
-        utilityFileSystem.removeGroupApplicationSupport()
-        utilityFileSystem.removeDocumentsDirectory()
-        utilityFileSystem.removeTemporaryDirectory()
-
-        NCPreferences().removeAll()
-//        NCKeychain().removeAll()
-//        NCNetworking.shared.removeAllKeyUserDefaultsData(account: nil)
-
-        exit(0)
-    }
-
-    // MARK: - Universal Links
-
-    func application(_ application: UIApplication, continue userActivity: NSUserActivity, restorationHandler: @escaping ([UIUserActivityRestoring]?) -> Void) -> Bool {
-        return false
-    }
 }
 
 // MARK: - Extension
@@ -783,3 +696,11 @@ extension AppDelegate: NCCreateFormUploadConflictDelegate {
         }
     }
 }
+
+//MARK: NMC Customisation
+extension AppDelegate {
+    func application(_ application: UIApplication, supportedInterfaceOrientationsFor window: UIWindow?) -> UIInterfaceOrientationMask {
+        return self.orientationLock
+    }
+}
+
