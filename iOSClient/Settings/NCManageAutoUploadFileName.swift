@@ -130,6 +130,10 @@ class NCManageAutoUploadFileName: XLFormViewController {
 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+        
+        // Re-evaluate in-app messages after viewDidAppear
+        MoEngageAnalytics.shared.displayInAppNotificationSafely(reason: "viewDidAppear")
+
         appDelegate.activeViewController = self
     }
 
