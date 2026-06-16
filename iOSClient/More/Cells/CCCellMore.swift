@@ -1,5 +1,5 @@
 //
-//  NCMoreUserCell.swift
+//  CCCellMore.swift
 //  Nextcloud
 //
 //  Created by Milen on 14.06.23.
@@ -22,23 +22,13 @@
 //
 
 import Foundation
-import MarqueeLabel
+import UIKit
 
-class NCMoreUserCell: BaseNCMoreCell {
-    @IBOutlet weak var displayName: UILabel!
-    @IBOutlet weak var avatar: UIImageView!
-    @IBOutlet weak var icon: UIImageView!
-    @IBOutlet weak var status: MarqueeLabel!
+class CCCellMore: BaseNCMoreCell {
+    @IBOutlet weak var labelText: UILabel!
+    @IBOutlet weak var imageIcon: UIImageView!
+    @IBOutlet weak var separator: UIView!
+    @IBOutlet weak var separatorHeigth: NSLayoutConstraint!
 
-    static let reuseIdentifier = "NCMoreUserCell"
-
-    static func fromNib() -> UINib {
-        return UINib(nibName: "NCMoreUserCell", bundle: nil)
-    }
-
-    override func awakeFromNib() {
-        super.awakeFromNib()
-
-        icon.makeCircularBackground(withColor: .systemBackground)
-    }
+    static let reuseIdentifier = "CCCellMore"
 }
