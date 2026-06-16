@@ -4,7 +4,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 import UIKit
-import UniformTypeIdentifiers
 import NextcloudKit
 import LucidBanner
 import SwiftUI
@@ -45,30 +44,15 @@ class NCShareExtension: UIViewController {
     var progress: CGFloat = 0
     var counterUploaded: Int = 0
     var uploadMetadata: [tableMetadata] = []
-    let hud = NCHud()
     let utilityFileSystem = NCUtilityFileSystem()
     let utility = NCUtility()
     let global = NCGlobal.shared
     var maintenanceMode: Bool = false
     var token: Int?
-    var banner: LucidBanner?
     var sceneIdentifier: String = UUID().uuidString
     private var isPresentingNoAccountAlert = false
+    var banner: LucidBanner?
 
-    let database = NCManageDatabase.shared
-    var account: String = ""
-    var session: NCSession.Session {
-        if !account.isEmpty,
-           let tableAccount = self.database.getTableAccount(account: account) {
-            return NCSession.Session(account: tableAccount.account, urlBase: tableAccount.urlBase, user: tableAccount.user, userId: tableAccount.userId)
-        } else if let activeTableAccount = self.database.getActiveTableAccount() {
-            self.account = activeTableAccount.account
-            return NCSession.Session(account: activeTableAccount.account, urlBase: activeTableAccount.urlBase, user: activeTableAccount.user, userId: activeTableAccount.userId)
-        } else {
-            return NCSession.Session(account: "", urlBase: "", user: "", userId: "")
-        }
-    }
-    
     // MARK: - View Life Cycle
 
     override func viewDidLoad() {
@@ -98,7 +82,7 @@ class NCShareExtension: UIViewController {
         uploadView.layer.cornerRadius = 10
 
         uploadLabel.text = NSLocalizedString("_upload_", comment: "")
-        uploadLabel.textColor = .systemBlue
+        uploadLabel.textColor = NCBrandColor.shared.label
         let uploadGesture = UITapGestureRecognizer(target: self, action: #selector(actionUpload(_:)))
         uploadView.addGestureRecognizer(uploadGesture)
 
@@ -111,13 +95,6 @@ class NCShareExtension: UIViewController {
         nkLog(start: "Start Share session " + versionNextcloudiOS)
 
         NCBrandColor.shared.createUserColors()
-
-        registerForTraitChanges([UITraitUserInterfaceStyle.self]) { (self: Self, _) in
-            guard !self.maintenanceMode else {
-                return
-            }
-            self.updateAppearance()
-        }
 
         NotificationCenter.default.addObserver(forName: UIApplication.willEnterForegroundNotification, object: nil, queue: nil) { _ in
             guard !self.maintenanceMode,
@@ -147,13 +124,10 @@ class NCShareExtension: UIViewController {
         }
 
         NCNetworking.shared.setupScene(sceneIdentifier: sceneIdentifier, controller: self)
-
+        
         if let windowScene = view.window?.windowScene {
             banner = LucidBannerRegistry.shared.banner(for: windowScene)
         }
-        NCImageCache.shared.createImagesCache()
-
-        NotificationCenter.default.addObserver(self, selector: #selector(didCreateFolder(_:)), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterCreateFolder), object: nil)
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -191,6 +165,14 @@ class NCShareExtension: UIViewController {
 
             self.collectionView.reloadData()
         }
+
+        if NCPreferences().presentPasscode {
+            NCPasscode.shared.presentPasscode(viewController: self, delegate: self) {
+                NCPasscode.shared.enableTouchFaceID()
+            }
+        }
+
+        self.collectionView.reloadData()
     }
 
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
@@ -201,9 +183,13 @@ class NCShareExtension: UIViewController {
         }
     }
 
-    private func updateAppearance() {
-        collectionView.visibleCells.forEach { $0.setNeedsLayout() }
-        tableView.visibleCells.forEach { $0.setNeedsLayout() }
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+
+        if !maintenanceMode {
+            collectionView.reloadData()
+            tableView.reloadData()
+        }
     }
 
     private func validateAccount() -> Bool {
@@ -279,7 +265,7 @@ class NCShareExtension: UIViewController {
         if let error {
             extensionContext?.cancelRequest(withError: error)
         } else {
-            extensionContext?.completeRequest(returningItems: extensionContext?.inputItems, completionHandler: nil)
+            self.extensionContext?.completeRequest(returningItems: self.extensionContext?.inputItems, completionHandler: nil)
         }
     }
 
@@ -303,11 +289,11 @@ class NCShareExtension: UIViewController {
 
         // BACK BUTTON
         let backButton = UIButton(type: .custom)
-        backButton.setImage(UIImage(named: "back"), for: .normal)
-        backButton.tintColor = .systemBlue
+        backButton.setImage(UIImage(named: "back")?.withTintColor(NCBrandColor.shared.iconImageColor), for: .normal)
+        backButton.tintColor = NCBrandColor.shared.label
         backButton.semanticContentAttribute = .forceLeftToRight
         backButton.setTitle(" " + NSLocalizedString("_back_", comment: ""), for: .normal)
-        backButton.setTitleColor(.systemBlue, for: .normal)
+        backButton.setTitleColor(NCBrandColor.shared.label, for: .normal)
         backButton.action(for: .touchUpInside) { _ in
             while self.serverUrl.last != "/" { self.serverUrl.removeLast() }
             self.serverUrl.removeLast()
@@ -321,34 +307,8 @@ class NCShareExtension: UIViewController {
             self.setNavigationBar(navigationTitle: navigationTitle)
         }
 
-        let image = utility.loadUserImage(for: tblAccount.user, displayName: tblAccount.displayName, urlBase: tblAccount.urlBase)
-        let profileButton = UIButton(type: .custom)
-        profileButton.setImage(image, for: .normal)
-
-        if serverUrl == utilityFileSystem.getHomeServer(session: session) {
-            var title = "  "
-            if !tblAccount.alias.isEmpty {
-                title += tblAccount.alias
-            } else {
-                title += tblAccount.displayName
-            }
-
-            profileButton.setTitle(title, for: .normal)
-            profileButton.setTitleColor(.systemBlue, for: .normal)
-        }
-
-        profileButton.semanticContentAttribute = .forceLeftToRight
-        profileButton.sizeToFit()
-        profileButton.action(for: .touchUpInside) { _ in
-            self.showAccountPicker()
-        }
-        var navItems = [UIBarButtonItem(customView: profileButton)]
-        if serverUrl != utilityFileSystem.getHomeServer(session: session) {
-            let space = UIBarButtonItem(barButtonSystemItem: .fixedSpace, target: nil, action: nil)
-            space.width = 20
-            navItems.append(contentsOf: [UIBarButtonItem(customView: backButton), space])
-        }
-        navigationItem.setLeftBarButtonItems(navItems, animated: true)
+//        navigationItem.setLeftBarButtonItems(navItems, animated: true)
+        navigationItem.setLeftBarButtonItems([UIBarButtonItem(customView: backButton)], animated: true)
     }
 
     func setCommandView() {
@@ -377,7 +337,7 @@ class NCShareExtension: UIViewController {
         guard let capabilities = NCNetworking.shared.capabilities[session.account] else {
             return
         }
-        let alertController = UIAlertController.createFolderWith(serverUrl: serverUrl, session: session, capabilities: capabilities) { error in
+        let alertController = UIAlertController.createFolder(serverUrl: serverUrl, session: session, capabilities: capabilities, scene: self.view.window?.windowScene) { error in
             if error == .success {
                 Task {
                     await self.loadFolder()
@@ -480,8 +440,14 @@ extension NCShareExtension {
         guard let window = self.view.window else {
             return
         }
+        let horizontalLayout = horizontalLayoutBanner(bounds: window.bounds,
+                                                      safeAreaInsets: window.safeAreaInsets,
+                                                      idiom: window.traitCollection.userInterfaceIdiom)
+
         let payload = LucidBannerPayload(stage: .button,
+                                         backgroundColor: Color(.systemBackground),
                                          vPosition: .center,
+                                         horizontalLayout: horizontalLayout,
                                          blocksTouches: true)
         (banner, token) = showUploadBanner(windowScene: window.windowScene,
                                            payload: payload,
@@ -511,10 +477,11 @@ extension NCShareExtension {
             banner?.update(payload: LucidBannerPayload.Update(subtitle: error?.errorDescription, stage: .error), for: self.token)
         }
 
-        Task { @MainActor in
-            try? await Task.sleep(for: .seconds(2))
-            banner?.dismiss()
-            extensionContext?.completeRequest(returningItems: extensionContext?.inputItems, completionHandler: nil)
+        if let banner, let token {
+            Task { @MainActor in
+                try? await Task.sleep(for: .seconds(2))
+                banner.dismiss()
+            }
         }
     }
 
