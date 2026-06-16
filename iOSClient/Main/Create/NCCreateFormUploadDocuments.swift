@@ -28,10 +28,6 @@ import XLForm
 // MARK: -
 
 @objc class NCCreateFormUploadDocuments: XLFormViewController, NCSelectDelegate, UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout, NCCreateFormUploadConflictDelegate {
-    func dismissSelect(serverUrl: String?, metadata: tableMetadata?, type: String, items: [Any], overwrite: Bool, copy: Bool, move: Bool, session: NCSession.Session) {
-        
-    }
-    
 
     @IBOutlet weak var indicator: UIActivityIndicatorView!
     @IBOutlet weak var collectionView: UICollectionView!
@@ -233,7 +229,7 @@ import XLForm
 
     // MARK: - Action
 
-    func dismissSelect(serverUrl: String?, metadata: tableMetadata?, type: String, items: [Any], overwrite: Bool, copy: Bool, move: Bool) {
+    func dismissSelect(serverUrl: String?, metadata: tableMetadata?, type: String, items: [Any], overwrite: Bool, copy: Bool, move: Bool, session: NCSession.Session) {
 
         guard let serverUrl = serverUrl else { return }
 
@@ -300,8 +296,10 @@ import XLForm
             // Trim whitespaces and newlines
             fileNameForm = fileNameForm.trimmingCharacters(in: .whitespacesAndNewlines)
             
-            let fileAutoRenamer = FileAutoRenamer()
-            fileName = fileAutoRenamer.rename(filename: fileNameForm, isFolderPath: true)
+//            let fileAutoRenamer = FileAutoRenamer()
+            let session = NCSession.shared.getSession(controller: self.controller)
+            let capabilities = await NKCapabilities.shared.getCapabilities(for: session.account)
+            fileName = FileAutoRenamer.rename(fileNameForm, isFolderPath: true, capabilities: capabilities) 
 
             let result = await NKTypeIdentifiers.shared.getInternalType(fileName: fileNameForm, mimeType: "", directory: false, account: session.account)
             
@@ -331,7 +329,7 @@ import XLForm
                 
             } else {
                 
-                let fileNamePath = utilityFileSystem.getFileNamePath(String(describing: fileNameForm), serverUrl: serverUrl, session: session)
+                let fileNamePath = utilityFileSystem.getRelativeFilePath(String(describing: fileNameForm), serverUrl: serverUrl, session: session)
                 await NCCreateDocument().createDocument(controller: controller, fileNamePath: fileNamePath, fileName: String(describing: fileNameForm), fileNameExtension: self.fileNameExtension, editorId: editorId, creatorId: creatorId, templateId: templateIdentifier, account: session.account)
                 
             }
@@ -342,7 +340,7 @@ import XLForm
 
         if let metadatas, metadatas.count > 0 {
             let fileName = metadatas[0].fileName
-            let fileNamePath = utilityFileSystem.getFileNamePath(fileName, serverUrl: serverUrl, session: session)
+            let fileNamePath = utilityFileSystem.getRelativeFilePath(fileName, serverUrl: serverUrl, session: session)
 //            createDocument(fileNamePath: fileNamePath, fileName: fileName)
             Task {
                 await NCCreateDocument().createDocument(controller: controller, fileNamePath: fileNamePath, fileName: String(describing: fileName), editorId: editorId, creatorId: creatorId, templateId: templateIdentifier, account: session.account)
@@ -382,12 +380,15 @@ import XLForm
                 guard results.error == .success, let url = results.url else {
                     return NCContentPresenter().showError(error: results.error)
                 }
-                let metadata = await NCManageDatabase.shared.createMetadataAsync(fileName: fileName,
-                                                                                 ocId: UUID,
-                                                                                 serverUrl: serverUrl,
-                                                                                 url: url,
-                                                                                 session: session,
-                                                                                 sceneIdentifier: controller.sceneIdentifier)
+                let metadata = await NCManageDatabaseCreateMetadata().createMetadataAsync(
+                    fileName: fileName,
+                    ocId: UUID,
+                    serverUrl: serverUrl,
+                    url: url,
+                    session: session,
+                    sceneIdentifier: controller.sceneIdentifier)
+
+                AnalyticsHelper.shared.trackCreateFile(metadata: metadata)
                 if let vc = await NCViewer().getViewerController(metadata: metadata, delegate: controller) {
                     controller.navigationController?.pushViewController(vc, animated: true)
                 }
@@ -409,13 +410,14 @@ import XLForm
                     return NCContentPresenter().showError(error: results.error)
                 }
                 
-                let metadata = await NCManageDatabase.shared.createMetadataAsync(fileName: fileName,
-                                                                                 ocId: UUID,
-                                                                                 serverUrl: serverUrl,
-                                                                                 url: url,
-                                                                                 session: session,
-                                                                                 sceneIdentifier: controller.sceneIdentifier)
-                
+                let metadata = await NCManageDatabaseCreateMetadata().createMetadataAsync(
+                    fileName: fileName,
+                    ocId: UUID,
+                    serverUrl: serverUrl,
+                    url: url,
+                    session: session,
+                    sceneIdentifier: controller.sceneIdentifier)
+
                 if let vc = await NCViewer().getViewerController(metadata: metadata, delegate: controller) {
                     controller.navigationController?.pushViewController(vc, animated: true)
                 }
