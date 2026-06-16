@@ -40,8 +40,8 @@ class NCAudioRecorderViewController: UIViewController, NCAudioRecorderDelegate {
 
         view.backgroundColor = .clear
         contentContainerView.backgroundColor = UIColor.lightGray
-        voiceRecordHUD.fillColor = NCBrandColor.shared.progressColorGreen60
-        
+        voiceRecordHUD.fillColor = UIColor.green
+
         Task {
             self.fileName = NCUtilityFileSystem().createFileNameDate(NSLocalizedString("_voice_memo_filename_", comment: ""), ext: "m4a")
             recording = NCAudioRecorder(to: self.fileName)
@@ -69,8 +69,13 @@ class NCAudioRecorderViewController: UIViewController, NCAudioRecorderDelegate {
         if recording.state == .record {
             recording.stop()
             voiceRecordHUD.update(0.0)
-            dismiss(animated: true) {
-                self.uploadMetadata()
+            dismiss(animated: true) { [self] in
+                guard let navigationController = UIStoryboard(name: "NCCreateFormUploadVoiceNote", bundle: nil).instantiateInitialViewController() as? UINavigationController,
+                      let viewController = navigationController.topViewController as? NCCreateFormUploadVoiceNote else { return }
+                navigationController.modalPresentationStyle = .formSheet
+                viewController.setup(serverUrl: controller.currentServerUrl(), fileNamePath: NSTemporaryDirectory() + self.fileName, fileName: self.fileName)
+                viewController.controller = controller
+                UIApplication.shared.firstWindow?.rootViewController?.present(navigationController, animated: true)
             }
         } else {
             do {
@@ -124,7 +129,7 @@ class NCAudioRecorderViewController: UIViewController, NCAudioRecorderDelegate {
         }
 
         voiceRecordHUD.update(CGFloat(rate))
-        voiceRecordHUD.fillColor = NCBrandColor.shared.progressColorGreen60
+        voiceRecordHUD.fillColor = UIColor.green
 
         let formatter = DateComponentsFormatter()
         formatter.allowedUnits = [.second]
