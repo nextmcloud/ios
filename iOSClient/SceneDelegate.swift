@@ -6,14 +6,12 @@ import Foundation
 import UIKit
 import NextcloudKit
 import WidgetKit
+import SwiftEntryKit
 import SwiftUI
 import CoreLocation
-import LucidBanner
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     var window: UIWindow?
-    var lucidBanner: LucidBanner?
-
     private let appDelegate = UIApplication.shared.delegate as? AppDelegate
     private var privacyProtectionWindow: UIWindow?
     private let global = NCGlobal.shared
@@ -23,10 +21,11 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         guard let windowScene = (scene as? UIWindowScene) else {
             return
         }
+        // Ensure MoEngage is initialized for multi-scene setups
+//        MoEngageAnalytics.setupIfNeeded()
+
         let versionApp = NCUtility().getVersionMaintenance()
         var lastVersion: String?
-
-        lucidBanner = LucidBannerRegistry.shared.banner(for: windowScene)
 
         if let groupDefaults = UserDefaults(suiteName: NCBrandOptions.shared.capabilitiesGroup) {
             lastVersion = groupDefaults.string(forKey: NCGlobal.shared.udLastVersion)
@@ -68,6 +67,13 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         } else {
             self.startNextcloud(scene: scene, withActivateSceneForAccount: false)
         }
+        
+//        if let tabBarController = window?.rootViewController as? UITabBarController {
+//           if #available(iOS 18.0, *) {
+//               // Forces the "Compact" (iPhone) size class so the tab bar stays at the bottom
+//               tabBarController.traitOverrides.horizontalSizeClass = .compact
+//           }
+//       }
     }
 
     private func startNextcloud(scene: UIScene, withActivateSceneForAccount activateSceneForAccount: Bool) {
@@ -114,7 +120,11 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             NCPreferences().removeAll()
 
             if let bundleID = Bundle.main.bundleIdentifier {
+                let lastUpdateCheckDate = UserDefaults.standard.object(forKey: AppUpdaterKey.lastUpdateCheckDate)
                 UserDefaults.standard.removePersistentDomain(forName: bundleID)
+                if lastUpdateCheckDate != nil {
+                    UserDefaults.standard.setValue(lastUpdateCheckDate, forKey: AppUpdaterKey.lastUpdateCheckDate)
+                }
             }
 
             if NCBrandOptions.shared.disable_intro {
@@ -148,9 +158,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
                 NotificationCenter.default.postOnMainThread(name: self.global.notificationCenterChangeTheming, userInfo: ["account": activeTblAccount.account])
             }
 
-            // Start Networking Process
+            // Set up networking session
             await NCNetworkingProcess.shared.setCurrentAccount(activeTblAccount.account)
-            await NCNetworkingProcess.shared.startTimer(interval: NCNetworkingProcess.shared.maxInterval)
         }
 
         // Set up networking session for all configured accounts
@@ -185,6 +194,10 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             //
             window?.rootViewController = controller
             window?.makeKeyAndVisible()
+            // Re-evaluate in-app messages after main interface is visible
+//            Task { @MainActor in
+                MoEngageAnalytics.shared.displayInAppNotificationSafely(reason: "main interface launched")
+//            }
             //
             if activateSceneForAccount {
                 self.activateSceneForAccount(scene, account: activeTblAccount.account, controller: controller)
@@ -198,17 +211,12 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     }
 
     func sceneDidDisconnect(_ scene: UIScene) {
-        guard let windowScene = scene as? UIWindowScene else { return }
-
-        LucidBannerRegistry.shared.remove(for: windowScene)
-        lucidBanner = nil
-
         print("[DEBUG] Scene did disconnect")
     }
 
     func sceneWillEnterForeground(_ scene: UIScene) {
         hidePrivacyProtectionWindow()
-        
+
         if let rootHostingController = scene.rootHostingController() {
             if rootHostingController.anyRootView is Maintenance {
                 return
@@ -216,34 +224,36 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         }
         let session = SceneManager.shared.getSession(scene: scene)
         let controller = SceneManager.shared.getController(scene: scene)
-        
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-            Task {
-                if let tableAccount = await self.database.getTableAccountAsync(account: session.account) {
-                    let num = await NCAutoUpload.shared.initAutoUpload(tblAccount: tableAccount)
-                    nkLog(start: "Auto upload with \(num) photo")
-                }
-            }
-        }
-        AppUpdater().checkForUpdate()
-        
-        NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterRichdocumentGrabFocus)
+
         activateSceneForAccount(scene, account: session.account, controller: controller)
     }
 
     func sceneDidBecomeActive(_ scene: UIScene) {
-        hidePrivacyProtectionWindow()
+        
+        let session = SceneManager.shared.getSession(scene: scene)
+        let controller = SceneManager.shared.getController(scene: scene)
+        nkLog(info: "Scene did become active")
 
-        if !NextcloudKit.shared.isNetworkReachable(),
-           let windowScenee = SceneManager.shared.getWindow(scene: scene)?.windowScene {
-            Task {
-                await showWarningBanner(windowScene: windowScenee,
-                                        subtitle: "_network_not_available_",
-                                        systemImage: "wifi.exclamationmark.circle",
-                                        imageAnimation: .bounce,
-                                        errorCode: NSURLErrorNotConnectedToInternet)
-            }
+        let oldVersion = UserDefaults.standard.value(forKey: NCSettingsBundleHelper.SettingsBundleKeys.BuildVersionKey) as? String
+        AppUpdater().checkForUpdate()
+        AnalyticsHelper.shared.trackAppVersion(oldVersion: oldVersion)
+        if let userAccount = NCManageDatabase.shared.getActiveTableAccount() {
+            AnalyticsHelper.shared.trackUsedStorageData(quotaUsed: userAccount.quotaUsed)
         }
+
+        NCSettingsBundleHelper.setVersionAndBuildNumber()
+        NCSettingsBundleHelper.checkAndExecuteSettings(delay: 0.5)
+        
+        // Re-evaluate in-app messages when scene becomes active
+//        Task { @MainActor in
+            MoEngageAnalytics.shared.displayInAppNotificationSafely(reason: "scene did become active")
+//        }
+        
+//        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+//            MoEngageAnalytics.shared.requestAppStoreReview()
+//        }
+
+        hidePrivacyProtectionWindow()
     }
 
     func sceneWillResignActive(_ scene: UIScene) {
@@ -254,10 +264,14 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             return
         }
 
-        WidgetCenter.shared.reloadAllTimelines()
-
         if NCPreferences().privacyScreenEnabled {
-            showPrivacyProtectionWindow()
+            if SwiftEntryKit.isCurrentlyDisplaying {
+                SwiftEntryKit.dismiss {
+                    self.showPrivacyProtectionWindow()
+                }
+            } else {
+                showPrivacyProtectionWindow()
+            }
         }
     }
 
@@ -265,7 +279,6 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let app = UIApplication.shared
         var bgID: UIBackgroundTaskIdentifier = .invalid
         let isBackgroundRefreshStatus = (UIApplication.shared.backgroundRefreshStatus == .available)
-        // Must be outside the Task otherwise isSuspendingDatabaseOperation suspends it
         let session = SceneManager.shared.getSession(scene: scene)
         guard let tblAccount = NCManageDatabase.shared.getTableAccount(predicate: NSPredicate(format: "account == %@", session.account)) else {
             return
@@ -308,7 +321,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
                     return true
                 }
                 group.addTask {
-                    try? await Task.sleep(for: .seconds(25))
+                    try? await Task.sleep(nanoseconds: 25 * 1_000_000_000) // ~25s
                     return false
                 }
                 return await group.next() ?? false
@@ -334,51 +347,19 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             return
         }
 
-        func getMatchedAccount(user: String, url: String, account: String? = nil) async -> tableAccount? {
+        func getMatchedAccount(userId: String, url: String) async -> tableAccount? {
             let tblAccounts = await NCManageDatabase.shared.getAllTableAccountAsync()
 
             for tblAccount in tblAccounts {
-                let host = URL(string: tblAccount.urlBase)?.host() ?? ""
-
-                if (account == tblAccount.account) || (url.contains(host) && user == tblAccount.userId) {
+                let urlBase = URL(string: tblAccount.urlBase)
+                if url.contains(urlBase?.host ?? "") && userId == tblAccount.userId {
                     await NCAccount().changeAccount(tblAccount.account, userProfile: nil, controller: controller)
                     // wait switch account
-                    try? await Task.sleep(for: .seconds(1))
+                    try? await Task.sleep(nanoseconds: 1_000_000_000)
                     return tblAccount
                 }
             }
             return nil
-        }
-
-        /*
-         Example: nextcloud://assistant/shared-text
-         */
-
-        if scheme == global.appScheme, action == "assistant", url.path == "/shared-text" {
-            guard let text = NCAssistantSharedTextStore.loadAndClear() else {
-                return
-            }
-
-            Task { @MainActor in
-                let capabilities = await NKCapabilities.shared.getCapabilities(for: controller.account)
-                if capabilities.assistantEnabled {
-                    let inputModel = NCAssistantInputModel(initialText: text)
-                    let assistant = NCAssistant(assistantModel: NCAssistantModel(controller: controller, inputModel: inputModel), chatModel: NCAssistantChatModel(controller: controller, inputModel: inputModel), conversationsModel: NCAssistantChatConversationsModel(controller: controller))
-                    let hostingController = UIHostingController(rootView: assistant)
-                    controller.present(hostingController, animated: true, completion: nil)
-                } else {
-                    try? await Task.sleep(for: .seconds(1))
-                    await showBanner(windowScene: scene as? UIWindowScene,
-                                     title: "_info_",
-                                     subtitle: "_no_assistant_installed_",
-                                     systemImage: "sparkles",
-                                     imageAnimation: .none,
-                                     imageColor: .systemBlue
-                    )
-                }
-            }
-
-            return
         }
 
         /*
@@ -395,12 +376,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
                 }
 
                 Task {
-                    if await getMatchedAccount(user: userScheme, url: urlScheme) == nil {
-                        let message = String(
-                            format: NSLocalizedString("account_does_not_exist", comment: ""),
-                            userScheme,
-                        )
-
+                    if await getMatchedAccount(userId: userScheme, url: urlScheme) == nil {
+                        let message = NSLocalizedString("_the_account_", comment: "") + " " + userScheme + NSLocalizedString("_of_", comment: "") + " " + urlScheme + " " + NSLocalizedString("_does_not_exist_", comment: "")
                         let alertController = UIAlertController(title: NSLocalizedString("_info_", comment: ""), message: message, preferredStyle: .alert)
                         alertController.addAction(UIAlertAction(title: NSLocalizedString("_ok_", comment: ""), style: .default, handler: { _ in }))
 
@@ -452,42 +429,36 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
         else if scheme == self.global.appScheme && action == "open-file" {
             if let urlComponents = URLComponents(url: url, resolvingAgainstBaseURL: false) {
+                var serverUrl: String = ""
+                var fileName: String = ""
                 let queryItems = urlComponents.queryItems
                 guard let userScheme = queryItems?.filter({ $0.name == "user" }).first?.value,
-                      // let pathScheme = queryItems?.filter({ $0.name == "path" }).first?.value,
-                      let linkScheme = queryItems?.filter({ $0.name == "link" }).first?.value else {
-                    return
-                }
-                let domain = URL(string: linkScheme)?.host ?? ""
-                let accountScheme = queryItems?.filter({ $0.name == "account" }).first?.value
+                      let pathScheme = queryItems?.filter({ $0.name == "path" }).first?.value,
+                      let linkScheme = queryItems?.filter({ $0.name == "link" }).first?.value else { return}
 
                 Task {
-                    guard let tblAccount = await getMatchedAccount(user: userScheme, url: linkScheme, account: accountScheme) else {
+                    guard let tblAccount = await getMatchedAccount(userId: userScheme, url: linkScheme) else {
+                        guard let domain = URL(string: linkScheme)?.host else { return }
 
-                        let message = String(format: NSLocalizedString("_account_not_available_", comment: ""), userScheme, domain)
+                        fileName = (pathScheme as NSString).lastPathComponent
+                        let message = String(format: NSLocalizedString("_account_not_available_", comment: ""), userScheme, domain, fileName)
                         let alertController = UIAlertController(title: NSLocalizedString("_info_", comment: ""), message: message, preferredStyle: .alert)
                         alertController.addAction(UIAlertAction(title: NSLocalizedString("_ok_", comment: ""), style: .default, handler: { _ in }))
 
                         controller.present(alertController, animated: true)
                         return
                     }
+                    let davFiles = "remote.php/dav/files/" + tblAccount.userId
 
-                    let results = await NextcloudKit.shared.getFileFromFileIdAsync(link: linkScheme,
-                                                                                   account: tblAccount.account)
-                    if results.error == .success, let file = results.file {
-                        let metadata = await NCManageDatabaseCreateMetadata().convertFileToMetadataAsync(file)
-                        await NCManageDatabase.shared.addMetadataAsync(metadata)
-                        if metadata.hasPreview {
-                            let results = await NextcloudKit.shared.downloadPreviewAsync(fileId: metadata.fileId, etag: metadata.etag, account: metadata.account)
-                            if results.error == .success,
-                               let data = results.responseData?.data {
-                                NCUtility().createImageFileFrom(data: data, metadata: metadata)
-                            }
-                        }
-                        await NCNetworking.shared.openFileView(serverUrl: metadata.serverUrl,
-                                                               metadata: metadata,
-                                                               sceneIdentifier: controller.sceneIdentifier)
+                    if pathScheme.contains("/") {
+                        fileName = (pathScheme as NSString).lastPathComponent
+                        serverUrl = tblAccount.urlBase + "/" + davFiles + "/" + (pathScheme as NSString).deletingLastPathComponent
+                    } else {
+                        fileName = pathScheme
+                        serverUrl = tblAccount.urlBase + "/" + davFiles
                     }
+
+                    NCNetworking.shared.openFileViewInFolder(serverUrl: serverUrl, fileNameBlink: nil, fileNameOpen: fileName, sceneIdentifier: controller.sceneIdentifier)
                 }
             }
 
@@ -506,18 +477,29 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             }
 
             Task {
-                _ = await getMatchedAccount(user: userScheme, url: urlScheme)
+                _ = await getMatchedAccount(userId: userScheme, url: urlScheme)
             }
         } else if let action {
             if DeepLink(rawValue: action) != nil {
                 NCDeepLinkHandler().parseDeepLink(url, controller: controller)
             }
         } else {
-            scene.open(url, options: nil)
+            let applicationHandle = NCApplicationHandle()
+            let isHandled = applicationHandle.applicationOpenURL(url)
+            if isHandled {
+                return
+            } else {
+                scene.open(url, options: nil)
+            }
         }
     }
 
     private func showPrivacyProtectionWindow() {
+        guard privacyProtectionWindow == nil else {
+            privacyProtectionWindow?.isHidden = false
+            return
+        }
+        
         guard let windowScene = self.window?.windowScene else {
             return
         }
@@ -552,16 +534,19 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             }
         }
 
+        // Re-evaluate in-app messages after activating scene for account
+        MoEngageAnalytics.shared.displayInAppNotificationSafely(reason: "activated scene for account")
+
         Task {
-            try? await Task.sleep(for: .seconds(1))
+            try? await Task.sleep(nanoseconds: 1_000_000_000)
 
             let num = await NCAutoUpload.shared.initAutoUpload()
             nkLog(start: "Auto upload with \(num) photo")
 
-            try? await Task.sleep(for: .seconds(1.5))
+            try? await Task.sleep(nanoseconds: 1_500_000_000)
             await NCService().startRequestServicesServer(account: account, controller: controller)
 
-            try? await Task.sleep(for: .seconds(2))
+            try? await Task.sleep(nanoseconds: 2_000_000_000)
             await NCNetworking.shared.verifyZombie()
         }
 
@@ -612,8 +597,7 @@ extension SceneDelegate: NCAccountRequestDelegate {
 
 // MARK: - Scene Manager
 
-@MainActor
-final class SceneManager {
+final class SceneManager: @unchecked Sendable {
     static let shared = SceneManager()
     private var sceneController: [NCMainTabBarController: UIScene] = [:]
 
@@ -646,9 +630,7 @@ final class SceneManager {
     }
 
     func getWindow(scene: UIScene?) -> UIWindow? {
-        guard let windowScene = scene as? UIWindowScene else { return nil }
-
-        return windowScene.keyWindow
+        return (scene as? UIWindowScene)?.keyWindow
     }
 
     func getWindow(controller: UITabBarController?) -> UIWindow? {
@@ -680,33 +662,20 @@ final class SceneManager {
                 .compactMap { $0 as? UIWindowScene }
                 .first
     }
-
+    
     func getWindow(sceneIdentifier: String?) -> UIWindow? {
-        // Try exact match via your registry
-        if let sceneIdentifier,
-           let controller = sceneController.keys.first(where: { $0.sceneIdentifier == sceneIdentifier }),
-           let scene = sceneController[controller] {
-            return getWindow(scene: scene)
-        }
+        var mainTabBarController: NCMainTabBarController?
 
-        // Fallback: prefer a foregroundActive window scene
-        if let active = UIApplication.shared.connectedScenes
-            .compactMap({ $0 as? UIWindowScene })
-            .first(where: { $0.activationState == .foregroundActive }),
-           let w = active.keyWindow {
-            return w
+        if let sceneIdentifier {
+            for controller in sceneController.keys {
+                if sceneIdentifier == controller.sceneIdentifier {
+                    mainTabBarController = controller
+                }
+            }
         }
-
-        // Last resort: first connected window scene
-        if let any = UIApplication.shared.connectedScenes
-            .compactMap({ $0 as? UIWindowScene })
-            .first,
-           let w = any.keyWindow {
-            return w
-        }
-
-        // Absolute last resort (if you keep it)
-        return UIApplication.shared.mainAppWindow
+        guard let mainTabBarController,
+              let scene = sceneController[mainTabBarController] else { return UIApplication.shared.mainAppWindow }
+        return getWindow(scene: scene)
     }
 
     func getSceneIdentifier() -> [String] {
@@ -722,3 +691,4 @@ final class SceneManager {
         return NCSession.shared.getSession(controller: controller)
     }
 }
+
