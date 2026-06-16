@@ -52,9 +52,6 @@ class NCViewerRichDocument: UIViewController, WKNavigationDelegate, WKScriptMess
                     }
                 ]))
         }
-//        navigationItem.hidesBackButton = true
-        navigationController?.navigationBar.prefersLargeTitles = false
-        navigationItem.title = metadata.fileNameView
 
         let config = WKWebViewConfiguration()
         config.websiteDataStore = WKWebsiteDataStore.nonPersistent()
@@ -103,8 +100,6 @@ class NCViewerRichDocument: UIViewController, WKNavigationDelegate, WKScriptMess
         NotificationCenter.default.addObserver(self, selector: #selector(self.grabFocus), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterRichdocumentGrabFocus), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardDidShow), name: UIResponder.keyboardDidShowNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
-        
-        AnalyticsHelper.shared.trackEvent(eventName: .EVENT__ONLINE_OFFICE_USED)
     }
 
     override func viewDidAppear(_ animated: Bool) {
@@ -324,7 +319,6 @@ class NCViewerRichDocument: UIViewController, WKNavigationDelegate, WKScriptMess
 
     // MARK: -
 
-    func dismissSelect(serverUrl: String?, metadata: tableMetadata?, type: String, items: [Any], overwrite: Bool, copy: Bool, move: Bool) {//, session: NCSession.Session) {
     func dismissSelect(serverUrl: String?, metadata: tableMetadata?, type: String, items: [Any], overwrite: Bool, copy: Bool, move: Bool, session: NCSession.Session, controller: NCMainTabBarController?) {
         if let serverUrl, let metadata {
             let path = utilityFileSystem.getRelativeFilePath(metadata.fileName, serverUrl: serverUrl, session: session)

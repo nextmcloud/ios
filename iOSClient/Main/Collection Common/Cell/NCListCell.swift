@@ -17,7 +17,6 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellMainP
     @IBOutlet weak var imageSelect: UIImageView!
     @IBOutlet weak var imageStatus: UIImageView!
     @IBOutlet weak var imageFavorite: UIImageView!
-//    @IBOutlet weak var imageFavoriteBackground: UIImageView!
     @IBOutlet weak var imageLocal: UIImageView!
 
     @IBOutlet weak var labelTitle: UILabel!
@@ -46,7 +45,6 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellMainP
             delegate?.openContextMenu(with: metadata, button: buttonMore, sender: self) /* preconfigure UIMenu with each metadata */
         }
     }
-
     var previewImg: UIImageView? {
         get { return imageItem }
         set { imageItem = newValue }
@@ -90,6 +88,7 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellMainP
 
     override func prepareForReuse() {
         super.prepareForReuse()
+
         initCell()
     }
 
@@ -104,7 +103,6 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellMainP
         imageItem.layer.masksToBounds = true
         imageStatus.image = nil
         imageFavorite.image = nil
-//        imageFavoriteBackground.isHidden = true
         imageLocal.image = nil
 
         buttonShared.setImage(nil, for: .normal)
@@ -119,7 +117,6 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellMainP
 
         imageItemLeftConstraint.constant = 10
         separatorHeightConstraint.constant = 0.5
-        titleInfoTrailingDefault()
 
         // Dynamic Type Font Configuration
         //
@@ -205,6 +202,7 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellMainP
     func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
         let locationInButton = touch.location(in: buttonMore)
         let result = buttonMore.bounds.contains(locationInButton)
+
         return result
     }
 
@@ -217,25 +215,6 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellMainP
         shareContainer.isHidden = status
     }
 
-    func selected(_ status: Bool, isEditMode: Bool) {
-        // E2EE - remove encrypt folder selection
-        if let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId), metadata.e2eEncrypted {
-            imageSelect.isHidden = true
-        } else {
-            imageSelect.isHidden = isEditMode ? false : true
-        }
-//        guard let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId), !metadata.e2eEncrypted else {
-////        guard let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId), !metadata.e2eEncrypted else {
-//            backgroundView = nil
-//            separator.isHidden = false
-//            imageSelect.isHidden = true
-//            return
-//        }
-        if isEditMode {
-            imageItemLeftConstraint.constant = 45
-//            imageSelect.isHidden = false
-            imageShared.isHidden = true
-            imageMore.isHidden = true
     func setButtonsHidden(_ hidden: Bool) {
         buttonShared.isHidden = hidden
         buttonMore.isHidden = hidden
@@ -254,9 +233,6 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellMainP
             accessibilityCustomActions = nil
         } else {
             imageItemLeftConstraint.constant = 10
-//            imageSelect.isHidden = true
-            imageShared.isHidden = false
-            imageMore.isHidden = false
             imageSelect.isHidden = true
             buttonShared.isHidden = false
             buttonMore.isHidden = false
@@ -274,7 +250,6 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellMainP
             backgroundView = blurEffectView
             separator.isHidden = true
         } else {
-           imageSelect.image = NCImageCache.shared.getImageCheckedNo()
             imageSelect.image = NCImageCache.shared.getImageCheckedNo(color: color)
             backgroundView = nil
             separator.isHidden = false
@@ -365,23 +340,6 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellMainP
         if imageFavorite.image != nil {
             let outlineView = UIImageView()
             outlineView.translatesAutoresizingMaskIntoConstraints = false
-            outlineView.image = UIImage(systemName: "star.fill")
-            outlineView.preferredSymbolConfiguration = UIImage.SymbolConfiguration(pointSize: 16, weight: .thin)
-            outlineView.tintColor = .systemBackground
-
-            imageFavorite.addSubview(outlineView)
-            NSLayoutConstraint.activate([
-                outlineView.leadingAnchor.constraint(equalTo: imageFavorite.leadingAnchor, constant: -1),
-                outlineView.trailingAnchor.constraint(equalTo: imageFavorite.trailingAnchor, constant: 1),
-                outlineView.topAnchor.constraint(equalTo: imageFavorite.topAnchor, constant: -1),
-                outlineView.bottomAnchor.constraint(equalTo: imageFavorite.bottomAnchor, constant: 1)
-            ])
-            imageFavorite.sendSubviewToBack(outlineView)
-        } else {
-            imageFavorite.subviews.forEach { view in
-                view.removeFromSuperview()
-            }
-        }
             outlineView.image = UIImage(systemName: "star")
             outlineView.preferredSymbolConfiguration = UIImage.SymbolConfiguration(pointSize: 16, weight: .thin)
             outlineView.tintColor = .systemBackground
@@ -400,7 +358,7 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellMainP
             }
         }
     }
-    
+
     override func layoutSubviews() {
         super.layoutSubviews()
         // Keep the shadow path in sync with current bounds
@@ -411,12 +369,6 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellMainP
             imageStatus.layer.cornerRadius = imageStatus.bounds.width / 2
         }
     }
-}
-
-protocol NCListCellDelegate: AnyObject {
-    func tapShareListItem(with ocId: String, ocIdTransfer: String, sender: Any)
-    func tapMoreListItem(with ocId: String, ocIdTransfer: String, image: UIImage?, sender: Any)
-    func longPressListItem(with ocId: String, ocIdTransfer: String, gestureRecognizer: UILongPressGestureRecognizer)
 }
 
 // MARK: - List Layout

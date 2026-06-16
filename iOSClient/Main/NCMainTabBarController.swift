@@ -47,47 +47,6 @@ class NCMainTabBarController: UITabBarController {
 
         tabBar.tintColor = NCBrandColor.shared.getElement(account: account)
 
-        // File
-        if let item = tabBar.items?[0] {
-            item.title = NSLocalizedString("_home_", comment: "")
-            item.image = UIImage(named: "home") // UIImage(systemName: "folder.fill")
-            item.selectedImage = item.image
-            item.tag = 100
-        }
-
-        // Favorite
-        if let item = tabBar.items?[1] {
-            item.title = NSLocalizedString("_favorites_", comment: "")
-            item.image = UIImage(named: "star") // UIImage(systemName: "star.fill")
-//            item.image = UIImage(systemName: "star.fill")
-            item.selectedImage = item.image
-            item.tag = 101
-        }
-
-        // Media
-        if let item = tabBar.items?[2] {
-            item.title = NSLocalizedString("_media_", comment: "")
-            item.image = UIImage(named: "media") // UIImage(systemName: "photo")
-            item.selectedImage = item.image
-            item.tag = 102
-        }
-
-        // Activity
-//        if let item = tabBar.items?[3] {
-//            item.title = NSLocalizedString("_activity_", comment: "")
-//            item.image = UIImage(systemName: "bolt")
-//            item.selectedImage = item.image
-//            item.tag = 103
-//        }
-
-        // More
-        if let item = tabBar.items?[3] {
-//        if let item = tabBar.items?[4] {
-            item.title = NSLocalizedString("_more_", comment: "")
-            item.image = UIImage(named: "more") // UIImage(systemName: "ellipsis")
-            item.selectedImage = item.image
-            item.tag = 104
-        }
         configureMoreController()
         configureTabBarItems()
         configureTabBarAppearance()
@@ -222,7 +181,7 @@ class NCMainTabBarController: UITabBarController {
 
             // Update right bar button item
             if let navigationController = self.selectedViewController as? NCMainNavigationController {
-                await navigationController.updateRightBarButtonItems(self.tabBar.items?[0])
+//                await navigationController.updateRightBarButtonItems(self.tabBar.items?[0])
             }
             // Update Activity tab bar
 //            if let item = self.tabBar.items?[3] {

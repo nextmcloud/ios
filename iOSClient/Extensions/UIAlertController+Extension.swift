@@ -70,13 +70,6 @@ extension UIAlertController {
                         }
                     }
                     if createFolderResults.error == .success {
-                        let error = await NCNetworkingE2EEMarkFolder().markFolderE2ee(account: session.account, serverUrlFileName: serverUrlFileName, userId: session.userId)
-                        if error != .success {
-                            NCContentPresenter().showError(error: error)
-                        }else {
-#if !EXTENSION
-                            AnalyticsHelper.shared.trackCreateFolder(isEncrypted: true, creationDate: Date())
-#endif
                         let error = await NCNetworkingE2EEMarkFolder().markFolderE2ee(account: session.account, serverUrlFileName: serverUrlFileName, userId: session.userId, sceneIdentifier: nil)
                         if let banner, let token {
                             if error == .success {
@@ -225,8 +218,6 @@ extension UIAlertController {
             })
         }
 
-        #if !EXTENSION
-        alertController.addAction(UIAlertAction(title: NSLocalizedString("_remove_local_file_", comment: ""), style: .destructive) { (_: UIAlertAction) in
         alertController.addAction(UIAlertAction(title: NSLocalizedString("_remove_local_file_", comment: ""), style: .default) { (_: UIAlertAction) in
             Task {
                 for metadata in metadatas {

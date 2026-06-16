@@ -45,22 +45,6 @@ class NCMediaCell: UICollectionViewCell {
     func initCell() {
         imageStatus.image = nil
         imageItem.image = nil
-        imageVisualEffect.alpha = 0.4
-        imageSelect.image = NCImageCache.shared.getImageCheckedYes()
-        imageVisualEffect.isHidden = true
-        imageSelect.isHidden = true
-    }
-
-    func selected(_ status: Bool) {
-        if status {
-//            imageSelect.isHidden = false
-            imageVisualEffect.isHidden = false
-            imageSelect.image = NCImageCache.shared.getImageCheckedYes()
-        } else {
-//            imageSelect.isHidden = true
-            imageVisualEffect.isHidden = true
-            imageSelect.image = NCImageCache.shared.getImageCheckedNo()
-        }
 
         imageVisualEffect.isHidden = false
         imageVisualEffect.effect = nil

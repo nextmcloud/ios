@@ -24,7 +24,7 @@
 import UIKit
 import WebKit
 import NextcloudKit
-import FloatingPanel
+//import FloatingPanel
 
 class NCLoginWeb: UIViewController {
 

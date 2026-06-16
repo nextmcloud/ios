@@ -45,48 +45,10 @@ class NCPhotoCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellMain
         return nil
     }
 
-    @objc private func handleTapObserver(_ g: UITapGestureRecognizer) {
-        let location = g.location(in: contentView)
-
-        if buttonMore.frame.contains(location) {
-            delegate?.onMenuIntent(with: metadata)
-        }
-    }
-
-    func setButtonMore(image: UIImage) {
-        buttonMore.setImage(image, for: .normal)
-    }
-
-    func hideButtonMore(_ status: Bool) {
-       // buttonMore.isHidden = status NO MORE USED
-    }
-
-    func hideImageStatus(_ status: Bool) {
-        imageStatus.isHidden = status
-    }
-
-    func selected(_ status: Bool, isEditMode: Bool) {
-        // E2EE - remove encrypt folder selection
-        if let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId), metadata.e2eEncrypted {
     func selected(_ status: Bool, isEditMode: Bool, color: UIColor) {
         imageVisualEffect.alpha = status ? 1 : 0
         imageSelect.alpha = status ? 1 : 0
         imageSelect.image = NCImageCache.shared.getImageCheckedYes(color: color)
-        // E2EE - remove encrypt folder selection
-        if let metadata = NCManageDatabase.shared.getMetadataFromOcId(self.metadata?.ocId), metadata.e2eEncrypted {
-            imageSelect.isHidden = true
-        } else {
-            imageSelect.isHidden = isEditMode ? false : true
-        }
-        if status {
-//            imageSelect.isHidden = false
-            imageVisualEffect.isHidden = false
-            imageSelect.image = NCImageCache.shared.getImageCheckedYes()
-        } else {
-//            imageSelect.isHidden = true
-            imageVisualEffect.isHidden = true
-            imageSelect.image = NCImageCache.shared.getImageCheckedNo()
-        }
     }
 
     func setAccessibility(label: String, value: String) {

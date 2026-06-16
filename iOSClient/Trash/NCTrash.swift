@@ -30,11 +30,6 @@ class NCTrash: UIViewController, NCTrashListCellDelegate, NCTrashGridCellDelegat
     var session: NCSession.Session {
         NCSession.shared.getSession(controller: tabBarController)
     }
-    
-    var serverUrl = ""
-    var selectableDataSource: [RealmSwiftObject] { datasource }
-    private let appDelegate = (UIApplication.shared.delegate as? AppDelegate)!
-    var emptyDataSet: NCEmptyDataSet?
 
     @MainActor
     var controller: NCMainTabBarController? {
@@ -117,7 +112,7 @@ class NCTrash: UIViewController, NCTrashListCellDelegate, NCTrashGridCellDelegat
         }
 
         // Cancel Queue & Retrieves Properties
-        NCNetworking.shared.downloadThumbnailTrashQueue.cancelAll()
+//        NCNetworking.shared.downloadThumbnailTrashQueue.cancelAll()
     }
 
     // MARK: TAP EVENT
@@ -150,22 +145,6 @@ class NCTrash: UIViewController, NCTrashListCellDelegate, NCTrashGridCellDelegat
             collectionView(self.collectionView, didSelectItemAt: indexPath!)
         }
     }
-    func tapButtonSwitch(_ sender: Any) {
-        if layoutForView?.layout == NCGlobal.shared.layoutGrid {
-            onListSelected()
-        } else {
-            onGridSelected()
-        }
-    }
-    
-    func tapButtonOrder(_ sender: Any) {
-
-        let sortMenu = NCSortMenu()
-//        sortMenu.toggleMenu(viewController: self, account: appDelegate.account, key: layoutKey, sortButton: sender as? UIButton, serverUrl: serverUrl)
-        sortMenu.toggleMenu(viewController: self, account: session.account, key: layoutKey, sortButton: sender as? UIButton, serverUrl: serverUrl)
-    }
-
-    func longPressGridItem(with objectId: String, gestureRecognizer: UILongPressGestureRecognizer) { }
 
     func longPressMoreGridItem(with objectId: String, gestureRecognizer: UILongPressGestureRecognizer) { }
 
@@ -175,13 +154,6 @@ class NCTrash: UIViewController, NCTrashListCellDelegate, NCTrashGridCellDelegat
         let results = await self.database.getTableTrashAsync(filePath: getFilePath(), account: session.account)
 
         await mainNavigationController?.updateMenuOption()
-//            // Switch back to main thread for UI updates
-//            await MainActor.run {
-//                self.datasource = results
-//                self.collectionView.reloadData()
-//                setNavigationRightItems()
-////                (self.navigationController as? NCMainNavigationController)?.updateRightMenu()
-//        await (self.navigationController as? NCMainNavigationController)?.updateRightMenu()
 
         await MainActor.run {
             self.datasource = results
@@ -215,23 +187,5 @@ class NCTrash: UIViewController, NCTrashListCellDelegate, NCTrashGridCellDelegat
         } else {
             return filePath + "/"
         }
-    }
-    
-    func getFooterInformation(datasource: [tableTrash]) -> (directories: Int, files: Int, size: Int64) {
-        let validMetadatas = datasource.filter { !$0.isInvalidated }
-        let directories = validMetadatas.filter({ $0.directory == true})
-        let files = validMetadatas.filter({ $0.directory == false})
-
-        var size: Int64 = 0
-
-        directories.forEach { metadata in
-            size += metadata.size
-        }
-        
-        files.forEach { metadata in
-            size += metadata.size
-        }
-
-        return (directories.count, files.count, size)
     }
 }

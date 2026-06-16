@@ -151,9 +151,6 @@ struct NCSettingsView: View {
                     }
                 }
             })
-            
-            // NMC-4558 - The following sections will be hidden / removed from the settings
-            /*
             // Calender & Contacts
             if !NCBrandOptions.shared.disable_mobileconfig {
                 Section(content: {
@@ -200,8 +197,6 @@ struct NCSettingsView: View {
                 Text(NSLocalizedString("_users_footer_", comment: ""))
                     .font(.footnote)
             })
-             */
-            
             // E2EEncryption` Section
             if capabilities.e2EEEnabled {
                 E2EESection(model: model)
@@ -222,65 +217,6 @@ struct NCSettingsView: View {
                     }
                 }
             }
-            
-            /// `Data Protection Section
-            Section(header: Text(NSLocalizedString("_data_protection_", comment: "")), content: {
-                /// Privacy Settings
-                Section(content: {
-                   NavigationLink(destination: LazyView {
-//                       NCFileNameView(model: NCFileNameModel(controller: model.controller))
-                       PrivacySettingsView()
-                   }) {
-                       Text(NSLocalizedString("_privacy_settings_", comment: ""))
-                   }
-                })
-                
-                /// Privacy Policy
-                Section(content: {
-                   NavigationLink(destination: LazyView {
-                       NCBrowserWebView(urlBase: URL(string: "https://static.magentacloud.de/privacy/datenschutzhinweise_app.htm")!, browserTitle: NSLocalizedString("_privacy_policy_", comment: ""))
-                   }) {
-//                       "https://static.magentacloud.de/privacy/datenschutzhinweise_app.htm"
-                       Text(NSLocalizedString("_privacy_policy_", comment: ""))
-                   }
-                })
-                
-                /// Opensource Software used
-                Section(content: {
-                   NavigationLink(destination: LazyView {
-                       NCBrowserWebView(urlBase: URL(string: "https://static.magentacloud.de/licences/ios.html")!, browserTitle: NSLocalizedString("_used_opensource_software_", comment: ""))
-                   }) {
-//                       "https://static.magentacloud.de/licences/ios.html"
-                       Text(NSLocalizedString("_used_opensource_software_", comment: ""))
-                   }
-                })
-            })
-            
-            /// `Service Section
-            Section(header: Text(NSLocalizedString("_service_", comment: "")), content: {
-                /// Privacy Policy
-                Section(content: {
-                   NavigationLink(destination: LazyView {
-                       NCBrowserWebView(urlBase: URL(string: "https://cloud.telekom-dienste.de/hilfe")!, browserTitle: NSLocalizedString("_help_", comment: ""))
-                   }) {
-//                       "https://cloud.telekom-dienste.de/hilfe"
-                       Text(NSLocalizedString("_help_", comment: ""))
-                   }
-                })
-                
-                /// Opensource Software used
-                Section(content: {
-                   NavigationLink(destination: LazyView {
-                       NCBrowserWebView(urlBase: URL(string: "https://www.telekom.de/impressum")!, browserTitle: NSLocalizedString("_imprint_", comment: ""))
-                   }) {
-//                       "https://www.telekom.de/impressum"
-                       Text(NSLocalizedString("_imprint_", comment: ""))
-                   }
-                })
-            })
-            
-            // NMC-4558 - The following sections will be hidden / removed from the settings
-            /*
             // `Information` Section
             Section(header: Text(NSLocalizedString("_information_", comment: "")).font(.headline), content: {
                 // Acknowledgements
@@ -340,13 +276,6 @@ struct NCSettingsView: View {
                     }
                 }
             })
-             */
-            
-            // `Watermark` Section
-            Section(content: {
-            }, footer: {
-//                Text(model.footerApp + model.footerServer + model.footerSlogan)
-                Text(model.footerApp + model.footerSlogan)
 #if DEBUG
             Section(header: Text("Debug").font(.headline), content: {
                 Button(action: {

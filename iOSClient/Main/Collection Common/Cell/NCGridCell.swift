@@ -88,7 +88,6 @@ class NCGridCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellMainP
         iconsStackView.addBlurBackground(style: .systemMaterial)
         iconsStackView.layer.cornerRadius = 8
         iconsStackView.clipsToBounds = true
-        
 
         imageVisualEffect.isHidden = false
         imageVisualEffect.effect = nil
@@ -163,48 +162,19 @@ class NCGridCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellMainP
         buttonMore.isHidden = status
     }
 
-    func selected(_ status: Bool, isEditMode: Bool) {
-        // E2EE - remove encrypt folder selection
-        if let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId), metadata.e2eEncrypted {
     func selected(_ status: Bool, isEditMode: Bool, color: UIColor) {
-        // E2EE - remove encrypt folder selection
-        if let metadata = NCManageDatabase.shared.getMetadataFromOcId(self.metadata?.ocId), metadata.e2eEncrypted {
-            imageSelect.isHidden = true
-        } else {
-            imageSelect.isHidden = isEditMode ? false : true
-        }
         if isEditMode {
-//            imageSelect.isHidden = false
             buttonMore.isHidden = true
             accessibilityCustomActions = nil
         } else {
-//            imageSelect.isHidden = true
             buttonMore.isHidden = false
-            setA11yActions()
-        }
-        if status {
-            imageSelect.image = NCImageCache.shared.getImageCheckedYes()
-            imageVisualEffect.isHidden = false
-
-        } else {
-            imageSelect.image = NCImageCache.shared.getImageCheckedNo()
-            backgroundView = nil
-            imageVisualEffect.isHidden = true
         }
 
         imageVisualEffect.alpha = status ? 1 : 0
         imageSelect.alpha = status ? 1 : 0
         imageSelect.image = NCImageCache.shared.getImageCheckedYes(color: color)
-//        if status {
-//            imageSelect.image = NCImageCache.shared.getImageCheckedYes()
-//            imageVisualEffect.isHidden = false
-//        } else {
-//            imageSelect.image = NCImageCache.shared.getImageCheckedNo()
-//            backgroundView = nil
-//            imageVisualEffect.isHidden = true
-//        }
     }
-    
+
     func writeInfoDateSize(date: NSDate, size: Int64) {
         let dateFormatter = DateFormatter()
         dateFormatter.dateStyle = .short
@@ -219,19 +189,6 @@ class NCGridCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellMainP
         accessibilityLabel = label
         accessibilityValue = value
     }
-
-    func setIconOutlines() {
-        if imageStatus.image != nil {
-            imageStatus.makeCircularBackground(withColor: .systemBackground)
-        } else {
-            imageStatus.backgroundColor = .clear
-        }
-    }
-}
-
-protocol NCGridCellDelegate: AnyObject {
-    func tapMoreGridItem(with ocId: String, ocIdTransfer: String, image: UIImage?, sender: Any)
-    func longPressGridItem(with ocId: String, ocIdTransfer: String, gestureRecognizer: UILongPressGestureRecognizer)
 }
 
 // MARK: - Grid Layout

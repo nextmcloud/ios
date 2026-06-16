@@ -19,12 +19,6 @@ protocol NCLoginProviderDelegate: AnyObject {
 /// Handles login authentication using ASWebAuthenticationSession with WKWebView fallback for mTLS.
 ///
 class NCLoginProvider: NSObject, ASWebAuthenticationPresentationContextProviding {
-    
-    var webView: WKWebView?
-    let appDelegate = (UIApplication.shared.delegate as? AppDelegate)!
-    let utility = NCUtility()
-    var titleView: String = ""
-
     var initialURLString = ""
     weak var delegate: NCLoginProviderDelegate?
     var controller: NCMainTabBarController?
@@ -100,39 +94,6 @@ class NCLoginProvider: NSObject, ASWebAuthenticationPresentationContextProviding
             // Fall back to WKWebView if ASWebAuthenticationSession fails to start
             fallbackToWebView(url: url)
         }
-//        if #available(iOS 13, *) {
-//            let keyWindow = UIApplication.shared.connectedScenes
-//                .filter({$0.activationState == .foregroundActive})
-//                .map({$0 as? UIWindowScene})
-//                .compactMap({$0})
-//                .first?.windows
-//                .filter({$0.isKeyWindow}).first
-//            let statusBar = UIView(frame: (keyWindow?.windowScene?.statusBarManager?.statusBarFrame)!)
-//            statusBar.backgroundColor = NCBrandColor.shared.customer
-//            keyWindow?.addSubview(statusBar)
-//        } else {
-//            if let statusBar = UIApplication.shared.value(forKey: "statusBar") as? UIView {
-//                statusBar.backgroundColor = NCBrandColor.shared.customer
-//            }
-//        }
-
-//
-//        nkLog(debug: "Cancelling existing polling task because view did disappear...")
-//        pollingTask?.cancel()
-//        pollingTask = nil
-//        appDelegate.timerErrorNetworkingDisabled = false
-    }
-
-    // MARK: - Navigation
-
-    private func loadWebPage(url: URL) {
-        let language = NSLocale.preferredLanguages[0] as String
-        var request = URLRequest(url: url)
-
-        request.addValue("true", forHTTPHeaderField: "OCS-APIRequest")
-        request.addValue(language, forHTTPHeaderField: "Accept-Language")
-
-        webView.load(request)
     }
 
     ///
@@ -299,7 +260,6 @@ class NCLoginProvider: NSObject, ASWebAuthenticationPresentationContextProviding
     ///
     private func createPollingTask(token: String, endpoint: String) -> Task<Void, any Error> {
         let options = NKRequestOptions(customUserAgent: userAgent)
-
         var grantValues: (urlBase: String, loginName: String, appPassword: String)?
 
         return Task { @MainActor in
@@ -415,8 +375,6 @@ class NCLoginProviderWebViewFallback: UIViewController, WKNavigationDelegate {
     }
 
     func webView(_ webView: WKWebView, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
-        nkLog(debug: "Web view did receive authentication challenge.")
-
         DispatchQueue.global().async {
             if let serverTrust = challenge.protectionSpace.serverTrust {
                 completionHandler(.useCredential, URLCredential(trust: serverTrust))

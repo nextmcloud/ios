@@ -1,25 +1,6 @@
-//
-//  NCNetworking+WebDAV.swift
-//  Nextcloud
-//
-//  Created by Marino Faggiana on 07/02/24.
-//  Copyright © 2024 Marino Faggiana. All rights reserved.
-//
-//  Author Marino Faggiana <marino.faggiana@nextcloud.com>
-//
-//  This program is free software: you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
-//  the Free Software Foundation, either version 3 of the License, or
-//  (at your option) any later version.
-//
-//  This program is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
-//
-//  You should have received a copy of the GNU General Public License
-//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-//
+// SPDX-FileCopyrightText: Nextcloud GmbH
+// SPDX-FileCopyrightText: 2024 Marino Faggiana
+// SPDX-License-Identifier: GPL-3.0-or-later
 
 import UIKit
 import NextcloudKit
@@ -63,7 +44,9 @@ extension NCNetworking {
                   account: String,
                   taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                   completion: @escaping (_ account: String, _ metadata: tableMetadata?, _ file: NKFile?, _ error: NKError) -> Void) {
-        NextcloudKit.shared.readFileOrFolder(serverUrlFileName: serverUrlFileName, depth: "0", account: account) { task in
+        let showHiddenFiles = NCPreferences().getShowHiddenFiles(account: account)
+
+        NextcloudKit.shared.readFileOrFolder(serverUrlFileName: serverUrlFileName, depth: "0", showHiddenFiles: showHiddenFiles, account: account) { task in
             Task {
                 let identifier = await NCNetworking.shared.networkingTasks.createIdentifier(account: account,
                                                                                             path: serverUrlFileName,
@@ -86,8 +69,10 @@ extension NCNetworking {
     func readFileAsync(serverUrlFileName: String,
                        account: String,
                        taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }) async -> (account: String, metadata: tableMetadata?, error: NKError) {
+        let showHiddenFiles = NCPreferences().getShowHiddenFiles(account: account)
         let results = await NextcloudKit.shared.readFileOrFolderAsync(serverUrlFileName: serverUrlFileName,
                                                                       depth: "0",
+                                                                      showHiddenFiles: showHiddenFiles,
                                                                       account: account) { task in
             Task {
                 let identifier = await NCNetworking.shared.networkingTasks.createIdentifier(account: account,
@@ -454,7 +439,7 @@ extension NCNetworking {
 
         return results.error
     }
-    
+
     // MARK: - Rename
 
     func setStatusWaitRename(_ metadata: tableMetadata, fileNameNew: String, windowScene: UIWindowScene?) async -> NKError {
@@ -483,94 +468,6 @@ extension NCNetworking {
         }
 
         return .success
-    }
-    
-    func renameMetadata(_ metadata: tableMetadata,
-                        fileNameNew: String,
-                        indexPath: IndexPath,
-                        viewController: UIViewController?,
-                        completion: @escaping (_ error: NKError) -> Void) {
-        
-        let permission = NCMetadataPermissions.permissionsContainsString(metadata.permissions, permissions: NCMetadataPermissions.permissionCanRename)
-        if (!metadata.permissions.isEmpty && permission == false) ||
-            (metadata.status != global.metadataStatusNormal && metadata.status != global.metadataStatusWaitRename) {
-//            return NCContentPresenter().showInfo(error: NKError(errorCode: NCGlobal.shared.errorInternalError, errorDescription: "_no_permission_modify_file_"))
-//            let error = await NCNetworkingE2EERename().rename(metadata: metadata, fileNameNew: fileNameNew)
-//            DispatchQueue.main.async { completion(error) }
-            completion(NKError(errorCode: NCGlobal.shared.errorInternalError, errorDescription: "_no_permission_modify_file_"))
-        }
-
-        if metadata.isDirectoryE2EE {
-#if !EXTENSION
-            if isOffline {
-//                return NCContentPresenter().showInfo(error: NKError(errorCode: NCGlobal.shared.errorInternalError, errorDescription: "_offline_not_allowed_"))
-                completion(NKError(errorCode: NCGlobal.shared.errorInternalError, errorDescription: "_offline_not_allowed_"))
-            }
-            Task {
-                let error = await NCNetworkingE2EERename().rename(metadata: metadata, fileNameNew: fileNameNew)
-                if error != .success {
-//                    NCContentPresenter().showError(error: error)
-                    completion(error)
-                }
-            }
-#endif
-        } else {
-            Task {
-                await self.transferDispatcher.notifyAllDelegatesAsync { delegate in
-                    let status = self.global.metadataStatusWaitRename
-                    await NCManageDatabase.shared.renameMetadata(fileNameNew: fileNameNew, ocId: metadata.ocId, status: status)
-                    delegate.transferReloadData(serverUrl: metadata.serverUrl, status: status)
-                }
-                NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterRenameFile, userInfo: ["serverUrl": metadata.serverUrl, "account": metadata.account, "error": NKError(errorCode: 0, errorDescription: ""), "ocId": metadata.ocId, "indexPath": indexPath])
-
-            }
-            
-            completion(NKError(errorCode: 0, errorDescription: ""))
-        }
-    }
-    
-    func renameMetadata(_ metadata: tableMetadata,
-                        fileNameNew: String,
-                        indexPath: IndexPath,
-                        viewController: UIViewController?,
-                        completion: @escaping (_ error: NKError) -> Void) {
-        
-        let permission = NCMetadataPermissions.permissionsContainsString(metadata.permissions, permissions: NCMetadataPermissions.permissionCanRename)
-        if (!metadata.permissions.isEmpty && permission == false) ||
-            (metadata.status != global.metadataStatusNormal && metadata.status != global.metadataStatusWaitRename) {
-//            return NCContentPresenter().showInfo(error: NKError(errorCode: NCGlobal.shared.errorInternalError, errorDescription: "_no_permission_modify_file_"))
-//            let error = await NCNetworkingE2EERename().rename(metadata: metadata, fileNameNew: fileNameNew)
-//            DispatchQueue.main.async { completion(error) }
-            completion(NKError(errorCode: NCGlobal.shared.errorInternalError, errorDescription: "_no_permission_modify_file_"))
-        }
-
-        if metadata.isDirectoryE2EE {
-#if !EXTENSION
-            if isOffline {
-//                return NCContentPresenter().showInfo(error: NKError(errorCode: NCGlobal.shared.errorInternalError, errorDescription: "_offline_not_allowed_"))
-                completion(NKError(errorCode: NCGlobal.shared.errorInternalError, errorDescription: "_offline_not_allowed_"))
-            }
-            Task {
-                let error = await NCNetworkingE2EERename().rename(metadata: metadata, fileNameNew: fileNameNew)
-                if error != .success {
-//                    NCContentPresenter().showError(error: error)
-                    completion(error)
-                }
-            }
-#endif
-        } else {
-            Task {
-                await self.transferDispatcher.notifyAllDelegatesAsync { delegate in
-                    let status = self.global.metadataStatusWaitRename
-                    await NCManageDatabase.shared.renameMetadata(fileNameNew: fileNameNew, ocId: metadata.ocId, status: status)
-                    delegate.transferReloadData(serverUrl: metadata.serverUrl, status: status)
-                }
-                NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterRenameFile, userInfo: ["serverUrl": metadata.serverUrl, "account": metadata.account, "error": NKError(errorCode: 0, errorDescription: ""), "ocId": metadata.ocId, "indexPath": indexPath])
-
-            }
-            
-            completion(NKError(errorCode: 0, errorDescription: ""))
-        }
     }
 
     func renameFileOrFolder(metadata: tableMetadata) async -> NKError {
@@ -606,51 +503,6 @@ extension NCNetworking {
         return results.error
     }
 
-    func renameMetadata(_ metadata: tableMetadata,
-                        fileNameNew: String,
-                        indexPath: IndexPath,
-                        viewController: UIViewController?,
-                        completion: @escaping (_ error: NKError) -> Void) {
-        
-        let permission = NCMetadataPermissions.permissionsContainsString(metadata.permissions, permissions: NCMetadataPermissions.permissionCanRename)
-        if (!metadata.permissions.isEmpty && permission == false) ||
-            (metadata.status != global.metadataStatusNormal && metadata.status != global.metadataStatusWaitRename) {
-//            return NCContentPresenter().showInfo(error: NKError(errorCode: NCGlobal.shared.errorInternalError, errorDescription: "_no_permission_modify_file_"))
-//            let error = await NCNetworkingE2EERename().rename(metadata: metadata, fileNameNew: fileNameNew)
-//            DispatchQueue.main.async { completion(error) }
-            completion(NKError(errorCode: NCGlobal.shared.errorInternalError, errorDescription: "_no_permission_modify_file_"))
-        }
-
-        if metadata.isDirectoryE2EE {
-#if !EXTENSION
-            if isOffline {
-//                return NCContentPresenter().showInfo(error: NKError(errorCode: NCGlobal.shared.errorInternalError, errorDescription: "_offline_not_allowed_"))
-                completion(NKError(errorCode: NCGlobal.shared.errorInternalError, errorDescription: "_offline_not_allowed_"))
-            }
-            Task {
-                let error = await NCNetworkingE2EERename().rename(metadata: metadata, fileNameNew: fileNameNew)
-                if error != .success {
-//                    NCContentPresenter().showError(error: error)
-                    completion(error)
-                }
-            }
-#endif
-        } else {
-            Task {
-                let ocId = metadata.ocId
-                let serverUrl = metadata.serverUrl
-                await self.transferDispatcher.notifyAllDelegatesAsync { delegate in
-                    await NCManageDatabase.shared.renameMetadata(fileNameNew: fileNameNew, ocId: ocId, status: self.global.metadataStatusWaitRename)
-                    delegate.transferReloadDataSource(serverUrl: serverUrl, requestData: false, status: self.global.metadataStatusWaitRename)
-                }
-//                NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterRenameFile, userInfo: ["serverUrl": metadata.serverUrl, "account": metadata.account, "error": NKError(errorCode: 0, errorDescription: ""), "ocId": metadata.ocId, "indexPath": indexPath])
-
-            }
-            
-            completion(NKError(errorCode: 0, errorDescription: ""))
-        }
-    }
-    
     // MARK: - Move
 
     func setStatusWaitMove(_ metadata: tableMetadata, destination: String, overwrite: Bool) async -> NKError {
@@ -787,27 +639,12 @@ extension NCNetworking {
             return NKError(errorCode: global.errorNotPermission, errorDescription: "_no_permission_favorite_file_")
         }
 
-        Task {
-            await self.transferDispatcher.notifyAllDelegatesAsync { delegate in
-                let status = self.global.metadataStatusWaitFavorite
-                await NCManageDatabase.shared.setMetadataFavoriteAsync(ocId: metadata.ocId, favorite: !metadata.favorite, saveOldFavorite: metadata.favorite.description, status: status)
         let ocId = metadata.ocId
         let serverUrl = metadata.serverUrl
         let favorite = metadata.favorite
         await self.transferDispatcher.notifyAllDelegatesAsync { delegate in
-
-#if !EXTENSION
-                if !metadata.favorite, !metadata.contentType.contains("directory") {
-                    AnalyticsHelper.shared.trackEventWithMetadata(eventName: .EVENT__ADD_FAVORITE ,metadata: metadata)
-                }
-#endif
-                delegate.transferReloadData(serverUrl: metadata.serverUrl, status: status)
-                await NCManageDatabase.shared.setMetadataFavoriteAsync(ocId: metadata.ocId, favorite: !metadata.favorite, saveOldFavorite: metadata.favorite.description, status: self.global.metadataStatusWaitFavorite)
-                delegate.transferReloadData(serverUrl: metadata.serverUrl, requestData: false, status: self.global.metadataStatusWaitFavorite)
-            }
             await NCManageDatabase.shared.setMetadataFavoriteAsync(ocId: ocId, favorite: !favorite, saveOldFavorite: favorite.description, status: self.global.metadataStatusWaitFavorite)
             delegate.transferReloadDataSource(serverUrl: serverUrl, requestData: false, status: self.global.metadataStatusWaitFavorite)
-
         }
 
         return .success
@@ -978,4 +815,3 @@ class NCOperationDownloadAvatar: ConcurrentOperation, @unchecked Sendable {
         }
     }
 }
-

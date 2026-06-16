@@ -7,13 +7,20 @@ import SwiftUI
 import UIKit
 
 /// A view that allows the user to configure the `auto upload settings for Nextcloud`
+@MainActor
 struct NCAutoUploadView: View {
+    @State private var reachedAnchor = false
+
     @StateObject var model: NCAutoUploadModel
     @StateObject var albumModel: AlbumModel
     @State private var showUploadFolder = false
     @State private var showSelectAlbums = false
     @State private var showUploadAllPhotosWarning = false
+    @State private var showFocusedAutoUploadIntro = false
+    @State private var showFocusedAutoUploadProgress = false
+    @State private var openFocusedAutoUploadFinish = false
     @State private var startAutoUpload = false
+    @Environment(NCAutoUploadCounter.self) private var autoUploadCounter
 
     var body: some View {
         ZStack {
@@ -25,8 +32,26 @@ struct NCAutoUploadView: View {
         }
         .navigationBarTitle(NSLocalizedString("_auto_upload_folder_", comment: ""))
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .principal) {
+                VStack(spacing: 0) {
+                    Text(NSLocalizedString("_auto_upload_folder_", comment: ""))
+                        .font(.headline)
+
+                    if model.autoUploadStart && autoUploadCounter.isLoaded {
+                        Text(autoUploadCounter.itemsLeftSummary)
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                    }
+                }
+            }
+        }
         .onAppear {
             model.onViewAppear()
+            updateAutoUploadCounterSubscription()
+        }
+        .onDisappear {
+            stopAutoUploadCounterSubscription()
         }
         .onReceive(NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification)) { _ in
             model.checkPermission()
@@ -43,35 +68,76 @@ struct NCAutoUploadView: View {
         .sheet(isPresented: $showSelectAlbums) {
             SelectAlbumView(model: albumModel)
         }
-        .alert(NSLocalizedString("_auto_upload_all_photos_warning_title_", comment: ""), isPresented: $showUploadAllPhotosWarning, actions: {
-            if model.existsAutoUpload() {
-                Button("_confirm_continue_") {
-                    model.autoUploadStart = true
-                }
-                Button("_confirm_resetting_") {
-                    model.deleteAutoUploadTransfer()
-                    model.autoUploadStart = true
-                }
-                Button("_cancel_", role: .cancel) {
-                    model.autoUploadStart = false
-                }
-            } else {
-                Button("_confirm_") {
-                    model.autoUploadStart = true
-                }
-                Button("_cancel_", role: .cancel) {
-                    model.autoUploadStart = false
-                }
+        .sheet(isPresented: $showUploadAllPhotosWarning) {
+            ConfirmAutoUploadSheet(model: model, isPresented: $showUploadAllPhotosWarning)
+            .presentationDetents([.medium, .large])
+        }
+        .sheet(isPresented: $showFocusedAutoUploadIntro, onDismiss: {
+            guard openFocusedAutoUploadFinish else { return }
+
+            openFocusedAutoUploadFinish = false
+            guard autoUploadCounter.hasItemsToUpload else { return }
+
+            showFocusedAutoUploadProgress = true
+        }) {
+            NCFocusedAutoUploadIntroView {
+                openFocusedAutoUploadFinish = true
+                showFocusedAutoUploadIntro = false
             }
-        }, message: {
-            Text("_auto_upload_all_photos_warning_message_")
-        })
-        .tint(.primary)
+            .presentationDetents([.large])
+        }
+        .fullScreenCover(isPresented: $showFocusedAutoUploadProgress) {
+            NCFocusedAutoUploadProgressView(isPresented: $showFocusedAutoUploadProgress,
+                                            account: model.session.account,
+                                            urlBase: model.session.urlBase,
+                                            userId: model.session.userId)
+                .environment(autoUploadCounter)
+        }
+        .onChange(of: model.autoUploadStart) { _, newValue in
+            if !newValue {
+                showFocusedAutoUploadIntro = false
+                showFocusedAutoUploadProgress = false
+                openFocusedAutoUploadFinish = false
+            }
+            updateAutoUploadCounterSubscription()
+        }
     }
 
     @ViewBuilder
     var autoUploadOnView: some View {
         Form {
+            if model.autoUploadStart && autoUploadCounter.hasItemsToUpload {
+                Section(content: {
+                    Button {
+                        showFocusedAutoUploadIntro = true
+                    } label: {
+                        HStack {
+                            Image(systemName: "moon")
+                                .font(.icon())
+                                .frame(width: 26)
+                                .foregroundColor(Color(NCBrandColor.shared.iconImageColor))
+
+                            Text(NSLocalizedString("_focused_auto_upload_", comment: ""))
+                                .font(.body)
+                                .foregroundStyle(.primary)
+
+                            Spacer()
+
+                            Image(systemName: "chevron.right")
+                                .font(.footnote)
+                                .fontWeight(.semibold)
+                                .foregroundStyle(.tertiary)
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .contentShape(Rectangle())
+                    }
+                    .buttonStyle(.plain)
+                }, footer: {
+                    Text(NSLocalizedString("_focused_auto_upload_settings_footer_", comment: ""))
+                        .font(.footnote)
+                })
+            }
+
             Group {
                 Section(content: {
                     Button(action: {
@@ -118,20 +184,20 @@ struct NCAutoUploadView: View {
                         })
                     }
 
-                    Toggle(NSLocalizedString("_back_up_new_photos_only_", comment: ""), isOn: $model.autoUploadOnlyNew)
-                        .tint(Color(NCBrandColor.shared.getElement(account: model.session.account)))
-                        .opacity(model.autoUploadStart ? 0.15 : 1)
-                        .onChange(of: model.autoUploadOnlyNew) { _, newValue in
+                    Toggle(NSLocalizedString("_back_up_new_photos_only_", comment: ""), isOn: Binding(
+                        get: {
+                            model.autoUploadSinceDate != nil
+                        },
+                        set: { newValue in
                             model.handleAutoUploadOnlyNew(newValue: newValue)
                         }
-                        .accessibilityIdentifier("NewPhotosToggle")
                     ))
                     .font(.body)
                     .tint(Color(NCBrandColor.shared.getElement(account: model.session.account)))
                     .opacity(model.autoUploadStart ? 0.15 : 1)
                     .accessibilityIdentifier("NewPhotosToggle")
                 }, footer: {
-                    if model.autoUploadOnlyNew == true, let date = model.autoUploadOnlyNewSinceDate {
+                    if let date = model.autoUploadSinceDate {
                         Text(String(format: NSLocalizedString("_new_photos_starting_", comment: ""), NCUtility().longDate(date)))
                             .font(.footnote)
                     }
@@ -212,11 +278,11 @@ struct NCAutoUploadView: View {
 
                 // Location
                 Section(content: {
-                    Toggle(NSLocalizedString("_enable_background_location_title_", comment: ""), isOn: $model.permissionGranted)
+                    Toggle(NSLocalizedString("_enable_background_location_title_", comment: ""), isOn: $model.locationAutoUploadPermissionGranted)
                         .font(.body)
                         .tint(Color(NCBrandColor.shared.getElement(account: model.session.account)))
                         .opacity(model.autoUploadStart ? 0.15 : 1)
-                        .onChange(of: model.permissionGranted) { _, newValue in
+                        .onChange(of: model.locationAutoUploadPermissionGranted) { _, newValue in
                             model.handleLocationChange(newValue: newValue)
                         }
                 }, footer: {
@@ -225,31 +291,14 @@ struct NCAutoUploadView: View {
                 })
             }
             .disabled(model.autoUploadStart)
-
-            // Auto Upload Full
-            Section(content: {
-                Toggle(isOn: model.autoUploadOnlyNew || model.autoUploadStart ? $model.autoUploadStart : $showUploadAllPhotosWarning) {
-                    Text(model.autoUploadStart ? "_stop_autoupload_" : "_start_autoupload_")
-                        .padding(.horizontal, 20)
-                        .padding(.vertical, 10)
-                }
-                .tint(Color(NCBrandColor.shared.getElement(account: model.session.account)))
-                .onChange(of: model.autoUploadStart) { _, newValue in
-                    albumModel.populateSelectedAlbums()
-                    model.handleAutoUploadChange(newValue: newValue, assetCollections: albumModel.selectedAlbums)
-                }
-                .font(.headline)
-                .toggleStyle(.button)
-                .buttonStyle(.bordered)
-            }, footer: {
-                Text(NSLocalizedString("_autoupload_notice_", comment: ""))
-                    .padding(.top, 20)
-                    .padding(.bottom, 40)
-            })
-            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
-            .listRowInsets(EdgeInsets())
-            .background(Color(UIColor.systemGroupedBackground))
         }
+        .safeAreaInset(edge: .bottom) {
+            autoUploadStartButton
+                .frame(maxWidth: .infinity)
+                .padding(.bottom, 10)
+        }
+    }
+
     @ViewBuilder
     var autoUploadStartButton: some View {
         Section(content: {
@@ -278,6 +327,17 @@ struct NCAutoUploadView: View {
                     .toggleStyle(AutoUploadProminentButtonStyle(model: model))
             }
         })
+    }
+
+    private func updateAutoUploadCounterSubscription() {
+        autoUploadCounter.start(account: model.session.account,
+                                urlBase: model.session.urlBase,
+                                userId: model.session.userId,
+                                autoUploadStart: model.autoUploadStart)
+    }
+
+    private func stopAutoUploadCounterSubscription() {
+        autoUploadCounter.stop()
     }
 }
 
@@ -412,4 +472,5 @@ struct ConfirmAutoUploadSheet: View {
 
 #Preview {
     NCAutoUploadView(model: NCAutoUploadModel(controller: nil), albumModel: AlbumModel(controller: nil))
+        .environment(NCAutoUploadCounter())
 }

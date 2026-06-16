@@ -15,7 +15,6 @@ extension NCMedia {
                                                                mediaPath: tblAccount.mediaPath,
                                                                showOnlyImages: self.showOnlyImages,
                                                                showOnlyVideos: self.showOnlyVideos)
-        if let metadatas = await self.database.getMetadatasAsync(predicate: mediaPredicate, sortedByKeyPath: NCPreferences().mediaSortDate, ascending: false) {
         let sortedByKeyPath = "date"
 
         if let metadatas = await self.database.getMetadatasAsync(predicate: mediaPredicate, sortedByKeyPath: sortedByKeyPath, ascending: false) {

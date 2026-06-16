@@ -68,8 +68,6 @@ class NCShareCommentsCell: UITableViewCell {
         avatarButton.showsMenuAsPrimaryAction = true
 
         buttonMenu.showsMenuAsPrimaryAction = true
-        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(tapAvatarImage))
-        imageItem?.addGestureRecognizer(tapGesture)
     }
 
     func configureAvatarMenu() {

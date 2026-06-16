@@ -96,51 +96,6 @@ extension NCManageDatabase {
             if let errorCode {
                 metadata.errorCode = errorCode
             }
-
-            if let progress {
-                metadata.progress = progress
-            }
-        }
-
-        return await performRealmReadAsync { realm in
-            realm.objects(tableMetadata.self)
-                .filter(query)
-                .first?
-                .detachedCopy()
-        }
-    }
-
-    func setMetadataProgress(fileName: String,
-                             serverUrl: String,
-                             taskIdentifier: Int,
-                             progress: Double) async {
-        await performRealmWriteAsync { realm in
-            guard let metadata = realm.objects(tableMetadata.self)
-                .filter("fileName == %@ AND serverUrl == %@ and sessionTaskIdentifier == %d", fileName, serverUrl, taskIdentifier)
-                .first else {
-                return
-            }
-
-            if abs(metadata.progress - progress) > 0.001 {
-                metadata.progress = progress
-                print(progress)
-            }
-        }
-    }
-
-    func setMetadataProgress(ocId: String,
-                             progress: Double) async {
-        await performRealmWriteAsync { realm in
-            guard let metadata = realm.objects(tableMetadata.self)
-                .filter("ocId == %@", ocId)
-                .first else {
-                return
-            }
-
-            if abs(metadata.progress - progress) > 0.001 {
-                metadata.progress = progress
-                print(progress)
-            }
         }
     }
 
@@ -210,23 +165,6 @@ extension NCManageDatabase {
         }
     }
 
-    // MARK: - Realm Read
-
-    func updateBadge() async {
-        #if !EXTENSION
-        let num = await performRealmReadAsync { realm in
-            realm.objects(tableMetadata.self)
-                .filter(NSPredicate(format: "status != %i", NCGlobal.shared.metadataStatusNormal))
-                .count
-        } ?? 0
-        DispatchQueue.main.async {
-            UNUserNotificationCenter.current().setBadgeCount(num) { error in
-                if let error {
-                    print("Failed to set badge count: \(error)")
-                }
-            }
-        }
-        #endif
     func clearMetadatasSessionAsync(ocId: String) async {
         await core.performRealmWriteAsync { realm in
             guard let object = realm.object(ofType: tableMetadata.self, forPrimaryKey: ocId) else { return }

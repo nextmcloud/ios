@@ -26,11 +26,6 @@ import SwiftUI
 import NextcloudKit
 
 protocol NCSelectDelegate: AnyObject {
-    func dismissSelect(serverUrl: String?, metadata: tableMetadata?, type: String, items: [Any], overwrite: Bool, copy: Bool, move: Bool)//, session: NCSession.Session)
-}
-
-class NCSelect: UIViewController, UIGestureRecognizerDelegate, UIAdaptivePresentationControllerDelegate, NCListCellDelegate, NCGridCellDelegate, NCSectionFirstHeaderDelegate, NCTransferDelegate, NCEmptyDataSetDelegate {
-    
     func dismissSelect(serverUrl: String?,
                        metadata: tableMetadata?,
                        type: String,
@@ -74,9 +69,6 @@ class NCSelect: UIViewController, UIGestureRecognizerDelegate, UIAdaptivePresent
     var titleCurrentFolder = NCBrandOptions.shared.brand
     var serverUrl = ""
     var session: NCSession.Session!
-    var controller: NCMainTabBarController? {
-        self.tabBarController as? NCMainTabBarController
-    }
     var controller: NCMainTabBarController?
     // -------------------------------------------------------------
 
@@ -94,46 +86,21 @@ class NCSelect: UIViewController, UIGestureRecognizerDelegate, UIAdaptivePresent
         SceneManager.shared.getWindowScene(controller: controller)
     }
 
-    private var layoutForView: NCDBLayoutForView?
-    private var activeAccount: tableAccount!
-    private var listLayout: NCListLayout!
-    private var gridLayout: NCGridLayout!
-//    private let layoutKey = NCGlobal.shared.layoutViewMove
-    internal var headerMenu: NCSectionHeaderMenu?
-    private var isEditMode = false
-    private var isSearching = false
-    private var networkInProgress = false
-    private var fileSelect: [String] = []
-    internal var richWorkspaceText: String?
-
-    private let window = UIApplication.shared.connectedScenes.flatMap { ($0 as? UIWindowScene)?.windows ?? [] }.first { $0.isKeyWindow }
-    var predicate = NSPredicate()
-    var emptyDataSet: NCEmptyDataSet?
-
     // MARK: - View Life Cycle
 
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        navigationController?.setNavigationBarAppearance()
-        navigationController?.navigationBar.prefersLargeTitles = true
-        navigationController?.presentationController?.delegate = self
 
         view.backgroundColor = .systemBackground
         collectionView.backgroundColor = .systemBackground
 
         selectCommandViewSelect?.separatorView.backgroundColor = .separator
 
-        activeAccount = NCManageDatabase.shared.getActiveTableAccount()
-        session = NCSession.shared.getSession(account: activeAccount.account)
-
         // Cell
         collectionView.register(UINib(nibName: "NCListCell", bundle: nil), forCellWithReuseIdentifier: "listCell")
-        collectionView.register(UINib(nibName: "NCGridCell", bundle: nil), forCellWithReuseIdentifier: "gridCell")
         collectionView.collectionViewLayout = NCListLayout()
 
         // Header
-        collectionView.register(UINib(nibName: "NCSectionHeaderMenu", bundle: nil), forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "sectionHeaderMenu")
         collectionView.register(UINib(nibName: "NCSectionFirstHeaderEmptyData", bundle: nil), forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "sectionFirstHeaderEmptyData")
         collectionView.register(UINib(nibName: "NCSectionFirstHeader", bundle: nil), forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "sectionFirstHeader")
 
@@ -142,16 +109,8 @@ class NCSelect: UIViewController, UIGestureRecognizerDelegate, UIAdaptivePresent
         collectionView.alwaysBounceVertical = true
         collectionView.backgroundColor = .systemBackground
 
-        listLayout = NCListLayout()
-        gridLayout = NCGridLayout()
-
         buttonCancel.title = NSLocalizedString("_cancel_", comment: "")
-        buttonCancel.tintColor = NCBrandColor.shared.customer
-        bottomContraint?.constant = UIApplication.shared.firstWindow?.rootViewController?.view.safeAreaInsets.bottom ?? 0
         bottomContraint?.constant = UIApplication.shared.mainAppWindow?.rootViewController?.view.safeAreaInsets.bottom ?? 0
-
-        // Empty
-        emptyDataSet = NCEmptyDataSet(view: collectionView, offset: NCGlobal.shared.heightButtonsView, delegate: self)
 
         // Type of command view
         if typeOfCommandView == .select || typeOfCommandView == .selectCreateFolder {
@@ -162,7 +121,7 @@ class NCSelect: UIViewController, UIGestureRecognizerDelegate, UIAdaptivePresent
             }
             self.view.addSubview(selectCommandViewSelect!)
 
-//            selectCommandViewSelect?.setColor(account: session.account)
+            selectCommandViewSelect?.setColor(account: session.account)
             selectCommandViewSelect?.selectView = self
             selectCommandViewSelect?.translatesAutoresizingMaskIntoConstraints = false
 
@@ -290,25 +249,6 @@ class NCSelect: UIViewController, UIGestureRecognizerDelegate, UIAdaptivePresent
             self.pushMetadata(metadata)
         }
     }
-    
-    // MARK: - Empty
-
-    func emptyDataSetView(_ view: NCEmptyView) {
-
-        if self.dataSourceTask?.state == .running {
-            view.emptyImage.image = UIImage(named: "networkInProgress")?.image(color: .gray, size: UIScreen.main.bounds.width)
-            view.emptyTitle.text = NSLocalizedString("_request_in_progress_", comment: "")
-            view.emptyDescription.text = ""
-        } else {
-            view.emptyImage.image = UIImage(named: "folder_nmcloud")
-            if includeImages {
-                view.emptyTitle.text = NSLocalizedString("_files_no_files_", comment: "")
-            } else {
-                view.emptyTitle.text = NSLocalizedString("_files_no_folders_", comment: "")
-            }
-            view.emptyDescription.text = ""
-        }
-    }
 
     // MARK: ACTION
 
@@ -317,19 +257,16 @@ class NCSelect: UIViewController, UIGestureRecognizerDelegate, UIAdaptivePresent
     }
 
     func selectButtonPressed(_ sender: UIButton) {
-        delegate?.dismissSelect(serverUrl: serverUrl, metadata: metadataFolder, type: type, items: items, overwrite: overwrite, copy: false, move: false)
         delegate?.dismissSelect(serverUrl: serverUrl, metadata: metadataFolder, type: type, items: items, overwrite: overwrite, copy: false, move: false, session: session, controller: controller)
         self.dismiss(animated: true, completion: nil)
     }
 
     func copyButtonPressed(_ sender: UIButton) {
-        delegate?.dismissSelect(serverUrl: serverUrl, metadata: metadataFolder, type: type, items: items, overwrite: overwrite, copy: true, move: false)
         delegate?.dismissSelect(serverUrl: serverUrl, metadata: metadataFolder, type: type, items: items, overwrite: overwrite, copy: true, move: false, session: session, controller: controller)
         self.dismiss(animated: true, completion: nil)
     }
 
     func moveButtonPressed(_ sender: UIButton) {
-        delegate?.dismissSelect(serverUrl: serverUrl, metadata: metadataFolder, type: type, items: items, overwrite: overwrite, copy: false, move: true)
         delegate?.dismissSelect(serverUrl: serverUrl, metadata: metadataFolder, type: type, items: items, overwrite: overwrite, copy: false, move: true, session: session, controller: controller)
         self.dismiss(animated: true, completion: nil)
     }
@@ -357,16 +294,6 @@ class NCSelect: UIViewController, UIGestureRecognizerDelegate, UIAdaptivePresent
     func tapRichWorkspace(_ sender: Any) { }
     func tapRecommendations(with metadata: tableMetadata) { }
 
-    func tapMoreGridItem(with ocId: String, ocIdTransfer: String, namedButtonMore: String, image: UIImage?, sender: Any) { }
-    
-    func longPressGridItem(with ocId: String, ocIdTransfer: String, namedButtonMore: String, gestureRecognizer: UILongPressGestureRecognizer) { }
-
-    func longPressMoreGridItem(with ocId: String, namedButtonMore: String, gestureRecognizer: UILongPressGestureRecognizer) { }
-
-    func tapMoreGridItem(with ocId: String, ocIdTransfer: String, image: UIImage?, sender: Any) { }
-    
-    func longPressGridItem(with ocId: String, ocIdTransfer: String, gestureRecognizer: UILongPressGestureRecognizer) { }
-    
     // MARK: - Push metadata
 
     func pushMetadata(_ metadata: tableMetadata) {
@@ -415,7 +342,6 @@ extension NCSelect: UICollectionViewDelegate {
         if metadata.directory {
             self.pushMetadata(metadata)
         } else {
-            self.delegate?.dismissSelect(serverUrl: self.serverUrl, metadata: metadata, type: self.type, items: self.items, overwrite: self.overwrite, copy: false, move: false)
             self.delegate?.dismissSelect(serverUrl: self.serverUrl, metadata: metadata, type: self.type, items: self.items, overwrite: self.overwrite, copy: false, move: false, session: self.session, controller: controller)
             self.dismiss(animated: true, completion: nil)
         }
@@ -480,10 +406,12 @@ extension NCSelect: UICollectionViewDataSource {
         if metadata.directory {
             if metadata.e2eEncrypted {
                 cell.imageItem.image = NCImageCache.shared.getFolderEncrypted(account: metadata.account)
-            } else if metadata.permissions.contains("S"), (metadata.permissions.range(of: "S") != nil) {
+            } else if isShare {
                 cell.imageItem.image = NCImageCache.shared.getFolderSharedWithMe(account: metadata.account)
-            } else if isShare || !metadata.shareType.isEmpty {
-                cell.imageItem.image = NCImageCache.shared.getFolderPublic(account: metadata.account)
+            } else if !metadata.shareType.isEmpty {
+                metadata.shareType.contains(3) ?
+                (cell.imageItem.image = NCImageCache.shared.getFolderPublic(account: metadata.account)) :
+                (cell.imageItem.image = NCImageCache.shared.getFolderSharedWithMe(account: metadata.account))
             } else if metadata.mountType == "group" {
                 cell.imageItem.image = NCImageCache.shared.getFolderGroup(account: metadata.account)
             } else if isMounted {
@@ -502,9 +430,6 @@ extension NCSelect: UICollectionViewDataSource {
 
             self.database.getTableLocal(predicate: NSPredicate(format: "ocId == %@", metadata.ocId)) { tblLocalFile in
                 if let tblLocalFile, tblLocalFile.offline {
-                    cell.imageLocal.image = NCImageCache.shared.getImageOfflineFlag(colors: [.systemBackground, .systemGreen])
-                } else if self.utilityFileSystem.fileProviderStorageExists(metadata) {
-                    cell.imageLocal.image = NCImageCache.shared.getImageLocal(colors: [.systemBackground, .systemGreen])
                     cell.imageLocal?.image = NCImageCache.shared.getImageOfflineFlag()
                 } else if self.utilityFileSystem.fileProviderStorageExists(metadata) {
                     cell.imageLocal?.image = NCImageCache.shared.getImageLocal()
@@ -755,7 +680,6 @@ struct SelectView: UIViewControllerRepresentable {
             self.parent = parent
         }
 
-        func dismissSelect(serverUrl: String?, metadata: tableMetadata?, type: String, items: [Any], overwrite: Bool, copy: Bool, move: Bool) {//}, session: NCSession.Session) {
         func dismissSelect(serverUrl: String?, metadata: tableMetadata?, type: String, items: [Any], overwrite: Bool, copy: Bool, move: Bool, session: NCSession.Session, controller: NCMainTabBarController?) {
             if let serverUrl = serverUrl {
                 self.parent.serverUrl = serverUrl
