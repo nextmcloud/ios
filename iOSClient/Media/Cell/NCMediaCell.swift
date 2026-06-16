@@ -5,7 +5,6 @@
 import UIKit
 
 class NCMediaCell: UICollectionViewCell {
-
     @IBOutlet weak var imageItem: UIImageView!
     @IBOutlet weak var imageVisualEffect: UIVisualEffectView!
     @IBOutlet weak var imageSelect: UIImageView!
@@ -28,20 +27,20 @@ class NCMediaCell: UICollectionViewCell {
         imageStatus.image = nil
         imageItem.image = nil
         imageVisualEffect.alpha = 0.4
-//        imageSelect.image = NCImageCache.shared.getImageCheckedYes(color: color)
+        imageSelect.image = NCImageCache.shared.getImageCheckedYes()
         imageVisualEffect.isHidden = true
         imageSelect.isHidden = true
     }
 
-    func selected(_ status: Bool, color: UIColor) {
+    func selected(_ status: Bool) {
         if status {
 //            imageSelect.isHidden = false
             imageVisualEffect.isHidden = false
-            imageSelect.image = NCImageCache.shared.getImageCheckedYes(color: color)
+            imageSelect.image = NCImageCache.shared.getImageCheckedYes()
         } else {
 //            imageSelect.isHidden = true
             imageVisualEffect.isHidden = true
-            imageSelect.image = NCImageCache.shared.getImageCheckedNo(color: color)
+            imageSelect.image = NCImageCache.shared.getImageCheckedNo()
         }
     }
 }
