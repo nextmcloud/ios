@@ -27,6 +27,7 @@ import EasyTipView
 import SwiftUI
 
 class NCScan: UIViewController, NCScanCellCellDelegate {
+
     @IBOutlet weak var collectionViewSource: UICollectionView!
     @IBOutlet weak var collectionViewDestination: UICollectionView!
     @IBOutlet weak var cancel: UIBarButtonItem!
@@ -51,10 +52,6 @@ class NCScan: UIViewController, NCScanCellCellDelegate {
     internal let utility = NCUtility()
     internal let database = NCManageDatabase.shared
     internal var filter: NCGlobal.TypeFilterScanDocument = NCPreferences().typeFilterScanDocument
-
-    private var editMenuInteraction: UIEditMenuInteraction?
-    private var traitRegistration: UITraitChangeRegistration?
-
     @MainActor
     internal var session: NCSession.Session {
         NCSession.shared.getSession(controller: controller)
@@ -69,14 +66,6 @@ class NCScan: UIViewController, NCScanCellCellDelegate {
 
         view.backgroundColor = .secondarySystemGroupedBackground
         navigationItem.title = NSLocalizedString("_scanned_images_", comment: "")
-
-        let interaction = UIEditMenuInteraction(delegate: self)
-        view.addInteraction(interaction)
-        self.editMenuInteraction = interaction
-
-        traitRegistration = registerForTraitChanges([UITraitUserInterfaceStyle.self]) { (self: Self, _) in
-            self.updateIcons()
-        }
 
         collectionViewSource.dragInteractionEnabled = true
         collectionViewSource.dragDelegate = self
@@ -122,6 +111,10 @@ class NCScan: UIViewController, NCScanCellCellDelegate {
 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+        
+        // Re-evaluate in-app messages after viewDidAppear
+        MoEngageAnalytics.shared.displayInAppNotificationSafely(reason: "viewDidAppear")
+
         showTip()
     }
 
@@ -137,7 +130,9 @@ class NCScan: UIViewController, NCScanCellCellDelegate {
 
     // MARK: -
 
-    private func updateIcons() {
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+
         add.setImage(utility.loadImage(named: "plus", colors: [NCBrandColor.shared.iconImageColor]), for: .normal)
         transferDown.setImage(utility.loadImage(named: "arrow.down", colors: [NCBrandColor.shared.iconImageColor]), for: .normal)
     }
@@ -294,31 +289,33 @@ class NCScan: UIViewController, NCScanCellCellDelegate {
     }
 
     @objc func handleLongPressGesture(recognizer: UIGestureRecognizer) {
-        guard recognizer.state == .began else { return }
-        becomeFirstResponder()
-
-        guard let recognizerView = recognizer.view,
-              UIPasteboard.general.hasImages else {
-//        if recognizer.state == UIGestureRecognizer.State.began {
-//            self.becomeFirstResponder()
-//            let pasteboard = UIPasteboard.general
-//            if let recognizerView = recognizer.view, let recognizerSuperView = recognizerView.superview, pasteboard.hasImages {
-//                UIMenuController.shared.menuItems = [UIMenuItem(title: "Paste", action: #selector(pasteImage))]
-//                UIMenuController.shared.showMenu(from: recognizerSuperView, rect: recognizerView.frame)
-//            }
+        if recognizer.state == UIGestureRecognizer.State.began {
+            self.becomeFirstResponder()
+            let pasteboard = UIPasteboard.general
+            if let recognizerView = recognizer.view, let recognizerSuperView = recognizerView.superview, pasteboard.hasImages {
+                UIMenuController.shared.menuItems = [UIMenuItem(title: "Paste", action: #selector(pasteImage(_:)))]
+                UIMenuController.shared.showMenu(from: recognizerSuperView, rect: recognizerView.frame)
+            }
             // TIP
             dismissTip()
-            return
         }
+    }
 
-        let sourcePoint = recognizer.location(in: recognizerView)
-        let configuration = UIEditMenuConfiguration(
-            identifier: nil,
-            sourcePoint: sourcePoint
-        )
+    @objc func pasteImage(_ sender: Any?) {
+        let pasteboard = UIPasteboard.general
+        if pasteboard.hasImages {
+            guard let image = pasteboard.image?.fixedOrientation() else { return }
+            let fileName = utilityFileSystem.createFileName("scan.png", fileDate: Date(), fileType: PHAssetMediaType.image, notUseMask: true)
+            let fileNamePath = utilityFileSystem.createServerUrl(serverUrl: utilityFileSystem.directoryScan, fileName: fileName)
 
-        editMenuInteraction?.presentEditMenu(with: configuration)
-        dismissTip()
+            do {
+                try image.pngData()?.write(to: NSURL.fileURL(withPath: fileNamePath), options: .atomic)
+            } catch {
+                return
+            }
+
+            loadImage()
+        }
     }
 
     func delete(with imageIndex: Int, sender: Any) {
@@ -397,56 +394,5 @@ extension NCScan: NCViewerQuickLookDelegate {
         }
         collectionViewSource.reloadData()
         collectionViewDestination.reloadData()
-    }
-}
-
-extension NCScan: UIEditMenuInteractionDelegate {
-    func editMenuInteraction(
-        _ interaction: UIEditMenuInteraction,
-        menuFor configuration: UIEditMenuConfiguration,
-        suggestedActions: [UIMenuElement]
-    ) -> UIMenu? {
-        guard UIPasteboard.general.hasImages else { return nil }
-
-        let pasteAction = UIAction(
-            title: NSLocalizedString("_paste_file_", comment: ""),
-            image: UIImage(systemName: "doc.on.clipboard")
-        ) { [weak self] _ in
-            self?.pasteImage()
-        }
-
-        return UIMenu(children: [pasteAction])
-    }
-
-    func pasteImage() {
-        let pasteboard = UIPasteboard.general
-
-        guard pasteboard.hasImages,
-              let image = pasteboard.image?.fixedOrientation(),
-              let data = image.pngData() else {
-            return
-        }
-
-        let fileName = utilityFileSystem.createFileName(
-            "scan.png",
-            fileDate: Date(),
-            fileType: .image,
-            notUseMask: true
-        )
-
-        let fileNamePath = utilityFileSystem.createServerUrl(
-            serverUrl: utilityFileSystem.directoryScan,
-            fileName: fileName
-        )
-
-        do {
-            try data.write(
-                to: URL(fileURLWithPath: fileNamePath),
-                options: .atomic
-            )
-            loadImage()
-        } catch {
-            return
-        }
     }
 }

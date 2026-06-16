@@ -71,6 +71,10 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
 
         self.init()
 
+        if serverUrl == utilityFileSystem.getHomeServer(urlBase: appDelegate?.urlBase ?? "", userId: appDelegate?.userId ?? "") {
+            titleServerUrl = "/"
+        } else {
+            titleServerUrl = (serverUrl as NSString).lastPathComponent
         if serverUrl == utilityFileSystem.getHomeServer(session: session) {
             titleServerUrl = "/"
         } else {
@@ -508,12 +512,18 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
 
     // MARK: - Action
     
+    func dismissSelect(serverUrl: String?, metadata: tableMetadata?, type: String, items: [Any], indexPath: [IndexPath], overwrite: Bool, copy: Bool, move: Bool) {
+        
+    func dismissSelect(serverUrl: String?, metadata: tableMetadata?, type: String, items: [Any], overwrite: Bool, copy: Bool, move: Bool) {
+        
+    
     func dismissSelect(serverUrl: String?, metadata: tableMetadata?, type: String, items: [Any], overwrite: Bool, copy: Bool, move: Bool) {
 
         if serverUrl != nil {
 
             self.serverUrl = serverUrl!
 
+            if serverUrl == utilityFileSystem.getHomeServer(urlBase: appDelegate?.urlBase ?? "", userId: appDelegate?.userId ?? "") {
             if serverUrl == utilityFileSystem.getHomeServer(session: session) {
                 self.titleServerUrl = "/"
             } else {
@@ -746,11 +756,18 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
                 }
             }
             
+            
+            let metadataForUpload = NCManageDatabase.shared.createMetadata(account: appDelegate?.account ?? "", user: appDelegate?.user ?? "", userId: appDelegate?.userId ?? "", fileName: fileNameSave, fileNameView: fileNameSave, ocId: UUID().uuidString, serverUrl: serverUrl, urlBase: appDelegate?.urlBase ?? "", url: "", contentType: "")
+            
+//            let metadataForUpload = NCManageDatabase.shared.createMetadata(account: appDelegate?.account ?? "", user: appDelegate?.user ?? "", userId: appDelegate?.userId ?? "", fileName: fileNameSave, fileNameView: fileNameSave, ocId: UUID().uuidString, serverUrl: serverUrl, urlBase: appDelegate?.urlBase ?? "", url: "", contentType: "")
             let metadataForUpload = NCManageDatabase.shared.createMetadata(fileName: fileNameSave, fileNameView: fileNameSave, ocId: UUID().uuidString, serverUrl: serverUrl, url: "", contentType: "", session: session, sceneIdentifier: self.appDelegate?.sceneIdentifier)
 
             metadataForUpload.session = NCNetworking.shared.sessionUploadBackground
             metadataForUpload.sessionSelector = NCGlobal.shared.selectorUploadFile
             metadataForUpload.status = NCGlobal.shared.metadataStatusWaitUpload
+            
+            if NCManageDatabase.shared.getMetadataConflict(account: appDelegate?.account ?? "", serverUrl: serverUrl, fileNameView: fileNameSave) != nil {
+                
                             
             if NCManageDatabase.shared.getMetadataConflict(account: session.account, serverUrl: serverUrl, fileNameView: fileNameSave, nativeFormat: false) != nil {
                 
@@ -882,11 +899,17 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
                 
                 let image = changeCompressionImage(arrayImages[count])
                 
+                let metadataForUpload = NCManageDatabase.shared.createMetadata(account: appDelegate?.account ?? "", user: appDelegate?.user ?? "", userId: appDelegate?.userId ?? "", fileName: fileNameSave, fileNameView: fileNameSave, ocId: UUID().uuidString, serverUrl: serverUrl, urlBase: appDelegate?.urlBase ?? "", url: "", contentType: "")
+                
+//                let metadataForUpload = NCManageDatabase.shared.createMetadata(account: appDelegate?.account ?? "", user: appDelegate?.user ?? "", userId: appDelegate?.userId ?? "", fileName: fileNameSave, fileNameView: fileNameSave, ocId: UUID().uuidString, serverUrl: serverUrl, urlBase: appDelegate?.urlBase ?? "", url: "", contentType: "")
                 let metadataForUpload = NCManageDatabase.shared.createMetadata(fileName: fileNameSave, fileNameView: fileNameSave, ocId: UUID().uuidString, serverUrl: serverUrl, url: "", contentType: "", session: session, sceneIdentifier: self.appDelegate?.sceneIdentifier)
 
                 metadataForUpload.session = NCNetworking.shared.sessionUploadBackground
                 metadataForUpload.sessionSelector = NCGlobal.shared.selectorUploadFile
                 metadataForUpload.status = NCGlobal.shared.metadataStatusWaitUpload
+                
+                if NCManageDatabase.shared.getMetadataConflict(account: appDelegate?.account ?? "", serverUrl: serverUrl, fileNameView: fileNameSave) != nil {
+                    
                                     
                 if NCManageDatabase.shared.getMetadataConflict(account: session.account, serverUrl: serverUrl, fileNameView: fileNameSave, nativeFormat: false) != nil {
                     
