@@ -20,7 +20,9 @@ extension NCCollectionViewCommon: UICollectionViewDelegate {
                     return
                 }
             } else {
-                await showInfoBanner(windowScene: windowScene, text: "_e2e_server_disabled_")
+                Task {
+                    await showInfoBanner(windowScene: windowScene, text: "_e2e_server_disabled_")
+                }
                 return
             }
         }
@@ -55,12 +57,11 @@ extension NCCollectionViewCommon: UICollectionViewDelegate {
                         for: token)
                 }
             }
-
             if let banner {
                 await banner.dismissAsync()
             }
 
-            if results.nkError == .success || results.nkError == .cancelled {
+            if results.nkError == .success || results.afError?.isExplicitlyCancelledError ?? false {
                 print("ok")
             } else {
                 await showErrorBanner(windowScene: windowScene, text: results.nkError.errorDescription, errorCode: results.nkError.errorCode)
@@ -68,7 +69,7 @@ extension NCCollectionViewCommon: UICollectionViewDelegate {
         }
 
         if metadata.directory {
-            await pushMetadata(metadata)
+            pushMetadata(metadata)
         } else {
             Task { @MainActor in
                 let image = utility.getImage(ocId: metadata.ocId, etag: metadata.etag, ext: self.global.previewExt1024, userId: metadata.userId, urlBase: metadata.urlBase)
@@ -115,8 +116,9 @@ extension NCCollectionViewCommon: UICollectionViewDelegate {
                         self.navigationController?.pushViewController(vc, animated: true)
                     }
                 } else {
-                    let error = NKError(errorCode: global.errorOffline, errorDescription: "_go_online_")
-                    NCContentPresenter().showInfo(error: error)
+                    Task {
+                        await showErrorBanner(windowScene: windowScene, text: "_go_online_", errorCode: NCGlobal.shared.errorOfflineNotAllowed)
+                    }
                 }
             }
         }
@@ -142,9 +144,7 @@ extension NCCollectionViewCommon: UICollectionViewDelegate {
             return
         }
 
-        Task {
-            await didSelectMetadata(metadata, withOcIds: true)
-        }
+        self.didSelectMetadata(metadata, withOcIds: true)
     }
 
     func collectionView(_ collectionView: UICollectionView, contextMenuConfigurationForItemAt indexPath: IndexPath, point: CGPoint) -> UIContextMenuConfiguration? {
@@ -169,9 +169,9 @@ extension NCCollectionViewCommon: UICollectionViewDelegate {
         }
 
         return UIContextMenuConfiguration(identifier: identifier, previewProvider: {
-            return NCViewerProviderContextMenu(metadata: metadata, image: image, sceneIdentifier: self.sceneIdentifier)
+            return nil
         }, actionProvider: { _ in
-            let contextMenu = NCContextMenu(metadata: metadata.detachedCopy(), viewController: self, sceneIdentifier: self.sceneIdentifier, image: image)
+            let contextMenu = NCContextMenu(metadata: metadata.detachedCopy(), viewController: self, sceneIdentifier: self.sceneIdentifier, sender: cell)
             return contextMenu.viewMenu()
         })
     }
