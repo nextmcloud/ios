@@ -187,8 +187,10 @@ class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAud
             self.form.delegate = nil
 
             if let fileNameNew = formRow.value as? String {
-                self.fileName = utility.removeForbiddenCharacters(fileNameNew)
-                self.fileName = FileAutoRenamer.rename(filename: fileNameNew, isFolderPath: true)
+                Task {
+                    let capabilities = await NKCapabilities.shared.getCapabilities(for: session.account)
+                    self.fileName = FileAutoRenamer.rename(fileNameNew, isFolderPath: true, capabilities: capabilities)
+                }
             } else {
                 self.fileName = ""
             }
@@ -209,8 +211,8 @@ class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAud
 
     // MARK: - Action
 
-    func dismissSelect(serverUrl: String?, metadata: tableMetadata?, type: String, items: [Any], overwrite: Bool, copy: Bool, move: Bool) {
-
+    func dismissSelect(serverUrl: String?, metadata: tableMetadata?, type: String, items: [Any], overwrite: Bool, copy: Bool, move: Bool, session: NCSession.Session) {
+        
         if serverUrl != nil {
 
             self.serverUrl = serverUrl!
@@ -245,27 +247,36 @@ class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAud
             fileNameSave = (name as NSString).deletingPathExtension + ".m4a"
         }
 
-        let metadataForUpload = NCManageDatabase.shared.createMetadata(fileName: fileNameSave, fileNameView: fileNameSave, ocId: UUID().uuidString, serverUrl: serverUrl, url: "", contentType: "", session: session, sceneIdentifier: self.appDelegate.sceneIdentifier)
+        Task {
+            let fileNamePath = NSTemporaryDirectory() + fileNameSave
+            let metadata = await NCManageDatabaseCreateMetadata().createMetadataAsync(
+                fileName: fileNameSave,
+                ocId: UUID().uuidString,
+                serverUrl: serverUrl,//controller.currentServerUrl(),
+                session: self.session,
+                sceneIdentifier: self.controller?.sceneIdentifier)
 
-        metadataForUpload.session = NCNetworking.shared.sessionUploadBackground
-        metadataForUpload.sessionSelector = NCGlobal.shared.selectorUploadFile
-        metadataForUpload.status = NCGlobal.shared.metadataStatusWaitUpload
-        metadataForUpload.size = utilityFileSystem.getFileSize(filePath: fileNamePath)
+            metadata.session = NCNetworking.shared.sessionUploadBackground
+            metadata.sessionSelector = NCGlobal.shared.selectorUploadFile
+            metadata.status = NCGlobal.shared.metadataStatusWaitUpload
+            metadata.sessionDate = Date()
+            metadata.size = NCUtilityFileSystem().getFileSize(filePath: fileNamePath)
 
-        if NCManageDatabase.shared.getMetadataConflict(account: session.account, serverUrl: serverUrl, fileNameView: fileNameSave, nativeFormat: false) != nil {
+            if NCManageDatabase.shared.getMetadataConflict(account: session.account, serverUrl: serverUrl, fileNameView: fileNameSave, nativeFormat: false) != nil {
 
-            guard let conflict = UIStoryboard(name: "NCCreateFormUploadConflict", bundle: nil).instantiateInitialViewController() as? NCCreateFormUploadConflict else { return }
+                guard let conflict = UIStoryboard(name: "NCCreateFormUploadConflict", bundle: nil).instantiateInitialViewController() as? NCCreateFormUploadConflict else { return }
 
-            conflict.textLabelDetailNewFile = NSLocalizedString("_now_", comment: "")
-            conflict.serverUrl = serverUrl
-            conflict.metadatasUploadInConflict = [metadataForUpload]
-            conflict.delegate = self
+                conflict.textLabelDetailNewFile = NSLocalizedString("_now_", comment: "")
+                conflict.serverUrl = serverUrl
+                conflict.metadatasUploadInConflict = [metadata]
+                conflict.delegate = self
 
-            self.present(conflict, animated: true, completion: nil)
+                self.present(conflict, animated: true, completion: nil)
 
-        } else {
+            } else {
 
-            dismissAndUpload(metadataForUpload)
+                dismissAndUpload(metadata)
+            }
         }
     }
 
@@ -282,8 +293,14 @@ class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAud
 
         AnalyticsHelper.shared.trackCreateVoiceMemo(size: metadata.size, date: metadata.creationDate as Date)
 
-        utilityFileSystem.copyFile(atPath: self.fileNamePath, toPath: utilityFileSystem.getDirectoryProviderStorageOcId(metadata.ocId, fileNameView: metadata.fileNameView))
+        NCUtilityFileSystem().copyFile(atPath: fileNamePath, toPath: NCUtilityFileSystem().getDirectoryProviderStorageOcId(metadata.ocId,
+                                                                                                                           fileName: metadata.fileNameView,
+                                                                                                                           userId: metadata.userId,
+                                                                                                                           urlBase: metadata.urlBase))
 
+        Task {
+            await NCManageDatabase.shared.addMetadataAsync(metadata)
+        }
         NCNetworkingProcess.shared.createProcessUploads(metadatas: [metadata], completion: { _ in })
 
         self.dismiss(animated: true, completion: nil)
