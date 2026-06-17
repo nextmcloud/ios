@@ -1,6 +1,23 @@
-// SPDX-FileCopyrightText: Nextcloud GmbH
-// SPDX-FileCopyrightText: 2018 Marino Faggiana
-// SPDX-License-Identifier: GPL-3.0-or-later
+//
+//  NCTrash+Networking.swift
+//  Nextcloud
+//
+//  Created by Marino Faggiana on 18/03/24.
+//  Copyright © 2024 Marino Faggiana. All rights reserved.
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//
 
 import UIKit
 import NextcloudKit
@@ -26,6 +43,7 @@ extension NCTrash {
         }
 
         if let items = resultsListingTrash.items {
+            await self.database.deleteTrashAsync(fileId: self.getFilePath(), account: self.session.account)
             await self.database.addTrashAsync(items: items, account: self.session.account)
         }
 
@@ -58,7 +76,7 @@ extension NCTrash {
 
     func emptyTrash() async {
         let serverUrlFileName = session.urlBase + "/remote.php/dav/trashbin/" + session.userId + "/trash"
-        let results = await NextcloudKit.shared.deleteFileOrFolderAsync(serverUrlFileName: serverUrlFileName, account: session.account) { task in
+        let response = await NextcloudKit.shared.deleteFileOrFolderAsync(serverUrlFileName: serverUrlFileName, account: session.account) { task in
             Task {
                 let identifier = await NCNetworking.shared.networkingTasks.createIdentifier(account: self.session.account,
                                                                                             path: serverUrlFileName,
@@ -67,8 +85,8 @@ extension NCTrash {
             }
         }
 
-        if results.error != .success {
-            await showErrorBanner(windowScene: self.windowScene, text: results.error.errorDescription, errorCode: results.error.errorCode)
+        if response.error != .success {
+            await showErrorBanner(windowScene: windowScene, text: response.error.errorDescription, errorCode: response.error.errorCode)
         }
         await self.database.deleteTrashAsync(fileId: nil, account: session.account)
         await self.reloadDataSource()
@@ -80,7 +98,7 @@ extension NCTrash {
                 continue
             }
             let serverUrlFileName = result.filePath + result.fileName
-            let results = await NextcloudKit.shared.deleteFileOrFolderAsync(serverUrlFileName: serverUrlFileName, account: session.account) { task in
+            let response = await NextcloudKit.shared.deleteFileOrFolderAsync(serverUrlFileName: serverUrlFileName, account: session.account) { task in
                 Task {
                     let identifier = await NCNetworking.shared.networkingTasks.createIdentifier(account: self.session.account,
                                                                                                 path: serverUrlFileName,
@@ -88,8 +106,8 @@ extension NCTrash {
                     await NCNetworking.shared.networkingTasks.track(identifier: identifier, task: task)
                 }
             }
-            if results.error != .success {
-                await showErrorBanner(windowScene: self.windowScene, text: results.error.errorDescription, errorCode: results.error.errorCode)
+            if response.error != .success {
+                await showErrorBanner(windowScene: windowScene, text: response.error.errorDescription, errorCode: response.error.errorCode)
             }
             await self.database.deleteTrashAsync(fileId: fileId, account: session.account)
             await self.reloadDataSource()
