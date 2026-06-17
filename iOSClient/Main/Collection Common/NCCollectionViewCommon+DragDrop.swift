@@ -81,9 +81,7 @@ extension NCCollectionViewCommon: UICollectionViewDropDelegate {
                    let metadata = self.dataSource.getMetadata(indexPath: destinationIndexPath),
                    metadata.directory {
                     DragDropHover.shared.cleanPushDragDropHover()
-                    Task {
-                        await self.pushMetadata(metadata)
-                    }
+                    self.pushMetadata(metadata)
                 }
             }
         }
@@ -98,13 +96,13 @@ extension NCCollectionViewCommon: UICollectionViewDropDelegate {
             if let metadata = metadatas.first, metadata.account != self.session.account {
                 DragDropHover.shared.sourceMetadatas = metadatas
                 Task {
-                    await NCDragDrop().transfers(windowScene: windowScene,
+                    await NCDragDrop().transfers(collectionViewCommon: self,
                                                  destination: serverUrl,
                                                  session: self.session)
                 }
             } else {
                 DragDropHover.shared.sourceMetadatas = metadatas
-                openDragDropMenuItems(location: coordinator.session.location(in: collectionView))
+                openMenu(collectionView: collectionView, location: coordinator.session.location(in: collectionView))
             }
         }
     }
@@ -115,6 +113,41 @@ extension NCCollectionViewCommon: UICollectionViewDropDelegate {
 
     func collectionView(_ collectionView: UICollectionView, dropSessionDidEnd session: UIDropSession) {
         DragDropHover.shared.cleanPushDragDropHover()
+    }
+
+    // MARK: -
+
+    private func openMenu(collectionView: UICollectionView, location: CGPoint) {
+        var listMenuItems: [UIMenuItem] = []
+
+        listMenuItems.append(UIMenuItem(title: NSLocalizedString("_copy_", comment: ""), action: #selector(copyMenuFile(_:))))
+        listMenuItems.append(UIMenuItem(title: NSLocalizedString("_move_", comment: ""), action: #selector(moveMenuFile(_:))))
+        UIMenuController.shared.menuItems = listMenuItems
+        UIMenuController.shared.showMenu(from: collectionView, rect: CGRect(x: location.x, y: location.y, width: 0, height: 0))
+    }
+
+    @objc func copyMenuFile(_ sender: Any?) {
+        guard let sourceMetadatas = DragDropHover.shared.sourceMetadatas else { return }
+        var destination: String = self.serverUrl
+
+        if let destinationMetadata = DragDropHover.shared.destinationMetadata, destinationMetadata.directory {
+            destination = utilityFileSystem.createServerUrl(serverUrl: destinationMetadata.serverUrl, fileName: destinationMetadata.fileName)
+        }
+        Task {
+            await NCDragDrop().copyFile(metadatas: sourceMetadatas, destination: destination)
+        }
+    }
+
+    @objc func moveMenuFile(_ sender: Any?) {
+        guard let sourceMetadatas = DragDropHover.shared.sourceMetadatas else { return }
+        var destination: String = self.serverUrl
+
+        if let destinationMetadata = DragDropHover.shared.destinationMetadata, destinationMetadata.directory {
+            destination = utilityFileSystem.createServerUrl(serverUrl: destinationMetadata.serverUrl, fileName: destinationMetadata.fileName)
+        }
+        Task {
+            await NCDragDrop().moveFile(metadatas: sourceMetadatas, destination: destination)
+        }
     }
 }
 
