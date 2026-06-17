@@ -10,12 +10,17 @@ import Foundation
 import MoEngageSDK
 import MoEngageInApps
 import StoreKit
+import OSLog
 
 class MoEngageAnalytics: NSObject {
+    static let shared = MoEngageAnalytics()
+    private let log = Logger(subsystem: Bundle.main.bundleIdentifier ?? "MoEngage", category: "MoEngageAnalytics")
     
     // Initializer for the MoEngageAnalytics class
     override init() {
         super.init()
+        
+        log.debug("Initializing MoEngage SDK…")
 
         // Create a configuration object for MoEngage SDK with the given App ID and Data Center
         let sdkConfig = MoEngageSDKConfig(appId: "7KWWUKA6OKXGP8Q6DMCXLDX5", dataCenter: MoEngageDataCenter.data_center_02)
@@ -31,57 +36,152 @@ class MoEngageAnalytics: NSObject {
 #else
         MoEngage.sharedInstance.initializeDefaultLiveInstance(sdkConfig)
 #endif
-        setupMoEngageInAppMessaging()
+        log.debug("MoEngage SDK initializeDefault instance set (debug: \( self._isDebugBuild() ))")
+
+        Task { @MainActor in
+            setupMoEngageInAppMessaging()
+        }
         
         // Register delegate for In-App Native callbacks
         MoEngageSDKInApp.sharedInstance.setInAppDelegate(self)
+        log.debug("MoEngage In-App delegate set")
     }
     
+    // MARK: - Setup Helper
+    /// Call this early in app lifecycle (e.g., AppDelegate didFinishLaunching or SceneDelegate willConnect)
+    static func setupIfNeeded() {
+        _ = MoEngageAnalytics.shared
+    }
+
+    // MARK: - UI Helpers
+    private func activeWindowScene() -> UIWindowScene? {
+        return UIApplication.shared.connectedScenes
+            .compactMap { $0 as? UIWindowScene }
+            .first { $0.activationState == .foregroundActive }
+    }
+
+    private func topViewController(in root: UIViewController?) -> UIViewController? {
+        guard let root = root else { return nil }
+        if let nav = root as? UINavigationController { return topViewController(in: nav.visibleViewController) }
+        if let tab = root as? UITabBarController { return topViewController(in: tab.selectedViewController) }
+        if let presented = root.presentedViewController { return topViewController(in: presented) }
+        return root
+    }
+
+    @MainActor
+    func currentTopViewController() -> UIViewController? {
+        // 1. Find the active window scene (Crucial for iPad)
+        let activeScene = UIApplication.shared.connectedScenes
+            .compactMap { $0 as? UIWindowScene }
+            .first { $0.activationState == .foregroundActive }
+        
+        // 2. Get the key window from that specific scene
+        let keyWindow = activeScene?.windows.first { $0.isKeyWindow }
+                        ?? activeScene?.windows.first
+        
+        // 3. Start from the rootViewController
+        var topController = keyWindow?.rootViewController
+        
+        // 4. Drill down through navigation, tabs, and presented controllers
+        while let presentedController = topController?.presentedViewController {
+            topController = presentedController
+        }
+        
+        return topController
+    }
+
+    /// Safer wrapper that ensures visible scene and top VC before asking MoEngage to show in-apps
+    @MainActor
+    func displayInAppNotificationSafely(reason: String? = nil) {
+        let reasonText = reason ?? "unspecified"
+        
+        // 1. Get all connected window scenes
+        let scenes = UIApplication.shared.connectedScenes
+            .compactMap { $0 as? UIWindowScene }
+        
+        // 2. Prioritize the scene that actually has the "Key Window" (Works best for iPad Split View)
+        let activeScene = scenes.first { $0.windows.contains(where: { $0.isKeyWindow }) }
+                          ?? scenes.first { $0.activationState == .foregroundActive }
+        
+        guard let scene = activeScene else {
+            print("In-App not shown: No foreground window scene (reason: \(reasonText))")
+            return
+        }
+        
+        // 3. Ensure we have a valid top controller
+        guard let topVC = currentTopViewController() else {
+            print("In-App not shown: No top view controller available (reason: \(reasonText))")
+            return
+        }
+        
+        // 4. Trigger MoEngage
+        // iPad Tip: MoEngage uses the key window to determine where to draw the UI
+        if UIDevice.current.userInterfaceIdiom != .pad{
+            self.triggerMoEngage()
+        }
+        else {
+#if targetEnvironment(simulator)
+            // Simulator: Always show fallback alert
+            print("In-App  shown: showInApp)")
+            let appID = "312838242"
+            
+            // Correct URLs with /app/id/ prefix
+            let webURLString = "https://apps.apple.com\(appID)?action=write-review"
+            
+            self.showSimulatorAlert(link: webURLString)
+#else
+            // iPad Fallback: Scene might be transitioning. Retry once.
+            print("iPad Scene transition detected. Retrying...")
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                self.triggerMoEngage()
+            }
+#endif
+        }
+    }
+
+    private func triggerMoEngage() {
+        MoEngageSDKInApp.sharedInstance.showInApp()
+        MoEngageSDKInApp.sharedInstance.showNudge()
+    }
+
+
+    private func _isDebugBuild() -> Bool {
+        #if DEBUG
+        return true
+        #else
+        return false
+        #endif
+    }
+
     // Method to track the App ID
     func trackAppId() {
         MoEngageSDKAnalytics.sharedInstance.trackLocale(forAppID: "312838242")
     }
     
-    func setupMoEngageInAppMessaging() {
-        //MARK: MoEngage In-App messages
-        MoEngageSDKInApp.sharedInstance.showInApp()
-        MoEngageSDKInApp.sharedInstance.showNudge()
-    }
-    
-    // Handles triggering Apple's native review popup
-//    private func requestAppStoreReview() {
-//        DispatchQueue.main.async {
-//            if let scene = UIApplication.shared.connectedScenes
-//                .first(where: { $0.activationState == .foregroundActive }) as? UIWindowScene {
-//                SKStoreReviewController.requestReview(in: scene)
-//            }
-//        }
-//    }
-    
-    private func requestAppStoreReview() {
-        DispatchQueue.main.async {
-            guard
-                let windowScene = UIApplication.shared.connectedScenes
-                    .compactMap({ $0 as? UIWindowScene })
-                    .first(where: { $0.activationState == .foregroundActive })
-            else {
-                return
-            }
-            
-            #if targetEnvironment(simulator)
-            // Simulator fallback for testing
-            let alert = UIAlertController(
-                title: "Review Prompt (Simulator)",
-                message: "This simulates the App Store review dialog.",
-                preferredStyle: .alert
-            )
-            alert.addAction(UIAlertAction(title: "OK", style: .default))
-            windowScene.keyWindow?.rootViewController?.present(alert, animated: true)
-            #else
-            // Real request on device
-            SKStoreReviewController.requestReview(in: windowScene)
-            #endif
+    @MainActor func setupMoEngageInAppMessaging() {
+        // MARK: MoEngage In-App messages
+        log.debug("setupMoEngageInAppMessaging() — scheduling initial in-app evaluation")
+        Task { @MainActor in
+            displayInAppNotificationSafely(reason: "initial setup")
         }
+    }
+
+    // Helper to show the alert on the topmost view controller
+    private func showSimulatorAlert(link: String) {
+        let alert = UIAlertController(
+            title: "Simulator Mode",
+            message: "App Store links don't open in Simulator. On a real device, this would open: \(link)",
+            preferredStyle: .alert
+        )
+        alert.addAction(UIAlertAction(title: "OK", style: .default))
+        
+        // Finds the current active window to present the alert
+        let keyWindow = UIApplication.shared.connectedScenes
+            .compactMap { $0 as? UIWindowScene }
+            .flatMap { $0.windows }
+            .first { $0.isKeyWindow }
+        
+        keyWindow?.rootViewController?.present(alert, animated: true)
     }
 
 }
@@ -92,6 +192,11 @@ extension MoEngageAnalytics: AnalyticsService {
     func trackEvent(eventName: AnalyticEvents, properties: [String: Any]?) {
         let eventProperties = MoEngageProperties(withAttributes: properties)
         MoEngageSDKAnalytics.sharedInstance.trackEvent(eventName.moEngageEvent, withProperties: eventProperties)
+        Task { @MainActor in
+            // Re-evaluate in-app messages after trackEvent
+            MoEngageAnalytics.shared.displayInAppNotificationSafely(reason: "track Event")
+        }
+
     }
     
     // Method to track user data
@@ -186,12 +291,6 @@ extension MoEngageAnalytics: AnalyticsService {
         properties.addAttribute(getDate(date: date), withName: AnalyticPropertyAttributes.PROPERTIES__CREATION_DATE.rawValue)
         MoEngageSDKAnalytics.sharedInstance.trackEvent(AnalyticEvents.EVENT__CREATE_VOICE_MEMO.rawValue, withProperties: properties)
     }
-    
-    func displayInAppNotification() {
-        MoEngageSDKInApp.sharedInstance.showInApp()
-        //For showing nudges at any mentioned position
-        MoEngageSDKInApp.sharedInstance.showNudge()
-    }
 }
 
 // Functions
@@ -247,28 +346,96 @@ extension MoEngageAnalytics: MoEngageInAppNativeDelegate {
                       forAccountMeta accountMeta: MoEngageAccountMeta) {
 
         let kv = customAction.keyValuePairs
+        log.debug("In-App custom action received: keyValues=\(kv)")
 
         if let showRating = kv["show-native-rating"] as? String,
            showRating.lowercased() == "true" {
-            requestAppStoreReview()
+            log.debug("User clicked Rating - Opening App Store directly")
+            
+            // Use the reliable direct link instead of the restricted native prompt
+            ReviewManager.shared.requestReviewIfAppropriate()
         }
     }
 
     // Called when a "self-handled" in-app is triggered
     func selfHandledInAppTriggered(withInfo inAppCampaign: MoEngageInAppSelfHandledCampaign,
                                    forAccountMeta accountMeta: MoEngageAccountMeta) {
-        // no-op unless you use self-handled campaigns
+        log.debug("Self-handled in-app triggered: \(String(describing: inAppCampaign))")
     }
 
     // Optional — track impression
     func inAppShown(withCampaignInfo inappCampaign: MoEngageInAppCampaign,
                     forAccountMeta accountMeta: MoEngageAccountMeta) {
-        // no-op
+        log.debug("In-App shown: \(String(describing: inappCampaign))")
     }
 
     // Optional — track dismissal
     func inAppDismissed(withCampaignInfo inappCampaign: MoEngageInAppCampaign,
                         forAccountMeta accountMeta: MoEngageAccountMeta) {
-        // no-op
+        log.debug("In-App dismissed: \(String(describing: inappCampaign))")
+    }
+}
+
+@MainActor // Ensures this is only called on the Main Thread
+class UIHelper {
+    
+    static func getTopViewController() -> UIViewController? {
+        // 1. Get the active scene
+        let activeScene = UIApplication.shared.connectedScenes
+            .first { $0.activationState == .foregroundActive } as? UIWindowScene
+        
+        // 2. Get the root view controller from the key window
+        let rootVC = activeScene?.windows
+            .first { $0.isKeyWindow }?.rootViewController
+            
+        return findTopViewController(from: rootVC)
+    }
+
+    private static func findTopViewController(from root: UIViewController?) -> UIViewController? {
+        if let nav = root as? UINavigationController {
+            return findTopViewController(from: nav.visibleViewController)
+        }
+        if let tab = root as? UITabBarController {
+            return findTopViewController(from: tab.selectedViewController)
+        }
+        if let presented = root?.presentedViewController {
+            return findTopViewController(from: presented)
+        }
+        return root
+    }
+}
+
+class ReviewManager {
+    static let shared = ReviewManager()
+    private let appID = "312838242"
+    
+    /// Requests the native system rating sheet if an active foreground scene is available.
+    func requestReviewIfAppropriate() {
+        // 1. Find the active, foreground UIWindowScene required by StoreKit
+        guard let scene = UIApplication.shared.connectedScenes
+            .first(where: { $0.activationState == .foregroundActive }) as? UIWindowScene else {
+            // Silently exit if no foreground view is active
+//            // Fallback: If no scene is active (rare), open the App Store directly
+//            self.forceOpenAppStore()
+            return
+        }
+        
+        // 2. Trigger the native system prompt overlay
+        // Note: Apple will throttle this to 3 times per year maximum per user.
+        SKStoreReviewController.requestReview(in: scene)
+    }
+    
+    /// Call this function ONLY when a user explicitly taps a manual "Rate Us" button.
+    func forceOpenAppStore() {
+        let appStoreURLString = "itms-apps://://apple.com\(appID)?action=write-review"
+        let webURLString = "https://apple.com\(appID)?action=write-review"
+        
+        if let url = URL(string: appStoreURLString), UIApplication.shared.canOpenURL(url) {
+            // Opens the native iOS App Store app directly to your review composition page
+            UIApplication.shared.open(url, options: [:], completionHandler: nil)
+        } else if let fallbackWebUrl = URL(string: webURLString) {
+            // Fallback safety layer: Opens up your App Store page inside Safari
+            UIApplication.shared.open(fallbackWebUrl, options: [:], completionHandler: nil)
+        }
     }
 }
