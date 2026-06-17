@@ -1,6 +1,23 @@
-// SPDX-FileCopyrightText: Nextcloud GmbH
-// SPDX-FileCopyrightText: 2024 Milen
-// SPDX-License-Identifier: GPL-3.0-or-later
+//
+//  NCTrashSelectTabBar.swift
+//  Nextcloud
+//
+//  Created by Milen on 05.02.24.
+//  Copyright © 2024 Marino Faggiana. All rights reserved.
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//
 
 import Foundation
 import UIKit
@@ -107,9 +124,7 @@ struct NCTrashSelectTabBarView: View {
                 Button {
                     tabBarSelect.delegate?.recover()
                 } label: {
-//                    Image(systemName: "arrow.counterclockwise")
-//                        .font(.icon())
-                    Image(systemName: "arrow.circlepath")
+                    Image(systemName: "arrow.counterclockwise")
                         .font(Font.system(.body).weight(.light))
                         .imageScale(sizeClass == .compact ? .medium : .large)
                 }
@@ -121,7 +136,8 @@ struct NCTrashSelectTabBarView: View {
                     tabBarSelect.delegate?.delete()
                 } label: {
                     Image(systemName: "trash")
-                        .font(.icon())
+                        .font(Font.system(.body).weight(.light))
+                        .imageScale(sizeClass == .compact ? .medium : .large)
                 }
                 .tint(.red)
                 .frame(maxWidth: .infinity)
@@ -131,7 +147,8 @@ struct NCTrashSelectTabBarView: View {
                     tabBarSelect.delegate?.selectAll()
                 } label: {
                     Image(systemName: "checkmark")
-                        .font(.icon())
+                        .font(Font.system(.body).weight(.light))
+                        .imageScale(sizeClass == .compact ? .medium : .large)
                 }
                 .tint(Color(NCBrandColor.shared.iconImageColor))
                 .frame(maxWidth: .infinity)

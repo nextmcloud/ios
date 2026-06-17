@@ -178,7 +178,6 @@ extension NCTrash: UICollectionViewDataSource {
         cell.account = resultTableTrash.account
         cell.setupCellUI(tableTrash: resultTableTrash, image: image)
         cell.selected(selectOcId.contains(resultTableTrash.fileId), isEditMode: isEditMode, account: resultTableTrash.account)
-//        cell.selected(selectOcId.contains(resultTableTrash.fileId), isEditMode: isEditMode, color: NCBrandColor.shared.getElement(account: session.account))
 
         return cell
     }
@@ -218,60 +217,6 @@ extension NCTrash: UICollectionViewDataSource {
             text = foldersText + ", " + filesText
         }
 
-        return text
-    }
-    
-    func setTitleLabel(directories: Int, files: Int, size: Int64) -> String {
-        var foldersText = ""
-        var filesText = ""
-        var text = ""
-
-        if directories > 1 {
-            foldersText = "\(directories) " + NSLocalizedString("_folders_", comment: "")
-        } else if directories == 1 {
-            foldersText = "1 " + NSLocalizedString("_folder_", comment: "")
-        }
-
-        if files > 1 {
-            filesText = "\(files) " + NSLocalizedString("_files_", comment: "") + " • " + utilityFileSystem.transformedSize(size)
-        } else if files == 1 {
-            filesText = "1 " + NSLocalizedString("_file_", comment: "") + " • " + utilityFileSystem.transformedSize(size)
-        }
-
-        if foldersText.isEmpty {
-            text = filesText
-        } else if filesText.isEmpty {
-            text = foldersText
-        } else {
-            text = foldersText + " • " + filesText
-        }
-        return text
-    }
-    
-    func setTitleLabel(directories: Int, files: Int, size: Int64) -> String {
-        var foldersText = ""
-        var filesText = ""
-        var text = ""
-
-        if directories > 1 {
-            foldersText = "\(directories) " + NSLocalizedString("_folders_", comment: "")
-        } else if directories == 1 {
-            foldersText = "1 " + NSLocalizedString("_folder_", comment: "")
-        }
-
-        if files > 1 {
-            filesText = "\(files) " + NSLocalizedString("_files_", comment: "") + " • " + utilityFileSystem.transformedSize(size)
-        } else if files == 1 {
-            filesText = "1 " + NSLocalizedString("_file_", comment: "") + " • " + utilityFileSystem.transformedSize(size)
-        }
-
-        if foldersText.isEmpty {
-            text = filesText
-        } else if filesText.isEmpty {
-            text = foldersText
-        } else {
-            text = foldersText + " • " + filesText
-        }
         return text
     }
     
