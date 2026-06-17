@@ -5,6 +5,7 @@
 import UIKit
 import SwiftRichString
 import NextcloudKit
+import SVGKit
 
 class NCActivity: UIViewController, NCSharePagingContent {
     @IBOutlet weak var viewContainerConstraint: NSLayoutConstraint!
@@ -48,7 +49,7 @@ class NCActivity: UIViewController, NCSharePagingContent {
     internal var windowScene: UIWindowScene? {
        SceneManager.shared.getWindowScene(controller: self.tabBarController as? NCMainTabBarController)
     }
-
+    
     // MARK: - View Life Cycle
 
     override func viewDidLoad() {
@@ -223,16 +224,15 @@ extension NCActivity: UITableViewDataSource {
         cell.indexPath = indexPath
         cell.tableComments = comment
         cell.delegate = self
-        cell.configureAvatarMenu()
 
         // Avatar
         let fileName = NCSession.shared.getFileName(urlBase: metadata.urlBase, user: comment.actorId)
         let results = NCManageDatabase.shared.getImageAvatarLoaded(fileName: fileName)
 
         if results.image == nil {
-            cell.avatarImage?.image = utility.loadUserImage(for: comment.actorId, displayName: comment.actorDisplayName, urlBase: NCSession.shared.getSession(account: account).urlBase)
+            cell.avatarImageView?.image = utility.loadUserImage(for: comment.actorId, displayName: comment.actorDisplayName, urlBase: NCSession.shared.getSession(account: account).urlBase)
         } else {
-            cell.avatarImage?.image = results.image
+            cell.avatarImageView?.image = results.image
         }
 
         if let tblAvatar = results.tblAvatar,
@@ -253,7 +253,6 @@ extension NCActivity: UITableViewDataSource {
         // Button Menu
         if comment.actorId == metadata.userId {
             cell.buttonMenu.isHidden = false
-            cell.configureCommentMenu()
         } else {
             cell.buttonMenu.isHidden = true
         }
@@ -271,7 +270,7 @@ extension NCActivity: UITableViewDataSource {
 
         cell.idActivity = activity.idActivity
         cell.account = activity.account
-        cell.index = indexPath
+        cell.indexPath = indexPath
         cell.avatar.image = nil
         cell.avatar.isHidden = true
         cell.didSelectItemEnable = self.didSelectItemEnable
@@ -280,14 +279,31 @@ extension NCActivity: UITableViewDataSource {
 
         // icon
         if !activity.icon.isEmpty {
-            Task {
-                let results = await NCUtility().convertSVGtoPNGWriteToUserData(serverUrl: activity.icon,
-                                                                               rewrite: false,
-                                                                               account: activity.account,
-                                                                               id: activity.idActivity)
-                if let image = results.image,
-                   cell.idActivity == results.id {
-                    cell.icon.image = image
+            activity.icon = activity.icon.replacingOccurrences(of: ".png", with: ".svg")
+            let fileNameIcon = (activity.icon as NSString).lastPathComponent
+            let fileNameLocalPath = utilityFileSystem.createServerUrl(serverUrl: utilityFileSystem.directoryUserData, fileName: fileNameIcon)
+
+            if FileManager.default.fileExists(atPath: fileNameLocalPath) {
+                let image = fileNameIcon.contains(".svg") ? SVGKImage(contentsOfFile: fileNameLocalPath)?.uiImage : UIImage(contentsOfFile: fileNameLocalPath)
+
+                if let image {
+                    cell.icon.image = image.withTintColor(NCBrandColor.shared.textColor, renderingMode: .alwaysOriginal)
+                }
+            } else {
+                NextcloudKit.shared.downloadContent(serverUrl: activity.icon, account: activity.account) { task in
+                    Task {
+                        let identifier = await NCNetworking.shared.networkingTasks.createIdentifier(account: self.account,
+                                                                                                    path: activity.icon,
+                                                                                                    name: "downloadContent")
+                        await NCNetworking.shared.networkingTasks.track(identifier: identifier, task: task)
+                    }
+                } completion: { _, responseData, error in
+                    if error == .success, let data = responseData?.data {
+                        do {
+                            try data.write(to: NSURL(fileURLWithPath: fileNameLocalPath) as URL, options: .atomic)
+                            self.tableView.reloadData()
+                        } catch { return }
+                    }
                 }
             }
         }
@@ -295,17 +311,16 @@ extension NCActivity: UITableViewDataSource {
         // avatar
         if !activity.user.isEmpty && activity.user != session.userId {
             cell.avatar.isHidden = false
-            cell.user = activity.user
+            cell.fileUser = activity.user
             cell.subjectLeadingConstraint.constant = 15
-            cell.configureAvatarMenu()
 
             let fileName = NCSession.shared.getFileName(urlBase: session.urlBase, user: activity.user)
             let results = NCManageDatabase.shared.getImageAvatarLoaded(fileName: fileName)
 
             if results.image == nil {
-                cell.avatar?.image = utility.loadUserImage(for: activity.user, displayName: nil, urlBase: session.urlBase)
+                cell.avatarImageView?.image = utility.loadUserImage(for: activity.user, displayName: nil, urlBase: session.urlBase)
             } else {
-                cell.avatar?.image = results.image
+                cell.avatarImageView?.image = results.image
             }
 
             if !(results.tblAvatar?.loaded ?? false),
@@ -526,21 +541,6 @@ extension NCActivity {
 }
 
 extension NCActivity: NCShareCommentsCellDelegate {
-
-    func openProfileMenu(with tableComment: tableComments?) -> UIMenu? {
-        guard let tableComment = tableComment else { return nil }
-        return NCContextMenuProfile(userId: tableComment.actorId, session: session, viewController: self).viewMenu()
-    }
-
-    func openCommentMenu(with tableComments: tableComments?) -> UIMenu? {
-        guard let tableComments, let metadata else { return nil }
-        return NCContextMenuComment(
-            tableComments: tableComments,
-            metadata: metadata,
-            viewController: self
-        ).viewMenu()
-    }
-
     func showProfile(with tableComment: tableComments?, sender: Any) {
         guard let tableComment = tableComment else {
             return
@@ -588,8 +588,8 @@ extension NCActivity: NCShareCommentsCellDelegate {
                                 self.loadComments()
                             } else {
                                 Task {@MainActor in
-                                    await showErrorBanner(controller: self.tabBarController,
-                                                          errorDescription: error.errorDescription,
+                                    await showErrorBanner(windowScene: self.windowScene,
+                                                          text: error.errorDescription,
                                                           errorCode: error.errorCode)
                                 }
                             }
@@ -605,7 +605,7 @@ extension NCActivity: NCShareCommentsCellDelegate {
             NCMenuAction(
                 title: NSLocalizedString("_delete_comment_", comment: ""),
                 destructive: true,
-                icon: utility.loadImage(named: "trashIcon", colors: [.red]),
+                icon: utility.loadImage(named: "trash", colors: [.red]),
                 sender: sender,
                 action: { _ in
                     guard let metadata = self.metadata, let tableComments = tableComments else { return }
@@ -621,9 +621,9 @@ extension NCActivity: NCShareCommentsCellDelegate {
                         if error == .success {
                             self.loadComments()
                         } else {
-                            Task {@MainActor in
-                                await showErrorBanner(controller: self.tabBarController,
-                                                      errorDescription: error.errorDescription,
+                            Task {
+                                await showErrorBanner(windowScene: self.windowScene,
+                                                      text: error.errorDescription,
                                                       errorCode: error.errorCode)
                             }
                         }

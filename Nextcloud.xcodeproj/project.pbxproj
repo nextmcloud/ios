@@ -4871,7 +4871,6 @@
 				F372087D2BAB4C0F006B5430 /* TestConstants.swift in Sources */,
 				F78E2D6C29AF02DB0024D4F3 /* Database.swift in Sources */,
 				B5E2E6D42DAE52B500AB2EDD /* SharingTest.swift in Sources */,
-				F7817CFE29801A3500FFBC65 /* Data+Extension.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -5087,7 +5086,6 @@
 				B5BEBD1F2E93A74C0002C9E5 /* NCPermissions.swift in Sources */,
 				B5BEBD202E93A74C0002C9E5 /* NCShareEmailLinkHeaderView.swift in Sources */,
 				B5BEBD212E93A74C0002C9E5 /* NoSharesFooterView.swift in Sources */,
-				F7327E322B73A86700A462C7 /* NCNetworking+WebDAV.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -5245,8 +5243,6 @@
 				B5E2E6EE2DAE66AF00AB2EDD /* NCShareEmailFieldCell.swift in Sources */,
 				F768822C2C0DD1E7001CF441 /* NCKeychain.swift in Sources */,
 				B5E2E6EE2DAE66AF00AB2EDD /* NCShareEmailFieldCell.swift in Sources */,
-				F7BFFD282C8846020029A201 /* NCHud.swift in Sources */,
-				F71CD6CA2930D7B1006C95C1 /* NCApplicationHandle.swift in Sources */,
 				F3754A7D2CF87D600009312E /* SetupPasscodeView.swift in Sources */,
 				F73EF7D72B0226080087E6E9 /* NCManageDatabase+Tip.swift in Sources */,
 				F3374A842D64AC31002A38F9 /* AssistantLabelStyle.swift in Sources */,
@@ -5276,7 +5272,6 @@
 				F7BD0A002C468925003A4A6D /* NCMedia+CollectionViewDataSource.swift in Sources */,
 				F76D3CF12428B40E005DFA87 /* NCViewerPDFSearch.swift in Sources */,
 				F7245924289BB50C00474787 /* ThreadSafeDictionary.swift in Sources */,
-				F73F537F1E929C8500F8678D /* NCMore.swift in Sources */,
 				B5BEBD192E93A5260002C9E5 /* Shareable.swift in Sources */,
 				F702F2CF25EE5B5C008F8E80 /* NCGlobal.swift in Sources */,
 				F794E13F2BBC0F70003693D7 /* SceneDelegate.swift in Sources */,
