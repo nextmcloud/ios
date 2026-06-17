@@ -26,18 +26,18 @@ import UIKit
 import NextcloudKit
 
 extension NCShare {
-    func toggleShareMenu(for share: tableShare, sender: Any?) {
+    func toggleShareMenu(for share: tableShare, sendMail: Bool, folder: Bool, sender: Any) {
         let capabilities = NCNetworking.shared.capabilities[self.metadata.account] ?? NKCapabilities.Capabilities()
         var actions = [NCMenuAction]()
 
         if share.shareType == NKShare.ShareType.publicLink.rawValue, canReshare {
             actions.append(
                 NCMenuAction(
-                    title: NSLocalizedString("_open_in_", comment: ""),
-                    icon: utility.loadImage(named: "open_file", colors: [NCBrandColor.shared.brandElement]),
+                    title: NSLocalizedString("_share_add_sharelink_", comment: ""),
+                    icon: utility.loadImage(named: "plus", colors: [NCBrandColor.shared.iconImageColor]),
                     sender: sender,
                     action: { _ in
-                        NCShareCommon.copyLink(link: share.url, viewController: self, sender: sender)
+                        self.makeNewLinkShare()
                     }
                 )
             )
@@ -80,7 +80,8 @@ extension NCShare {
                         guard let viewNewUserComment = storyboard.instantiateViewController(withIdentifier: "NCShareNewUserAddComment") as? NCShareNewUserAddComment else { return }
                         viewNewUserComment.metadata = self.metadata
                         viewNewUserComment.share = tableShare(value: share)
-//                        viewNewUserComment.networking = self.networking
+                        viewNewUserComment.networking = self.networking
+                        viewNewUserComment.isFromMenu = true
                         self.navigationController?.pushViewController(viewNewUserComment, animated: true)
                     }
                 )
@@ -94,7 +95,7 @@ extension NCShare {
                 sender: sender,
                 action: { _ in
                     Task {
-                        if share.shareType != NKShare.ShareType.publicLink.rawValue, let metadata = self.metadata, metadata.e2eEncrypted && capabilities.e2EEApiVersion == NCGlobal.shared.e2eeVersionV20 {
+                        if share.shareType != NKShare.ShareType.publicLink.rawValue, let metadata = self.metadata, metadata.e2eEncrypted && NCGlobal.shared.isE2eeVersion2(capabilities.e2EEApiVersion) {
                             if await NCNetworkingE2EE().isInUpload(account: metadata.account, serverUrl: metadata.serverUrlFileName) {
                                 let error = NKError(errorCode: NCGlobal.shared.errorE2EEUploadInProgress, errorDescription: NSLocalizedString("_e2e_in_upload_", comment: ""))
                                 return NCContentPresenter().showInfo(error: error)

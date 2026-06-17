@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import XLForm
 
 class NCFilePermissionEditCell: XLFormBaseCell, UITextFieldDelegate {
     
@@ -37,7 +38,7 @@ class NCFilePermissionEditCell: XLFormBaseCell, UITextFieldDelegate {
     
     @objc func changeTheming() {
         self.backgroundColor = NCBrandColor.shared.secondarySystemGroupedBackground
-        self.titleLabel.textColor = NCBrandColor.shared.iconColor
+        self.titleLabel.textColor = NCBrandColor.shared.iconImageColor
     }
     
     override func configure() {
@@ -158,12 +159,15 @@ class NCFilePermissionEditCell: XLFormBaseCell, UITextFieldDelegate {
     }
     
     @objc func doneDatePicker() {
-        let dateFormatter = DateFormatter()
-        dateFormatter.formatterBehavior = .behavior10_4
-        dateFormatter.dateStyle = .medium
-        self.expirationDateText = dateFormatter.string(from: datePicker.date as Date)
+//        let dateFormatter = DateFormatter()
+//        dateFormatter.formatterBehavior = .behavior10_4
+//        dateFormatter.dateStyle = .medium
+//        self.expirationDateText = dateFormatter.string(from: datePicker.date as Date)
+//        dateFormatter.dateFormat = "YYYY-MM-dd HH:mm:ss"
         
-        dateFormatter.dateFormat = "YYYY-MM-dd HH:mm:ss"
+        let expiryDateString = DateFormatter.formattedExpiryDate(datePicker.date)
+
+        self.expirationDateText = expiryDateString
         self.expirationDate = datePicker.date as NSDate
         self.cellTextField.text = self.expirationDateText
         self.rowDescriptor.value = self.expirationDate
