@@ -19,6 +19,8 @@ final class NCImageCache: @unchecked Sendable {
     private let allowExtensions = [NCGlobal.shared.previewExt256]
     private var brandElementColor: UIColor?
 
+    private var observerToken: NSObjectProtocol?
+
     public var countLimit: Int = 2000
     lazy var cache: LRUCache<String, UIImage> = {
         return LRUCache<String, UIImage>(countLimit: countLimit)
@@ -62,20 +64,11 @@ final class NCImageCache: @unchecked Sendable {
     init() {
         observerToken = NotificationCenter.default.addObserver(forName: UIApplication.didReceiveMemoryWarningNotification, object: nil, queue: nil) { _ in
             self.cache.removeAll()
-
-        countLimit = calculateMaxImages(percentage: 5.0, imageSizeKB: 30.0) // 5% of cache = 20
-        NextcloudKit.shared.nkCommonInstance.writeLog("Counter cache image: \(countLimit)")
-
-        NotificationCenter.default.addObserver(forName: LRUCacheMemoryWarningNotification, object: nil, queue: nil) { _ in
-            self.cache.removeAllValues()
-//            self.countLimit = self.countLimit - 500
-//            if self.countLimit <= 0 { self.countLimit = 100 }
             self.cache = LRUCache<String, UIImage>(countLimit: self.countLimit)
         }
 
         NotificationCenter.default.addObserver(forName: UIApplication.didEnterBackgroundNotification, object: nil, queue: nil) { _ in
-            self.cache.removeAllValues()
-//            self.cache.removeAll()
+            self.cache.removeAll()
             self.cache = LRUCache<String, UIImage>(countLimit: self.countLimit)
         }
 
@@ -102,10 +95,10 @@ final class NCImageCache: @unchecked Sendable {
                     self.isLoadingCache = true
                     self.database.filterAndNormalizeLivePhotos(from: metadatas) { metadatas in
                         autoreleasepool {
-                            self.cache.removeAllValues()
+                            self.cache.removeAll()
                             for metadata in metadatas {
                                 guard !isAppInBackground else {
-                                    self.cache.removeAllValues()
+                                    self.cache.removeAll()
                                     break
                                 }
                                 if let image = self.utility.getImage(ocId: metadata.ocId,
@@ -127,16 +120,11 @@ final class NCImageCache: @unchecked Sendable {
     }
 
     deinit {
-        NotificationCenter.default.removeObserver(self, name: LRUCacheMemoryWarningNotification, object: nil)
+        if let token = observerToken {
+            NotificationCenter.default.removeObserver(token)
+        }
     }
 
-    func getMediaMetadatas(account: String, predicate: NSPredicate? = nil) -> ThreadSafeArray<tableMetadata>? {
-        guard let tableAccount = NCManageDatabase.shared.getTableAccount(predicate: NSPredicate(format: "account == %@", account)) else { return nil }
-        let startServerUrl = NCUtilityFileSystem().getHomeServer(urlBase: tableAccount.urlBase, userId: tableAccount.userId) + tableAccount.mediaPath
-        let predicateBoth = NSPredicate(format: showBothPredicateMediaString, account, startServerUrl)
-        return NCManageDatabase.shared.getMediaMetadatas(predicate: predicate ?? predicateBoth, sorted: "date")
-    }
-    
     func allowExtensions(ext: String) -> Bool {
         return allowExtensions.contains(ext)
     }
@@ -173,8 +161,7 @@ final class NCImageCache: @unchecked Sendable {
     }
 
     func removeAll() {
-//        cache.removeAll()
-        self.cache.removeAllValues()
+        cache.removeAll()
     }
 
     // MARK: - MEDIA -
@@ -183,55 +170,21 @@ final class NCImageCache: @unchecked Sendable {
                            mediaPath: String,
                            showOnlyImages: Bool,
                            showOnlyVideos: Bool) -> NSPredicate {
+        var predicate = NSPredicate()
         let startServerUrl = self.utilityFileSystem.getHomeServer(session: session) + mediaPath
-
-        let showBothPredicate = """
-        account == %@ AND
-        serverUrl BEGINSWITH %@ AND
-        mediaSearch == true AND
-        hasPreview == true AND
-        (
-        classFile == '\(NKTypeClassFile.image.rawValue)' OR classFile == '\(NKTypeClassFile.video.rawValue)'
-        ) AND
-        NOT (status IN %@)
-        """
-
-        let showOnlyPredicateImage = """
-        account == %@ AND
-        serverUrl BEGINSWITH %@ AND
-        mediaSearch == true AND
-        hasPreview == true AND
-        (
-        classFile == '\(NKTypeClassFile.image.rawValue)' OR (classFile == '\(NKTypeClassFile.video.rawValue)' AND livePhotoFile != '')
-        ) AND
-        NOT (status IN %@)
-        """
-
-        let showOnlyPredicateVideo = """
-        account == %@ AND
-        serverUrl BEGINSWITH %@ AND
-        mediaSearch == true AND
-        hasPreview == true AND
-        classFile == 'video' AND
-        NOT (status IN %@)
-        """
+        let showBothPredicate = "account == %@ AND serverUrl BEGINSWITH %@ AND mediaSearch == true AND hasPreview == true AND (classFile == '\(NKTypeClassFile.image.rawValue)' OR classFile == '\(NKTypeClassFile.video.rawValue)') AND NOT (status IN %@)"
+        let showOnlyPredicateImage = "account == %@ AND serverUrl BEGINSWITH %@ AND mediaSearch == true AND hasPreview == true AND classFile == 'image' AND NOT (status IN %@)"
+        let showOnlyPredicateVideo = "account == %@ AND serverUrl BEGINSWITH %@ AND mediaSearch == true AND hasPreview == true AND classFile == 'video' AND livePhotoFile == '' AND NOT (status IN %@)"
 
         if showOnlyImages {
-            return NSPredicate(format: showOnlyPredicateImage,
-                               session.account,
-                               startServerUrl,
-                               global.metadataStatusHideInView)
+            predicate = NSPredicate(format: showOnlyPredicateImage, session.account, startServerUrl, global.metadataStatusHideInView)
         } else if showOnlyVideos {
-            return NSPredicate(format: showOnlyPredicateVideo,
-                               session.account,
-                               startServerUrl,
-                               global.metadataStatusHideInView)
+            predicate = NSPredicate(format: showOnlyPredicateVideo, session.account, startServerUrl, global.metadataStatusHideInView)
         } else {
-            return NSPredicate(format: showBothPredicate,
-                               session.account,
-                               startServerUrl,
-                               global.metadataStatusHideInView)
+            predicate = NSPredicate(format: showBothPredicate, session.account, startServerUrl, global.metadataStatusHideInView)
         }
+
+        return predicate
     }
 
     // MARK: -
@@ -281,113 +234,29 @@ final class NCImageCache: @unchecked Sendable {
     func createImagesCache() {
         let utility = NCUtility()
 
-//        images.file = UIImage(named: "file")!
-//
-//        images.shared = UIImage(named: "share")!.image(color: NCBrandColor.shared.iconImageColor, size: 24)//50)
-//        images.canShare = UIImage(named: "share")!.image(color: NCBrandColor.shared.iconImageColor, size: 24)//50)
-//        images.shareByLink = UIImage(named: "sharebylink")!.image(color: NCBrandColor.shared.iconImageColor, size: 24)//50)
-//        images.sharedWithMe = UIImage.init(named: "cloudUpload")!.image(color: NCBrandColor.shared.nmcIconSharedWithMe, size: 24)//50)
-//
-////        images.favorite = utility.loadImage(named: "star", colors: [NCBrandColor.shared.yellowFavorite]) //utility.loadImage(named: "star.fill", colors: [NCBrandColor.shared.yellowFavorite])
-//        images.comment = UIImage(named: "comment")!.image(color: NCBrandColor.shared.iconImageColor, size: 24)//50)
-//        images.livePhoto = utility.loadImage(named: "livephoto", colors: [.label])
-//        images.offlineFlag = utility.loadImage(named: "arrow.down.circle.fill", colors: [.systemGreen], size: 24)
-//        images.local = utility.loadImage(named: "checkmark.circle.fill", colors: [.systemGreen], size: 24)
-//
-//        images.checkedYes = UIImage(named: "checkedYes")!
-//        images.checkedNo = utility.loadImage(named: "circle", colors: [NCBrandColor.shared.iconImageColor], size: 24)
-//
-//        images.buttonMore = UIImage(named: "more")!.image(color: NCBrandColor.shared.iconImageColor, size: 24)//50)
-//        images.buttonStop = utility.loadImage(named: "stop.circle", colors: [NCBrandColor.shared.iconImageColor], size: 24)
-//        images.buttonMoreLock = utility.loadImage(named: "lock.fill", colors: [NCBrandColor.shared.iconImageColor], size: 24)
-//        images.buttonRestore = UIImage(named: "restore")!.image(color: NCBrandColor.shared.iconImageColor, size: 24)//50)
-//        images.buttonTrash = UIImage(named: "trashIcon")!.image(color: NCBrandColor.shared.iconImageColor, size: 24)//50)
+        images.file = UIImage(named: "file")!
+
+        images.shared = UIImage(named: "share")!.image(color: NCBrandColor.shared.iconImageColor, size: 24)//50)
+        images.canShare = UIImage(named: "share")!.image(color: NCBrandColor.shared.iconImageColor, size: 24)//50)
+        images.shareByLink = UIImage(named: "sharebylink")!.image(color: NCBrandColor.shared.iconImageColor, size: 24)//50)
+        images.sharedWithMe = UIImage.init(named: "cloudUpload")!.image(color: NCBrandColor.shared.nmcIconSharedWithMe, size: 24)//50)
+        
+//        images.favorite = utility.loadImage(named: "star.fill", colors: [NCBrandColor.shared.yellowFavorite])
+        images.comment = UIImage(named: "comment")!.image(color: NCBrandColor.shared.iconImageColor, size: 24)//50)
+        images.livePhoto = utility.loadImage(named: "livephoto", colors: [.label])
+        images.offlineFlag = utility.loadImage(named: "arrow.down.circle.fill", colors: [.systemGreen], size: 24)
+        images.local = utility.loadImage(named: "checkmark.circle.fill", colors: [.systemGreen], size: 24)
+
+        images.checkedYes = UIImage(named: "checkedYes")!
+        images.checkedNo = utility.loadImage(named: "circle", colors: [NCBrandColor.shared.iconImageColor], size: 24)
+
+        images.buttonMore = UIImage(named: "more")!.image(color: NCBrandColor.shared.iconImageColor, size: 24)//50)
+        images.buttonStop = utility.loadImage(named: "stop.circle", colors: [NCBrandColor.shared.iconImageColor], size: 24)
+        images.buttonMoreLock = utility.loadImage(named: "lock.fill", colors: [NCBrandColor.shared.iconImageColor], size: 24)
+        images.buttonRestore = UIImage(named: "restore")!.image(color: NCBrandColor.shared.iconImageColor, size: 24)//50)
+        images.buttonTrash = UIImage(named: "trashIcon")!.image(color: NCBrandColor.shared.iconImageColor, size: 24)//50)
 
         createImagesBrandCache()
-    }
-
-    func getImageCanShare() -> UIImage {
-        return UIImage(named: "share")!.imageColor(.systemGray)
-    }
-
-    func getImageShareByLink(colors: [UIColor] = [NCBrandColor.shared.iconImageColor]) -> UIImage {
-        return utility.loadImage(named: "link", colors: colors)
-    }
-
-    func getImageFavorite(colors: [UIColor] = [NCBrandColor.shared.yellowFavorite]) -> UIImage {
-        return utility.loadImage(named: "star.fill", colors: colors)
-    }
-
-    func getImageOfflineFlag(colors: [UIColor] = [.systemGreen]) -> UIImage {
-        return utility.loadImage(named: "arrow.down.circle.fill", colors: colors)
-    }
-
-    func getImageLocal(colors: [UIColor] = [.systemGreen]) -> UIImage {
-        return utility.loadImage(named: "checkmark.circle.fill", colors: colors)
-    }
-
-    func getImageCheckedYes(color: UIColor) -> UIImage? {
-        let config = UIImage.SymbolConfiguration(paletteColors: [.white, color])
-        return UIImage(systemName: "checkmark.circle.fill", withConfiguration: config)
-    }
-
-    func getImageCheckedNo(color: UIColor) -> UIImage? {
-        let weightConfig = UIImage.SymbolConfiguration(weight: .light)
-        let colorConfig = UIImage.SymbolConfiguration(paletteColors: [color])
-        let config = weightConfig.applying(colorConfig)
-        return UIImage(systemName: "circle", withConfiguration: config)
-    }
-
-    func getImageButtonMore() -> UIImage {
-        return UIImage(named: "more")!.imageColor(.systemGray)
-    }
-
-    func getImageButtonStop(colors: [UIColor] = [NCBrandColor.shared.iconImageColor]) -> UIImage {
-        return utility.loadImage(named: "stop.circle", colors: colors)
-    }
-
-    func getImageButtonMoreLock(colors: [UIColor] = [NCBrandColor.shared.iconImageColor]) -> UIImage {
-        return utility.loadImage(named: "lock.fill", colors: colors)
-    }
-
-    func getFolder(account: String) -> UIImage {
-        return UIImage(named: "folder")!.image(color: NCBrandColor.shared.getElement(account: account))
-    }
-
-    func getAddFolder() -> UIImage {
-        return UIImage(named: "addFolder")!
-    }
-
-    func getAddFolderInfo() -> UIImage {
-        return UIImage(named: "addFolderInfo")!.imageColor(NCBrandColor.shared.iconImageColor)
-    }
-
-    func getFolderEncrypted(account: String) -> UIImage {
-        return UIImage(named: "folderEncrypted")!.image(color: NCBrandColor.shared.getElement(account: account))
-    }
-
-    func getEncryptedFolder() -> UIImage {
-        return UIImage(named: "encryptedfolder")!.imageColor(NCBrandColor.shared.iconImageColor)
-    }
-
-    func getFolderSharedWithMe(account: String) -> UIImage {
-        return UIImage(named: "folder_shared_with_me")!.image(color: NCBrandColor.shared.getElement(account: account))
-    }
-
-    func getFolderPublic(account: String) -> UIImage {
-        return UIImage(named: "folder_public")!.image(color: NCBrandColor.shared.getElement(account: account))
-    }
-
-    func getFolderGroup(account: String) -> UIImage {
-        return UIImage(named: "folder_group")!.image(color: NCBrandColor.shared.getElement(account: account))
-    }
-
-    func getFolderExternal(account: String) -> UIImage {
-        return UIImage(named: "folder_external")!.image(color: NCBrandColor.shared.getElement(account: account))
-    }
-
-    func getFolderAutomaticUpload(account: String) -> UIImage {
-        return UIImage(named: "folderAutomaticUpload")!.image(color: NCBrandColor.shared.getElement(account: account))
     }
 
     func createImagesBrandCache() {
@@ -442,10 +311,6 @@ final class NCImageCache: @unchecked Sendable {
     func getImageFavorite(colors: [UIColor] = [NCBrandColor.shared.yellowFavorite]) -> UIImage {
         return utility.loadImage(named: "star.fill", colors: colors, size: 24)
     }
-            
-    func getImageShared() -> UIImage {
-        return NCImageCache.images.shared
-    }
 
     func getImageOfflineFlag(colors: [UIColor] = [.systemGreen]) -> UIImage {
         return utility.loadImage(named: "arrow.down.circle.fill", colors: colors, size: 24)
@@ -475,79 +340,31 @@ final class NCImageCache: @unchecked Sendable {
         return utility.loadImage(named: "lock.fill", colors: colors, size: 24)
     }
 
-    func getFolder(account: String) -> UIImage {
-        return UIImage(named: "folder")!
-    }
-
-    func getFolder(account: String) -> UIImage {
-        return UIImage(named: "folder")!
-    }
-
-    func getFolderEncrypted(account: String) -> UIImage {
-        return UIImage(named: "folderEncrypted")!
-    }
-
-    func getFolderEncrypted(account: String) -> UIImage {
-        return UIImage(named: "folderEncrypted")!
-    }
-
-    func getFolderSharedWithMe(account: String) -> UIImage {
-        return UIImage(named: "folder_shared_with_me")!
-    }
-
-    func getFolderPublic(account: String) -> UIImage {
-        return UIImage(named: "folder_public")!
-    }
-
-    func getFolderGroup(account: String) -> UIImage {
-        return UIImage(named: "folder_group")!
-    }
-
-    func getFolderExternal(account: String) -> UIImage {
-        return UIImage(named: "folder_external")!
-    }
-
-    func getFolderAutomaticUpload(account: String) -> UIImage {
-        return UIImage(named: "folderAutomaticUpload")!
-    }
-            
-    func getFolderPublic() -> UIImage {
-        return NCImageCache.images.folderPublic
-    }
-    
-    func getFolderGroup() -> UIImage {
-        return NCImageCache.images.folderGroup
-    }
-    
-    func getFolderExternal() -> UIImage {
-        return NCImageCache.images.folderExternal
-    }
-    
-    func getFolderAutomaticUpload() -> UIImage {
-        return NCImageCache.images.folderAutomaticUpload
-    }
-    
     func getFolder() -> UIImage {
-        return NCImageCache.images.folder
+        return UIImage(named: "folder")!
     }
-    
-    func getFolderSharedWithMe(account: String) -> UIImage {
+
+    func getFolderEncrypted() -> UIImage {
+        return UIImage(named: "folderEncrypted")!
+    }
+
+    func getFolderSharedWithMe() -> UIImage {
         return UIImage(named: "folder_shared_with_me")!
     }
 
-    func getFolderPublic(account: String) -> UIImage {
+    func getFolderPublic() -> UIImage {
         return UIImage(named: "folder_public")!
     }
 
-    func getFolderGroup(account: String) -> UIImage {
+    func getFolderGroup() -> UIImage {
         return UIImage(named: "folder_group")!
     }
 
-    func getFolderExternal(account: String) -> UIImage {
+    func getFolderExternal() -> UIImage {
         return UIImage(named: "folder_external")!
     }
 
-    func getFolderAutomaticUpload(account: String) -> UIImage {
+    func getFolderAutomaticUpload() -> UIImage {
         return UIImage(named: "folderAutomaticUpload")!
     }
 }

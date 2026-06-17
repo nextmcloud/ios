@@ -46,12 +46,15 @@ class NCViewerRichDocument: UIViewController, WKNavigationDelegate, WKScriptMess
                 primaryAction: nil,
                 menu: UIMenu(title: "", children: [
                     UIDeferredMenuElement.uncached { [self] completion in
-                        if let menu = NCContextMenuViewer(metadata: self.metadata, controller: self.tabBarController as? NCMainTabBarController, webView: true, sender: self).viewMenu() {
+                        if let menu = NCViewerContextMenu.makeContextMenu(controller: self.tabBarController as? NCMainTabBarController, metadata: self.metadata, webView: true, sender: self) {
                             completion(menu.children)
                         }
                     }
                 ]))
         }
+//        navigationItem.hidesBackButton = true
+        navigationController?.navigationBar.prefersLargeTitles = false
+        navigationItem.title = metadata.fileNameView
 
         let config = WKWebViewConfiguration()
         config.websiteDataStore = WKWebsiteDataStore.nonPersistent()
@@ -100,10 +103,15 @@ class NCViewerRichDocument: UIViewController, WKNavigationDelegate, WKScriptMess
         NotificationCenter.default.addObserver(self, selector: #selector(self.grabFocus), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterRichdocumentGrabFocus), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardDidShow), name: UIResponder.keyboardDidShowNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
+        
+        AnalyticsHelper.shared.trackEvent(eventName: .EVENT__ONLINE_OFFICE_USED)
     }
 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+
+        // Re-evaluate in-app messages after viewDidAppear
+        MoEngageAnalytics.shared.displayInAppNotificationSafely(reason: "viewDidAppear")
 
         Task {
             await NCNetworking.shared.transferDispatcher.addDelegate(self)
@@ -186,9 +194,7 @@ class NCViewerRichDocument: UIViewController, WKNavigationDelegate, WKScriptMess
             }
 
             if message.body as? String == "share" {
-                NCCreate().createShare(controller: self.controller,
-                                       metadata: metadata,
-                                       page: .sharing)
+                NCCreate().createShare(viewController: self, metadata: metadata, page: .sharing)
             }
 
             if let param = message.body as? [AnyHashable: Any] {
@@ -225,16 +231,10 @@ class NCViewerRichDocument: UIViewController, WKNavigationDelegate, WKScriptMess
                                                                                 status: self.global.metadataStatusDownloading)
                                 }
                             }, progressHandler: { _ in
-                            }, completionHandler: { account, response, error in
+                            }, completionHandler: { account, etag, _, _, headers, _, error in
                                 NCActivityIndicator.shared.stop()
-                                let allHeaderFields = response?.response?.allHeaderFields
-
                                 Task {
-                                    let nkComm = NextcloudKit.shared.nkCommonInstance
                                     let ocId = self.metadata.ocId
-                                    let allHeaderFields = response?.response?.allHeaderFields
-                                    let etag = nkComm.normalizedETag(nkComm.findHeader("oc-etag", allHeaderFields: allHeaderFields))
-
                                     await self.database.setMetadataSessionAsync(ocId: ocId,
                                                                                 session: "",
                                                                                 sessionTaskIdentifier: 0,
@@ -244,15 +244,8 @@ class NCViewerRichDocument: UIViewController, WKNavigationDelegate, WKScriptMess
                                 }
                                 if error == .success && account == self.metadata.account {
                                     var item = fileNameLocalPath
-                                    if let disposition = NextcloudKit.shared.nkCommonInstance.findHeader("Content-Disposition", allHeaderFields: allHeaderFields),
-                                        let filenameContentDisposition = self.filenameFromContentDisposition(disposition) {
-                                         fileName = filenameContentDisposition
-                                         item = self.utilityFileSystem.createServerUrl(serverUrl: self.utilityFileSystem.directoryUserData, fileName: fileName)
-                                         _ = self.utilityFileSystem.moveFile(atPath: fileNameLocalPath, toPath: item)
-                                    }
 
-                                    /*
-                                    if let allHeaderFields {
+                                    if let headers {
                                         if let disposition = headers["Content-Disposition"] as? String,
                                            let filenameContentDisposition = self.filenameFromContentDisposition(disposition) {
                                             fileName = filenameContentDisposition
@@ -260,7 +253,6 @@ class NCViewerRichDocument: UIViewController, WKNavigationDelegate, WKScriptMess
                                             _ = self.utilityFileSystem.moveFile(atPath: fileNameLocalPath, toPath: item)
                                         }
                                     }
-                                    */
 
                                     if type == "print" {
                                         let pic = UIPrintInteractionController.shared
@@ -324,7 +316,7 @@ class NCViewerRichDocument: UIViewController, WKNavigationDelegate, WKScriptMess
 
     // MARK: -
 
-    func dismissSelect(serverUrl: String?, metadata: tableMetadata?, type: String, items: [Any], overwrite: Bool, copy: Bool, move: Bool, session: NCSession.Session, controller: NCMainTabBarController?) {
+    func dismissSelect(serverUrl: String?, metadata: tableMetadata?, type: String, items: [Any], overwrite: Bool, copy: Bool, move: Bool, session: NCSession.Session) {
         if let serverUrl, let metadata {
             let path = utilityFileSystem.getRelativeFilePath(metadata.fileName, serverUrl: serverUrl, session: session)
 
