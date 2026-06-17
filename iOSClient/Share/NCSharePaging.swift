@@ -25,6 +25,7 @@
 import UIKit
 import Parchment
 import NextcloudKit
+import MarqueeLabel
 import TagListView
 
 protocol NCSharePagingContent {
@@ -35,9 +36,9 @@ class NCSharePaging: UIViewController {
     private let pagingViewController = NCShareHeaderViewController()
     private weak var appDelegate = UIApplication.shared.delegate as? AppDelegate
     private var currentVC: NCSharePagingContent?
+    private let applicationHandle = NCApplicationHandle()
 
     var metadata = tableMetadata()
-    var controller: NCMainTabBarController?
     var pages: [NCBrandOptions.NCInfoPagingTab] = []
     var page: NCBrandOptions.NCInfoPagingTab = .activity
 
@@ -50,14 +51,6 @@ class NCSharePaging: UIViewController {
         title = NSLocalizedString("_details_", comment: "")
 
         navigationItem.leftBarButtonItem = UIBarButtonItem(title: NSLocalizedString("_close_", comment: ""), style: .plain, target: self, action: #selector(exitTapped(_:)))
-
-        let manageTagsAction = UIAction(title: NSLocalizedString("_edit_tags_", comment: ""), image: UIImage(systemName: "tag")) { [weak self] _ in
-            self?.editTagsTapped(nil)
-        }
-
-        let moreButton = UIBarButtonItem(image: UIImage(systemName: "ellipsis"), style: .plain, target: nil, action: nil)
-        moreButton.menu = UIMenu(children: [manageTagsAction])
-        navigationItem.rightBarButtonItem = moreButton
 
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow(notification:)), name: UIResponder.keyboardWillShowNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide(notification:)), name: UIResponder.keyboardWillHideNotification, object: nil)
@@ -110,6 +103,10 @@ class NCSharePaging: UIViewController {
 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+        
+        // Re-evaluate in-app messages after viewDidAppear
+        MoEngageAnalytics.shared.displayInAppNotificationSafely(reason: "viewDidAppear")
+
         currentVC = pagingViewController.pageViewController.selectedViewController as? NCSharePagingContent
     }
 
@@ -174,20 +171,6 @@ class NCSharePaging: UIViewController {
         self.dismiss(animated: true, completion: nil)
     }
 
-    @objc func editTagsTapped(_ sender: Any?) {
-        guard let header = (pagingViewController.view as? NCSharePagingView)?.header else {
-            return
-        }
-
-        header.presentTagEditor(from: self) { [weak self] tags in
-            guard let self else { return }
-            self.metadata.tags.removeAll()
-            self.metadata.tags.append(objectsIn: tags, account: self.metadata.account)
-            self.pagingViewController.metadata.tags.removeAll()
-            self.pagingViewController.metadata.tags.append(objectsIn: tags, account: self.pagingViewController.metadata.account)
-        }
-    }
-
     @objc func applicationDidEnterBackground(notification: Notification) {
         self.dismiss(animated: false, completion: nil)
     }
@@ -226,10 +209,9 @@ extension NCSharePaging: PagingViewControllerDataSource {
             }
             viewController.metadata = metadata
             viewController.height = height
-            viewController.controller = controller
             return viewController
         } else {
-            return UIViewController()
+            return applicationHandle.pagingViewController(pagingViewController, viewControllerAt: index, metadata: metadata, topHeight: height)
         }
     }
 
@@ -240,7 +222,7 @@ extension NCSharePaging: PagingViewControllerDataSource {
         } else if pages[index] == .sharing {
             return PagingIndexItem(index: index, title: NSLocalizedString("_sharing_", comment: ""))
         } else {
-            return PagingIndexItem(index: index, title: "")
+            return applicationHandle.pagingViewController(pagingViewController, pagingItemAt: index)
         }
     }
 
@@ -341,50 +323,7 @@ class NCShareHeaderView: UIView {
 
     @IBAction func touchUpInsideFavorite(_ sender: UIButton) {
         guard let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId) else { return }
-        NCNetworking.shared.favoriteMetadata(metadata) { error in
-            if error == .success {
-                guard let metadata = NCManageDatabase.shared.getMetadataFromOcId(metadata.ocId) else { return }
-                self.favorite.setImage(NCUtility().loadImage(named: metadata.favorite ? "star" : "star.fill", colors: [NCBrandColor.shared.yellowFavorite], size: 20), for: .normal)
-            } else {
-                NCContentPresenter().showError(error: error)
-            }
-        }
-    }
-
-    @IBAction func touchUpInsideDetails(_ sender: UIButton) {
-        creation.isHidden = !creation.isHidden
-        upload.isHidden = !upload.isHidden
-    }
-
-    @objc func longTap(_ sender: UIGestureRecognizer) {
-        UIPasteboard.general.string = path.text
-        let error = NKError(errorCode: NCGlobal.shared.errorInternalError, errorDescription: "_copied_path_")
-        NCContentPresenter().showInfo(error: error)
-    }
-}
-
-class NCShareHeaderView: UIView {
-
-    @IBOutlet weak var imageView: UIImageView!
-    @IBOutlet weak var path: MarqueeLabel!
-    @IBOutlet weak var info: UILabel!
-    @IBOutlet weak var creation: UILabel!
-    @IBOutlet weak var upload: UILabel!
-    @IBOutlet weak var favorite: UIButton!
-    @IBOutlet weak var details: UIButton!
-    @IBOutlet weak var tagListView: TagListView!
-
-    var ocId = ""
-
-    override func awakeFromNib() {
-        super.awakeFromNib()
-        let longGesture = UILongPressGestureRecognizer(target: self, action: #selector(longTap(_:)))
-        path.addGestureRecognizer(longGesture)
-    }
-
-    @IBAction func touchUpInsideFavorite(_ sender: UIButton) {
-        guard let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId) else { return }
-        NCNetworking.shared.favoriteMetadata(metadata) { error in
+        NCNetworking.shared.setStatusWaitFavorite(metadata) { error in
             if error == .success {
                 guard let metadata = NCManageDatabase.shared.getMetadataFromOcId(metadata.ocId) else { return }
                 self.favorite.setImage(NCUtility().loadImage(named: metadata.favorite ? "star" : "star.fill", colors: [NCBrandColor.shared.yellowFavorite], size: 20), for: .normal)

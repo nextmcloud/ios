@@ -70,29 +70,6 @@ extension UIView {
         self.layer.masksToBounds = true
     }
 
-    /// Splits a filename into base name + extension across two labels to prevent
-    /// Unicode bidi override attacks from visually disguising the real file extension.
-    func setBidiSafeFilename(
-        _ filename: String,
-        isDirectory: Bool,
-        titleLabel: UILabel?,
-        extensionLabel: UILabel?
-    ) {
-        let nsName = filename as NSString
-        let ext = nsName.pathExtension
-        let base = nsName.deletingPathExtension
-
-        if isDirectory || ext.isEmpty || base.isEmpty {
-            titleLabel?.text = filename
-            extensionLabel?.text = ""
-            extensionLabel?.isHidden = true
-        } else {
-            titleLabel?.text = base
-            extensionLabel?.text = "." + ext
-            extensionLabel?.isHidden = false
-        }
-    }
-
     var parentTabBarController: UITabBarController? {
         var responder: UIResponder? = self
         while let nextResponder = responder?.next {
@@ -100,16 +77,6 @@ extension UIView {
                 return tabBarController
             }
             responder = nextResponder
-        }
-        return nil
-    }
-
-    func addShadow(location: VerticalLocation, height: CGFloat = 2, color: UIColor = NCBrandColor.shared.customerDarkGrey, opacity: Float = 0.4, radius: CGFloat = 2) {
-        switch location {
-        case .bottom:
-             addShadow(offset: CGSize(width: 0, height: height), color: color, opacity: opacity, radius: radius)
-        case .top:
-            addShadow(offset: CGSize(width: 0, height: -height), color: color, opacity: opacity, radius: radius)
         }
         return nil
     }

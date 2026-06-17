@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="24412" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="IP9-yB-QOU">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="24506" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="IP9-yB-QOU">
     <device id="retina5_5" orientation="portrait" appearance="light"/>
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="24405"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="24504"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -285,7 +285,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="21D-rC-4bk">
-                                <rect key="frame" x="0.0" y="20" width="414" height="716"/>
+                                <rect key="frame" x="0.0" y="20" width="414" height="646"/>
                                 <subviews>
                                     <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="g5m-tV-49u">
                                         <rect key="frame" x="0.0" y="0.0" width="414" height="736"/>
@@ -350,6 +350,50 @@
                                 <viewLayoutGuide key="contentLayoutGuide" id="fEb-Rc-uJQ"/>
                                 <viewLayoutGuide key="frameLayoutGuide" id="0Tz-a7-cEw"/>
                             </scrollView>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="8nx-ed-7fc">
+                                <rect key="frame" x="0.0" y="666" width="414" height="70"/>
+                                <subviews>
+                                    <stackView opaque="NO" contentMode="scaleToFill" distribution="fillEqually" spacing="16" translatesAutoresizingMaskIntoConstraints="NO" id="dfS-ym-Ojx">
+                                        <rect key="frame" x="16" y="15" width="382" height="40"/>
+                                        <subviews>
+                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ZND-fc-EeT">
+                                                <rect key="frame" x="0.0" y="0.0" width="183" height="40"/>
+                                                <color key="backgroundColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                <constraints>
+                                                    <constraint firstAttribute="height" constant="40" id="qO3-8N-e2h"/>
+                                                </constraints>
+                                                <fontDescription key="fontDescription" type="system" pointSize="16"/>
+                                                <color key="tintColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                                <state key="normal" title="Cancel"/>
+                                                <connections>
+                                                    <action selector="cancelClicked:" destination="aMp-CA-qAj" eventType="touchUpInside" id="nDZ-gF-CLb"/>
+                                                </connections>
+                                            </button>
+                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="kyF-Vy-9Wz">
+                                                <rect key="frame" x="199" y="0.0" width="183" height="40"/>
+                                                <color key="backgroundColor" red="0.8862745098" green="0.0" blue="0.4549019608" alpha="1" colorSpace="calibratedRGB"/>
+                                                <constraints>
+                                                    <constraint firstAttribute="height" constant="40" id="M17-PN-i5C"/>
+                                                </constraints>
+                                                <state key="normal" title="Send email"/>
+                                                <state key="highlighted">
+                                                    <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                </state>
+                                                <connections>
+                                                    <action selector="sendShareClicked:" destination="aMp-CA-qAj" eventType="touchUpInside" id="hqw-wu-NoO"/>
+                                                </connections>
+                                            </button>
+                                        </subviews>
+                                    </stackView>
+                                </subviews>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <constraints>
+                                    <constraint firstAttribute="centerX" secondItem="dfS-ym-Ojx" secondAttribute="centerX" id="4Fp-AX-ATk"/>
+                                    <constraint firstAttribute="centerY" secondItem="dfS-ym-Ojx" secondAttribute="centerY" id="64T-Zz-It2"/>
+                                    <constraint firstAttribute="height" constant="70" id="Xb2-27-8uh"/>
+                                    <constraint firstItem="dfS-ym-Ojx" firstAttribute="leading" secondItem="8nx-ed-7fc" secondAttribute="leading" constant="16" id="hti-od-drs"/>
+                                </constraints>
+                            </view>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="Bo7-K4-14Z"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
@@ -358,11 +402,23 @@
                             <constraint firstItem="E9C-pp-2cY" firstAttribute="height" relation="lessThanOrEqual" secondItem="4Yy-0R-AD6" secondAttribute="height" constant="-150" id="Tjc-vv-HrI"/>
                             <constraint firstItem="Bo7-K4-14Z" firstAttribute="trailing" secondItem="21D-rC-4bk" secondAttribute="trailing" id="Wk2-iR-eSL"/>
                             <constraint firstItem="21D-rC-4bk" firstAttribute="leading" secondItem="Bo7-K4-14Z" secondAttribute="leading" id="XlB-WJ-R33"/>
+                            <constraint firstItem="8nx-ed-7fc" firstAttribute="bottom" secondItem="Bo7-K4-14Z" secondAttribute="bottom" id="d2r-dz-eLf"/>
+                            <constraint firstItem="8nx-ed-7fc" firstAttribute="top" secondItem="21D-rC-4bk" secondAttribute="bottom" id="dWa-Fy-JZB"/>
+                            <constraint firstItem="8nx-ed-7fc" firstAttribute="leading" secondItem="4Yy-0R-AD6" secondAttribute="leading" id="gz4-ym-7Nx"/>
                             <constraint firstItem="21D-rC-4bk" firstAttribute="top" secondItem="Bo7-K4-14Z" secondAttribute="top" id="vj5-af-ORD"/>
+                            <constraint firstAttribute="trailing" secondItem="8nx-ed-7fc" secondAttribute="trailing" id="yhb-vu-iQ5"/>
                         </constraints>
+                        <variation key="default">
+                            <mask key="constraints">
+                                <exclude reference="La5-IN-HDW"/>
+                            </mask>
+                        </variation>
                     </view>
                     <navigationItem key="navigationItem" id="Iqa-QD-yvJ"/>
                     <connections>
+                        <outlet property="btnCancel" destination="ZND-fc-EeT" id="VMG-hP-3xh"/>
+                        <outlet property="btnSendShare" destination="kyF-Vy-9Wz" id="INI-m2-fEY"/>
+                        <outlet property="buttonContainerView" destination="8nx-ed-7fc" id="BrG-ix-53Z"/>
                         <outlet property="headerContainerView" destination="6ix-yG-4SB" id="ewu-xm-Z7z"/>
                         <outlet property="noteTextField" destination="E9C-pp-2cY" id="DqA-y9-oJM"/>
                         <outlet property="sharingLabel" destination="POm-h2-PiG" id="91c-tO-vzy"/>

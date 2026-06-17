@@ -22,6 +22,7 @@
 //
 
 import UIKit
+import NextcloudKit
 
 // MARK: - NCCell Delegates
 extension NCShare: NCShareLinkCellDelegate, NCShareUserCellDelegate {
@@ -50,25 +51,16 @@ extension NCShare: NCShareLinkCellDelegate, NCShareUserCellDelegate {
     }
 
     func tapMenu(with tableShare: tableShare?, sender: Any) {
-        // Menu is now shown via native context menu on the button
-        // Only handle the case where there's no tableShare (add new link)
-        if tableShare == nil {
-//        if let tableShare = tableShare {
-//            self.toggleShareMenu(for: tableShare, sender: sender)
-            self.toggleShareMenu(for: tableShare, sendMail: (tableShare.shareType != NCShareCommon().SHARE_TYPE_LINK), folder: metadata?.directory ?? false, sender: sender)
+        if let tableShare = tableShare {
+            self.toggleShareMenu(for: tableShare, sendMail: (tableShare.shareType != NKShare.ShareType.publicLink.rawValue), folder: metadata?.directory ?? false, sender: sender)
         } else {
             self.makeNewLinkShare()
         }
     }
 
-    func tapProfileMenu(with tableShare: tableShare?) -> UIMenu? {
-        guard let tableShare else { return nil }
-        return NCContextMenuProfile(userId: tableShare.shareWith, session: session, viewController: self).viewMenu()
-    }
-
-    func tapQuickStatus(with tableShare: tableShare?, sender: Any) {
+    func showProfile(with tableShare: tableShare?, sender: Any) {
         guard let tableShare else { return }
-        presentQuickStatusActionSheet(for: tableShare, sender: sender)
+        showProfileMenu(userId: tableShare.shareWith, session: session, sender: sender)
     }
 
     func quickStatus(with tableShare: tableShare?, sender: Any) {

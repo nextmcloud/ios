@@ -2,6 +2,7 @@
 // SPDX-FileCopyrightText: 2018 Marino Faggiana
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+import Foundation
 import UIKit
 import NextcloudKit
 import PDFKit
@@ -114,18 +115,13 @@ final class NCUtility: NSObject, Sendable {
         let zeros = String(repeating: "0", count: 8 - fileId.count)
         return zeros + fileId
     }
-//    func getVersionApp(withBuild: Bool = true) -> String {
-//        if let dictionary = Bundle.main.infoDictionary {
-//            if let version = dictionary["CFBundleShortVersionString"], let build = dictionary["CFBundleVersion"] {
-//                if withBuild {
-//                    return "\(version).\(build)"
-//                } else {
-//                    return "\(version)"
-//                }
-//            }
-//        }
-//        return ""
-//    }
+
+    func getLivePhotoOcId(metadata: tableMetadata) -> String? {
+        if let instanceId = splitOcId(metadata.ocId).instanceId {
+            return paddedFileId(metadata.livePhotoFile) + instanceId
+        }
+        return nil
+    }
 
     func getVersionBuild() -> String {
         if let dictionary = Bundle.main.infoDictionary,
@@ -227,6 +223,7 @@ final class NCUtility: NSObject, Sendable {
         return isEqual
     }
 
+    #if !EXTENSION_FILE_PROVIDER_EXTENSION
     func getLocation(latitude: Double, longitude: Double, completion: @escaping (String?) -> Void) {
         let geocoder = CLGeocoder()
         let llocation = CLLocation(latitude: latitude, longitude: longitude)
@@ -247,6 +244,7 @@ final class NCUtility: NSObject, Sendable {
             }
         }
     }
+    #endif
 
     // https://stackoverflow.com/questions/5887248/ios-app-maximum-memory-budget/19692719#19692719
     // https://stackoverflow.com/questions/27556807/swift-pointer-problems-with-mach-task-basic-info/27559770#27559770
@@ -285,6 +283,14 @@ final class NCUtility: NSObject, Sendable {
             height = (view.frame.height / 2) + landscapeOffset
         }
         return height
+    }
+
+    func formatBadgeCount(_ count: Int) -> String {
+        if count <= 9999 {
+            return "\(count)"
+        } else {
+            return count.formatted(.number.notation(.compactName).locale(Locale(identifier: "en_US")))
+        }
     }
     
     // E-mail validations

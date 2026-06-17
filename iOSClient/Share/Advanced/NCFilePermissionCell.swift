@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import XLForm
 
 class NCFilePermissionCell: XLFormButtonCell {
     
@@ -28,6 +29,7 @@ class NCFilePermissionCell: XLFormButtonCell {
     @objc func changeTheming() {
         self.backgroundColor = NCBrandColor.shared.secondarySystemGroupedBackground
         self.titleLabel.textColor = NCBrandColor.shared.label
+        self.titleLabelBottom.textColor = NCBrandColor.shared.iconImageColor
         self.titleLabelBottom.textColor = NCBrandColor.shared.iconColor
     }
     

@@ -28,15 +28,15 @@ class NCShareNetworking: NSObject {
     let database = NCManageDatabase.shared
     weak var delegate: NCShareNetworkingDelegate?
     var view: UIView
-    let metadata: tableMetadata
-    let session: NCSession.Session
+    var metadata: tableMetadata
+    var session: NCSession.Session
     let controller: NCMainTabBarController?
 
     @MainActor
     internal var windowScene: UIWindowScene? {
         SceneManager.shared.getWindowScene(controller: controller)
     }
-
+    
     init(metadata: tableMetadata,
          view: UIView,
          delegate: NCShareNetworkingDelegate?,
@@ -50,6 +50,7 @@ class NCShareNetworking: NSObject {
 
         super.init()
     }
+
 
     private func readDownloadLimit(account: String, token: String) async throws -> NKDownloadLimit? {
         return try await withCheckedThrowingContinuation { continuation in
@@ -130,7 +131,7 @@ class NCShareNetworking: NSObject {
     // MARK: - Create Share Link
     func createShareLink(password: String?) {
         NCActivityIndicator.shared.start(backgroundView: view)
-        let filenamePath = utilityFileSystem.getFileNamePath(metadata.fileName, serverUrl: metadata.serverUrl, session: session)
+        let filenamePath = utilityFileSystem.getRelativeFilePath(metadata.fileName, serverUrl: metadata.serverUrl, session: session)
 
         NextcloudKit.shared.createShare(path: filenamePath,
                                         shareType: NCShareCommon.shareTypeLink,
@@ -151,7 +152,9 @@ class NCShareNetworking: NSObject {
                 // 🔄 ensure we sync DB + UI with server
                 self.readShare(showLoadingIndicator: false)
             } else {
-                NCContentPresenter().showError(error: error)
+                Task {
+                    await showErrorBanner(windowScene: self.windowScene, error: error)
+                }
             }
 
             self.delegate?.shareCompleted()
@@ -188,12 +191,12 @@ class NCShareNetworking: NSObject {
                 self.database.addShare(account: self.metadata.account, home: home, shares: [share])
 
                 if shareable.hasChanges(comparedTo: share) {
-                    self.updateShare(shareable, downloadLimit: downloadLimit)
+                    self.updateShare(shareable, downloadLimit: downloadLimit, changeDownloadLimit: true)
                     // Download limit update should happen implicitly on share update.
                 } else {
                     if case let .limited(limit, _) = downloadLimit,
                        capabilities.fileSharingDownloadLimit,
-                       shareable.shareType == NCShareCommon.shareTypeLink,
+                       shareable.shareType == NKShare.ShareType.publicLink.rawValue,
                        shareable.itemType == NCShareCommon.itemTypeFile {
                         self.setShareDownloadLimit(limit, token: share.token)
                     }
@@ -247,7 +250,7 @@ class NCShareNetworking: NSObject {
         }
     }
 
-    func updateShare(_ shareable: Shareable, downloadLimit: DownloadLimitViewModel) {
+    func updateShare(_ shareable: Shareable, downloadLimit: DownloadLimitViewModel, changeDownloadLimit: Bool = false) {
         NCActivityIndicator.shared.start(backgroundView: view)
         NextcloudKit.shared.updateShare(idShare: shareable.idShare, password: shareable.password, expireDate: shareable.formattedDateString, permissions: shareable.permissions, note: shareable.note, label: shareable.label, hideDownload: shareable.hideDownload, attributes: shareable.attributes, account: metadata.account) { task in
             Task {
@@ -267,8 +270,9 @@ class NCShareNetworking: NSObject {
                 self.delegate?.readShareCompleted()
 
                 if capabilities.fileSharingDownloadLimit,
-                   shareable.shareType == NCShareCommon.shareTypeLink,
-                   shareable.itemType == NCShareCommon.itemTypeFile {
+                   shareable.shareType == NKShare.ShareType.publicLink.rawValue,
+                   shareable.itemType == NCShareCommon.itemTypeFile,
+                   changeDownloadLimit {
                     if case let .limited(limit, _) = downloadLimit {
                         self.setShareDownloadLimit(limit, token: share.token)
                     } else {
@@ -306,8 +310,7 @@ class NCShareNetworking: NSObject {
                 self.delegate?.getSharees(sharees: sharees)
             } else {
                 Task {
-                    let windowScene = await SceneManager.shared.getWindowScene(controller: self.controller)
-                    await showErrorBanner(windowScene: windowScene, error: error)
+                    await showErrorBanner(windowScene: self.windowScene, error: error)
                 }
                 self.delegate?.getSharees(sharees: nil)
             }
