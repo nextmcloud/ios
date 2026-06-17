@@ -2,6 +2,8 @@
 // SPDX-FileCopyrightText: 2022 Henrik Storch
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+import NextcloudKit
+
 ///
 /// Table view cell to manage the expiration date on a share in its details.
 ///
@@ -10,7 +12,6 @@ class NCShareDateCell: UITableViewCell {
     let textField = UITextField()
     var shareType: Int
     var onReload: (() -> Void)?
-    let shareCommon = NCShareCommon()
 
     init(share: Shareable) {
         self.shareType = share.shareType
@@ -19,9 +20,18 @@ class NCShareDateCell: UITableViewCell {
         picker.datePickerMode = .date
         picker.minimumDate = Calendar.current.date(byAdding: .day, value: 1, to: Date())
         picker.preferredDatePickerStyle = .wheels
+        // Get the app's language (first language in the preferred languages array)
+        let appLanguage = Locale.preferredLanguages.first?.prefix(2) ?? "en"
+
+        // Set the locale of the picker to the app's language
+        picker.locale = Locale(identifier: "\(appLanguage)_\(appLanguage.uppercased())")
+
+        // Handle date changes
+//        picker.addTarget(self, action: #selector(dateChanged(_:)), for: .valueChanged)
+
         picker.action(for: .valueChanged) { datePicker in
             guard let datePicker = datePicker as? UIDatePicker else { return }
-            self.detailTextLabel?.text = DateFormatter.shareExpDate.string(from: datePicker.date)
+            self.detailTextLabel?.text = DateFormatter.formattedExpiryDate(datePicker.date)//DateFormatter.shareExpDate.string(from: datePicker.date)
         }
         accessoryView = textField
 
@@ -41,7 +51,7 @@ class NCShareDateCell: UITableViewCell {
         textField.inputView = picker
 
         if let expDate = share.expirationDate {
-            detailTextLabel?.text = DateFormatter.shareExpDate.string(from: expDate as Date)
+            detailTextLabel?.text = DateFormatter.formattedExpiryDate(expDate as Date) //DateFormatter.shareExpDate.string(from: expDate as Date)
         }
     }
 
@@ -58,6 +68,8 @@ class NCShareDateCell: UITableViewCell {
     }
 
     private func isExpireDateEnforced(account: String) -> Bool {
+        let capabilities = NCNetworking.shared.capabilities[account] ?? NKCapabilities.Capabilities()
+
         switch self.shareType {
         case NKShare.ShareType.publicLink.rawValue,
             NKShare.ShareType.email.rawValue,
@@ -77,6 +89,8 @@ class NCShareDateCell: UITableViewCell {
     }
 
     private func defaultExpirationDays(account: String) -> Int {
+        let capabilities = NCNetworking.shared.capabilities[account] ?? NKCapabilities.Capabilities()
+
         switch self.shareType {
         case NKShare.ShareType.publicLink.rawValue,
             NKShare.ShareType.email.rawValue,
