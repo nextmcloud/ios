@@ -44,7 +44,10 @@ class NCFiles: NCCollectionViewCommon {
         }
 
         NotificationCenter.default.addObserver(forName: UIApplication.didEnterBackgroundNotification, object: nil, queue: nil) { _ in
-            self.stopSyncMetadata()
+            Task {
+                await self.stopSyncMetadata()
+                await self.searchOperationHandle.cancel()
+            }
         }
 
         if self.serverUrl.isEmpty {
@@ -134,8 +137,8 @@ class NCFiles: NCCollectionViewCommon {
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
 
-        stopSyncMetadata()
         Task {
+            await stopSyncMetadata()
             await NCNetworking.shared.networkingTasks.cancel(identifier: "\(self.serverUrl)_NCFiles")
         }
     }
@@ -197,7 +200,8 @@ class NCFiles: NCCollectionViewCommon {
         }
 
         guard !isSearchingMode else {
-            return networkSearch()
+            await self.search()
+            return
         }
 
         func downloadMetadata(_ metadata: tableMetadata) async -> Bool {
@@ -325,20 +329,13 @@ class NCFiles: NCCollectionViewCommon {
 
             // No metadata fount, re-send it
             if results.error.errorCode == NCGlobal.shared.errorResourceNotFound {
-                NCContentPresenter().showInfo(description: "Metadata not found")
+                await showInfoBanner(windowScene: windowScene, text: "Metadata not found")
                 let error = await NCNetworkingE2EE().uploadMetadata(serverUrl: serverUrl, account: account)
                 if error != .success {
-                    await showErrorBanner(controller: self.controller,
-                                          errorDescription: error.errorDescription,
-                                          errorCode: error.errorCode)
+                    await showErrorBanner(windowScene: windowScene, text: error.errorDescription, errorCode: error.errorCode)
                 }
             } else {
-                // show error
-                Task {@MainActor in
-                    await showErrorBanner(controller: self.controller,
-                                          errorDescription: error.errorDescription,
-                                          errorCode: error.errorCode)
-                }
+                await showErrorBanner(windowScene: windowScene, text: error.errorDescription, errorCode: error.errorCode)
             }
 
             return(metadatas, error, reloadRequired)
@@ -349,30 +346,23 @@ class NCFiles: NCCollectionViewCommon {
 
         if errorDecodeMetadata == .success {
             let capabilities = await NKCapabilities.shared.getCapabilities(for: self.session.account)
-            if version == "v1", capabilities.e2EEApiVersion == NCGlobal.shared.e2eeVersionV20 {
-                NCContentPresenter().showInfo(description: "Conversion metadata v1 to v2 required, please wait...")
+            if version == "v1", NCGlobal.shared.isE2eeVersion2(capabilities.e2EEApiVersion) {
+                await showInfoBanner(windowScene: windowScene, text: "Conversion metadata v1 to v2 required, please wait...")
                 nkLog(tag: self.global.logTagE2EE, message: "Conversion v1 to v2")
                 NCActivityIndicator.shared.start()
 
                 let error = await NCNetworkingE2EE().uploadMetadata(serverUrl: serverUrl, updateVersionV1V2: true, account: account)
                 if error != .success {
-                    Task {@MainActor in
-                        await showErrorBanner(controller: self.controller,
-                                              errorDescription: error.errorDescription,
-                                              errorCode: error.errorCode)
-                    }
+                    await showErrorBanner(windowScene: windowScene, text: error.errorDescription, errorCode: error.errorCode)
                 }
                 NCActivityIndicator.shared.stop()
             }
         } else {
             // Client Diagnostic
             await self.database.addDiagnosticAsync(account: account, issue: NCGlobal.shared.diagnosticIssueE2eeErrors)
-            Task {@MainActor in
-                await showErrorBanner(controller: self.controller,
-                                      errorDescription: error.errorDescription,
-                                      errorCode: error.errorCode)
-            }
+            await showErrorBanner(windowScene: windowScene, text: errorDecodeMetadata.errorDescription, errorCode: errorDecodeMetadata.errorCode)
         }
+
 
         return (metadatas, error, reloadRequired)
     }

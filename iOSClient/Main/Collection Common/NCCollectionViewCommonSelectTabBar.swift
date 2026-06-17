@@ -26,15 +26,11 @@ class NCCollectionViewCommonSelectTabBar: ObservableObject {
     @Published var isAnyDirectory = false
     @Published var isAllDirectory = false
     @Published var isAnyLocked = false
+    @Published var isAnyEncrypted = false
     @Published var canUnlock = true
     @Published var enableLock = false
     @Published var isSelectedEmpty = true
     @Published var metadatas: [tableMetadata] = []
-
-    var isFilesLockCapabilityEnabled: Bool {
-        let capabilities = NCNetworking.shared.capabilities[controller?.account ?? ""] ?? NKCapabilities.Capabilities()
-        return !capabilities.filesLockVersion.isEmpty
-    }
 
     init(controller: NCMainTabBarController? = nil, viewController: UIViewController, delegate: NCCollectionViewCommonSelectTabBarDelegate? = nil) {
         guard let controller else {
@@ -72,6 +68,7 @@ class NCCollectionViewCommonSelectTabBar: ObservableObject {
         }
 
         controller.hide()
+        NotificationCenter.default.post(name: Notification.Name("NCSelectionModeDidBegin"), object: nil)
 
         if hostingController.view.isHidden {
             hostingController.view.isHidden = false
@@ -89,6 +86,7 @@ class NCCollectionViewCommonSelectTabBar: ObservableObject {
         }
 
         hostingController.view.isHidden = true
+        NotificationCenter.default.post(name: Notification.Name("NCSelectionModeDidEnd"), object: nil)
         controller.show()
     }
 
@@ -99,25 +97,31 @@ class NCCollectionViewCommonSelectTabBar: ObservableObject {
             isAnyDirectory = false
             isAllDirectory = true
             isAnyLocked = false
+            isAnyEncrypted = false
             canUnlock = true
             self.metadatas = metadatas
-
+            
             for metadata in metadatas {
                 if metadata.directory {
                     isAnyDirectory = true
                 } else {
                     isAllDirectory = false
                 }
-
+                
                 if !metadata.canSetAsAvailableOffline {
                     canSetAsOffline = false
                 }
-
+                
                 if metadata.lock {
                     isAnyLocked = true
                     if metadata.lockOwner != userId {
                         canUnlock = false
                     }
+                }
+                
+                // If any selected item is end-to-end encrypted, mark it so we can hide copy/move
+                if metadata.isDirectoryE2EE || metadata.e2eEncrypted {
+                    isAnyEncrypted = true
                 }
 
                 guard !isAnyOffline else { continue }
@@ -131,8 +135,8 @@ class NCCollectionViewCommonSelectTabBar: ObservableObject {
                     isAnyOffline = localFile.offline
                 } // else: file is not offline, continue
             }
-            // let capabilities = NCNetworking.shared.capabilities[controller?.account ?? ""] ?? NKCapabilities.Capabilities()
-            enableLock = !isAnyDirectory && canUnlock && isFilesLockCapabilityEnabled
+            let capabilities = NCNetworking.shared.capabilities[controller?.account ?? ""] ?? NKCapabilities.Capabilities()
+            enableLock = !isAnyDirectory && canUnlock && !capabilities.filesLockVersion.isEmpty
         }
         self.isSelectedEmpty = fileSelect.isEmpty
     }
@@ -151,7 +155,8 @@ struct NCCollectionViewCommonSelectTabBarView: View {
                     tabBarSelect.delegate?.share()
                 } label: {
                     Image(systemName: "square.and.arrow.up")
-                        .font(.icon(23))
+                        .font(Font.system(.body).weight(.light))
+                        .imageScale(sizeClass == .compact ? .medium : .large)
                 }
                 .tint(Color(NCBrandColor.shared.iconImageColor))
                 .frame(maxWidth: .infinity)
@@ -161,17 +166,20 @@ struct NCCollectionViewCommonSelectTabBarView: View {
                     tabBarSelect.delegate?.move()
                 } label: {
                     Image(systemName: "rectangle.portrait.and.arrow.right")
-                        .font(.icon(23))
+                        .font(Font.system(.body).weight(.light))
+                        .imageScale(sizeClass == .compact ? .medium : .large)
                 }
                 .tint(Color(NCBrandColor.shared.iconImageColor))
                 .frame(maxWidth: .infinity)
-                .disabled(tabBarSelect.isSelectedEmpty)
+                .disabled(tabBarSelect.isSelectedEmpty || tabBarSelect.isAnyEncrypted)
+//                .opacity(tabBarSelect.isAnyEncrypted ? 0 : 1)
 
                 Button {
                     tabBarSelect.delegate?.delete()
                 } label: {
                     Image(systemName: "trash")
-                        .font(.icon(23))
+                        .font(Font.system(.body).weight(.light))
+                        .imageScale(sizeClass == .compact ? .medium : .large)
                 }
                 .tint(.red)
                 .frame(maxWidth: .infinity)
@@ -185,16 +193,10 @@ struct NCCollectionViewCommonSelectTabBarView: View {
 
                         if !tabBarSelect.canSetAsOffline && !tabBarSelect.isAnyOffline {
                             Text(NSLocalizedString("_e2ee_set_as_offline_", comment: ""))
-                                .cappedFont(.body, maxDynamicType: .accessibility2)
                         }
                     })
                     .disabled(!tabBarSelect.isAnyOffline && (!tabBarSelect.canSetAsOffline || tabBarSelect.isSelectedEmpty))
 
-                    if tabBarSelect.isFilesLockCapabilityEnabled {
-                        Button(action: {
-                            tabBarSelect.delegate?.lock(isAnyLocked: tabBarSelect.isAnyLocked)
-                        }, label: {
-                            Label(NSLocalizedString(tabBarSelect.isAnyLocked ? "_unlock_" : "_lock_", comment: ""), systemImage: tabBarSelect.isAnyLocked ? "lock.open" : "lock")
                     // NMC-5295 - iOS v10.2.2.3 - File Browser: Remove "file lock" feature from menu
                     // lock menu entry is not available. not supported by magentacloud
 //                    Button(action: {
@@ -208,13 +210,6 @@ struct NCCollectionViewCommonSelectTabBarView: View {
 //                    })
 //                    .disabled(!tabBarSelect.enableLock || tabBarSelect.isSelectedEmpty)
 
-                            if !tabBarSelect.enableLock {
-                                Text(NSLocalizedString("_lock_no_permissions_selected_", comment: ""))
-                                    .cappedFont(.body, maxDynamicType: .accessibility2)
-                            }
-                        })
-                        .disabled(!tabBarSelect.enableLock || tabBarSelect.isSelectedEmpty)
-                    }
                     Button(action: {
                         tabBarSelect.delegate?.selectAll()
                     }, label: {
@@ -222,7 +217,8 @@ struct NCCollectionViewCommonSelectTabBarView: View {
                     })
                 } label: {
                     Image(systemName: "ellipsis.circle")
-                        .font(.icon(23))
+                        .font(Font.system(.body).weight(.light))
+                        .imageScale(sizeClass == .compact ? .medium : .large)
                 }
                 .tint(Color(NCBrandColor.shared.iconImageColor))
                 .frame(maxWidth: .infinity)
