@@ -387,6 +387,7 @@ final class NCGlobal: Sendable {
     let notificationCenterUserInteractionMonitor                = "serInteractionMonitor"
 
     let notificationCenterNetworkingProcess                     = "networkingProcess"
+    let notificationCenterTransferCountChanged                  = "transferCountChanged"
 
     // Networking Status
     let networkingStatusCreateFolder                            = "statusCreateFolder"

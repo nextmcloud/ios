@@ -428,10 +428,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     }
 
     func nextcloudPushNotificationAction(data: [String: AnyObject]) {
-        guard let data = NCApplicationHandle().nextcloudPushNotificationAction(data: data)
-        else {
-            return
-        }
         let account = data["account"] as? String ?? "unavailable"
         let app = data["app"] as? String
 
@@ -439,7 +435,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
             if app == NCGlobal.shared.termsOfServiceName {
                 Task {
                     await NCNetworking.shared.transferDispatcher.notifyAllDelegatesAsync { delegate in
-                        try? await Task.sleep(nanoseconds: 500_000_000)
+                        try? await Task.sleep(for: .seconds(0.5))
                         delegate.transferReloadDataSource(serverUrl: nil, requestData: true, status: nil)
                     }
                 }
@@ -462,7 +458,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
                 openNotification(controller: controller)
             }
         } else {
-            let message = NSLocalizedString("_the_account_", comment: "") + " " + account + " " + NSLocalizedString("_does_not_exist_", comment: "")
+            let message = String(
+                format: NSLocalizedString("account_does_not_exist", comment: ""),
+                account
+            )
+
             let alertController = UIAlertController(title: NSLocalizedString("_info_", comment: ""), message: message, preferredStyle: .alert)
             alertController.addAction(UIAlertAction(title: NSLocalizedString("_ok_", comment: ""), style: .default, handler: { _ in }))
             UIApplication.shared.mainAppWindow?.rootViewController?.present(alertController, animated: true, completion: { })
@@ -676,7 +676,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     }
 
     @objc private func checkErrorNetworking() {
-        guard !account.isEmpty, NCKeychain().getPassword(account: account).isEmpty else { return }
+        guard !account.isEmpty, NCPreferences().getPassword(account: account).isEmpty else { return }
         openLogin(viewController: window?.rootViewController, selector: NCGlobal.shared.introLogin, openLoginWeb: true)
     }
 }

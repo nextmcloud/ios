@@ -1,10 +1,3 @@
-//
-//  NCTrashGridCell.swift
-//  Nextcloud
-//
-//  Created by A200073704 on 27/06/23.
-//  Copyright © 2023 Marino Faggiana. All rights reserved.
-//
 // SPDX-FileCopyrightText: Nextcloud GmbH
 // SPDX-FileCopyrightText: 2024 Marino Faggiana
 // SPDX-License-Identifier: GPL-3.0-or-later
@@ -31,32 +24,6 @@ class NCTrashGridCell: UICollectionViewCell, NCTrashCellProtocol {
     var statusImg: UIImageView? {
         get { return nil }
         set { imageItem = newValue }
-    }
-    var indexPath = IndexPath()
-    var account = ""
-    var user = ""
-
-    var namedButtonMore = ""
-
-    var fileObjectId: String? {
-        get { return objectId }
-        set { objectId = newValue ?? "" }
-    }
-    var filePreviewImageView: UIImageView? {
-        get { return imageItem }
-        set { imageItem = newValue }
-    }
-    var fileUser: String? {
-        get { return user }
-        set { user = newValue ?? "" }
-    }
-    var fileTitleLabel: UILabel? {
-        get { return labelTitle }
-        set { labelTitle = newValue }
-    }
-    var fileInfoLabel: UILabel? {
-        get { return labelInfo }
-        set { labelInfo = newValue }
     }
 
     override func awakeFromNib() {
@@ -110,10 +77,6 @@ class NCTrashGridCell: UICollectionViewCell, NCTrashCellProtocol {
         // adjustsFontForContentSizeCategory:
         //     Enables live updates when accessibility settings change.
         //
-//        progressView.tintColor = NCBrandColor.shared.brandElement
-//        progressView.transform = CGAffineTransform(scaleX: 1.0, y: 0.5)
-//        progressView.trackTintColor = .clear
-
         labelTitle.text = ""
         labelTitle.font = .callout()
         labelTitle.adjustsFontForContentSizeCategory = true
@@ -127,9 +90,9 @@ class NCTrashGridCell: UICollectionViewCell, NCTrashCellProtocol {
         labelInfo.font = .footnote()
         labelInfo.adjustsFontForContentSizeCategory = true
 
-//        labelSubinfo.text = ""
-//        labelSubinfo.font = .footnote()
-//        labelSubinfo.adjustsFontForContentSizeCategory = true
+        labelSubinfo.text = ""
+        labelSubinfo.font = .footnote()
+        labelSubinfo.adjustsFontForContentSizeCategory = true
 
         if labelExtension.isHidden {
             labelTitle.numberOfLines = 2
@@ -138,9 +101,6 @@ class NCTrashGridCell: UICollectionViewCell, NCTrashCellProtocol {
             labelTitle.numberOfLines = 1
             labelTitle.lineBreakMode = .byTruncatingTail
         }
-        labelTitle.textColor = .label
-        labelInfo.textColor = .systemGray
-        labelSubinfo.text = ""
     }
 
     override func snapshotView(afterScreenUpdates afterUpdates: Bool) -> UIView? {
@@ -174,17 +134,9 @@ class NCTrashGridCell: UICollectionViewCell, NCTrashCellProtocol {
             setA11yActions()
         }
 
-//        imageVisualEffect.alpha = status ? 1 : 0
-//        imageSelect.alpha = status ? 1 : 0
-//        imageSelect.image = NCImageCache.shared.getImageCheckedYes(color: color)
-        if status {
-            imageSelect.image = NCImageCache.shared.getImageCheckedYes(color: color)
-            imageSelect.isHidden = false
-            imageVisualEffect.isHidden = false
-        } else {
-            imageSelect.isHidden = true
-            imageVisualEffect.isHidden = true
-        }
+        imageVisualEffect.alpha = status ? 1 : 0
+        imageSelect.alpha = status ? 1 : 0
+        imageSelect.image = NCImageCache.shared.getImageCheckedYes(color: color)
     }
 
     func writeInfoDateSize(date: NSDate, size: Int64) {

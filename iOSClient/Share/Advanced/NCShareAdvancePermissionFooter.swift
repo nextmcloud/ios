@@ -23,7 +23,7 @@
 
 import UIKit
 
-protocol NCShareAdvanceFooterDelegate: AnyObject {
+protocol NCShareAdvanceFotterDelegate: AnyObject {
     var isNewShare: Bool { get }
     func dismissShareAdvanceView(shouldSave: Bool)
 }
@@ -31,12 +31,12 @@ protocol NCShareAdvanceFooterDelegate: AnyObject {
 class NCShareAdvancePermissionFooter: UIView {
     @IBOutlet weak var buttonCancel: UIButton!
     @IBOutlet weak var buttonNext: UIButton!
-    weak var delegate: NCShareAdvanceFooterDelegate?
+    weak var delegate: NCShareAdvanceFotterDelegate?
 
-    func setupUI(delegate: NCShareAdvanceFooterDelegate?, account: String) {
+    func setupUI(delegate: NCShareAdvanceFotterDelegate?, account: String) {
         self.delegate = delegate
-        buttonCancel.addTarget(self, action: #selector(cancelClicked), for: .touchUpInside)
-        buttonNext.addTarget(self, action: #selector(nextClicked), for: .touchUpInside)
+        backgroundColor = .clear
+
         buttonCancel.setTitle(NSLocalizedString("_cancel_", comment: ""), for: .normal)
         buttonCancel.layer.cornerRadius = 10
         buttonCancel.layer.masksToBounds = true
@@ -51,32 +51,14 @@ class NCShareAdvancePermissionFooter: UIView {
         buttonNext.layer.masksToBounds = true
         buttonNext.backgroundColor = NCBrandColor.shared.getElement(account: account)
         buttonNext.addTarget(self, action: #selector(nextClicked(_:)), for: .touchUpInside)
-        buttonNext.setTitle(NSLocalizedString(delegate?.isNewShare == true ? "_next_" : "_apply_changes_", comment: ""), for: .normal)
-        buttonCancel.layer.cornerRadius = 10
-        buttonCancel.layer.masksToBounds = true
-        buttonCancel.layer.borderWidth = 1
-        buttonNext.setTitle(NSLocalizedString(delegate?.isNewShare == true ? "_next_" : "_apply_changes_", comment: ""), for: .normal)
-        buttonCancel.layer.cornerRadius = 10
-        buttonCancel.layer.masksToBounds = true
-        buttonCancel.layer.borderWidth = 1
-        addShadow(location: .top)
-        layer.cornerRadius = 10
-        layer.masksToBounds = true
-        backgroundColor = NCBrandColor.shared.secondarySystemGroupedBackground
-        buttonCancel.setTitleColor(NCBrandColor.shared.label, for: .normal)
-        buttonCancel.layer.borderColor = NCBrandColor.shared.label.cgColor
-        buttonCancel.backgroundColor = NCBrandColor.shared.secondarySystemGroupedBackground
-        buttonNext.setBackgroundColor(NCBrandColor.shared.customer, for: .normal)
         buttonNext.setTitleColor(.white, for: .normal)
-        buttonNext.layer.cornerRadius = 10
-        buttonNext.layer.masksToBounds = true
     }
 
-    @objc func cancelClicked() {
+    @objc func cancelClicked(_ sender: Any?) {
         delegate?.dismissShareAdvanceView(shouldSave: false)
     }
 
-    @objc func nextClicked() {
+    @objc func nextClicked(_ sender: Any?) {
         delegate?.dismissShareAdvanceView(shouldSave: true)
     }
 }

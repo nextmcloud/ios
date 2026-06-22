@@ -60,12 +60,11 @@ class NCMoreAppSuggestionsCell: BaseNCMoreCell {
     }
 
     @objc func assistantTapped(_ sender: Any?) {
-        if let viewController = self.window?.rootViewController {
-            let assistant = NCAssistant()
-                .environmentObject(NCAssistantModel(controller: self.controller))
-            let hostingController = UIHostingController(rootView: assistant)
-            viewController.present(hostingController, animated: true, completion: nil)
-        }
+//        if let viewController = self.window?.rootViewController {
+//            let assistant = NCAssistant(assistantModel: NCAssistantModel(controller: self.controller), chatModel: NCAssistantChatModel(controller: self.controller), conversationsModel: NCAssistantChatConversationsModel(controller: self.controller))
+//            let hostingController = UIHostingController(rootView: assistant)
+//            viewController.present(hostingController, animated: true, completion: nil)
+//        }
     }
 
     @objc func talkTapped(_ sender: Any?) {

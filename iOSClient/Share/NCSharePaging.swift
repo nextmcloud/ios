@@ -26,6 +26,7 @@ import UIKit
 import Parchment
 import NextcloudKit
 import TagListView
+import MarqueeLabel
 
 protocol NCSharePagingContent {
     var textField: UITextField? { get }
@@ -133,7 +134,6 @@ class NCSharePaging: UIViewController {
         super.viewWillDisappear(animated)
         Task {
             await NCNetworking.shared.transferDispatcher.notifyAllDelegates { delegate in
-                delegate.transferReloadData(serverUrl: metadata.serverUrl, status: nil)
                 delegate.transferReloadDataSource(serverUrl: self.metadata.serverUrl, requestData: false, status: nil)
             }
         }
@@ -342,12 +342,18 @@ class NCShareHeaderView: UIView {
 
     @IBAction func touchUpInsideFavorite(_ sender: UIButton) {
         guard let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId) else { return }
-        NCNetworking.shared.favoriteMetadata(metadata) { error in
+        Task {
+            let error = await NCNetworking.shared.setStatusWaitFavorite(metadata)
             if error == .success {
-                guard let metadata = NCManageDatabase.shared.getMetadataFromOcId(metadata.ocId) else { return }
-                self.favorite.setImage(NCUtility().loadImage(named: metadata.favorite ? "star" : "star.fill", colors: [NCBrandColor.shared.yellowFavorite], size: 20), for: .normal)
+                if let metadata = NCManageDatabase.shared.getMetadataFromOcId(metadata.ocId) {
+                    await MainActor.run {
+                        self.favorite.setImage(NCUtility().loadImage(named: metadata.favorite ? "star" : "star.fill", colors: [NCBrandColor.shared.yellowFavorite], size: 20), for: .normal)
+                    }
+                }
             } else {
-                NCContentPresenter().showError(error: error)
+                await MainActor.run {
+                    NCContentPresenter().showError(error: error)
+                }
             }
         }
     }
@@ -364,45 +370,45 @@ class NCShareHeaderView: UIView {
     }
 }
 
-class NCShareHeaderView: UIView {
-
-    @IBOutlet weak var imageView: UIImageView!
-    @IBOutlet weak var path: MarqueeLabel!
-    @IBOutlet weak var info: UILabel!
-    @IBOutlet weak var creation: UILabel!
-    @IBOutlet weak var upload: UILabel!
-    @IBOutlet weak var favorite: UIButton!
-    @IBOutlet weak var details: UIButton!
-    @IBOutlet weak var tagListView: TagListView!
-
-    var ocId = ""
-
-    override func awakeFromNib() {
-        super.awakeFromNib()
-        let longGesture = UILongPressGestureRecognizer(target: self, action: #selector(longTap(_:)))
-        path.addGestureRecognizer(longGesture)
-    }
-
-    @IBAction func touchUpInsideFavorite(_ sender: UIButton) {
-        guard let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId) else { return }
-        NCNetworking.shared.favoriteMetadata(metadata) { error in
-            if error == .success {
-                guard let metadata = NCManageDatabase.shared.getMetadataFromOcId(metadata.ocId) else { return }
-                self.favorite.setImage(NCUtility().loadImage(named: metadata.favorite ? "star" : "star.fill", colors: [NCBrandColor.shared.yellowFavorite], size: 20), for: .normal)
-            } else {
-                NCContentPresenter().showError(error: error)
-            }
-        }
-    }
-
-    @IBAction func touchUpInsideDetails(_ sender: UIButton) {
-        creation.isHidden = !creation.isHidden
-        upload.isHidden = !upload.isHidden
-    }
-
-    @objc func longTap(_ sender: UIGestureRecognizer) {
-        UIPasteboard.general.string = path.text
-        let error = NKError(errorCode: NCGlobal.shared.errorInternalError, errorDescription: "_copied_path_")
-        NCContentPresenter().showInfo(error: error)
-    }
-}
+//class NCShareHeaderView: UIView {
+//
+//    @IBOutlet weak var imageView: UIImageView!
+//    @IBOutlet weak var path: MarqueeLabel!
+//    @IBOutlet weak var info: UILabel!
+//    @IBOutlet weak var creation: UILabel!
+//    @IBOutlet weak var upload: UILabel!
+//    @IBOutlet weak var favorite: UIButton!
+//    @IBOutlet weak var details: UIButton!
+//    @IBOutlet weak var tagListView: TagListView!
+//
+//    var ocId = ""
+//
+//    override func awakeFromNib() {
+//        super.awakeFromNib()
+//        let longGesture = UILongPressGestureRecognizer(target: self, action: #selector(longTap(_:)))
+//        path.addGestureRecognizer(longGesture)
+//    }
+//
+//    @IBAction func touchUpInsideFavorite(_ sender: UIButton) {
+//        guard let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId) else { return }
+//        NCNetworking.shared.favoriteMetadata(metadata) { error in
+//            if error == .success {
+//                guard let metadata = NCManageDatabase.shared.getMetadataFromOcId(metadata.ocId) else { return }
+//                self.favorite.setImage(NCUtility().loadImage(named: metadata.favorite ? "star" : "star.fill", colors: [NCBrandColor.shared.yellowFavorite], size: 20), for: .normal)
+//            } else {
+//                NCContentPresenter().showError(error: error)
+//            }
+//        }
+//    }
+//
+//    @IBAction func touchUpInsideDetails(_ sender: UIButton) {
+//        creation.isHidden = !creation.isHidden
+//        upload.isHidden = !upload.isHidden
+//    }
+//
+//    @objc func longTap(_ sender: UIGestureRecognizer) {
+//        UIPasteboard.general.string = path.text
+//        let error = NKError(errorCode: NCGlobal.shared.errorInternalError, errorDescription: "_copied_path_")
+//        NCContentPresenter().showInfo(error: error)
+//    }
+//}

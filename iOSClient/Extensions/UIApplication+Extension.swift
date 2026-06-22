@@ -52,6 +52,14 @@ extension UIApplication {
             requestSceneSessionDestruction(windowScene.session, options: options, errorHandler: nil)
         }
     }
+    
+    var firstWindow: UIWindow? {
+        let windowScenes = UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }
+        let firstActiveScene = windowScenes.first
+        let keyWindow = firstActiveScene?.keyWindow
+        return keyWindow
+    }
+    
 
     /// Returns all foreground-active window scenes.
     var foregroundActiveScenes: [UIWindowScene] {

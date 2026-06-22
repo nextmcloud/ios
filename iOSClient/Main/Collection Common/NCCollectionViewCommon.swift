@@ -325,7 +325,7 @@ class NCCollectionViewCommon: UIViewController, NCAccountSettingsModelDelegate, 
         Task {
             await NCNetworking.shared.transferDispatcher.addDelegate(self)
 
-            await (self.navigationController as? NCMainNavigationController)?.setNavigationLeftItems()
+//            await (self.navigationController as? NCMainNavigationController)?.setNavigationLeftItems()
             await (self.navigationController as? NCMainNavigationController)?.setNavigationRightItems()
         }
 

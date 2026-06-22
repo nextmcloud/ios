@@ -93,7 +93,7 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
 
         Task {
             let capabilities = await database.getCapabilities(account: self.session.account) ?? NKCapabilities.Capabilities()
-            await mainNavigationController?.createPlusMenu(session: self.session, capabilities: capabilities, isHidden: true)
+//            await mainNavigationController?.createPlusMenu(session: self.session, capabilities: capabilities, isHidden: true)
         }
 
         loadItems()
@@ -435,10 +435,10 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
             alertController.addAction(actionNo)
             self.present(alertController, animated: true, completion: nil)
         } else if item.url == "openAssistant" {
-            let assistant = NCAssistant()
-                .environmentObject(NCAssistantModel(controller: self.controller))
-            let hostingController = UIHostingController(rootView: assistant)
-            present(hostingController, animated: true, completion: nil)
+//            let assistant = NCAssistant()
+//                .environmentObject(NCAssistantModel(controller: self.controller))
+//            let hostingController = UIHostingController(rootView: assistant)
+//            present(hostingController, animated: true, completion: nil)
         } else if item.url == "openSettings" {
             let settingsView = NCSettingsView(model: NCSettingsModel(controller: self.controller))
             let settingsController = UIHostingController(rootView: settingsView)

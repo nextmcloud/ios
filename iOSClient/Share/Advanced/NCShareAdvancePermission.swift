@@ -25,7 +25,7 @@ import UIKit
 import NextcloudKit
 import CloudKit
 
-class NCShareAdvancePermission: UITableViewController, NCShareAdvanceFooterDelegate, NCShareNavigationTitleSetting {
+class NCShareAdvancePermission: UITableViewController, NCShareAdvanceFotterDelegate, NCShareNavigationTitleSetting {
     let database = NCManageDatabase.shared
 
     var oldTableShare: tableShare?
@@ -60,7 +60,7 @@ class NCShareAdvancePermission: UITableViewController, NCShareAdvanceFooterDeleg
     var windowScene: UIWindowScene? {
         SceneManager.shared.getWindowScene(controller: controller)
     }
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         self.shareConfig = NCShareConfig(parentMetadata: metadata, share: share)
@@ -113,7 +113,7 @@ class NCShareAdvancePermission: UITableViewController, NCShareAdvanceFooterDeleg
         guard let headerView = (Bundle.main.loadNibNamed("NCShareHeader", owner: self, options: nil)?.first as? NCShareHeader) else { return }
         headerView.setupUI(with: metadata)
 
-        let container = UIView(frame: CGRect(x: 0, y: 0, width: view.frame.width, height: 200))
+        let container = UIView(frame: CGRect(x: 0, y: 0, width: view.frame.width, height: 220))
         container.addSubview(headerView)
         tableView.tableHeaderView = container
         headerView.translatesAutoresizingMaskIntoConstraints = false
@@ -189,9 +189,27 @@ class NCShareAdvancePermission: UITableViewController, NCShareAdvanceFooterDeleg
                 tableView.reloadData()
                 return
             }
+//            let alertController = UIAlertController.password(titleKey: "_share_password_") { password in
+//                self.share.password = password ?? ""
+//                tableView.reloadData()
+//            }
             let alertController = UIAlertController.password(titleKey: "_share_password_") { password in
-                self.share.password = password ?? ""
-                tableView.reloadData()
+                let newPassword = password ?? ""
+                
+                // Enforce identical rules: minimum 6 characters
+                if newPassword.count >= 6 {
+                    self.share.password = newPassword
+                    tableView.reloadData()
+                } else if !newPassword.isEmpty {
+                    // Optional: Show an error alert or toast for "too short"
+//                    print(NSLocalizedString("_share_password_must_be_at_least_6_chars", comment: ""))
+//                    NCContentPresenter().showInfo(title: "_share_password_must_be_at_least_6_chars")
+                    Task {
+                        await showErrorBanner(windowScene: self.windowScene,
+                                              text: "_share_password_must_be_at_least_6_chars",
+                                              errorCode: 0)
+                    }
+                }
             }
             self.present(alertController, animated: true)
         case .note:
@@ -200,6 +218,7 @@ class NCShareAdvancePermission: UITableViewController, NCShareAdvanceFooterDeleg
             viewNewUserComment.metadata = self.metadata
             viewNewUserComment.share = self.share
             viewNewUserComment.onDismiss = tableView.reloadData
+            viewNewUserComment.networking = self.networking
             self.navigationController?.pushViewController(viewNewUserComment, animated: true)
         case .label:
             let alertController = UIAlertController.withTextField(titleKey: "_share_link_name_") { textField in
@@ -245,8 +264,16 @@ class NCShareAdvancePermission: UITableViewController, NCShareAdvanceFooterDeleg
                 share.permissions = share.permissions - NKShare.Permission.share.rawValue
             }
 
+//            guard share.permissions > 0 else {
+//                NCContentPresenter().showInfo(title: "_share_permission_should_not_be_empty_")
+//                return
+//            }
+            
             if isNewShare {
-                if share.shareType != NKShare.ShareType.publicLink.rawValue, metadata.e2eEncrypted {
+                let capabilities = await NKCapabilities.shared.getCapabilities(for: metadata.account)
+
+                if share.shareType != NKShare.ShareType.publicLink.rawValue, metadata.e2eEncrypted,
+                   NCGlobal.shared.isE2eeVersion2(capabilities.e2EEApiVersion) {
 
                     if await NCNetworkingE2EE().isInUpload(account: metadata.account, serverUrl: metadata.serverUrlFileName) {
                         await showErrorBanner(windowScene: windowScene,

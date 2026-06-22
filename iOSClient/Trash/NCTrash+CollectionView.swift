@@ -1,25 +1,6 @@
-//
-//  NCTrash+CollectionView.swift
-//  Nextcloud
-//
-//  Created by Henrik Storch on 18.01.22.
-//  Copyright © 2022 Henrik Storch. All rights reserved.
-//
-//  Author Henrik Storch <henrik.storch@nextcloud.com>
-//
-//  This program is free software: you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
-//  the Free Software Foundation, either version 3 of the License, or
-//  (at your option) any later version.
-//
-//  This program is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
-//
-//  You should have received a copy of the GNU General Public License
-//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-//
+// SPDX-FileCopyrightText: Nextcloud GmbH
+// SPDX-FileCopyrightText: 2018 Marino Faggiana
+// SPDX-License-Identifier: GPL-3.0-or-later
 
 import UIKit
 import RealmSwift
@@ -69,7 +50,17 @@ extension NCTrash: UICollectionViewDataSource {
             gridCell.delegate = self
             cell = gridCell
         }
+
         guard let resultTableTrash = datasource?[indexPath.item] else { return cell }
+
+        let contextMenu = NCContextMenuTrash(objectId: resultTableTrash.fileId, trashController: self)
+        if let listCell = cell as? NCTrashListCell {
+            listCell.buttonMore.menu = contextMenu.viewMenu()
+            listCell.buttonMore.showsMenuAsPrimaryAction = true
+        } else if let gridCell = cell as? NCTrashGridCell {
+            gridCell.buttonMore.menu = contextMenu.viewMenu()
+            gridCell.buttonMore.showsMenuAsPrimaryAction = true
+        }
 
         cell.imageItem.contentMode = .scaleAspectFit
 
@@ -94,10 +85,9 @@ extension NCTrash: UICollectionViewDataSource {
             }
         }
 
-        cell.account = resultTableTrash.account
         cell.objectId = resultTableTrash.fileId
         cell.setupCellUI(tableTrash: resultTableTrash, image: image)
-        cell.selected(selectOcId.contains(resultTableTrash.fileId), isEditMode: isEditMode, account: resultTableTrash.account)
+        cell.selected(selectOcId.contains(resultTableTrash.fileId), isEditMode: isEditMode, color: NCBrandColor.shared.getElement(account: session.account))
 
         return cell
     }
@@ -139,39 +129,12 @@ extension NCTrash: UICollectionViewDataSource {
 
         return text
     }
-    
-    func setTitleLabel(directories: Int, files: Int, size: Int64) -> String {
-        var foldersText = ""
-        var filesText = ""
-        var text = ""
-
-        if directories > 1 {
-            foldersText = "\(directories) " + NSLocalizedString("_folders_", comment: "")
-        } else if directories == 1 {
-            foldersText = "1 " + NSLocalizedString("_folder_", comment: "")
-        }
-
-        if files > 1 {
-            filesText = "\(files) " + NSLocalizedString("_files_", comment: "") + " • " + utilityFileSystem.transformedSize(size)
-        } else if files == 1 {
-            filesText = "1 " + NSLocalizedString("_file_", comment: "") + " • " + utilityFileSystem.transformedSize(size)
-        }
-
-        if foldersText.isEmpty {
-            text = filesText
-        } else if filesText.isEmpty {
-            text = foldersText
-        } else {
-            text = foldersText + " • " + filesText
-        }
-        return text
-    }
 
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
         if kind == UICollectionView.elementKindSectionHeader {
             guard let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: "sectionFirstHeaderEmptyData", for: indexPath) as? NCSectionFirstHeaderEmptyData
             else { return NCSectionFirstHeaderEmptyData() }
-            header.emptyImage.image = utility.loadImage(named: "trashIcon", colors: [NCBrandColor.shared.getElement(account: session.account)])
+            header.emptyImage.image = utility.loadImage(named: "trash", colors: [NCBrandColor.shared.getElement(account: session.account)])
             header.emptyTitle.text = NSLocalizedString("_trash_no_trash_", comment: "")
             header.emptyDescription.text = NSLocalizedString("_trash_no_trash_description_", comment: "")
             return header
@@ -180,8 +143,6 @@ extension NCTrash: UICollectionViewDataSource {
             else { return NCSectionFooter() }
             if let datasource {
                 footer.setTitleLabel(setTextFooter(datasource: datasource))
-//                let info = self.getFooterInformation(datasource: datasource)
-//                footer.setTitleLabel(directories: info.directories, files: info.files, size: info.size)
             }
             return footer
         }

@@ -82,9 +82,9 @@ class AnalyticsHelper: NSObject, AnalyticsService {
         }
     }
     
-    func displayInAppNotification() {
-        self.analyticsServices.forEach { $0.displayInAppNotification() }
-    }
+//    func displayInAppNotification() {
+//        self.analyticsServices.forEach { $0.displayInAppNotification() }
+//    }
 
 
 }

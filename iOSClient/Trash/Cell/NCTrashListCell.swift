@@ -31,7 +31,6 @@ class NCTrashListCell: UICollectionViewCell, NCTrashCellProtocol {
         get { return imageStatus }
         set { imageStatus = newValue }
     }
-    var account = ""
 
     override func awakeFromNib() {
         super.awakeFromNib()

@@ -351,14 +351,12 @@ class NCLogin: UIViewController, UITextFieldDelegate, NCLoginQRCodeDelegate {
                     // Login Flow V2
                     if error == .success, let token, let endpoint, let login {
                         nkLog(debug: "Successfully received login flow information.")
-                        let loginProvider = NCLoginProvider()
-                        loginProvider.initialURLString = login
-                        loginProvider.delegate = self
-                        loginProvider.controller = self.controller
-                        loginProvider.presentingViewController = self
-                        loginProvider.startPolling(loginFlowV2Token: token, loginFlowV2Endpoint: endpoint, loginFlowV2Login: login)
-                        loginProvider.startAuthentication()
-                        self.activeLoginProvider = loginProvider
+                        let safariVC = NCLoginProvider()
+                        safariVC.initialURLString = login
+                        safariVC.uiColor = textColor
+                        safariVC.delegate = self
+                        safariVC.startPolling(loginFlowV2Token: token, loginFlowV2Endpoint: endpoint, loginFlowV2Login: login)
+                        navigationController?.pushViewController(safariVC, animated: true)
                     }
                 }
             case .failure(let error):
@@ -523,7 +521,5 @@ extension NCLogin: NCLoginProviderDelegate {
     func onBack() {
         loginButton.isEnabled = true
         loginButton.hideSpinnerAndShowButton()
-        activeLoginProvider?.cancel()
-        activeLoginProvider = nil
     }
 }

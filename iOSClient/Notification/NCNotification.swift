@@ -73,6 +73,9 @@ class NCNotification: UITableViewController, NCNotificationCellDelegate {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
 
+        // Re-evaluate in-app messages after viewDidAppear
+        MoEngageAnalytics.shared.displayInAppNotificationSafely(reason: "viewDidAppear")
+
         Task {
             await getNetwokingNotification()
         }
@@ -102,16 +105,9 @@ class NCNotification: UITableViewController, NCNotificationCellDelegate {
     }
 
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-//        let notification = notifications[indexPath.row]
-        
         let notification = notifications[indexPath.row]
-
-        if notification.app == "files_sharing" {
-            NCActionCenter.shared.viewerFile(account: session.account, fileId: notification.objectId, viewController: self)
-        } else {
-            NCApplicationHandle().didSelectNotification(notification, viewController: self)
-        }
-        guard let notification = NCApplicationHandle().didSelectNotification(notifications[indexPath.row], viewController: self) else { return }
+        
+//         guard let notification = NCApplicationHandle().didSelectNotification(notifications[indexPath.row], viewController: self) else { return }
 
         do {
             if let subjectRichParameters = notification.subjectRichParameters,
@@ -244,13 +240,6 @@ class NCNotification: UITableViewController, NCNotificationCellDelegate {
                 cell.more.isEnabled = true
                 cell.more.isHidden = false
                 cell.more.setTitle("…", for: .normal)
-
-                let contextMenu = NCContextMenuNotification(
-                    notification: notification,
-                    delegate: self
-                )
-                cell.more.menu = contextMenu.viewMenu()
-                cell.more.showsMenuAsPrimaryAction = true
             }
 
             var buttonWidth = max(cell.primary.intrinsicContentSize.width, cell.secondary.intrinsicContentSize.width)
@@ -337,7 +326,7 @@ class NCNotification: UITableViewController, NCNotificationCellDelegate {
     }
 
     func tapMore(with notification: NKNotifications, sender: Any?) {
-       toggleMenu(notification: notification, sender: sender)
+//       toggleMenu(notification: notification, sender: sender)
     }
 
     // MARK: - Load notification networking

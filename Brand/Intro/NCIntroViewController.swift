@@ -206,17 +206,11 @@ class NCIntroViewController: UIViewController, UICollectionViewDataSource, UICol
     }
 
     @IBAction func signupWithProvider(_ sender: Any) {
-        let loginProvider = NCLoginProvider()
-        loginProvider.controller = self.controller
-        loginProvider.initialURLString = NCBrandOptions.shared.linkloginPreferredProviders
-        loginProvider.presentingViewController = self
-        loginProvider.startAuthentication()
-        self.activeLoginProvider = loginProvider
-//        if let viewController = UIStoryboard(name: "NCLogin", bundle: nil).instantiateViewController(withIdentifier: "NCLoginProvider") as? NCLoginProvider {
-//            viewController.controller = self.controller
-//            viewController.initialURLString = NCBrandOptions.shared.linkloginPreferredProviders
-//            self.navigationController?.pushViewController(viewController, animated: true)
-//        }
+        if let viewController = UIStoryboard(name: "NCLogin", bundle: nil).instantiateViewController(withIdentifier: "NCLoginProvider") as? NCLoginProvider {
+            viewController.controller = self.controller
+            viewController.initialURLString = NCBrandOptions.shared.linkloginPreferredProviders
+            self.navigationController?.pushViewController(viewController, animated: true)
+        }
     }
 
     @IBAction func host(_ sender: Any) {
