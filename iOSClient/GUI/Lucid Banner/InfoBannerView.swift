@@ -39,7 +39,7 @@ func showInfoBanner(windowScene: UIWindowScene?,
         systemImage: "checkmark.circle",
         backgroundColor: Color(.systemBackground).opacity(0.4),
         textColor: Color(uiColor: .label),
-        imageColor: Color(uiColor: .systemBlue),
+        imageColor: Color(uiColor: NCBrandColor.shared.customer),
         vPosition: .top,
         verticalMargin: 10,
         horizontalLayout: horizontalLayout,
@@ -129,9 +129,9 @@ struct InfoBannerView: View {
                 subtitle: "Subtitle",
                 footnote: "footnote",
                 systemImage: "checkmark.circle",
-                backgroundColor: Color(UIColor.systemBlue.withAlphaComponent(0.12)),
+                backgroundColor: Color(NCBrandColor.shared.customer.withAlphaComponent(0.12)),
                 textColor: Color(uiColor: .label),
-                imageColor: Color(uiColor: .systemBlue)
+                imageColor: Color(uiColor: NCBrandColor.shared.customer)
             )
         )
 

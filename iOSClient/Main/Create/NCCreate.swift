@@ -183,6 +183,14 @@ class NCCreate: NSObject {
                         }
                     }
 
+                    let shareNavigationController = UIStoryboard(name: "NCShare", bundle: nil).instantiateInitialViewController() as? UINavigationController
+                    let shareViewController = shareNavigationController?.topViewController as? NCShare
+                    shareViewController?.metadata = metadata
+                    shareNavigationController?.modalPresentationStyle = .formSheet
+                    if let shareNavigationController = shareNavigationController {
+                        controller.present(shareNavigationController, animated: true, completion: nil)
+                    }
+                    /*
                     var pages: [NCBrandOptions.NCInfoPagingTab] = []
                     let shareNavigationController = UIStoryboard(name: "NCShare", bundle: nil).instantiateInitialViewController() as? UINavigationController
                     let shareViewController = shareNavigationController?.topViewController as? NCSharePaging
@@ -213,6 +221,7 @@ class NCCreate: NSObject {
                     if let shareNavigationController = shareNavigationController {
                         controller.present(shareNavigationController, animated: true, completion: nil)
                     }
+                     */
                 }
             }
         }

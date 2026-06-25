@@ -14,7 +14,6 @@ import XLForm
 class PrivacySettingsViewController: XLFormViewController{
     
    @objc public var isShowSettingsButton: Bool = false
-    @objc public var isShowSettingsButton: Bool = false
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -116,9 +115,6 @@ class PrivacySettingsViewController: XLFormViewController{
         self.form = form
     }
     
-    
-        self.form = form
-    }
     
     override func formRowDescriptorValueHasChanged(_ formRow: XLFormRowDescriptor!, oldValue: Any!, newValue: Any!) {
         super.formRowDescriptorValueHasChanged(formRow, oldValue: oldValue, newValue: newValue)

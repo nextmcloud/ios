@@ -223,6 +223,13 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellMainP
     }
 
     func selected(_ status: Bool, isEditMode: Bool, color: UIColor) {
+//        // E2EE - remove encrypt folder selection
+//        if let metadata = NCManageDatabase.shared.getMetadataFromOcId(self.metadata?.ocId), metadata.e2eEncrypted {
+//            imageSelect.isHidden = true
+//        } else {
+//            imageSelect.isHidden = isEditMode ? false : true
+//        }
+
         if isEditMode {
             imageItemLeftConstraint.constant = 45
             imageSelect.isHidden = false
@@ -423,7 +430,25 @@ extension NCCollectionViewCommon {
         var isMounted = false
         var a11yValues: [String] = []
         let existsImagePreview = utilityFileSystem.fileProviderStorageImageExists(metadata.ocId, etag: metadata.etag, userId: metadata.userId, urlBase: metadata.urlBase)
+        let shares = NCManageDatabase.shared.getTableShares(metadata: metadata)
+        let shareItems = shares.share ?? []
 
+        // Determine Link Shares: true if firstShareLink is public OR if any item in shareItems is public
+        let hasLinkShares = (shares.firstShareLink?.shareType == NKShare.ShareType.publicLink.rawValue) ||
+                            shareItems.contains { $0.shareType == NKShare.ShareType.publicLink.rawValue }
+
+        // Determine Email Shares: true if any item in shareItems is email type
+        let hasEmailShares = shareItems.contains { $0.shareType == NKShare.ShareType.email.rawValue }
+
+        // Combined Logic
+        let hasEmailAndLinkShares = hasLinkShares && hasEmailShares
+        
+        defer {
+            let capabilities = NCNetworking.shared.capabilities[session.account] ?? NKCapabilities.Capabilities()
+            if !metadata.isSharable() || (!capabilities.fileSharingApiEnabled && !capabilities.filesComments && capabilities.activity.isEmpty) {
+                cell.hideButtonShare(true)
+            }
+        }
         // CONTENT MODE
         cell.previewImg?.layer.borderWidth = 0
 
@@ -476,17 +501,27 @@ extension NCCollectionViewCommon {
             a11yValues.append(NSLocalizedString("_favorite_short_", comment: ""))
         }
 
-        // Share button image (SF Symbol)
-        if isShare {
-            cell.buttonShared.setImage(imageCache.getImageShared(), for: .normal)
-        } else if !metadata.shareType.isEmpty {
-            metadata.shareType.contains(NKShare.ShareType.publicLink.rawValue) ?
-            (cell.buttonShared.setImage(imageCache.getImageShareByLink(), for: .normal)) :
-            (cell.buttonShared.setImage(imageCache.getImageShared(), for: .normal))
-        } else {
-            cell.buttonShared.setImage(imageCache.getImageCanShare(), for: .normal)
-        }
+        // Configure Share Button Image with clear priority
+        // Priority order:
+        // 1) Shared-with-me indicator (permissions contains "S")
+        // 2) Cross-account item
+        // 3) Has any shares (public link, direct shares, or firstShareLink)
+        // 4) Default can-share icon (gray)
+        let isSharedWithMe = metadata.permissions.contains("S")
+        let isCrossAccount = session.account != metadata.account
+        let hasAnyShare = !metadata.shareType.isEmpty || !(shares.share?.isEmpty ?? true) || (shares.firstShareLink != nil)
 
+        if isSharedWithMe {
+            cell.buttonShared.setImage(imageCache.getImageSharedWithMe(), for: .normal)
+        } else if isCrossAccount {
+            cell.buttonShared.setImage(imageCache.getImageShared(), for: .normal)
+        } else if hasAnyShare || isShare {
+            // Shared by me or has link/email shares
+            cell.buttonShared.setImage(imageCache.getImageShared().image(color: NCBrandColor.shared.customer), for: .normal)
+        } else {
+            cell.buttonShared.setImage(imageCache.getImageCanShare().image(color: NCBrandColor.shared.gray60), for: .normal)
+        }
+        
         // Button More
         if metadata.lock == true {
             cell.setButtonMore(image: imageCache.getImageButtonMoreLock())
@@ -498,6 +533,7 @@ extension NCCollectionViewCommon {
         // Status
         cellMainStatus(cell: cell, metadata: metadata, a11yValues: &a11yValues)
 
+        /*
         // AVATAR
         if !metadata.ownerId.isEmpty, metadata.ownerId != metadata.userId {
             let fileName = NCSession.shared.getFileName(urlBase: metadata.urlBase, user: metadata.ownerId)
@@ -520,6 +556,7 @@ extension NCCollectionViewCommon {
                 }
             }
         }
+         */
 
         // URL
         if metadata.classFile == NKTypeClassFile.url.rawValue {

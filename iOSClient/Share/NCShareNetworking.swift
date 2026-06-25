@@ -28,15 +28,15 @@ class NCShareNetworking: NSObject {
     let database = NCManageDatabase.shared
     weak var delegate: NCShareNetworkingDelegate?
     var view: UIView
-    let metadata: tableMetadata
-    let session: NCSession.Session
+    var metadata: tableMetadata
+    var session: NCSession.Session
     let controller: NCMainTabBarController?
 
     @MainActor
     internal var windowScene: UIWindowScene? {
         SceneManager.shared.getWindowScene(controller: controller)
     }
-
+    
     init(metadata: tableMetadata,
          view: UIView,
          delegate: NCShareNetworkingDelegate?,
@@ -50,6 +50,7 @@ class NCShareNetworking: NSObject {
 
         super.init()
     }
+
 
     private func readDownloadLimit(account: String, token: String) async throws -> NKDownloadLimit? {
         return try await withCheckedThrowingContinuation { continuation in
@@ -151,7 +152,9 @@ class NCShareNetworking: NSObject {
                 // 🔄 ensure we sync DB + UI with server
                 self.readShare(showLoadingIndicator: false)
             } else {
-                NCContentPresenter().showError(error: error)
+                Task {
+                    await showErrorBanner(windowScene: self.windowScene, error: error)
+                }
             }
 
             self.delegate?.shareCompleted()
@@ -197,6 +200,10 @@ class NCShareNetworking: NSObject {
                        shareable.itemType == NCShareCommon.itemTypeFile {
                         self.setShareDownloadLimit(limit, token: share.token)
                     }
+                }
+                
+                if !self.metadata.contentType.contains("directory") {
+                    AnalyticsHelper.shared.trackEventWithMetadata(eventName: .EVENT__SHARE_FILE, metadata: self.metadata)
                 }
 
                 Task {
@@ -303,8 +310,7 @@ class NCShareNetworking: NSObject {
                 self.delegate?.getSharees(sharees: sharees)
             } else {
                 Task {
-                    let windowScene = await SceneManager.shared.getWindowScene(controller: self.controller)
-                    await showErrorBanner(windowScene: windowScene, error: error)
+                    await showErrorBanner(windowScene: self.windowScene, error: error)
                 }
                 self.delegate?.getSharees(sharees: nil)
             }

@@ -82,7 +82,7 @@ class NCShareExtension: UIViewController {
         uploadView.layer.cornerRadius = 10
 
         uploadLabel.text = NSLocalizedString("_upload_", comment: "")
-        uploadLabel.textColor = .systemBlue
+        uploadLabel.textColor = NCBrandColor.shared.customer
         let uploadGesture = UITapGestureRecognizer(target: self, action: #selector(actionUpload(_:)))
         uploadView.addGestureRecognizer(uploadGesture)
 
@@ -224,10 +224,10 @@ class NCShareExtension: UIViewController {
         // BACK BUTTON
         let backButton = UIButton(type: .custom)
         backButton.setImage(UIImage(named: "back"), for: .normal)
-        backButton.tintColor = .systemBlue
+        backButton.tintColor = NCBrandColor.shared.customer
         backButton.semanticContentAttribute = .forceLeftToRight
         backButton.setTitle(" " + NSLocalizedString("_back_", comment: ""), for: .normal)
-        backButton.setTitleColor(.systemBlue, for: .normal)
+        backButton.setTitleColor(NCBrandColor.shared.customer, for: .normal)
         backButton.action(for: .touchUpInside) { _ in
             while self.serverUrl.last != "/" { self.serverUrl.removeLast() }
             self.serverUrl.removeLast()
@@ -254,7 +254,7 @@ class NCShareExtension: UIViewController {
             }
 
             profileButton.setTitle(title, for: .normal)
-            profileButton.setTitleColor(.systemBlue, for: .normal)
+            profileButton.setTitleColor(NCBrandColor.shared.customer, for: .normal)
         }
 
         profileButton.semanticContentAttribute = .forceLeftToRight

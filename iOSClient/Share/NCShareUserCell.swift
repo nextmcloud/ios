@@ -24,7 +24,7 @@ import UIKit
 import DropDown
 import NextcloudKit
 
-class NCShareUserCell: UITableViewCell {
+class NCShareUserCell: UITableViewCell, NCCellProtocol {
 
     @IBOutlet weak var imageItem: UIImageView!
     @IBOutlet weak var labelTitle: UILabel!
@@ -100,15 +100,12 @@ class NCShareUserCell: UITableViewCell {
 
     // MARK: - UI Setup
     private func setupCellUIAppearance() {
-//        contentView.backgroundColor = NCBrandColor.shared.secondarySystemGroupedBackground
-        buttonMenu.contentMode = .scaleAspectFill
-//        buttonMenu.setImage(NCImageCache.images.buttonMore.image(color: NCBrandColor.shared.brand, size: 24), for: .normal)
-        buttonMenu.setImage(NCImageCache.shared.getImageButtonMore().image(color: NCBrandColor.shared.brand, size: 24), for: .normal)
         labelQuickStatus.textColor = NCBrandColor.shared.shareBlueColor
         labelTitle.textColor = NCBrandColor.shared.label
         imageRightArrow.image = UIImage(named: "rightArrow")?.image(color: NCBrandColor.shared.shareBlueColor)
         imageExpiredDateSet.image = UIImage(named: "calenderNew")?.image(color: NCBrandColor.shared.shareBlueColor)
         imagePasswordSet.image = UIImage(named: "lockNew")?.image(color: NCBrandColor.shared.shareBlueColor)
+        buttonMenu.setImage(NCImageCache.shared.getImageButtonMore().image(color: NCBrandColor.shared.brand, size: 24), for: .normal)
 
         imagePermissionType.image = imagePermissionType.image?.image(color: NCBrandColor.shared.shareBlueColor)
         // Permission UI is updated via tableShare didSet or explicit refresh
@@ -168,9 +165,9 @@ class NCShareUserCell: UITableViewCell {
         }
     }
 
-    @objc func tapAvatarImage(_ sender: UITapGestureRecognizer) {
-        delegate?.tapProfileMenu(with: tableShare)
-    }
+//    @objc func tapAvatarImage(_ sender: UITapGestureRecognizer) {
+//        delegate?.showProfile(with: tableShare, sender: sender)
+//    }
 
     @IBAction func touchUpInsideMenu(_ sender: Any) {
         delegate?.tapMenu(with: tableShare, sender: sender)
@@ -178,6 +175,10 @@ class NCShareUserCell: UITableViewCell {
 
     @IBAction func quickStatusClicked(_ sender: Any) {
         delegate?.tapQuickStatus(with: tableShare, sender: sender)
+    }
+    
+    @objc func openQuickStatus(_ sender: UIGestureRecognizer) {
+        delegate?.tapQuickStatus(with: tableShare, sender: sender.view ?? sender)
     }
 }
 
@@ -189,7 +190,7 @@ protocol NCShareUserCellDelegate: AnyObject {
 
 // MARK: - NCSearchUserDropDownCell
 
-class NCSearchUserDropDownCell: DropDownCell {
+class NCSearchUserDropDownCell: DropDownCell, NCCellProtocol {
 
     @IBOutlet weak var imageItem: UIImageView!
     @IBOutlet weak var imageStatus: UIImageView!

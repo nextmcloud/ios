@@ -37,10 +37,15 @@ final class NCMoreModel: ObservableObject {
     @Published var quotaProgress: Double = 0
     @Published var quotaExternalSiteTitle: String = ""
     @Published var quotaExternalSiteUrl: String?
+    @Published var autoUploadStart: Bool = false
 
     private weak var controller: NCMainTabBarController?
     var account: String {
         controller?.account ?? ""
+    }
+
+    var session: NCSession.Session {
+        NCSession.shared.getSession(controller: controller)
     }
 
     private let database = NCManageDatabase.shared
@@ -166,6 +171,9 @@ final class NCMoreModel: ObservableObject {
             return
         }
 
+        autoUploadStart = tableAccount.autoUploadStart
+
+        var userItems: [Item] = []
         var functionItems: [Item] = []
         var externalSiteItems: [Item] = []
         var settingsItems: [Item] = []
@@ -173,7 +181,15 @@ final class NCMoreModel: ObservableObject {
         sections.removeAll()
         quotaExternalSiteTitle = ""
         quotaExternalSiteUrl = nil
-
+        
+        userItems.append(
+            Item(
+                titleKey: getUserName(tableAccount),
+                image: "person",
+                destination: .none
+            )
+        )
+        
         functionItems.append(
             Item(
                 titleKey: "_recent_",
@@ -292,6 +308,15 @@ final class NCMoreModel: ObservableObject {
 
         loadExternalSites(sessionAccount: tableAccount.account, externalSiteItems: &externalSiteItems)
 
+        if !userItems.isEmpty {
+            sections.append(
+                Section(
+                    type: .regular,
+                    items: userItems
+                )
+            )
+        }
+        
         if !functionItems.isEmpty {
             sections.append(
                 Section(
@@ -510,6 +535,23 @@ final class NCMoreModel: ObservableObject {
         navigationController.pushViewController(settingsController, animated: true)
     }
 
+    /// Opens the SwiftUI auto-upload screen, injecting the shared counter so the row and the
+    /// screen observe the same source.
+    func openAutoUpload(counter: NCAutoUploadCounter) {
+        guard let controller,
+              let navigationController = controller.currentNavigationController() else {
+            return
+        }
+
+        let autoUploadView = NCAutoUploadView(model: NCAutoUploadModel(controller: controller),
+                                              albumModel: AlbumModel(controller: controller))
+            .environment(counter)
+
+        let hostingController = UIHostingController(rootView: autoUploadView)
+
+        navigationController.pushViewController(hostingController, animated: true)
+    }
+
     /// Opens an app using a custom URL scheme.
     ///
     /// If the app is not installed or the scheme cannot be handled, the fallback URL is opened.
@@ -538,5 +580,16 @@ final class NCMoreModel: ObservableObject {
         }
 
         UIApplication.shared.open(url)
+    }
+    
+    /// Func to get the user display name + alias
+    func getUserName(_ tableAccount: tableAccount) -> String {
+        if !tableAccount.email.isEmpty {
+            return tableAccount.email
+        } else if tableAccount.email.isEmpty {//}|| tableAccount.alias.isEmpty {
+            return tableAccount.displayName
+        } else {
+            return tableAccount.alias
+        }
     }
 }

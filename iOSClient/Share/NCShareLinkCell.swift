@@ -123,6 +123,18 @@ class NCShareLinkCell: UITableViewCell {
 
     // MARK: - Actions
 
+    @IBAction func touchUpInsideCopy(_ sender: Any) {
+        delegate?.tapCopy(with: tableShare, sender: sender)
+    }
+
+    @IBAction func touchUpInsideDetail(_ sender: Any) {
+        delegate?.tapMenu(with: tableShare, sender: sender)
+    }
+
+    @IBAction func quickStatusClicked(_ sender: UIButton) {
+        delegate?.tapQuickStatus(with: tableShare, sender: sender)
+    }
+    
     @IBAction func touchUpCopy(_ sender: Any) {
         delegate?.tapCopy(with: tableShare, sender: sender)
     }

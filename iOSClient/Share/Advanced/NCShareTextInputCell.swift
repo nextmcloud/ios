@@ -25,7 +25,6 @@ class NCShareTextInputCell: XLFormBaseCell, UITextFieldDelegate {
         self.cellTextField.delegate = self
         self.cellTextField.isEnabled = true
         calendarImageView.image = UIImage(named: "calender")//?.imageColor(NCBrandColor.shared.brandElement)
-        calendarImageView.image = UIImage(named: "calender")?.imageColor(NCBrandColor.shared.brandElement)
         self.selectionStyle = .none
         self.backgroundColor = NCBrandColor.shared.secondarySystemGroupedBackground
         self.cellTextField.attributedPlaceholder = NSAttributedString(
@@ -91,7 +90,6 @@ class NCShareTextInputCell: XLFormBaseCell, UITextFieldDelegate {
     func setDatePicker(sender: UITextField) {
         datePicker.datePickerMode = .date
         datePicker.minimumDate = Date()//.tomorrow
-        datePicker.minimumDate = Date.tomorrow
         if #available(iOS 13.4, *) {
             datePicker.preferredDatePickerStyle = .wheels
             datePicker.sizeToFit()
@@ -113,14 +111,6 @@ class NCShareTextInputCell: XLFormBaseCell, UITextFieldDelegate {
 //        let expiryDateString = DateFormatter.formattedShareExpDate(from: datePicker.date)
         let expiryDateString = DateFormatter.formattedExpiryDate(datePicker.date)
 
-//        let dateFormatter = DateFormatter()
-//        dateFormatter.dateFormat = NCShareAdvancePermission.displayDateFormat
-//        var expiryDate = dateFormatter.string(from: datePicker.date)
-//        expiryDate = expiryDate.replacingOccurrences(of: "..", with: ".")
-//        self.expirationDateText = expiryDate
-//        self.expirationDate = datePicker.date as NSDate
-
-        let expiryDateString = DateFormatter.shareExpDate.string(from: datePicker.date)
         self.expirationDateText = expiryDateString
         self.expirationDate = datePicker.date as NSDate
 

@@ -172,9 +172,9 @@ struct BannerView: View {
                 subtitle: "_creating_db_photo_progress_",
                 systemImage: "photo.on.rectangle.angled",
                 imageAnimation: .none,
-                backgroundColor: Color(UIColor.systemBlue.withAlphaComponent(0.12)),
+                backgroundColor: Color(NCBrandColor.shared.customer.withAlphaComponent(0.12)),
                 textColor: Color(uiColor: .label),
-                imageColor: Color(uiColor: .systemBlue),
+                imageColor: Color(uiColor: NCBrandColor.shared.customer),
             )
         )
 

@@ -43,10 +43,11 @@ class NCShare: UIViewController, NCSharePagingContent {
 //    @IBOutlet weak var sharedWithYouByImage: UIImageView!
 //    @IBOutlet weak var sharedWithYouByLabel: UILabel!
 //    @IBOutlet weak var searchFieldTopConstraint: NSLayoutConstraint!
-    @IBOutlet weak var searchField: UISearchBar!
+//    @IBOutlet weak var searchField: UISearchBar!
 //    var textField: UIView? { searchField }
     var textField: UITextField? { self.view.viewWithTag(Tag.searchField) as? UITextField }
 
+    @IBOutlet weak var searchField: UISearchBar!
     @IBOutlet weak var tableView: UITableView!
 //    @IBOutlet weak var btnContact: UIButton!
 
@@ -175,9 +176,9 @@ class NCShare: UIViewController, NCSharePagingContent {
 
     // MARK: - Notification Center
 
-    @objc func openShareProfile(_ sender: UITapGestureRecognizer) {
+//    @objc func openShareProfile(_ sender: UITapGestureRecognizer) {
 //        self.showProfileMenu(userId: metadata.ownerId, session: session, sender: sender.view)
-    }
+//    }
 
     private func scrollToTopIfNeeded() {
         if tableView.numberOfSections > 0 && tableView.numberOfRows(inSection: 0) > 0 {
@@ -351,9 +352,8 @@ class NCShare: UIViewController, NCSharePagingContent {
         } else {
             networking?.createShareLink(password: "")
         }
-        
     }
-    
+
     func presentQuickStatusActionSheet(for share: tableShare, sender: Any?) {
         guard let metadata = metadata else { return }
 
@@ -438,7 +438,6 @@ class NCShare: UIViewController, NCSharePagingContent {
 
         networking?.updateShare(updatedShare, downloadLimit: downloadLimit)
     }
-
 }
 
 // MARK: - NCShareNetworkingDelegate

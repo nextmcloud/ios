@@ -377,7 +377,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
                                      subtitle: "_no_assistant_installed_",
                                      systemImage: "sparkles",
                                      imageAnimation: .none,
-                                     imageColor: .systemBlue
+                                     imageColor: NCBrandColor.shared.customer
                     )
                 }
             }

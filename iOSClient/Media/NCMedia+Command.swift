@@ -27,7 +27,7 @@ extension NCMedia {
         self.collectionView.reloadData()
 
         Task {
-            await (self.navigationController as? NCMainNavigationController)?.setNavigationLeftItems()
+//            await (self.navigationController as? NCMainNavigationController)?.setNavigationLeftItems()
             await (self.navigationController as? NCMainNavigationController)?.setNavigationRightItems()
         }
     }
