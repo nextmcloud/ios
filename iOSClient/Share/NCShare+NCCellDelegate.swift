@@ -49,24 +49,6 @@ extension NCShare: NCShareLinkCellDelegate, NCShareUserCellDelegate {
         }
         NCShareCommon.copyLink(link: tableShare.url, viewController: self, sender: sender)
     }
-
-//    func tapMenu(with tableShare: tableShare?, sender: Any) {
-//        if let tableShare = tableShare {
-//            self.toggleShareMenu(for: tableShare, sendMail: (tableShare.shareType != NKShare.ShareType.publicLink.rawValue), folder: metadata?.directory ?? false, sender: sender)
-//        } else {
-//            self.makeNewLinkShare()
-//        }
-//    }
-
-//    func showProfile(with tableShare: tableShare?, sender: Any) {
-//        guard let tableShare else { return }
-//        return NCContextMenuProfile(userId: tableShare.shareWith, session: session, viewController: self).viewMenu()
-//    }
-//
-//    func quickStatus(with tableShare: tableShare?, sender: Any) {
-//        guard let tableShare, let metadata else { return }
-//        self.toggleQuickPermissionsMenu(isDirectory: metadata.directory, share: tableShare, sender: sender)
-//    }
     
     func tapMenu(with tableShare: tableShare?, sender: Any) {
         // Menu is now shown via native context menu on the button

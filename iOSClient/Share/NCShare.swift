@@ -90,7 +90,7 @@ class NCShare: UIViewController, NCSharePagingContent {
     var shareOthers: [tableShare] = []
     private var cachedHeader: NCShareAdvancePermissionHeader?
     
-    var sendMail: Bool = false
+//    var sendMail: Bool = false
     
     // MARK: - View Life Cycle
 
@@ -620,6 +620,7 @@ extension NCShare: UITableViewDataSource {
                 let linkNumber = " \(indexPath.row + 1)"
                 cell.configure(with: tableShare, at: indexPath, isDirectory: metadata.directory, title: linkNumber)
             }
+//            self.sendMail = (tableShare.shareType != NKShare.ShareType.publicLink.rawValue)
             cell.buttonDetail.menu = NCContextMenuShare(share: tableShare, isDirectory: metadata.isDirectory, canReshare: canReshare, shareController: self, controller: controller).viewMenu()
             cell.buttonDetail.showsMenuAsPrimaryAction = true
 

@@ -64,7 +64,7 @@ final class NCBrandOptions: @unchecked Sendable {
     var brandUserAgent:             String = "MagentaCLOUD"
     var textCopyrightNextcloudiOS:       String = "MagentaCLOUD for iOS %@"
     var textCopyrightNextcloudServer:    String = "MagentaCLOUD Server %@"
-    var loginBaseUrl:                    String = "https://magentacloud.de"
+    var loginBaseUrl:                    String = "https://dev1.next.magentacloud.de" //"https://magentacloud.de"
     var pushNotificationServerProxy: String = ""
     var linkLoginHost: String = "https://nextcloud.com/install"
     var linkloginPreferredProviders: String = "https://nextcloud.com/signup-ios"

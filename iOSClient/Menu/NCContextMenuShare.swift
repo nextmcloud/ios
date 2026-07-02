@@ -50,36 +50,19 @@ class NCContextMenuShare: NSObject {
                 title: NSLocalizedString("_advance_permissions_", comment: ""),
                 image: utility.loadImage(named: "rename", colors: [NCBrandColor.shared.brandElement])
             ) { [self] _ in
-                guard
-                    let advancePermission = UIStoryboard(name: "NCShare", bundle: nil).instantiateViewController(withIdentifier: "NCShareAdvancePermission") as? NCShareAdvancePermission,
-                    let navigationController = shareController.navigationController, !share.isInvalidated else { return }
-                advancePermission.networking = shareController.networking
-                advancePermission.share = tableShare(value: share)
-                advancePermission.oldTableShare = tableShare(value: share)
-                advancePermission.metadata = shareController.metadata
-
-                if let downloadLimit = try? shareController.database.getDownloadLimit(byAccount: shareController.metadata.account, shareToken: share.token) {
-                    advancePermission.downloadLimit = .limited(limit: downloadLimit.limit, count: downloadLimit.count)
-                }
-
-                navigationController.pushViewController(advancePermission, animated: true)
+                openAdvancePermission(shareController: shareController)
             }
             actions.append(advancePermissionAction)
         }
         
         // Send email
-        if shareController.sendMail {
+        if (share.shareType != NKShare.ShareType.publicLink.rawValue) {
+//        if shareController.sendMail {
             let sendNewEmailAction = UIAction(
                 title: NSLocalizedString("_send_new_email_", comment: ""),
                 image: utility.loadImage(named: "email", colors: [NCBrandColor.shared.brandElement])
             ) { [self] _ in
-                let storyboard = UIStoryboard(name: "NCShare", bundle: nil)
-                guard let viewNewUserComment = storyboard.instantiateViewController(withIdentifier: "NCShareNewUserAddComment") as? NCShareNewUserAddComment else { return }
-                viewNewUserComment.metadata = shareController.metadata
-                viewNewUserComment.share = tableShare(value: share)
-                viewNewUserComment.networking = shareController.networking
-                viewNewUserComment.isFromMenu = true
-                shareController.navigationController?.pushViewController(viewNewUserComment, animated: true)
+                openShareEmail(shareController: shareController)
             }
             actions.append(sendNewEmailAction)
         }
@@ -215,5 +198,16 @@ class NCContextMenuShare: NSObject {
             }
         }
         shareController.networking?.unShare(idShare: share.idShare)
+    }
+    
+    private func openShareEmail(shareController: NCShare) {
+        let storyboard = UIStoryboard(name: "NCShare", bundle: nil)
+        guard let viewNewUserComment = storyboard.instantiateViewController(withIdentifier: "NCShareNewUserAddComment") as? NCShareNewUserAddComment else { return }
+        viewNewUserComment.metadata = shareController.metadata
+        viewNewUserComment.share = tableShare(value: share)
+        viewNewUserComment.networking = shareController.networking
+        viewNewUserComment.isFromMenu = true
+        viewNewUserComment.controller = controller
+        shareController.navigationController?.pushViewController(viewNewUserComment, animated: true)
     }
 }

@@ -11,7 +11,68 @@ import CoreMedia
 import Photos
 
 extension NCUtility {
+    
     func loadImage(named imageName: String,
+                   colors: [UIColor]? = nil,
+                   size: CGFloat? = nil,
+                   useTypeIconFile: Bool = false,
+                   systemNameWeight: UIImage.SymbolWeight = .regular,
+                   account: String? = nil) -> UIImage {
+        var image: UIImage?
+
+        if useTypeIconFile {
+            switch imageName {
+            case NKTypeIconFile.audio.rawValue: image = UIImage(named: "file_audio")
+            case NKTypeIconFile.code.rawValue: image = UIImage(named: "file_code")
+            case NKTypeIconFile.compress.rawValue: image = UIImage(named: "file_compress")
+            case NKTypeIconFile.directory.rawValue: image = UIImage(named: "folder")
+            case NKTypeIconFile.document.rawValue: image = UIImage(named: "document")
+            case NKTypeIconFile.image.rawValue: image = UIImage(named: "file_photo")
+            case NKTypeIconFile.video.rawValue: image = UIImage(named: "file_movie")
+            case NKTypeIconFile.xls.rawValue: image = UIImage(named: "file_xls")
+            case NKTypeIconFile.pdf.rawValue: image = UIImage(named: "file_pdf")
+            case NKTypeIconFile.ppt.rawValue: image = UIImage(named: "file_ppt")
+            case NKTypeIconFile.txt.rawValue: image = UIImage(named: "file_txt")
+            default: image = (imageName as NSString).pathExtension == "odg" ? UIImage(named: "file_odg") : UIImage(named: "file")
+            }
+        }
+
+        if let image { return image }//.withTintColor(NCBrandColor.shared.iconImageColor) }
+        // see https://stackoverflow.com/questions/71764255
+//        let sfSymbolName = imageName.replacingOccurrences(of: "_", with: ".")
+//        let color = colors?.first ?? UIColor.systemGray
+
+        // SF IMAGE
+        if let colors {
+            image = UIImage(systemName: imageName, withConfiguration: UIImage.SymbolConfiguration(weight: systemNameWeight))?.applyingSymbolConfiguration(UIImage.SymbolConfiguration(paletteColors: colors))
+        } else {
+            image = UIImage(systemName: imageName, withConfiguration: UIImage.SymbolConfiguration(weight: systemNameWeight))
+        }
+        
+        if let image { return image }//.withTintColor(NCBrandColor.shared.iconImageColor) }
+
+        // IMAGES
+        if let color = colors?.first, let size {
+            image = UIImage(named: imageName)?.image(color: color, size: size)
+        } else if let color = colors?.first, size == nil {
+            image = UIImage(named: imageName)?.image(color: color, size: 24)
+        } else if colors == nil, size == nil {
+            image = UIImage(named: imageName)?.resizeImage(size: CGSize(width: 24, height: 24))
+        } else if colors == nil, let size {
+            image = UIImage(named: imageName)?.resizeImage(size: CGSize(width: size, height: size))
+        }
+        
+        if let image { return image }//.withTintColor(NCBrandColor.shared.iconImageColor) }
+
+        // NO IMAGES FOUND
+        if let color = colors?.first, let size {
+            return UIImage(named: "file")!.image(color: color, size: size)
+        } else {
+            return UIImage(named: "file")!
+        }
+    }
+    
+    func loadImage1(named imageName: String,
                    colors: [UIColor]? = nil,
                    size: CGFloat? = nil,
                    useTypeIconFile: Bool = false,
