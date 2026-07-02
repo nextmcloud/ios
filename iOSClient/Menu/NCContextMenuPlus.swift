@@ -60,6 +60,7 @@ class NCContextMenuPlus: NSObject {
         var menuTextElement: [UIMenuElement] = []
         var menuDirectEditingElement: [UIMenuElement] = []
         var menuRichDocumentElement: [UIMenuElement] = []
+        var menuOnlyOfficeElement: [UIMenuElement] = []
 
         // ------------------------------- ACTION
 
@@ -181,11 +182,26 @@ class NCContextMenuPlus: NSObject {
            !isDirectoryE2EE {
             menuTextElement.append(UIAction(title: NSLocalizedString("_create_nextcloudtext_document_", comment: ""),
                                             image: utility.loadImage(named: "doc.text", colors: [NCBrandColor.shared.iconImageColor])) { _ in
+//                Task {
+//                    let fileName = await NCNetworking.shared.createFileName(fileNameBase: NSLocalizedString("_untitled_", comment: "") + "." + creator.ext, account: session.account, serverUrl: serverUrl)
+//                    let fileNamePath = utilityFileSystem.getRelativeFilePath(String(describing: fileName), serverUrl: serverUrl, session: session)
+//
+//                    await NCCreate().createDocument(controller: controller, fileNamePath: fileNamePath, fileName: String(describing: fileName), editorId: "text", creatorId: creator.identifier, templateId: "document", account: session.account)
+//                }
                 Task {
-                    let fileName = await NCNetworking.shared.createFileName(fileNameBase: NSLocalizedString("_untitled_", comment: "") + "." + creator.ext, account: session.account, serverUrl: serverUrl)
-                    let fileNamePath = utilityFileSystem.getRelativeFilePath(String(describing: fileName), serverUrl: serverUrl, session: session)
-
-                    await NCCreate().createDocument(controller: controller, fileNamePath: fileNamePath, fileName: String(describing: fileName), editorId: "text", creatorId: creator.identifier, templateId: "document", account: session.account)
+                    guard let navigationController = UIStoryboard(name: "NCCreateFormUploadDocuments", bundle: nil).instantiateInitialViewController() else {
+                        return
+                    }
+                    navigationController.modalPresentationStyle = UIModalPresentationStyle.formSheet
+                    if let viewController = (navigationController as? UINavigationController)?.topViewController as? NCCreateFormUploadDocuments {
+                        viewController.editorId = NCGlobal.shared.editorText
+                        viewController.creatorId = creator.identifier
+                        viewController.typeTemplate = NCGlobal.shared.editorText
+                        viewController.serverUrl = serverUrl
+                        viewController.titleForm = NSLocalizedString("_create_nextcloudtext_document_", comment: "")
+                        viewController.controller = controller
+                        controller.present(navigationController, animated: true, completion: nil)
+                    }
                 }
             })
         }
@@ -197,6 +213,7 @@ class NCContextMenuPlus: NSObject {
 
             // ------------------------------- COLLABORA
             if capabilities.richDocumentsEnabled {
+                /*
                 menuRichDocumentElement.append(UIAction(title: NSLocalizedString("_create_new_document_", comment: ""),
                                                         image: utility.loadImage(named: "doc.richtext", colors: [NCBrandColor.shared.documentIconColor])) { _ in
                     Task { @MainActor in
@@ -232,6 +249,60 @@ class NCContextMenuPlus: NSObject {
                         await createDocument.createDocument(controller: controller, fileNamePath: fileNamePath, fileName: String(describing: fileName), editorId: "collabora", templateId: templates.selectedTemplate.identifier, account: session.account)
                     }
                 })
+                 */
+                menuRichDocumentElement.append(UIAction(title: NSLocalizedString("_create_new_document_", comment: ""),
+                                                        image: UIImage(named: "create_file_document")!.resizeImage(size: CGSize(width: 24, height: 24))) { _ in
+                    
+                    guard let navigationController = UIStoryboard(name: "NCCreateFormUploadDocuments", bundle: nil).instantiateInitialViewController() else {
+                        return
+                    }
+                    navigationController.modalPresentationStyle = UIModalPresentationStyle.formSheet
+
+                    if let viewController = (navigationController as? UINavigationController)?.topViewController as? NCCreateFormUploadDocuments {
+                        viewController.editorId = NCGlobal.shared.editorCollabora
+                        viewController.typeTemplate = NCGlobal.shared.templateDocument
+                        viewController.serverUrl = serverUrl
+                        viewController.titleForm = NSLocalizedString("_create_new_document_", comment: "")
+                        viewController.controller = controller
+                        controller.present(navigationController, animated: true, completion: nil)
+                    }
+                })
+
+                menuRichDocumentElement.append(UIAction(title: NSLocalizedString("_create_new_spreadsheet_", comment: ""),
+                                                        image: UIImage(named: "create_file_xls")!.resizeImage(size: CGSize(width: 24, height: 24))) { _ in
+                    
+                    guard let navigationController = UIStoryboard(name: "NCCreateFormUploadDocuments", bundle: nil).instantiateInitialViewController() else {
+                        return
+                    }
+                    navigationController.modalPresentationStyle = UIModalPresentationStyle.formSheet
+
+                    if let viewController = (navigationController as? UINavigationController)?.topViewController as? NCCreateFormUploadDocuments {
+                        viewController.editorId = NCGlobal.shared.editorCollabora
+                        viewController.typeTemplate = NCGlobal.shared.templateSpreadsheet
+                        viewController.serverUrl = serverUrl
+                        viewController.titleForm = NSLocalizedString("_create_new_spreadsheet_", comment: "")
+                        viewController.controller = controller
+                        controller.present(navigationController, animated: true, completion: nil)
+                    }
+                })
+
+                menuRichDocumentElement.append(UIAction(title: NSLocalizedString("_create_new_presentation_", comment: ""),
+                                                        image: UIImage(named: "create_file_ppt")!.resizeImage(size: CGSize(width: 24, height: 24))) { _ in
+                    
+                    guard let navigationController = UIStoryboard(name: "NCCreateFormUploadDocuments", bundle: nil).instantiateInitialViewController() else {
+                        return
+                    }
+                    navigationController.modalPresentationStyle = UIModalPresentationStyle.formSheet
+
+                    if let viewController = (navigationController as? UINavigationController)?.topViewController as? NCCreateFormUploadDocuments {
+                        viewController.editorId = NCGlobal.shared.editorCollabora
+                        viewController.typeTemplate = NCGlobal.shared.templatePresentation
+                        viewController.serverUrl = serverUrl
+                        viewController.titleForm = NSLocalizedString("_create_new_presentation_", comment: "")
+                        viewController.controller = controller
+                        controller.present(navigationController, animated: true, completion: nil)
+                    }
+                })
             }
 
             // ------------------------------- DIRECT EDITING CREATORS (onlyoffice, eurooffice, …)
@@ -265,9 +336,37 @@ class NCContextMenuPlus: NSObject {
                                 fileExt = creator.ext
                                 templateIdentifier = ""
                             }
-                            let fileName = await NCNetworking.shared.createFileName(fileNameBase: NSLocalizedString("_untitled_", comment: "") + "." + fileExt, account: session.account, serverUrl: serverUrl)
-                            let fileNamePath = utilityFileSystem.getRelativeFilePath(String(describing: fileName), serverUrl: serverUrl, session: session)
-                            await createDocument.createDocument(controller: controller, fileNamePath: fileNamePath, fileName: String(describing: fileName), editorId: editorId, creatorId: creator.identifier, templateId: templateIdentifier, account: session.account)
+//                            let fileName = await NCNetworking.shared.createFileName(fileNameBase: NSLocalizedString("_untitled_", comment: "") + "." + fileExt, account: session.account, serverUrl: serverUrl)
+//                            let fileNamePath = utilityFileSystem.getRelativeFilePath(String(describing: fileName), serverUrl: serverUrl, session: session)
+//                            await createDocument.createDocument(controller: controller, fileNamePath: fileNamePath, fileName: String(describing: fileName), editorId: editorId, creatorId: creator.identifier, templateId: templateIdentifier, account: session.account)
+                            var titleForm = NSLocalizedString("_create_nextcloudtext_document_", comment: "")
+                            switch creator.identifier {
+                            case "onlyoffice_docx":
+                                titleForm = NSLocalizedString("_create_nextcloudtext_document_", comment: "")
+
+                            case "onlyoffice_xlsx":
+                                titleForm = NSLocalizedString("_create_new_spreadsheet_", comment: "")
+
+                            case "onlyoffice_pptx":
+                                titleForm = NSLocalizedString("_create_new_presentation_", comment: "")
+
+                            default:
+                                titleForm = NSLocalizedString("_create_nextcloudtext_document_", comment: "")
+                            }
+                            
+                            guard let navigationController = UIStoryboard(name: "NCCreateFormUploadDocuments", bundle: nil).instantiateInitialViewController() else {
+                                return
+                            }
+                            navigationController.modalPresentationStyle = UIModalPresentationStyle.formSheet
+                            if let viewController = (navigationController as? UINavigationController)?.topViewController as? NCCreateFormUploadDocuments {
+                                viewController.editorId = NCGlobal.shared.editorOnlyoffice
+                                viewController.creatorId = creator.identifier
+                                viewController.typeTemplate = templateIdentifier//NCGlobal.shared.templateDocument
+                                viewController.serverUrl = serverUrl
+                                viewController.titleForm = titleForm //NSLocalizedString("_create_nextcloudtext_document_", comment: "")
+                                viewController.controller = controller
+                                controller.present(navigationController, animated: true, completion: nil)
+                            }
                         }
                     })
                 }
@@ -279,6 +378,7 @@ class NCContextMenuPlus: NSObject {
         let menuE2EE = UIMenu(title: "", options: .displayInline, children: menuE2EEElement)
         let menuDirectEditing = UIMenu(title: "", options: .displayInline, children: menuDirectEditingElement)
         let menuRichDocument = UIMenu(title: "", options: .displayInline, children: menuRichDocumentElement)
+        let menuOnlyOffice = UIMenu(title: "", options: .displayInline, children: menuOnlyOfficeElement)
 
         let plusMenu = UIMenu(children: [menuAction, menuE2EE, menuText, menuRichDocument, menuDirectEditing])
 
@@ -289,7 +389,8 @@ class NCContextMenuPlus: NSObject {
             plusItem.menu = plusMenu
         } else {
             let plusItem = UIBarButtonItem(image: plusImage, style: .plain, target: nil, action: nil)
-            plusItem.tintColor = NCBrandColor.shared.getElement(account: session.account)
+//            plusItem.tintColor = NCBrandColor.shared.getElement(account: session.account)
+            plusItem.tintColor = NCBrandColor.shared.customer
             plusItem.menu = plusMenu
             menuToolbar.setItems([plusItem], animated: false)
             menuToolbar.sizeToFit()

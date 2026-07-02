@@ -623,4 +623,21 @@ actor NCNetworkingProcess {
 
         return .success
     }
+    
+    func createProcessUploads(metadatas: [tableMetadata], verifyAlreadyExists: Bool = false, completion: @escaping (_ items: Int) -> Void = {_ in}) {
+        var metadatasForUpload: [tableMetadata] = []
+        for metadata in metadatas {
+            if verifyAlreadyExists {
+                if NCManageDatabase.shared.getMetadata(predicate: NSPredicate(format: "account == %@ && serverUrl == %@ && fileName == %@ && session != ''",
+                                                                    metadata.account,
+                                                                    metadata.serverUrl,
+                                                                    metadata.fileName)) != nil {
+                    continue
+                }
+            }
+            metadatasForUpload.append(metadata)
+        }
+        NCManageDatabase.shared.addMetadatas(metadatasForUpload)
+        completion(metadatasForUpload.count)
+    }
 }

@@ -24,7 +24,7 @@
 "_cancel_"                  = "Cancel";
 "_edit_"                    = "Edit";
 "_tap_to_cancel_"           = "Tap to cancel";
-"_tap_to_min_max_"          = "Tap to minimize / maximize";
+"_tap_to_min_max_"          = "Tap to minimize/maximize";
 "_cancel_request_"          = "Do you want to cancel?";
 "_upload_file_"             = "Upload file";
 "_download_file_"           = "Download file";
@@ -415,10 +415,10 @@
 "_delete_active_account_"       = "Remove active account";
 "_want_delete_"                 = "Do you really want to delete?";
 "_want_leave_share_"            = "You will leave the following shares: ";
-"_delete_account_"              = "Remove account";
-"_delete_active_account_"       = "Remove active account";
-"_want_delete_"                 = "Do you really want to delete?";
-"_want_leave_share_"            = "You will leave the following shares: ";
+//"_delete_account_"              = "Remove account";
+//"_delete_active_account_"       = "Remove active account";
+//"_want_delete_"                 = "Do you really want to delete?";
+//"_want_leave_share_"            = "You will leave the following shares: ";
 "_no_delete_"                   = "No, do not delete";
 "_yes_delete_"                  = "Yes, delete";
 "_remove_cache_"                = "Deleting cache, please wait …";
@@ -673,7 +673,8 @@
 "_folder_automatic_upload_"     = "Folder for \"Auto upload\"";
 "_search_no_record_found_"      = "No result";
 "_search_in_progress_"          = "Search in progress …";
-"_search_instruction_"          = "Search for file (minimum 2 characters)";
+//"_search_instruction_"          = "Search for file (minimum 2 characters)";
+"_search_instruction_"          = "Search for files and/or folders (minimum 2 characters)";
 "_files_no_files_"              = "No files in here";
 "_files_no_folders_"            = "No folders in here";
 "_request_in_progress_"         = "Request to server in progress …";
@@ -1496,6 +1497,20 @@ You can stop it at any time, adjust the settings, and enable it again.";
 "_no_internet_alert_message_"       = "A data connection is not currently allowed.";
 "_no_internet_alert_title_"         = "Connection error";
 "_auto_upload_help_text_"           = "With this option, you upload your photos or videos to the same folder that you selected for \"Automatic upload.\"";
+"_auto_upload_no_new_items_to_upload_" = "No new items to upload";
+"_focused_auto_upload_" = "Focused Auto Upload";
+"_focused_auto_upload_settings_footer_" = "Keep the app open and darken the screen while auto upload is backing up at higher speed.";
+"_focused_auto_upload_intro_heading_" = "Keep backing up with the screen darkened.";
+"_focused_auto_upload_intro_message_" = "Photos and videos will continue backing up at higher speed while the screen is darkened. During the process:";
+"_focused_auto_upload_wifi_" = "Connect to Wi-Fi";
+"_focused_auto_upload_charger_" = "Connect to charger";
+"_focused_auto_upload_do_not_exit_" = "Do not exit the app";
+"_enable_focused_auto_upload_" = "Enable Focused Auto Upload";
+"_focused_auto_upload_backing_up_" = "Backing up";
+"_focused_auto_upload_completed_" = "Upload completed!";
+"_focused_auto_upload_countdown_" = "Do not lock the screen or exit the app. The screen will turn dark in %d seconds.";
+"_stop_focused_auto_upload_" = "Stop Focused Auto Upload";
+"_finish_" = "Finish";
 "_item_with_same_name_already_exists_" = "An item with the same name already exists.";
 
 // MARK: Dashboard

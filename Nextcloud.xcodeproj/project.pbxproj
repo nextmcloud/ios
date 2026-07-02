@@ -84,6 +84,20 @@
 		AFCE353727E4ED7B00FEA6C2 /* NCShareCells.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFCE353627E4ED7B00FEA6C2 /* NCShareCells.swift */; };
 		AFCE353927E5DE0500FEA6C2 /* Shareable.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFCE353827E5DE0400FEA6C2 /* Shareable.swift */; };
 		B533EDF42FD80C8F00D430A5 /* Queuer in Frameworks */ = {isa = PBXBuildFile; productRef = B533EDF32FD80C8F00D430A5 /* Queuer */; };
+		B55F81B72FF4E0AA0053242A /* TextTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = B55F81B62FF4E0AA0053242A /* TextTableViewCell.xib */; };
+		B55F81B82FF4E0AA0053242A /* NCCreateFormUploadVoiceNote.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B55F81B22FF4E0AA0053242A /* NCCreateFormUploadVoiceNote.storyboard */; };
+		B55F81B92FF4E0AA0053242A /* NCCreateFormUploadDocuments.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B55F81B02FF4E0AA0053242A /* NCCreateFormUploadDocuments.storyboard */; };
+		B55F81BE2FF4E0AA0053242A /* TextTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = B55F81B62FF4E0AA0053242A /* TextTableViewCell.xib */; };
+		B55F81BF2FF4E0AA0053242A /* NCCreateFormUploadVoiceNote.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B55F81B22FF4E0AA0053242A /* NCCreateFormUploadVoiceNote.storyboard */; };
+		B55F81C02FF4E0AA0053242A /* NCCreateFormUploadDocuments.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B55F81B02FF4E0AA0053242A /* NCCreateFormUploadDocuments.storyboard */; };
+		B55F81C12FF4E0AA0053242A /* TextTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = B55F81B52FF4E0AA0053242A /* TextTableViewCell.swift */; };
+		B55F81C32FF4E0AA0053242A /* NCCreateFormUploadVoiceNote.swift in Sources */ = {isa = PBXBuildFile; fileRef = B55F81B32FF4E0AA0053242A /* NCCreateFormUploadVoiceNote.swift */; };
+		B55F81C42FF4E0AA0053242A /* NCCreateFormUploadDocuments.swift in Sources */ = {isa = PBXBuildFile; fileRef = B55F81B12FF4E0AA0053242A /* NCCreateFormUploadDocuments.swift */; };
+		B55F81CA2FF4E8610053242A /* NCCreateDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = B55F81C92FF4E8610053242A /* NCCreateDocument.swift */; };
+		B55F81D02FF4E91F0053242A /* NCCreateDocumentCustomTextField.xib in Resources */ = {isa = PBXBuildFile; fileRef = B55F81CE2FF4E91F0053242A /* NCCreateDocumentCustomTextField.xib */; };
+		B55F81D12FF4E91F0053242A /* FolderPathCustomCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = B55F81CC2FF4E91F0053242A /* FolderPathCustomCell.xib */; };
+		B55F81D22FF4E91F0053242A /* FolderPathCustomCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = B55F81CB2FF4E91F0053242A /* FolderPathCustomCell.swift */; };
+		B55F81D32FF4E91F0053242A /* NCCreateDocumentCustomTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = B55F81CD2FF4E91F0053242A /* NCCreateDocumentCustomTextField.swift */; };
 		B597789A2FDC23E300C3262A /* NCShare+Helper.swift in Sources */ = {isa = PBXBuildFile; fileRef = B59778992FDC23E300C3262A /* NCShare+Helper.swift */; };
 		B59778A12FDC409100C3262A /* NCActivity.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B597789B2FDC409100C3262A /* NCActivity.storyboard */; };
 		B59778A22FDC409100C3262A /* NCActivityCommentView.xib in Resources */ = {isa = PBXBuildFile; fileRef = B597789E2FDC409100C3262A /* NCActivityCommentView.xib */; };
@@ -1139,6 +1153,17 @@
 		AFCE353627E4ED7B00FEA6C2 /* NCShareCells.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCShareCells.swift; sourceTree = "<group>"; };
 		AFCE353827E5DE0400FEA6C2 /* Shareable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Shareable.swift; sourceTree = "<group>"; };
 		B4C7A5B36D1ED178FB6B76CB /* NCContextMenuPlayerTracks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCContextMenuPlayerTracks.swift; sourceTree = "<group>"; };
+		B55F81B02FF4E0AA0053242A /* NCCreateFormUploadDocuments.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = NCCreateFormUploadDocuments.storyboard; sourceTree = "<group>"; };
+		B55F81B12FF4E0AA0053242A /* NCCreateFormUploadDocuments.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCCreateFormUploadDocuments.swift; sourceTree = "<group>"; };
+		B55F81B22FF4E0AA0053242A /* NCCreateFormUploadVoiceNote.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = NCCreateFormUploadVoiceNote.storyboard; sourceTree = "<group>"; };
+		B55F81B32FF4E0AA0053242A /* NCCreateFormUploadVoiceNote.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCCreateFormUploadVoiceNote.swift; sourceTree = "<group>"; };
+		B55F81B52FF4E0AA0053242A /* TextTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextTableViewCell.swift; sourceTree = "<group>"; };
+		B55F81B62FF4E0AA0053242A /* TextTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = TextTableViewCell.xib; sourceTree = "<group>"; };
+		B55F81C92FF4E8610053242A /* NCCreateDocument.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCCreateDocument.swift; sourceTree = "<group>"; };
+		B55F81CB2FF4E91F0053242A /* FolderPathCustomCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FolderPathCustomCell.swift; sourceTree = "<group>"; };
+		B55F81CC2FF4E91F0053242A /* FolderPathCustomCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = FolderPathCustomCell.xib; sourceTree = "<group>"; };
+		B55F81CD2FF4E91F0053242A /* NCCreateDocumentCustomTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCCreateDocumentCustomTextField.swift; sourceTree = "<group>"; };
+		B55F81CE2FF4E91F0053242A /* NCCreateDocumentCustomTextField.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = NCCreateDocumentCustomTextField.xib; sourceTree = "<group>"; };
 		B59778992FDC23E300C3262A /* NCShare+Helper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NCShare+Helper.swift"; sourceTree = "<group>"; };
 		B597789B2FDC409100C3262A /* NCActivity.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = NCActivity.storyboard; sourceTree = "<group>"; };
 		B597789C2FDC409100C3262A /* NCActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCActivity.swift; sourceTree = "<group>"; };
@@ -2066,6 +2091,17 @@
 				AF93474D27E3F211002537EE /* NCShareNewUserAddComment.swift */,
 			);
 			path = Advanced;
+			sourceTree = "<group>";
+		};
+		B55F81CF2FF4E91F0053242A /* NMC Custom Views */ = {
+			isa = PBXGroup;
+			children = (
+				B55F81CB2FF4E91F0053242A /* FolderPathCustomCell.swift */,
+				B55F81CC2FF4E91F0053242A /* FolderPathCustomCell.xib */,
+				B55F81CD2FF4E91F0053242A /* NCCreateDocumentCustomTextField.swift */,
+				B55F81CE2FF4E91F0053242A /* NCCreateDocumentCustomTextField.xib */,
+			);
+			path = "NMC Custom Views";
 			sourceTree = "<group>";
 		};
 		B5D5768F2FE536AD00F85FD6 /* ExternalResources */ = {
@@ -3372,6 +3408,13 @@
 		F7DFB7E9219C5A0500680748 /* Create */ = {
 			isa = PBXGroup;
 			children = (
+				B55F81C92FF4E8610053242A /* NCCreateDocument.swift */,
+				B55F81B02FF4E0AA0053242A /* NCCreateFormUploadDocuments.storyboard */,
+				B55F81B12FF4E0AA0053242A /* NCCreateFormUploadDocuments.swift */,
+				B55F81B22FF4E0AA0053242A /* NCCreateFormUploadVoiceNote.storyboard */,
+				B55F81B32FF4E0AA0053242A /* NCCreateFormUploadVoiceNote.swift */,
+				B55F81B52FF4E0AA0053242A /* TextTableViewCell.swift */,
+				B55F81B62FF4E0AA0053242A /* TextTableViewCell.xib */,
 				F7FA7FFD2C0F4F3B0072FC60 /* Upload Assets */,
 				F7A509242C26BD5D00326106 /* NCCreate.swift */,
 				F704B5E22430AA6F00632F5F /* NCCreateFormUploadConflict.storyboard */,
@@ -3497,6 +3540,7 @@
 		F7F67BAA1A24D27800EE80DA /* iOSClient */ = {
 			isa = PBXGroup;
 			children = (
+				B55F81CF2FF4E91F0053242A /* NMC Custom Views */,
 				B5D576952FE54CE400F85FD6 /* Albums */,
 				B5D5768C2FE5353800F85FD6 /* AppUtility.swift */,
 				B5E2E0812FDAD38700FAA4FD /* Analytics */,
@@ -4074,6 +4118,9 @@
 			files = (
 				F714803B262EBE3900693E51 /* MainInterface.storyboard in Resources */,
 				F7148054262ED51000693E51 /* NCListCell.xib in Resources */,
+				B55F81B72FF4E0AA0053242A /* TextTableViewCell.xib in Resources */,
+				B55F81B82FF4E0AA0053242A /* NCCreateFormUploadVoiceNote.storyboard in Resources */,
+				B55F81B92FF4E0AA0053242A /* NCCreateFormUploadDocuments.storyboard in Resources */,
 				F7E4022C2BA85D1D007E5609 /* PrivacyInfo.xcprivacy in Resources */,
 				AF22B209277B4E4C00DAB0CC /* NCCreateFormUploadConflictCell.xib in Resources */,
 				F7CBC1242BAC8B0000EC1D55 /* NCSectionFirstHeaderEmptyData.xib in Resources */,
@@ -4175,6 +4222,9 @@
 				F7FDFF6A2E437E55000D7688 /* NCShareAccounts.storyboard in Resources */,
 				B59778A12FDC409100C3262A /* NCActivity.storyboard in Resources */,
 				B59778A22FDC409100C3262A /* NCActivityCommentView.xib in Resources */,
+				B55F81BE2FF4E0AA0053242A /* TextTableViewCell.xib in Resources */,
+				B55F81BF2FF4E0AA0053242A /* NCCreateFormUploadVoiceNote.storyboard in Resources */,
+				B55F81C02FF4E0AA0053242A /* NCCreateFormUploadDocuments.storyboard in Resources */,
 				F774264A22EB4D0000B23912 /* NCSearchUserDropDownCell.xib in Resources */,
 				F77B0F7D1D118A16002130FE /* Images.xcassets in Resources */,
 				B5D576E22FE5525100F85FD6 /* NCMediaCommandView.xib in Resources */,
@@ -4186,6 +4236,8 @@
 				F7B398422A6A91D5007538D6 /* NCSectionFirstHeader.xib in Resources */,
 				F7501C322212E57500FB1415 /* NCMedia.storyboard in Resources */,
 				B5D576DE2FE54CFE00F85FD6 /* NCAlbums.storyboard in Resources */,
+				B55F81D02FF4E91F0053242A /* NCCreateDocumentCustomTextField.xib in Resources */,
+				B55F81D12FF4E91F0053242A /* FolderPathCustomCell.xib in Resources */,
 				F76687082B7D067400779E3F /* NCAudioRecorderViewController.storyboard in Resources */,
 				B5D576F32FE554E200F85FD6 /* NCMoreAppSuggestionsCell.xib in Resources */,
 			);
@@ -4647,6 +4699,8 @@
 				F7236DDF2F7C00E600F9D722 /* HudIndeterminateBannerView.swift in Sources */,
 				F799DF852C4B7E56003410B5 /* NCSectionHeader.swift in Sources */,
 				F78A10BF29322E8A008499B8 /* NCManageDatabase+Directory.swift in Sources */,
+				B55F81D22FF4E91F0053242A /* FolderPathCustomCell.swift in Sources */,
+				B55F81D32FF4E91F0053242A /* NCCreateDocumentCustomTextField.swift in Sources */,
 				F7743A122C33F0A20034F670 /* NCCollectionViewCommon+CollectionViewDelegate.swift in Sources */,
 				F7D60CAF2C941ACB008FBFDD /* NCMediaPinchGesture.swift in Sources */,
 				F71916142E2901FB00E13E96 /* NCNetworking+Upload.swift in Sources */,
@@ -4709,6 +4763,7 @@
 				F7E7AEA52BA32C6500512E52 /* NCCollectionViewDownloadThumbnail.swift in Sources */,
 				AF730AF827834B1400B7520E /* NCShare+NCCellDelegate.swift in Sources */,
 				F3C587AE2D47E4FE004532DB /* PHAssetCollectionThumbnailLoader.swift in Sources */,
+				B55F81CA2FF4E8610053242A /* NCCreateDocument.swift in Sources */,
 				F78F74362163781100C2ADAD /* NCTrash.swift in Sources */,
 				F71638922FA0C20C00A913B7 /* NCMoreView.swift in Sources */,
 				AF2D7C7C2742556F00ADF566 /* NCShareLinkCell.swift in Sources */,
@@ -4755,6 +4810,9 @@
 				F7C30DF6291BC0CA0017149B /* NCNetworkingE2EEUpload.swift in Sources */,
 				F3DDFE232F1FB4C300A784C8 /* NCAssistantChatModel.swift in Sources */,
 				F7501C332212E57500FB1415 /* NCMedia.swift in Sources */,
+				B55F81C12FF4E0AA0053242A /* TextTableViewCell.swift in Sources */,
+				B55F81C32FF4E0AA0053242A /* NCCreateFormUploadVoiceNote.swift in Sources */,
+				B55F81C42FF4E0AA0053242A /* NCCreateFormUploadDocuments.swift in Sources */,
 				F7411C552D7B26D700F57358 /* NCNetworking+ServerError.swift in Sources */,
 				F72944F22A84246400246839 /* NCEndToEndMetadataV2.swift in Sources */,
 				F78026122E9CFA6300B63436 /* NCTransfersModel.swift in Sources */,
@@ -5221,7 +5279,7 @@
 				ALWAYS_SEARCH_USER_PATHS = YES;
 				CODE_SIGN_ENTITLEMENTS = "$(SRCROOT)/Brand/Notification_Service_Extension.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = "";
@@ -5236,7 +5294,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "com.t-systems.pu-ds.magentacloud.qa.Notification-Service-Extension";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "MagentaCloud QA NotificationServiceExtension Dist";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "MagentaCloud QA NotificationServiceExtension Dev";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
@@ -5252,7 +5310,7 @@
 				ALWAYS_SEARCH_USER_PATHS = YES;
 				CODE_SIGN_ENTITLEMENTS = "$(SRCROOT)/Brand/Notification_Service_Extension.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = "";
@@ -5267,7 +5325,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "com.t-systems.pu-ds.magentacloud.qa.Notification-Service-Extension";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "MagentaCloud QA NotificationServiceExtension Dist";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "MagentaCloud QA NotificationServiceExtension Dev";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
@@ -5540,7 +5598,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "com.t-systems.pu-ds.magentacloud.qa.Share";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "MagentaCloud QA Share Distribution";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "MagentaCloud QA Share Development";
 				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
@@ -5569,7 +5627,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "com.t-systems.pu-ds.magentacloud.qa.Share";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "MagentaCloud QA Share Distribution";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "MagentaCloud QA Share Development";
 				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
@@ -5598,7 +5656,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "com.t-systems.pu-ds.magentacloud.qa.FileProviderExtension";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "MagentaCloud QA FileProviderExtension Dist";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "MagentaCloud QA FileProviderExtension Development";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
@@ -5626,7 +5684,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "com.t-systems.pu-ds.magentacloud.qa.FileProviderExtension";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "MagentaCloud QA FileProviderExtension Dist";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "MagentaCloud QA FileProviderExtension Development";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
@@ -5652,7 +5710,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "com.t-systems.pu-ds.magentacloud.qa";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "MagentaCloud QA Distribution";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "MagentaCloud QA Development";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
@@ -5669,7 +5727,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
 				CODE_SIGN_ENTITLEMENTS = "$(SRCROOT)/Brand/iOSClient.entitlements";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				DEAD_CODE_STRIPPING = YES;
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 9FH6TNGWF2;
 				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
@@ -5677,7 +5735,7 @@
 				OTHER_LDFLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.t-systems.pu-ds.magentacloud.qa";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "MagentaCloud QA Distribution";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "MagentaCloud QA Development";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;

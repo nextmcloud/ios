@@ -155,7 +155,7 @@ extension UIAlertController {
                 let textCheck = FileNameValidator.checkFileName(folderName, account: session.account, capabilities: capabilities)
                 let alreadyExists = NCManageDatabase.shared.getMetadata(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@ AND fileNameView == %@", session.account, serverUrl, folderName)) != nil
 
-                okAction.isEnabled = !text.isEmpty && textCheck?.error == nil && alreadyExists == false
+                okAction.isEnabled = !folderName.isEmpty && textCheck?.error == nil && alreadyExists == false
 
                 var message = ""
                 var messageColor = UIColor.label
@@ -258,6 +258,7 @@ extension UIAlertController {
         let oldExtension = fileName.fileExtension
 
         let text = alertController.textFields?.first?.text?.trimmingCharacters(in: .whitespaces) ?? ""
+        let trimmedInitial = text.trimmingCharacters(in: .whitespaces)
         let textCheck = FileNameValidator.checkFileName(text, account: account, capabilities: capabilities)
         var message = textCheck?.error.localizedDescription ?? ""
         var messageColor = UIColor.red
@@ -286,12 +287,13 @@ extension UIAlertController {
             object: alertController.textFields?.first,
             queue: .main) { _ in
                 guard let text = alertController.textFields?.first?.text else { return }
+                let trimmedText = text.trimmingCharacters(in: .whitespaces)
                 let newExtension = text.fileExtension
 
                 let textCheck = FileNameValidator.checkFileName(text, account: account, capabilities: capabilities)
                 let isFileHidden = FileNameValidator.isFileHidden(text)
 
-                okAction.isEnabled = !text.isEmpty && textCheck?.error == nil
+                okAction.isEnabled = !trimmedText.isEmpty && textCheck?.error == nil
 
                 message = ""
                 messageColor = UIColor.label

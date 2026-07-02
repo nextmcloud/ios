@@ -27,7 +27,7 @@ extension NCMedia {
         self.collectionView.reloadData()
 
         Task {
-//            await (self.navigationController as? NCMainNavigationController)?.setNavigationLeftItems()
+            await (self.navigationController as? NCMainNavigationController)?.setNavigationLeftItems()
             await (self.navigationController as? NCMainNavigationController)?.setNavigationRightItems()
         }
     }
@@ -46,8 +46,9 @@ extension NCMedia {
     }
 
     func setElements() {
-        let highTextTitle = titleDate.frame.height
-        let isOver = self.collectionView.contentOffset.y + highTextTitle <= -view.safeAreaInsets.top && self.collectionView.contentOffset.y != -view.safeAreaInsets.top
+//        let highTextTitle = titleDate.frame.height
+//        let isOver = self.collectionView.contentOffset.y + highTextTitle <= -view.safeAreaInsets.top && self.collectionView.contentOffset.y != -view.safeAreaInsets.top
+        let isOver = self.collectionView.contentOffset.y <= -view.safeAreaInsets.top - titleConstraint.constant
 
         if isOver || dataSource.metadatas.isEmpty {
             UIView.animate(withDuration: 0.3) { [self] in
@@ -75,30 +76,6 @@ extension NCMedia {
 }
 
 extension NCMedia: NCMediaSelectTabBarDelegate {
-    func move() {
-        Task {
-            let ocIds = self.fileSelect.map { $0 }
-            let metadatas = await database.getMetadatasFromOcIdsAsync(ocIds)
-
-            setEditMode(false)
-
-            NCSelectOpen.shared.openView(items: metadatas, controller: self.controller)
-        }
-    }
-
-    func share() {
-        Task {
-            let ocIds = self.fileSelect.map { $0 }
-            let metadatas = await database.getMetadatasFromOcIdsAsync(ocIds)
-
-            setEditMode(false)
-            await NCCreate().createActivityViewController(
-                selectedMetadata: metadatas,
-                controller: self.controller,
-                sender: nil)
-        }
-    }
-
     func delete() {
         let ocIds = self.fileSelect.map { $0 }
         var alertStyle = UIAlertController.Style.actionSheet
@@ -164,4 +141,5 @@ extension NCMedia: NCMediaSelectTabBarDelegate {
             }
         }
     }
+
 }

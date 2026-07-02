@@ -190,10 +190,6 @@ class NCShareAdvancePermission: UITableViewController, NCShareAdvanceFotterDeleg
                 tableView.reloadData()
                 return
             }
-//            let alertController = UIAlertController.password(titleKey: "_share_password_") { password in
-//                self.share.password = password ?? ""
-//                tableView.reloadData()
-//            }
             let alertController = UIAlertController.password(titleKey: "_share_password_") { password in
                 let newPassword = password ?? ""
                 
@@ -202,9 +198,6 @@ class NCShareAdvancePermission: UITableViewController, NCShareAdvanceFotterDeleg
                     self.share.password = newPassword
                     tableView.reloadData()
                 } else if !newPassword.isEmpty {
-                    // Optional: Show an error alert or toast for "too short"
-//                    print(NSLocalizedString("_share_password_must_be_at_least_6_chars", comment: ""))
-//                    NCContentPresenter().showInfo(title: "_share_password_must_be_at_least_6_chars")
                     Task {
                         await showErrorBanner(windowScene: self.windowScene,
                                               text: "_share_password_must_be_at_least_6_chars",

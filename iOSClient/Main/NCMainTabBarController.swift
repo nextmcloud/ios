@@ -145,14 +145,14 @@ class NCMainTabBarController: UITabBarController {
         configureTabBarItem(
             at: 2,
             title: "_media_",
-            imageName: "photo.fill",
+            imageName: "photo",
             tag: 102
         )
 
         configureTabBarItem(
             at: 3,
             title: "_albums_",
-            imageName: "bolt.fill",
+            imageName: "mediaSelected",
             tag: 103
         )
     }
@@ -162,7 +162,7 @@ class NCMainTabBarController: UITabBarController {
 
         let item = items[index]
         item.title = NSLocalizedString(title, comment: "")
-        item.image = UIImage(systemName: imageName)
+        item.image = title == "_albums_" ? UIImage(named: "mediaSelected")?.image(color: NCBrandColor.shared.brandElement, size: 25) : UIImage(systemName: imageName)
         item.selectedImage = item.image
         item.tag = tag
     }

@@ -37,17 +37,57 @@ class NCContextMenuShare: NSObject {
         if share.shareType == NKShare.ShareType.publicLink.rawValue, canReshare {
             let addLinkAction = UIAction(
                 title: NSLocalizedString("_share_add_sharelink_", comment: ""),
-                image: utility.loadImage(named: "plus", colors: [NCBrandColor.shared.iconImageColor])
+                image: utility.loadImage(named: "plus", colors: [NCBrandColor.shared.brandElement])
             ) { [self] _ in
                 shareController.makeNewLinkShare()
             }
             actions.append(addLinkAction)
         }
 
+        // Add share link (only for public links with reshare permission)
+        if share.shareType == NKShare.ShareType.publicLink.rawValue, canReshare {
+            let advancePermissionAction = UIAction(
+                title: NSLocalizedString("_advance_permissions_", comment: ""),
+                image: utility.loadImage(named: "rename", colors: [NCBrandColor.shared.brandElement])
+            ) { [self] _ in
+                guard
+                    let advancePermission = UIStoryboard(name: "NCShare", bundle: nil).instantiateViewController(withIdentifier: "NCShareAdvancePermission") as? NCShareAdvancePermission,
+                    let navigationController = shareController.navigationController, !share.isInvalidated else { return }
+                advancePermission.networking = shareController.networking
+                advancePermission.share = tableShare(value: share)
+                advancePermission.oldTableShare = tableShare(value: share)
+                advancePermission.metadata = shareController.metadata
+
+                if let downloadLimit = try? shareController.database.getDownloadLimit(byAccount: shareController.metadata.account, shareToken: share.token) {
+                    advancePermission.downloadLimit = .limited(limit: downloadLimit.limit, count: downloadLimit.count)
+                }
+
+                navigationController.pushViewController(advancePermission, animated: true)
+            }
+            actions.append(advancePermissionAction)
+        }
+        
+        // Send email
+        if shareController.sendMail {
+            let sendNewEmailAction = UIAction(
+                title: NSLocalizedString("_send_new_email_", comment: ""),
+                image: utility.loadImage(named: "email", colors: [NCBrandColor.shared.brandElement])
+            ) { [self] _ in
+                let storyboard = UIStoryboard(name: "NCShare", bundle: nil)
+                guard let viewNewUserComment = storyboard.instantiateViewController(withIdentifier: "NCShareNewUserAddComment") as? NCShareNewUserAddComment else { return }
+                viewNewUserComment.metadata = shareController.metadata
+                viewNewUserComment.share = tableShare(value: share)
+                viewNewUserComment.networking = shareController.networking
+                viewNewUserComment.isFromMenu = true
+                shareController.navigationController?.pushViewController(viewNewUserComment, animated: true)
+            }
+            actions.append(sendNewEmailAction)
+        }
+        
         // Details action
         let detailsAction = UIAction(
             title: NSLocalizedString("_details_", comment: ""),
-            image: utility.loadImage(named: "pencil", colors: [NCBrandColor.shared.iconImageColor])
+            image: utility.loadImage(named: "pencil", colors: [NCBrandColor.shared.brandElement])
         ) { [self] _ in
             openAdvancePermission(shareController: shareController)
         }
@@ -56,7 +96,7 @@ class NCContextMenuShare: NSObject {
         // Unshare action (destructive)
         let unshareAction = UIAction(
             title: NSLocalizedString("_share_unshare_", comment: ""),
-            image: utility.loadImage(named: "person.2.slash"),
+            image: utility.loadImage(named: "trashIcon", colors: [NCBrandColor.shared.brandElement]),
             attributes: .destructive
         ) { [self] _ in
             Task {

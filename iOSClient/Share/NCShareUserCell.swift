@@ -165,10 +165,6 @@ class NCShareUserCell: UITableViewCell, NCCellProtocol {
         }
     }
 
-//    @objc func tapAvatarImage(_ sender: UITapGestureRecognizer) {
-//        delegate?.showProfile(with: tableShare, sender: sender)
-//    }
-
     @IBAction func touchUpInsideMenu(_ sender: Any) {
         delegate?.tapMenu(with: tableShare, sender: sender)
     }

@@ -317,10 +317,13 @@ class NCEndToEndSetup {
 
             var passphraseTextField: UITextField?
 
+            // Create OK action, initially disabled until non-whitespace is entered
             let ok = UIAlertAction(title: "OK", style: .default) { _ in
-                let passphrase = passphraseTextField?.text ?? ""
-                continuation.resume(returning: passphrase)
+                let raw = passphraseTextField?.text ?? ""
+                let trimmed = raw.trimmingCharacters(in: .whitespacesAndNewlines)
+                continuation.resume(returning: trimmed)
             }
+            ok.isEnabled = false
 
             let cancel = UIAlertAction(title: "Cancel", style: .cancel) { _ in
                 continuation.resume(throwing: NKError(
@@ -336,6 +339,12 @@ class NCEndToEndSetup {
                 passphraseTextField = textField
                 textField.placeholder = NSLocalizedString("_enter_passphrase_", comment: "")
                 textField.isSecureTextEntry = true
+                // Enable OK only when trimmed text is non-empty
+                textField.addAction(UIAction { _ in
+                    let raw = textField.text ?? ""
+                    let trimmed = raw.trimmingCharacters(in: .whitespacesAndNewlines)
+                    ok.isEnabled = !trimmed.isEmpty
+                }, for: .editingChanged)
             }
 
             self.controller?.present(alertController, animated: true)
@@ -390,3 +399,4 @@ class NCEndToEndSetup {
         }
     }
 }
+

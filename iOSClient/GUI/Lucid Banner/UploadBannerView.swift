@@ -84,7 +84,7 @@ struct UploadBannerView: View {
                         .foregroundStyle(state.payload.imageColor)
 
                     if let p = state.payload.progress {
-                        Text("\(Int(p * 100))%")
+                        Text("\(Int(p * 100)) %")
                             .cappedFont(.body, maxDynamicType: .accessibility2)
                             .monospacedDigit()
                             .foregroundStyle(state.payload.textColor)

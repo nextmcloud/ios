@@ -68,10 +68,6 @@ class NCShareLinkCell: UITableViewCell {
         self.indexPath = indexPath
         self.isDirectory = isDirectory
         setupCellAppearance(titleAppendString: title)
-
-//        let shareLinksCountString = shareLinksCount > 0 ? String(shareLinksCount) : ""
-//        setupCellAppearance(titleAppendString: shareLinksCountString)
-//        setupCellAppearance(titleAppendString: String(shareLinksCount))
     }
 
     private func setupCellAppearance(titleAppendString: String? = nil) {

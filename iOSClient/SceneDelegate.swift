@@ -23,6 +23,10 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         guard let windowScene = (scene as? UIWindowScene) else {
             return
         }
+        
+        // Ensure MoEngage is initialized for multi-scene setups
+//        MoEngageAnalytics.setupIfNeeded()
+
         let versionApp = NCUtility().getVersionMaintenance()
         var lastVersion: String?
 
@@ -128,7 +132,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
                     window?.makeKeyAndVisible()
                 }
             } else {
-                if let navigationController = UIStoryboard(name: "NCIntro", bundle: nil).instantiateInitialViewController() as? UINavigationController {
+                if let viewController = UIStoryboard(name: "NCIntro", bundle: nil).instantiateInitialViewController() as? NCIntroViewController {
+                    let navigationController = UINavigationController(rootViewController: viewController)
                     window?.rootViewController = navigationController
                     window?.makeKeyAndVisible()
                 }
@@ -188,6 +193,12 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             //
             window?.rootViewController = controller
             window?.makeKeyAndVisible()
+            
+            // Re-evaluate in-app messages after main interface is visible
+//            Task { @MainActor in
+                MoEngageAnalytics.shared.displayInAppNotificationSafely(reason: "main interface launched")
+//            }
+            
             //
             if activateSceneForAccount {
                 self.activateSceneForAccount(scene, account: activeTblAccount.account, controller: controller)
@@ -239,6 +250,15 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         NCSettingsBundleHelper.setVersionAndBuildNumber()
         NCSettingsBundleHelper.checkAndExecuteSettings(delay: 0.5)
         
+        // Re-evaluate in-app messages when scene becomes active
+//        Task { @MainActor in
+            MoEngageAnalytics.shared.displayInAppNotificationSafely(reason: "scene did become active")
+//        }
+        
+//        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+//            MoEngageAnalytics.shared.requestAppStoreReview()
+//        }
+
         hidePrivacyProtectionWindow()
 
         if !NextcloudKit.shared.isNetworkReachable(),
@@ -263,6 +283,13 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
         if NCPreferences().privacyScreenEnabled {
             showPrivacyProtectionWindow()
+//            if SwiftEntryKit.isCurrentlyDisplaying {
+//                SwiftEntryKit.dismiss {
+//                    self.showPrivacyProtectionWindow()
+//                }
+//            } else {
+//                showPrivacyProtectionWindow()
+//            }
         }
     }
 
@@ -560,6 +587,10 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
                 requestedAccount(controller: controller)
             }
         }
+        
+        // Re-evaluate in-app messages after activating scene for account
+        MoEngageAnalytics.shared.displayInAppNotificationSafely(reason: "activated scene for account")
+
 
         Task {
             try? await Task.sleep(for: .seconds(1))

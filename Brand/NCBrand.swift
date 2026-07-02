@@ -72,7 +72,8 @@ final class NCBrandOptions: @unchecked Sendable {
     var privacy: String = "https://static.magentacloud.de/privacy/datenschutzhinweise_app.htm"
     var sourceCode: String = "https://github.com/nextcloud/ios"
     var mobileconfig: String = "/remote.php/dav/provisioning/apple-provisioning.mobileconfig"
-    var appStoreUrl: String = "https://apps.apple.com/in/app/nextcloud/id1125420102"
+    var appStoreUrlNC: String = "https://apps.apple.com/in/app/nextcloud/id1125420102"
+    var appStoreUrl: String = "https://apps.apple.com/de/app/id312838242"
 
     // Auto Upload default folder
 //    var folderDefaultAutoUpload: String = Locale.current.language.languageCode?.identifier == "de" ? "Kamera-Medien" : "Camera-Media"
@@ -81,8 +82,6 @@ final class NCBrandOptions: @unchecked Sendable {
     
 
     // Capabilities Group
-//    var capabilitiesGroup: String = "group.it.twsweb.Crypto-Cloud"
-//    var capabilitiesGroupApps: String = "group.com.nextcloud.apps"
 //#if DEBUG
     // QA :
     @objc public var capabilitiesGroup:              String = "group.com.t-systems.pu-ds.magentacloud.qa"
@@ -92,9 +91,7 @@ final class NCBrandOptions: @unchecked Sendable {
 //    @objc public var capabilitiesGroup:              String = "group.de.telekom.Mediencenter"
 //    @objc public var capabilitiesGroupApps:              String = "group.de.telekom.Mediencenter"
 //#endif
-    
-//#endif
-    
+        
     // BRAND ONLY
     // Set use_login_web_personalized to true for prod and false for configurable path
     var use_login_web_personalized: Bool = true                               // Don't touch me !!
@@ -103,17 +100,17 @@ final class NCBrandOptions: @unchecked Sendable {
     var use_AppConfig: Bool = false                                                         // Don't touch me !!
 
     // Use server theming color
-    var use_themingColor:                Bool = false
+    var use_themingColor: Bool = true
 
-    var disable_intro:       Bool = true
-    var disable_request_login_url:       Bool = true
-    var disable_multiaccount:            Bool = true
+    var disable_intro: Bool = false
+    var disable_request_login_url: Bool = false
+    var disable_multiaccount: Bool = false
     var disable_more_external_site: Bool = false
     var disable_openin_file: Bool = false                                                       // Don't touch me !!
-    var disable_crash_service:             Bool = true
+    var disable_crash_service: Bool = false
     var disable_log: Bool = false
-    var disable_mobileconfig: Bool = false  
-    var disable_show_more_nextcloud_apps_in_settings:         Bool = true
+    var disable_mobileconfig: Bool = false
+    var disable_show_more_nextcloud_apps_in_settings: Bool = true
     var doNotAskPasscodeAtStartup: Bool = false
     var disable_source_code_in_settings: Bool = false
     var enforce_passcode_lock = false
@@ -172,7 +169,7 @@ final class NCBrandOptions: @unchecked Sendable {
         }
 
         if pushNotificationServerProxy.isEmpty,
-            brand == "Nextcloud" {
+           brand == "Nextcloud" ||  brand == "MagentaCLOUD" {
             pushNotificationServerProxy = "https://push-notifications.nextcloud.com"
             // DEBUG SERVER PUSH
             // pushNotificationServerProxy = "https://c0004.customerpush.nextcloud.com"
@@ -195,8 +192,6 @@ final class NCBrandColor: @unchecked Sendable {
     // This is rewrited from customet theme, default is Nextcloud color
     let customer:              UIColor = UIColor(red: 226.0/255.0, green: 0.0/255.0, blue: 116.0/255.0, alpha: 1.0)
     var customerText:             UIColor = UIColor(red: 255.0/255.0, green: 255.0/255.0, blue: 255.0/255.0, alpha: 1.0)
-//    let customer: UIColor = UIColor(red: 226.0/255.0, green: 0.0/255.0, blue: 116.0/255.0, alpha: 1.0)         // Nextcloud : #0082C9
-//    var customerText: UIColor = .white
 
     var brand: UIColor                                                                                         // don't touch me
     var brandElement: UIColor                                                                                  // don't touch me

@@ -90,6 +90,8 @@ class NCShare: UIViewController, NCSharePagingContent {
     var shareOthers: [tableShare] = []
     private var cachedHeader: NCShareAdvancePermissionHeader?
     
+    var sendMail: Bool = false
+    
     // MARK: - View Life Cycle
 
     override func viewDidLoad() {
@@ -618,6 +620,9 @@ extension NCShare: UITableViewDataSource {
                 let linkNumber = " \(indexPath.row + 1)"
                 cell.configure(with: tableShare, at: indexPath, isDirectory: metadata.directory, title: linkNumber)
             }
+            cell.buttonDetail.menu = NCContextMenuShare(share: tableShare, isDirectory: metadata.isDirectory, canReshare: canReshare, shareController: self, controller: controller).viewMenu()
+            cell.buttonDetail.showsMenuAsPrimaryAction = true
+
             return cell
 
         case .emails:
@@ -627,6 +632,8 @@ extension NCShare: UITableViewDataSource {
             }
             cell.delegate = self
             cell.configure(with: tableShare, at: indexPath, isDirectory: metadata.directory, userId: session.userId)
+            cell.buttonMenu.menu = NCContextMenuShare(share: tableShare, isDirectory: metadata.isDirectory, canReshare: canReshare, shareController: self, controller: controller).viewMenu()
+            cell.buttonMenu.showsMenuAsPrimaryAction = true
             return cell
         }
     }

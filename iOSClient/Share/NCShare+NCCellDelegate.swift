@@ -74,6 +74,13 @@ extension NCShare: NCShareLinkCellDelegate, NCShareUserCellDelegate {
         if tableShare == nil {
             self.makeNewLinkShare()
         }
+//        if let tableShare = tableShare {
+//            
+//            self.toggleShareMenu(for: tableShare, sendMail: (tableShare.shareType != NKShare.ShareType.publicLink.rawValue), folder: metadata?.directory ?? false, sender: sender)
+//            
+//        } else {
+//            self.makeNewLinkShare()
+//        }
     }
 
     func tapProfileMenu(with tableShare: tableShare?) -> UIMenu? {
