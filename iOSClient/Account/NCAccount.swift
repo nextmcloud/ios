@@ -108,6 +108,10 @@ class NCAccount: NSObject {
                 // set theming color
                 NCBrandColor.shared.settingThemingColor(account: account, capabilities: capabilities)
             }
+//            // Start the auto upload
+//            let num = await NCAutoUpload.shared.initAutoUpload(tblAccount: tblAccount)
+//            nkLog(start: "Auto upload with \(num) photo")
+            
             // Networking Process
             await NCNetworkingProcess.shared.setCurrentAccount(account)
 
@@ -193,6 +197,7 @@ class NCAccount: NSObject {
         guard let tblAccount = await NCManageDatabase.shared.getTableAccountAsync(predicate: NSPredicate(format: "account == %@", account)) else {
             return
         }
+
         let windowScene = SceneManager.shared.getWindowScene(controller: controller)
         await showErrorBanner(windowScene: windowScene, text: String(format: NSLocalizedString("_account_unauthorized_", comment: ""), account), errorCode: NCGlobal.shared.errorUnauthorized401)
 
