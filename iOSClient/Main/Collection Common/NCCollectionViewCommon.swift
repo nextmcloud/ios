@@ -4,10 +4,12 @@
 
 import UIKit
 import SwiftUI
+import Realm
 import RealmSwift
 import NextcloudKit
 import EasyTipView
 import LucidBanner
+import MoEngageInApps
 
 class NCCollectionViewCommon: UIViewController, NCAccountSettingsModelDelegate, UIGestureRecognizerDelegate, UISearchResultsUpdating, UISearchControllerDelegate, UISearchBarDelegate, UIAdaptivePresentationControllerDelegate, UIContextMenuInteractionDelegate {
 
@@ -101,6 +103,10 @@ class NCCollectionViewCommon: UIViewController, NCAccountSettingsModelDelegate, 
 
     internal let heightHeaderRecommendations: CGFloat = 160
     internal let heightHeaderSection: CGFloat = 30
+    var isTransitioning: Bool = false
+    var selectableDataSource: [RealmSwiftObject] { dataSource.getMetadataSourceForAllSections() }
+    var pushed: Bool = false
+    var emptyDataSet: NCEmptyDataSet?
 
     internal var isLayoutPhoto: Bool {
         layoutForView?.layout == global.layoutPhotoRatio || layoutForView?.layout == global.layoutPhotoSquare
@@ -152,7 +158,17 @@ class NCCollectionViewCommon: UIViewController, NCAccountSettingsModelDelegate, 
        SceneManager.shared.getWindowScene(controller: self.tabBarController as? NCMainTabBarController)
     }
 
-    internal var isNumberOfItemsInAllSectionsNull: Bool {
+    var defaultPredicate: NSPredicate {
+        let predicate = NSPredicate(format: "account == %@ AND serverUrl == %@ AND NOT (status IN %@) AND NOT (livePhotoFile != '' AND classFile == %@)", session.account, self.serverUrl, NCGlobal.shared.metadataStatusHideInView, NKCommon.TypeClassFile.video.rawValue)
+        return predicate
+    }
+
+    var personalFilesOnlyPredicate: NSPredicate {
+        let predicate = NSPredicate(format: "account == %@ AND serverUrl == %@ AND (ownerId == %@ || ownerId == '') AND mountType == '' AND NOT (status IN %@) AND NOT (livePhotoFile != '' AND classFile == %@)", session.account, self.serverUrl, session.userId, global.metadataStatusHideInView, NKCommon.TypeClassFile.video.rawValue)
+        return predicate
+    }
+    
+    var isNumberOfItemsInAllSectionsNull: Bool {
         var totalItems = 0
         for section in 0..<self.collectionView.numberOfSections {
             totalItems += self.collectionView.numberOfItems(inSection: section)
@@ -209,6 +225,7 @@ class NCCollectionViewCommon: UIViewController, NCAccountSettingsModelDelegate, 
             navigationItem.searchController = searchController
             navigationItem.hidesSearchBarWhenScrolling = false
             navigationItem.preferredSearchBarPlacement = .inline
+            navigationItem.backBarButtonItem = UIBarButtonItem(title: NSLocalizedString("_back_", comment: ""), style: .plain, target: nil, action: nil)
         }
 
         let interaction = UIEditMenuInteraction(delegate: self)
@@ -265,6 +282,14 @@ class NCCollectionViewCommon: UIViewController, NCAccountSettingsModelDelegate, 
         let dropInteraction = UIDropInteraction(delegate: self)
         self.navigationController?.navigationItem.leftBarButtonItems?.first?.customView?.addInteraction(dropInteraction)
 
+        if(!UserDefaults.standard.bool(forKey: "isInitialPrivacySettingsShowed") || isApplicationUpdated()){
+            redirectToPrivacyViewController()
+            
+            //set current app version
+            let appVersion = Bundle.main.infoDictionary?["CFBundleInfoDictionaryVersion"] as? String
+            UserDefaults.standard.set(appVersion, forKey: "CurrentAppVersion")
+        }
+        
         registerForTraitChanges([UITraitUserInterfaceStyle.self]) { [weak self] (view: NCCollectionViewCommon, _) in
             guard let self else { return }
             sectionFirstHeader?.setRichWorkspaceColor(style: view.traitCollection.userInterfaceStyle)
@@ -284,6 +309,8 @@ class NCCollectionViewCommon: UIViewController, NCAccountSettingsModelDelegate, 
                 await self.debouncerReloadData.resume()
             }
         }
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(updateIcons), name: NSNotification.Name(rawValue: global.notificationCenterUpdateIcons), object: nil)
 
         DispatchQueue.main.async {
             self.collectionView?.collectionViewLayout.invalidateLayout()
@@ -350,6 +377,10 @@ class NCCollectionViewCommon: UIViewController, NCAccountSettingsModelDelegate, 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
 
+        Task {
+            await NCNetworking.shared.transferDispatcher.addDelegate(self)
+        }
+
         NotificationCenter.default.addObserver(self, selector: #selector(applicationWillResignActive(_:)), name: UIApplication.willResignActiveNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(closeRichWorkspaceWebView), name: NSNotification.Name(rawValue: global.notificationCenterCloseRichWorkspaceWebView), object: nil)
     }
@@ -390,6 +421,23 @@ class NCCollectionViewCommon: UIViewController, NCAccountSettingsModelDelegate, 
 
     override var canBecomeFirstResponder: Bool {
         return true
+    }
+    
+    @objc func updateIcons() {
+        collectionView.reloadData()
+    }
+
+    func isApplicationUpdated() -> Bool {
+        let appVersion = Bundle.main.infoDictionary?["CFBundleInfoDictionaryVersion"] as? String ?? ""
+        let currentVersion = UserDefaults.standard.string(forKey: "CurrentAppVersion")
+        return currentVersion != appVersion
+    }
+    
+    func redirectToPrivacyViewController() {
+        let storyBoard: UIStoryboard = UIStoryboard(name: "NCSettings", bundle: nil)
+        let newViewController = storyBoard.instantiateViewController(withIdentifier: "privacySettingsNavigation") as? UINavigationController
+        newViewController?.modalPresentationStyle = .fullScreen
+        self.present(newViewController!, animated: true, completion: nil)
     }
 
     func presentationControllerDidDismiss( _ presentationController: UIPresentationController) {
@@ -589,7 +637,20 @@ class NCCollectionViewCommon: UIViewController, NCAccountSettingsModelDelegate, 
         }
     }
 
-    // MARK: - TAP EVENT
+
+    func tapRecommendations(with metadata: tableMetadata) {
+        didSelectMetadata(metadata, withOcIds: false)
+    }
+
+    func longPressListItem(with ocId: String, ocIdTransfer: String, gestureRecognizer: UILongPressGestureRecognizer) { }
+
+    func longPressGridItem(with ocId: String, ocIdTransfer: String, gestureRecognizer: UILongPressGestureRecognizer) { }
+
+    func longPressMoreListItem(with ocId: String, ocIdTransfer: String, gestureRecognizer: UILongPressGestureRecognizer) { }
+
+    func longPressPhotoItem(with ocId: String, ocIdTransfer: String, gestureRecognizer: UILongPressGestureRecognizer) { }
+
+    func longPressMoreGridItem(with ocId: String, ocIdTransfer: String, gestureRecognizer: UILongPressGestureRecognizer) { }
 
     @objc func longPressCollecationView(_ gestureRecognizer: UILongPressGestureRecognizer) {
         openMenuItems(with: nil, gestureRecognizer: gestureRecognizer)
@@ -601,6 +662,115 @@ class NCCollectionViewCommon: UIViewController, NCAccountSettingsModelDelegate, 
         }, actionProvider: { _ in
             return nil
         })
+    }
+
+    func openMenuItems(with objectId: String?, gestureRecognizer: UILongPressGestureRecognizer) {
+        if gestureRecognizer.state != .began { return }
+
+        var listMenuItems: [UIMenuItem] = []
+        let touchPoint = gestureRecognizer.location(in: collectionView)
+
+        becomeFirstResponder()
+
+        if !serverUrl.isEmpty {
+            listMenuItems.append(UIMenuItem(title: NSLocalizedString("_paste_file_", comment: ""), action: #selector(pasteFilesMenu(_:))))
+        }
+
+        if !listMenuItems.isEmpty {
+            UIMenuController.shared.menuItems = listMenuItems
+            UIMenuController.shared.showMenu(from: collectionView, rect: CGRect(x: touchPoint.x, y: touchPoint.y, width: 0, height: 0))
+        }
+    }
+
+    // MARK: - Menu Item
+
+    override func canPerformAction(_ action: Selector, withSender sender: Any?) -> Bool {
+        if #selector(pasteFilesMenu(_:)) == action {
+            if !UIPasteboard.general.items.isEmpty, !(metadataFolder?.e2eEncrypted ?? false) {
+                return true
+            }
+        } else if #selector(copyMenuFile(_:)) == action {
+            return true
+        } else if #selector(moveMenuFile(_:)) == action {
+            return true
+        }
+
+        return false
+    }
+
+    @objc func pasteFilesMenu(_ sender: Any?) {
+        Task {@MainActor in
+            guard let tblAccount = await NCManageDatabase.shared.getTableAccountAsync(account: session.account) else {
+                return
+            }
+            let scene = SceneManager.shared.getWindow(controller: controller)?.windowScene
+            let token = showHudBanner(
+                scene: scene,
+                title: NSLocalizedString("_upload_in_progress_", comment: ""))
+
+            for (index, items) in UIPasteboard.general.items.enumerated() {
+                for item in items {
+                    let capabilities = await NKCapabilities.shared.getCapabilities(for: session.account)
+                    let results = NKFilePropertyResolver().resolve(inUTI: item.key, capabilities: capabilities)
+                    guard let data = UIPasteboard.general.data(forPasteboardType: item.key,
+                                                               inItemSet: IndexSet([index]))?.first
+                    else {
+                        continue
+                    }
+                    let fileName = results.name + "_" + NCPreferences().incrementalNumber + "." + results.ext
+                    let serverUrlFileName = utilityFileSystem.createServerUrl(serverUrl: serverUrl, fileName: fileName)
+                    let ocIdUpload = UUID().uuidString
+                    let fileNameLocalPath = utilityFileSystem.getDirectoryProviderStorageOcId(
+                        ocIdUpload,
+                        fileName: fileName,
+                        userId: tblAccount.userId,
+                        urlBase: tblAccount.urlBase
+                    )
+                    do {
+                        try data.write(to: URL(fileURLWithPath: fileNameLocalPath))
+                    } catch {
+                        continue
+                    }
+
+                    let resultsUpload = await NCNetworking.shared.uploadFile(account: session.account,
+                                                                             fileNameLocalPath: fileNameLocalPath,
+                                                                             serverUrlFileName: serverUrlFileName) { _ in
+                    } progressHandler: { _, _, fractionCompleted in
+                        Task {@MainActor in
+                            LucidBanner.shared.update(progress: fractionCompleted, for: token)
+                        }
+                    }
+
+                    if resultsUpload.error == .success,
+                       let etag = resultsUpload.etag,
+                       let ocId = resultsUpload.ocId {
+                        let toPath = self.utilityFileSystem.getDirectoryProviderStorageOcId(
+                            ocId,
+                            fileName: fileName,
+                            userId: tblAccount.userId,
+                            urlBase: tblAccount.urlBase)
+                        self.utilityFileSystem.moveFile(atPath: fileNameLocalPath, toPath: toPath)
+                        NCManageDatabase.shared.addLocalFile(
+                            account: session.account,
+                            etag: etag,
+                            ocId: ocId,
+                            fileName: fileName)
+                        Task {
+                            await NCNetworking.shared.transferDispatcher.notifyAllDelegates { delegate in
+                                delegate.transferReloadData(serverUrl: serverUrl, requestData: true, status: nil)
+                            }
+                        }
+                    } else {
+                        Task {@MainActor in
+                            await showErrorBanner(scene: scene,
+                                                  errorDescription: resultsUpload.error.errorDescription,
+                                                  errorCode: resultsUpload.error.errorCode)
+                        }
+                    }
+                }
+            }
+            LucidBanner.shared.dismiss()
+        }
     }
 
     // MARK: - DataSource
