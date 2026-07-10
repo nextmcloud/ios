@@ -2,64 +2,82 @@
 // SPDX-FileCopyrightText: 2018 Marino Faggiana
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-import Foundation
 import UIKit
-import NextcloudKit
 
 protocol NCListCellDelegate: AnyObject {
     func onMenuIntent(with metadata: tableMetadata?)
-    func openContextMenu(with metadata: tableMetadata?, button: UIButton, sender: Any)
+    func contextMenu(with metadata: tableMetadata?, button: UIButton, sender: Any)
     func tapShareListItem(with metadata: tableMetadata?, button: UIButton, sender: Any)
 }
 
-class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellMainProtocol {
+class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProtocol {
     @IBOutlet weak var imageItem: UIImageView!
     @IBOutlet weak var imageSelect: UIImageView!
     @IBOutlet weak var imageStatus: UIImageView!
     @IBOutlet weak var imageFavorite: UIImageView!
     @IBOutlet weak var imageLocal: UIImageView!
-
     @IBOutlet weak var labelTitle: UILabel!
     @IBOutlet weak var labelInfo: UILabel!
-    @IBOutlet weak var labelSubinfo: UILabel!
     @IBOutlet weak var labelInfoSeparator: UILabel!
-    @IBOutlet weak var tag1: PaddedAndBorderedLabel!
-    @IBOutlet weak var tag2: PaddedAndBorderedLabel!
-    @IBOutlet weak var tagMore: PaddedAndBorderedLabel!
-    @IBOutlet weak var labelExtension: UILabel!
-
+    @IBOutlet weak var labelSubinfo: UILabel!
+    @IBOutlet weak var imageShared: UIImageView!
     @IBOutlet weak var buttonShared: UIButton!
+    @IBOutlet weak var imageMore: UIImageView!
     @IBOutlet weak var buttonMore: UIButton!
-    @IBOutlet weak var shareContainer: UIView!
-    @IBOutlet weak var moreContainer: UIView!
     @IBOutlet weak var separator: UIView!
+    @IBOutlet weak var tag0: UILabel!
+    @IBOutlet weak var tag1: UILabel!
 
     @IBOutlet weak var imageItemLeftConstraint: NSLayoutConstraint!
     @IBOutlet weak var separatorHeightConstraint: NSLayoutConstraint!
+    @IBOutlet weak var titleTrailingConstraint: NSLayoutConstraint!
 
     weak var delegate: NCListCellDelegate?
 
-    // Cell Protocol
     var metadata: tableMetadata? {
         didSet {
-            delegate?.openContextMenu(with: metadata, button: buttonMore, sender: self) /* preconfigure UIMenu with each metadata */
+            delegate?.contextMenu(with: metadata, button: buttonMore, sender: self) /* preconfigure UIMenu with each metadata */
         }
     }
-    var previewImg: UIImageView? {
+
+    var avatarImageView: UIImageView? {
+        return imageShared
+    }
+    var previewImageView: UIImageView? {
         get { return imageItem }
         set { imageItem = newValue }
     }
-    var localImg: UIImageView? {
-        get { return imageLocal }
-        set { imageLocal = newValue }
+    var title: UILabel? {
+        get { return labelTitle }
+        set { labelTitle = newValue }
     }
-    var statusImg: UIImageView? {
+    var info: UILabel? {
+        get { return labelInfo }
+        set { labelInfo = newValue }
+    }
+    var subInfo: UILabel? {
+        get { return labelSubinfo }
+        set { labelSubinfo = newValue }
+    }
+    var statusImageView: UIImageView? {
         get { return imageStatus }
         set { imageStatus = newValue }
     }
-    var infoLbl: UILabel? {
-        get { return labelInfo }
-        set { labelInfo = newValue }
+    var localImageView: UIImageView? {
+        get { return imageLocal }
+        set { imageLocal = newValue }
+    }
+    var favoriteImageView: UIImageView? {
+        get { return imageFavorite }
+        set { imageFavorite = newValue }
+    }
+    var shareImageView: UIImageView? {
+        get { return imageShared }
+        set { imageShared = newValue }
+    }
+    var separatorView: UIView? {
+        get { return separator }
+        set { separator = newValue }
     }
 
     override var accessibilityIdentifier: String? {
@@ -88,7 +106,6 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellMainP
 
     override func prepareForReuse() {
         super.prepareForReuse()
-
         initCell()
     }
 
@@ -104,83 +121,19 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellMainP
         imageStatus.image = nil
         imageFavorite.image = nil
         imageLocal.image = nil
+        labelTitle.text = ""
+        labelInfo.text = ""
+        labelSubinfo.text = ""
+        imageShared.image = nil
+        imageMore.image = nil
+        separatorHeightConstraint.constant = 0.5
+        tag0.text = ""
+        tag1.text = ""
+        titleTrailingConstraint.constant = 90
 
-        buttonShared.setImage(nil, for: .normal)
-        buttonShared.imageEdgeInsets = .zero
-
-        buttonMore.setImage(nil, for: .normal)
+        contentView.bringSubviewToFront(buttonMore)
         buttonMore.menu = nil
         buttonMore.showsMenuAsPrimaryAction = true
-
-        shareContainer.isHidden = false
-        moreContainer.isHidden = false
-
-        imageItemLeftConstraint.constant = 10
-        separatorHeightConstraint.constant = 0.5
-
-        // Dynamic Type Font Configuration
-        //
-        // These labels use fonts generated by the custom UIFont helpers defined in
-        // the UIFont extension (e.g. `.callout()`, `.caption1()`).
-        //
-        // Those helpers wrap `UIFontMetrics` to provide Dynamic Type scaling while
-        // applying an upper bound to the maximum font size. This ensures:
-        //
-        // - The text respects the user's preferred accessibility size.
-        // - The UI layout remains stable and does not grow indefinitely.
-        //
-        // `adjustsFontForContentSizeCategory` is enabled to allow UIKit to
-        // automatically update the font when the user changes the Dynamic Type
-        // setting while the application is running.
-        //
-        // Without this flag, the label would keep the initially computed font size
-        // and would not react to content size category changes.
-        //
-        // In summary:
-        //
-        // UIFont helper:
-        //     Defines how the font scales and its maximum size.
-        //
-        // adjustsFontForContentSizeCategory:
-        //     Enables live updates when accessibility settings change.
-        //
-        labelTitle.text = ""
-        labelTitle.font = .callout()
-        labelTitle.adjustsFontForContentSizeCategory = true
-
-        labelExtension.text = ""
-        labelExtension.isHidden = true
-        labelExtension.font = .callout()
-        labelExtension.adjustsFontForContentSizeCategory = true
-
-        labelInfo.text = ""
-        labelInfo.font = .footnote()
-        labelInfo.adjustsFontForContentSizeCategory = true
-
-        labelInfoSeparator.font = .footnote()
-        labelInfoSeparator.adjustsFontForContentSizeCategory = true
-
-        labelSubinfo.text = ""
-        labelSubinfo.font = .footnote()
-        labelSubinfo.adjustsFontForContentSizeCategory = true
-
-        tag1.text = ""
-        tag2.text = ""
-
-        tag1.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
-        tag2.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
-
-        tag1.setContentHuggingPriority(.defaultLow, for: .horizontal)
-        tag2.setContentHuggingPriority(.defaultLow, for: .horizontal)
-
-        tagMore.text = ""
-        tagMore.setContentCompressionResistancePriority(.required, for: .horizontal)
-        tagMore.setContentHuggingPriority(.required, for: .horizontal)
-    }
-
-    func setSharedAvatarImage(_ image: UIImage) {
-        buttonShared.setImage(image, for: .normal)
-        buttonShared.imageEdgeInsets = UIEdgeInsets(top: 4, left: 4, bottom: 4, right: 4)
     }
 
     override func snapshotView(afterScreenUpdates afterUpdates: Bool) -> UIView? {
@@ -192,52 +145,60 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellMainP
     }
 
     @objc private func handleTapObserver(_ g: UITapGestureRecognizer) {
-        let locationInButton = g.location(in: buttonMore)
+        let location = g.location(in: contentView)
 
-        if buttonMore.bounds.contains(locationInButton) {
+        if buttonMore.frame.contains(location) {
             delegate?.onMenuIntent(with: metadata)
         }
     }
 
+    // Allow the button to receive taps even with the long press gesture
     func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
-        let locationInButton = touch.location(in: buttonMore)
-        let result = buttonMore.bounds.contains(locationInButton)
+        let location = touch.location(in: contentView)
+        return buttonMore.frame.contains(location)
+    }
 
-        return result
+    func titleInfoTrailingFull() {
+        titleTrailingConstraint.constant = 10
     }
 
     func setButtonMore(image: UIImage) {
-        buttonMore.setImage(image, for: .normal)
+        imageMore.image = image
+    }
+
+    func hideButtonMore(_ status: Bool) {
+        imageMore.isHidden = status
+        buttonMore.isHidden = status
     }
 
     func hideButtonShare(_ status: Bool) {
+        imageShared.isHidden = status
         buttonShared.isHidden = status
-        shareContainer.isHidden = status
     }
 
-    func setButtonsHidden(_ hidden: Bool) {
-        buttonShared.isHidden = hidden
-        buttonMore.isHidden = hidden
-        shareContainer.isHidden = hidden
-        moreContainer.isHidden = hidden
-    }
+    func selected(_ status: Bool, isEditMode: Bool) {
+        // E2EE - remove encrypt folder selection
+        if let metadata = NCManageDatabase.shared.getMetadataFromOcId(self.metadata?.ocId), metadata.e2eEncrypted {
+            imageSelect.isHidden = true
+        } else {
+            imageSelect.isHidden = isEditMode ? false : true
+        }
 
-    func selected(_ status: Bool, isEditMode: Bool, color: UIColor) {
         if isEditMode {
             imageItemLeftConstraint.constant = 45
-            imageSelect.isHidden = false
+//            imageSelect.isHidden = false
+            imageShared.isHidden = true
+            imageMore.isHidden = true
             buttonShared.isHidden = true
             buttonMore.isHidden = true
-            shareContainer.isHidden = true
-            moreContainer.isHidden = true
             accessibilityCustomActions = nil
         } else {
             imageItemLeftConstraint.constant = 10
-            imageSelect.isHidden = true
+//            imageSelect.isHidden = true
+            imageShared.isHidden = false
+            imageMore.isHidden = false
             buttonShared.isHidden = false
             buttonMore.isHidden = false
-            shareContainer.isHidden = false
-            moreContainer.isHidden = false
             backgroundView = nil
         }
         if status {
@@ -246,11 +207,11 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellMainP
             blurEffectView?.backgroundColor = .lightGray
             blurEffectView?.frame = self.bounds
             blurEffectView?.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-            imageSelect.image = NCImageCache.shared.getImageCheckedYes(color: color)
+            imageSelect.image = NCImageCache.shared.getImageCheckedYes()
             backgroundView = blurEffectView
             separator.isHidden = true
         } else {
-            imageSelect.image = NCImageCache.shared.getImageCheckedNo(color: color)
+            imageSelect.image = NCImageCache.shared.getImageCheckedNo()
             backgroundView = nil
             separator.isHidden = false
         }
@@ -267,69 +228,28 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellMainP
         accessibilityValue = value
     }
 
-    func setTags(tags: [tableMetadataTag]) {
-        applyDefaultTagBorderStyle()
-
+    func setTags(tags: [String]) {
         if tags.isEmpty {
+            tag0.isHidden = true
             tag1.isHidden = true
-            tag2.isHidden = true
-            tagMore.isHidden = true
             labelInfo.isHidden = false
             labelSubinfo.isHidden = false
-            labelInfoSeparator.isHidden = false
+//            labelInfoSeparator.isHidden = false
         } else {
+            tag0.isHidden = false
+            tag1.isHidden = true
             labelInfo.isHidden = true
             labelSubinfo.isHidden = true
-            labelInfoSeparator.isHidden = true
+//            labelInfoSeparator.isHidden = true
 
-            tag1.isHidden = true
-            tag2.isHidden = true
-            tagMore.isHidden = true
-
-            if tags.count >= 1 {
-                let firstTag = tags[0]
-                tag1.isHidden = false
-                tag1.text = firstTag.name
-                applyTagBorderStyle(tag1, colorHex: firstTag.color)
-            }
-            if tags.count >= 2 {
-                let secondTag = tags[1]
-                tag2.isHidden = false
-                tag2.text = secondTag.name
-                applyTagBorderStyle(tag2, colorHex: secondTag.color)
-            }
-            if tags.count > 2 {
-                tagMore.isHidden = false
-                tagMore.text = "+\(tags.count - 2)"
+            if let tag = tags.first {
+                tag0.text = tag
+                if tags.count > 1 {
+                    tag1.isHidden = false
+                    tag1.text = "+\(tags.count - 1)"
+                }
             }
         }
-
-    }
-
-    private func applyDefaultTagBorderStyle() {
-        tag1.backgroundColor = .clear
-        tag2.backgroundColor = .clear
-        tagMore.backgroundColor = .clear
-        tag1.borderColor = .systemGray5
-        tag2.borderColor = .systemGray5
-        tagMore.borderColor = .systemGray5
-        tag1.textColor = .systemGray
-        tag2.textColor = .systemGray
-        tagMore.textColor = .systemGray
-        tag1.setNeedsDisplay()
-        tag2.setNeedsDisplay()
-        tagMore.setNeedsDisplay()
-    }
-
-    private func applyTagBorderStyle(_ label: PaddedAndBorderedLabel, colorHex: String?) {
-        guard let colorHex, let color = UIColor(hex: colorHex) else {
-            return
-        }
-
-        label.backgroundColor = .clear
-        label.borderColor = color
-        label.textColor = color
-        label.setNeedsDisplay()
     }
 
     func setIconOutlines() {
@@ -340,7 +260,7 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellMainP
         if imageFavorite.image != nil {
             let outlineView = UIImageView()
             outlineView.translatesAutoresizingMaskIntoConstraints = false
-            outlineView.image = UIImage(systemName: "star")
+            outlineView.image = UIImage(systemName: "star.fill")
             outlineView.preferredSymbolConfiguration = UIImage.SymbolConfiguration(pointSize: 16, weight: .thin)
             outlineView.tintColor = .systemBackground
 
@@ -357,6 +277,7 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellMainP
                 view.removeFromSuperview()
             }
         }
+
     }
 
     override func layoutSubviews() {
@@ -410,181 +331,75 @@ class NCListLayout: UICollectionViewFlowLayout {
     }
 }
 
-#if !EXTENSION
-extension NCCollectionViewCommon {
-    func listCell(cell: NCListCell, indexPath: IndexPath, metadata: tableMetadata) -> NCListCell {
-        defer {
-            let capabilities = NCNetworking.shared.capabilities[session.account] ?? NKCapabilities.Capabilities()
-            if !metadata.isSharable() || (!capabilities.fileSharingApiEnabled && !capabilities.filesComments && capabilities.activity.isEmpty) {
-                cell.hideButtonShare(true)
-            }
-        }
-        var isShare = false
-        var isMounted = false
-        var a11yValues: [String] = []
-        let existsImagePreview = utilityFileSystem.fileProviderStorageImageExists(metadata.ocId, etag: metadata.etag, userId: metadata.userId, urlBase: metadata.urlBase)
-
-        // CONTENT MODE
-        cell.previewImg?.layer.borderWidth = 0
-
-        if existsImagePreview && layoutForView?.layout != global.layoutPhotoRatio {
-            cell.previewImg?.contentMode = .scaleAspectFill
-        } else {
-            cell.previewImg?.contentMode = .scaleAspectFit
-        }
-
-        guard let metadata = self.dataSource.getMetadata(indexPath: indexPath) else {
-            return cell
-        }
-
-        if let metadataFolder {
-            isShare = metadata.permissions.contains(NCMetadataPermissions.permissionShared) && !metadataFolder.permissions.contains(NCMetadataPermissions.permissionShared)
-            isMounted = metadata.permissions.contains(NCMetadataPermissions.permissionMounted) && !metadataFolder.permissions.contains(NCMetadataPermissions.permissionMounted)
-        }
-
-        if isSearchingMode {
-            if metadata.name == global.appName {
-                cell.labelInfo?.text = NSLocalizedString("_in_", comment: "") + " " + utilityFileSystem.getPath(path: metadata.path, user: metadata.user)
-            } else {
-                cell.labelInfo?.text = metadata.subline
-            }
-            cell.labelSubinfo?.isHidden = true
-        } else if !metadata.sessionError.isEmpty, metadata.status != global.metadataStatusNormal {
-            cell.labelSubinfo?.isHidden = false
-            cell.labelInfo?.text = metadata.sessionError
-        } else {
-            cell.labelSubinfo?.isHidden = false
-            cell.writeInfoDateSize(date: metadata.date, size: metadata.size)
-        }
-
-        cell.setBidiSafeFilename(metadata.fileNameView, isDirectory: metadata.directory, titleLabel: cell.labelTitle, extensionLabel: cell.labelExtension)
-
-        // Accessibility [shared] if metadata.ownerId != appDelegate.userId, appDelegate.account == metadata.account {
-        if metadata.ownerId != metadata.userId {
-            a11yValues.append(NSLocalizedString("_shared_with_you_by_", comment: "") + " " + metadata.ownerDisplayName)
-        }
-
-        if metadata.directory {
-            cellMainDirectory(cell: cell, metadata: metadata, isShare: isShare, isMounted: isMounted)
-        } else {
-            cellMainFile(cell: cell, metadata: metadata, a11yValues: &a11yValues)
-        }
-
-        // image Favorite
-        if metadata.favorite {
-            cell.imageFavorite?.image = imageCache.getImageFavorite()
-            a11yValues.append(NSLocalizedString("_favorite_short_", comment: ""))
-        }
-
-        // Share button image (SF Symbol)
-        if isShare {
-            cell.buttonShared.setImage(imageCache.getImageShared(), for: .normal)
-        } else if !metadata.shareType.isEmpty {
-            metadata.shareType.contains(NKShare.ShareType.publicLink.rawValue) ?
-            (cell.buttonShared.setImage(imageCache.getImageShareByLink(), for: .normal)) :
-            (cell.buttonShared.setImage(imageCache.getImageShared(), for: .normal))
-        } else {
-            cell.buttonShared.setImage(imageCache.getImageCanShare(), for: .normal)
-        }
-
-        // Button More
-        if metadata.lock == true {
-            cell.setButtonMore(image: imageCache.getImageButtonMoreLock())
-            a11yValues.append(String(format: NSLocalizedString("_locked_by_", comment: ""), metadata.lockOwnerDisplayName))
-        } else {
-            cell.setButtonMore(image: imageCache.getImageButtonMore())
-        }
-
-        // Status
-        cellMainStatus(cell: cell, metadata: metadata, a11yValues: &a11yValues)
-
-        // AVATAR
-        if !metadata.ownerId.isEmpty, metadata.ownerId != metadata.userId {
-            let fileName = NCSession.shared.getFileName(urlBase: metadata.urlBase, user: metadata.ownerId)
-            if let image = NCImageCache.shared.getImageCache(key: fileName) {
-                cell.setSharedAvatarImage(image)
-            } else {
-                self.database.getImageAvatarLoaded(fileName: fileName) { image, tblAvatar in
-                    if let image {
-                        cell.setSharedAvatarImage(image)
-                        NCImageCache.shared.addImageCache(image: image, key: fileName)
-                    } else {
-                        let image = self.utility.loadUserImage(for: metadata.ownerId, displayName: metadata.ownerDisplayName, urlBase: metadata.urlBase)
-                        cell.setSharedAvatarImage(image)
-                    }
-
-                    if !(tblAvatar?.loaded ?? false),
-                       self.networking.downloadAvatarQueue.operations.filter({ ($0 as? NCOperationDownloadAvatar)?.fileName == fileName }).isEmpty {
-                        self.networking.downloadAvatarQueue.addOperation(NCOperationDownloadAvatar(user: metadata.ownerId, fileName: fileName, account: metadata.account, view: self.collectionView))
-                    }
-                }
-            }
-        }
-
-        // URL
-        if metadata.classFile == NKTypeClassFile.url.rawValue {
-            cell.imageLocal.image = nil
-            cell.setButtonsHidden(true)
-        }
-
-        // Separator
-        if collectionView.numberOfItems(inSection: indexPath.section) == indexPath.row + 1 || isSearchingMode {
-            cell.separator?.isHidden = true
-        } else {
-            cell.separator?.isHidden = false
-        }
-
-        // Edit mode
-        if fileSelect.contains(metadata.ocId) {
-            cell.selected(true, isEditMode: isEditMode, color: NCBrandColor.shared.getElement(account: session.account))
-            a11yValues.append(NSLocalizedString("_selected_", comment: ""))
-        } else {
-            cell.selected(false, isEditMode: isEditMode, color: NCBrandColor.shared.getElement(account: session.account))
-        }
-
-        // Accessibility
-        cell.setAccessibility(label: metadata.fileNameView + ", " + (cell.labelInfo?.text ?? "") + (cell.labelSubinfo?.text ?? ""), value: a11yValues.joined(separator: ", "))
-
-        // Color string find in search
-        cell.labelTitle?.textColor = NCBrandColor.shared.textColor
-        cell.labelExtension?.textColor = NCBrandColor.shared.textColor
-
-        if isSearchingMode,
-           let searchResultStore,
-           !searchResultStore.isEmpty,
-           let title = cell.labelTitle?.text {
-            let attributedString = NSMutableAttributedString(string: title)
-            let nsTitle = title as NSString
-            let range = nsTitle.range(of: searchResultStore, options: [.caseInsensitive])
-            let color = NCBrandColor.shared.getElement(account: session.account)
-
-            if range.location != NSNotFound,
-               NSMaxRange(range) <= nsTitle.length {
-                attributedString.addAttribute(.foregroundColor, value: color, range: range)
-            }
-
-            cell.labelTitle?.attributedText = attributedString
-        }
-
-        // TAGS
-        cell.setTags(tags: Array(metadata.tags))
-
-        // SearchingMode - TAG Separator Hidden
-        if isSearchingMode {
-            cell.labelInfoSeparator.isHidden = true
-        }
-
-        // Hide buttons
-        if metadata.name != global.appName {
-            cell.setButtonsHidden(true)
-        }
-
-        cell.setIconOutlines()
-
-        // Obligatory here, at the end !!
-        cell.metadata = metadata
-
-        return cell
-    }
-}
-#endif
+//class BidiFilenameLabel: UILabel {
+//    var fullFilename: String = ""
+//
+//    var isFolder: Bool = false
+//
+//    var isRTL: Bool = false
+//
+//    override init(frame: CGRect) {
+//        super.init(frame: frame)
+//    }
+//
+//    required init?(coder: NSCoder) {
+//        super.init(coder: coder)
+//    }
+//
+//    override func layoutSubviews() {
+//        super.layoutSubviews()
+//        updateText()
+//    }
+//
+//    private func updateText() {
+//        guard !fullFilename.isEmpty else {
+//            self.text = ""
+//            return
+//        }
+//
+//        let availableWidth = bounds.width
+//        guard availableWidth > 0 else { return }
+//
+//        let isRTL = UIView.userInterfaceLayoutDirection(for: semanticContentAttribute) == .rightToLeft
+//        let sanitizedFilename = fullFilename.sanitizeForBidiCharacters(isFolder: isFolder, isRTL: isRTL)
+//
+//        let nsFilename = sanitizedFilename as NSString
+//        let ext = nsFilename.pathExtension
+//        let base = nsFilename.deletingPathExtension
+//
+//        let dotExt = ext.isEmpty ? "" : "." + ext
+//        let truncatedBase = truncateBase(base: base, dotExt: dotExt, maxWidth: availableWidth, font: font ?? UIFont.systemFont(ofSize: 17))
+//
+//        self.text = sanitizedFilename.replacingOccurrences(of: base, with: truncatedBase)
+//    }
+//
+//    private func truncateBase(base: String, dotExt: String, maxWidth: CGFloat, font: UIFont) -> String {
+//        let extWidth = (dotExt as NSString).size(withAttributes: [.font: font]).width
+//
+//        if (base as NSString).size(withAttributes: [.font: font]).width + extWidth <= maxWidth {
+//            return base
+//        }
+//
+//        let characters = Array(base)
+//        var low = 0
+//        var high = characters.count
+//        var result = ""
+//
+//        while low <= high {
+//            let mid = (low + high) / 2
+//            let prefixCount = mid / 2
+//            let suffixCount = mid - prefixCount
+//            let finalString = String(characters.prefix(prefixCount)) + "…" + String(characters.suffix(suffixCount))
+//            let finalStringWidth = (finalString as NSString).size(withAttributes: [.font: font]).width + extWidth
+//
+//            if finalStringWidth <= maxWidth {
+//                result = finalString
+//                low = mid + 1
+//            } else {
+//                high = mid - 1
+//            }
+//        }
+//
+//        return result
+//    }
+//}
