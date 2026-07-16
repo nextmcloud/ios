@@ -113,44 +113,8 @@ class NCShareAdvancePermissionHeader: UITableViewHeaderFooterView {
     let utility = NCUtility()
     let utilityFileSystem = NCUtilityFileSystem()
     var shares: (firstShareLink: tableShare?, share: [tableShare]?) = (nil, nil)
-
-    func setupUI(with metadata: tableMetadata) {
-        fileName.textColor = NCBrandColor.shared.label
-        info.textColor = NCBrandColor.shared.textInfo
-
-        let isShare = metadata.permissions.contains(NCPermissions().permissionShared)
-
-        if let image = NCUtility().getImage(ocId: metadata.ocId, etag: metadata.etag, ext: NCGlobal.shared.previewExt1024, userId: metadata.userId, urlBase: metadata.urlBase) {
-            fullWidthImageView.image = image
-            fullWidthImageView.contentMode = .scaleAspectFill
-            imageView.isHidden = true
-        } else {
-            imageView.isHidden = false
-            if metadata.e2eEncrypted {
-                imageView.image = NCImageCache.shared.getFolderEncrypted()
-            } else if isShare || !metadata.shareType.isEmpty {
-                imageView.image = NCImageCache.shared.getFolderPublic()
-            } else if !metadata.shareType.isEmpty {
-                imageView.image = metadata.shareType.contains(3)
-                    ? NCImageCache.shared.getFolderPublic()
-                    : NCImageCache.shared.getFolderSharedWithMe()
-            } else if metadata.permissions.contains("S"), (metadata.permissions.range(of: "S") != nil) {
-                imageView.image = NCImageCache.shared.getImageSharedWithMe()
-            } else if metadata.directory {
-                imageView.image = NCImageCache.shared.getFolder()
-            } else if !metadata.iconName.isEmpty {
-                imageView.image = NCUtility().loadImage(named: metadata.iconName, useTypeIconFile: true, account: metadata.account)
-            } else {
-                imageView.image = NCImageCache.shared.getImageFile()
-            }
-        }
-
-        fileName.text = metadata.fileNameView
-        fileName.textColor = NCBrandColor.shared.fileFolderName
-
-        updateFavoriteIcon(isFavorite: metadata.favorite)
-        info.text = utilityFileSystem.transformedSize(metadata.size) + ", " + utility.getRelativeDateTitle(metadata.date as Date)
-    }
+    var shareLinks: [tableShare] = []
+    var shareEmails: [tableShare] = []
     
     func setupUI(with metadata: tableMetadata, linkCount: Int, emailCount: Int) {
         fileName.textColor = NCBrandColor.shared.label

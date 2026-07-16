@@ -25,6 +25,7 @@
 #import "TOPasscodeViewControllerAnimatedTransitioning.h"
 #import "TOPasscodeKeypadView.h"
 #import "TOPasscodeInputField.h"
+#import "NCBridgeSwift.h"
 
 @interface TOPasscodeViewController () <UIViewControllerTransitioningDelegate>
 
@@ -188,6 +189,7 @@
     if (!self.rightAccessoryButton && !self.cancelButton) {
         self.cancelButton = [UIButton buttonWithType:UIButtonTypeSystem];
         [self.cancelButton setTitle:NSLocalizedString(@"_cancel_", @"Cancel") forState:UIControlStateNormal];
+        [self.cancelButton setTitleColor: NCBrandColor.shared.shareBlackColor forState:UIControlStateNormal];
         self.cancelButton.titleLabel.font = buttonFont;
         [self.cancelButton addTarget:self action:@selector(accessoryButtonTapped:) forControlEvents:UIControlEventTouchUpInside];
         // If cancelling is disabled, we hide the cancel button but we still create it, because it can
@@ -329,6 +331,7 @@
     self.cancelButton.tintColor = accessoryTintColor;
     self.leftAccessoryButton.tintColor = accessoryTintColor;
     self.rightAccessoryButton.tintColor = accessoryTintColor;
+    self.cancelButton.tintColor = accessoryTintColor;
 
     self.backgroundView.backgroundColor = isDark ? [UIColor colorWithWhite:0.1f alpha:1.0f] : [UIColor whiteColor];
 }
@@ -341,10 +344,10 @@
     }
 
     CGFloat pointSize = 17.0f;
-    if (width < (CGFloat)TOPasscodeViewContentSizeMedium) {
+    if (width < TOPasscodeViewContentSizeMedium) {
         pointSize = 14.0f;
     }
-    else if (width < (CGFloat)TOPasscodeViewContentSizeDefault) {
+    else if (width < TOPasscodeViewContentSizeDefault) {
         pointSize = 16.0f;
     }
 
@@ -361,10 +364,10 @@
     CGFloat width = MIN(size.width, size.height);
 
     CGFloat verticalInset = 44.0f;
-    if (width < (CGFloat)TOPasscodeViewContentSizeMedium) {
+    if (width < TOPasscodeViewContentSizeMedium) {
         verticalInset = 20.0f;
     }
-    else if (width < (CGFloat)TOPasscodeViewContentSizeDefault) {
+    else if (width < TOPasscodeViewContentSizeDefault) {
         verticalInset = 30.0f;
     }
     
@@ -400,10 +403,10 @@
     CGFloat buttonInset = self.passcodeView.keypadButtonInset;
     CGFloat width = MIN(size.width, size.height);
     CGFloat verticalInset = 35.0f;
-    if (width < (CGFloat)TOPasscodeViewContentSizeMedium) {
+    if (width < TOPasscodeViewContentSizeMedium) {
         verticalInset = 30.0f;
     }
-    else if (width < (CGFloat)TOPasscodeViewContentSizeDefault) {
+    else if (width < TOPasscodeViewContentSizeDefault) {
         verticalInset = 35.0f;
     }
 
@@ -708,4 +711,3 @@
 }
 
 @end
-

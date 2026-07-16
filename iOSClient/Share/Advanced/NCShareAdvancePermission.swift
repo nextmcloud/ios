@@ -62,6 +62,10 @@ class NCShareAdvancePermission: UITableViewController, NCShareAdvanceFotterDeleg
         SceneManager.shared.getWindowScene(controller: controller)
     }
     
+    var shares: (firstShareLink: tableShare?, share: [tableShare]?) = (nil, nil)
+    var shareLinks: [tableShare] = []
+    var shareEmails: [tableShare] = []
+   
     override func viewDidLoad() {
         super.viewDidLoad()
         self.shareConfig = NCShareConfig(parentMetadata: metadata, share: share)
@@ -111,10 +115,12 @@ class NCShareAdvancePermission: UITableViewController, NCShareAdvanceFotterDeleg
     }
 
     func setupHeaderView() {
-        guard let headerView = (Bundle.main.loadNibNamed("NCShareHeader", owner: self, options: nil)?.first as? NCShareHeader) else { return }
-        headerView.setupUI(with: metadata)
+        guard let headerView = (Bundle.main.loadNibNamed("NCShareAdvancePermissionHeader", owner: self, options: nil)?.first as? NCShareAdvancePermissionHeader) else { return }
+        headerView.ocId = metadata.ocId
+        headerView.shares = self.shares
+        headerView.setupUI(with: metadata, linkCount: shareLinks.count, emailCount: shareEmails.count)
 
-        let container = UIView(frame: CGRect(x: 0, y: 0, width: view.frame.width, height: 220))
+        let container = UIView(frame: CGRect(x: 0, y: 0, width: view.frame.width, height: 200))
         container.addSubview(headerView)
         tableView.tableHeaderView = container
         headerView.translatesAutoresizingMaskIntoConstraints = false

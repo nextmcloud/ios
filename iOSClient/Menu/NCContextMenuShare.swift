@@ -34,15 +34,15 @@ class NCContextMenuShare: NSObject {
         var actions: [UIMenuElement] = []
 
         // Add share link (only for public links with reshare permission)
-        if share.shareType == NKShare.ShareType.publicLink.rawValue, canReshare {
-            let addLinkAction = UIAction(
-                title: NSLocalizedString("_share_add_sharelink_", comment: ""),
-                image: utility.loadImage(named: "plus", colors: [NCBrandColor.shared.brandElement])
-            ) { [self] _ in
-                shareController.makeNewLinkShare()
-            }
-            actions.append(addLinkAction)
-        }
+//        if share.shareType == NKShare.ShareType.publicLink.rawValue, canReshare {
+//            let addLinkAction = UIAction(
+//                title: NSLocalizedString("_share_add_sharelink_", comment: ""),
+//                image: utility.loadImage(named: "plus", colors: [NCBrandColor.shared.brandElement])
+//            ) { [self] _ in
+//                shareController.makeNewLinkShare()
+//            }
+//            actions.append(addLinkAction)
+//        }
 
         // Add share link (only for public links with reshare permission)
         if share.shareType == NKShare.ShareType.publicLink.rawValue, canReshare {
@@ -166,6 +166,9 @@ class NCContextMenuShare: NSObject {
         advancePermission.oldTableShare = tableShare(value: share)
         advancePermission.metadata = metadata
         advancePermission.controller = controller
+        advancePermission.shares = shareController.shares
+        advancePermission.shareEmails = shareController.shareEmails
+        advancePermission.shareLinks = shareController.shareLinks
 
         if let downloadLimit = try? database.getDownloadLimit(byAccount: metadata.account, shareToken: share.token) {
             advancePermission.downloadLimit = .limited(limit: downloadLimit.limit, count: downloadLimit.count)
