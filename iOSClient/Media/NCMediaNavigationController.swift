@@ -272,19 +272,18 @@ class NCMediaNavigationController: NCMainNavigationController {
                 }
             ),
             
-//            UIAction(
-//                title: NSLocalizedString("_albums_list_new_album_popup_title_", comment: ""),
-//                image: utility.loadImage(named: "open_file", colors: [NCBrandColor.shared.iconImageColor], size: 24).withTintColor(NCBrandColor.shared.iconImageColor),//, colors: [NCBrandColor.shared.iconImageColor]),
-////                state: NCPreferences().mediaSortDate == "uploadDate" ? .on : .off,
-//                handler: { _ in
-//                    NCPreferences().mediaSortDate = "uploadDate"
-//                    Task {
-//                        await media.loadDataSource()
-//                        await media.networkRemoveAll()
-//                        await self.updateRightMenu()
-//                    }
-//                }
-//            )
+            UIAction(
+                title: NSLocalizedString("_albums_list_new_album_popup_title_", comment: ""),
+                image: utility.loadImage(named: "album", colors: [NCBrandColor.shared.iconImageColor], size: 24).withTintColor(NCBrandColor.shared.iconImageColor),
+                handler: { _ in
+                    guard let controller = self.controller else { return }
+                    NCMediaNavigationController.presentInputAlbumNameAlert(on: controller) { albumName in
+                        NCMediaNavigationController.createNewAlbum(for: albumName, selectedPhotos: media.fileSelect, controller: controller, account: controller.account)
+                    } onCancel: {
+                       
+                    }
+                }
+            )
         ]
 
         let mediaSortMenu = UIMenu(
@@ -351,7 +350,7 @@ class NCMediaNavigationController: NCMainNavigationController {
         viewController.present(alert, animated: true)
     }
      
-     static private func createNewAlbum(for name: String, selectedPhotos: [String], controller: UIViewController) {
+     static private func createNewAlbum(for name: String, selectedPhotos: [String], controller: UIViewController, account: String) {
          
          guard  let delegate = UIApplication.shared.delegate as? AppDelegate else { return }
          
@@ -382,7 +381,7 @@ class NCMediaNavigationController: NCMainNavigationController {
         }, onCreateAlbum: {
             presentingController.dismiss(animated: true)
             presentInputAlbumNameAlert(on: presentingController) { albumName in
-                createNewAlbum(for: albumName, selectedPhotos: selectedPhotos, controller: presentingController)
+                createNewAlbum(for: albumName, selectedPhotos: selectedPhotos, controller: presentingController, account: account)
             } onCancel: {
                
             }
