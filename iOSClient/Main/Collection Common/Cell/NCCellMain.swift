@@ -86,23 +86,23 @@ extension NCCollectionViewCommon {
         let tblDirectory = database.getTableDirectory(ocId: metadata.ocId)
 
         if metadata.e2eEncrypted {
-            cell.previewImg?.image = imageCache.getFolderEncrypted(account: metadata.account)
+            cell.previewImg?.image = imageCache.getFolderEncrypted()
         } else if isShare {
-            cell.previewImg?.image = imageCache.getFolderSharedWithMe(account: metadata.account)
+            cell.previewImg?.image = imageCache.getFolderSharedWithMe()
         } else if !metadata.shareType.isEmpty {
             metadata.shareType.contains(NKShare.ShareType.publicLink.rawValue) ?
-            (cell.previewImg?.image = imageCache.getFolderPublic(account: metadata.account)) :
-            (cell.previewImg?.image = imageCache.getFolderSharedWithMe(account: metadata.account))
+            (cell.previewImg?.image = imageCache.getFolderPublic()) :
+            (cell.previewImg?.image = imageCache.getFolderSharedWithMe())
         } else if !metadata.shareType.isEmpty && metadata.shareType.contains(NKShare.ShareType.publicLink.rawValue) {
-            cell.previewImg?.image = imageCache.getFolderPublic(account: metadata.account)
+            cell.previewImg?.image = imageCache.getFolderPublic()
         } else if metadata.mountType == "group" {
-            cell.previewImg?.image = imageCache.getFolderGroup(account: metadata.account)
+            cell.previewImg?.image = imageCache.getFolderGroup()
         } else if isMounted {
-            cell.previewImg?.image = imageCache.getFolderExternal(account: metadata.account)
+            cell.previewImg?.image = imageCache.getFolderExternal()
         } else if metadata.fileName == autoUploadFileName && metadata.serverUrl == autoUploadDirectory {
-            cell.previewImg?.image = imageCache.getFolderAutomaticUpload(account: metadata.account)
+            cell.previewImg?.image = imageCache.getFolderAutomaticUpload()
         } else {
-            cell.previewImg?.image = imageCache.getFolder(account: metadata.account)
+            cell.previewImg?.image = imageCache.getFolder()
         }
 
         // Local image: offline
@@ -147,7 +147,7 @@ extension NCCollectionViewCommon {
             case let str where str.contains("contacts"):
                 cell.previewImg?.image = utility.loadImage(named: "person.crop.rectangle.stack", colors: [NCBrandColor.shared.iconImageColor])
             case let str where str.contains("conversation"):
-                cell.previewImg?.image = UIImage(named: "talk-template")!.image(color: NCBrandColor.shared.getElement(account: metadata.account))
+                cell.previewImg?.image = UIImage(named: "talk-template")!.image(color: NCBrandColor.shared.brand)
             case let str where str.contains("calendar"):
                 cell.previewImg?.image = utility.loadImage(named: "calendar", colors: [NCBrandColor.shared.iconImageColor])
             case let str where str.contains("deck"):
@@ -155,7 +155,7 @@ extension NCCollectionViewCommon {
             case let str where str.contains("mail"):
                 cell.previewImg?.image = utility.loadImage(named: "mail", colors: [NCBrandColor.shared.iconImageColor])
             case let str where str.contains("talk"):
-                cell.previewImg?.image = UIImage(named: "talk-template")!.image(color: NCBrandColor.shared.getElement(account: metadata.account))
+                cell.previewImg?.image = UIImage(named: "talk-template")!.image(color: NCBrandColor.shared.brand)
             case let str where str.contains("confirm"):
                 cell.previewImg?.image = utility.loadImage(named: "arrow.right", colors: [NCBrandColor.shared.iconImageColor])
             case let str where str.contains("pages"):

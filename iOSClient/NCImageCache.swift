@@ -248,34 +248,6 @@ final class NCImageCache: @unchecked Sendable {
         return utility.loadImage(named: "lock.fill", colors: colors)
     }
 
-    func getFolder(account: String) -> UIImage {
-        return UIImage(named: "folder")!.image(color: NCBrandColor.shared.getElement(account: account))
-    }
-
-    func getFolderEncrypted(account: String) -> UIImage {
-        return UIImage(named: "folderEncrypted")!.image(color: NCBrandColor.shared.getElement(account: account))
-    }
-
-    func getFolderSharedWithMe(account: String) -> UIImage {
-        return UIImage(named: "folder_shared_with_me")!.image(color: NCBrandColor.shared.getElement(account: account))
-    }
-
-    func getFolderPublic(account: String) -> UIImage {
-        return UIImage(named: "folder_public")!.image(color: NCBrandColor.shared.getElement(account: account))
-    }
-
-    func getFolderGroup(account: String) -> UIImage {
-        return UIImage(named: "folder_group")!.image(color: NCBrandColor.shared.getElement(account: account))
-    }
-
-    func getFolderExternal(account: String) -> UIImage {
-        return UIImage(named: "folder_external")!.image(color: NCBrandColor.shared.getElement(account: account))
-    }
-
-    func getFolderAutomaticUpload(account: String) -> UIImage {
-        return UIImage(named: "folderAutomaticUpload")!.image(color: NCBrandColor.shared.getElement(account: account))
-    }
-    
     // MARK: -
 
     struct images {
@@ -375,57 +347,7 @@ final class NCImageCache: @unchecked Sendable {
         NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterChangeTheming)
     }
     
-//    func getImageFile(colors: [UIColor] = [NCBrandColor.shared.iconImageColor2]) -> UIImage {
-//        return UIImage(named: "file")!.image(color: colors.first!, size: 24)
-//    }
-//
-//    func getImageShared(colors: [UIColor] = [NCBrandColor.shared.iconSystemGrayColor]) -> UIImage {
-//        return utility.loadImage(named: "share", colors: colors, size: 24)
-//    }
-//
-//    func getImageCanShare(colors: [UIColor] = [NCBrandColor.shared.iconSystemGrayColor]) -> UIImage {
-//        return utility.loadImage(named: "share", colors: colors, size: 24)
-//    }
-//
-//    func getImageShareByLink(colors: [UIColor] = [NCBrandColor.shared.iconSystemGrayColor]) -> UIImage {
-//        return utility.loadImage(named: "share", colors: colors, size: 24)
-//    }
-//
-//    func getImageSharedWithMe(colors: [UIColor] = [NCBrandColor.shared.iconSystemGrayColor]) -> UIImage {
-//        return utility.loadImage(named: "cloudUpload", colors: [NCBrandColor.shared.nmcIconSharedWithMe], size: 24)
-//    }
-//    
-//    func getImageFavorite(colors: [UIColor] = [NCBrandColor.shared.yellowFavorite]) -> UIImage {
-//        return utility.loadImage(named: "star.fill", colors: colors, size: 24)
-//    }
-//
-//    func getImageOfflineFlag(colors: [UIColor] = [.systemGreen]) -> UIImage {
-//        return utility.loadImage(named: "arrow.down.circle.fill", colors: colors, size: 24)
-//    }
-//
-//    func getImageLocal(colors: [UIColor] = [.systemGreen]) -> UIImage {
-//        return utility.loadImage(named: "checkmark.circle.fill", colors: colors, size: 24)
-//    }
-//
-//    func getImageCheckedYes(colors: [UIColor] = [NCBrandColor.shared.iconImageColor]) -> UIImage {
-//        return UIImage(named: "checkedYes")!
-//    }
-//
-//    func getImageCheckedNo(colors: [UIColor] = [NCBrandColor.shared.iconImageColor]) -> UIImage {
-//        return utility.loadImage(named: "circle", colors: colors, size: 24)
-//    }
-//
-//    func getImageButtonMore(colors: [UIColor] = [NCBrandColor.shared.iconImageColor]) -> UIImage {
-//        return UIImage(named: "more")!.image(color: .systemGray, size: 24)
-//    }
-//
-//    func getImageButtonStop(colors: [UIColor] = [NCBrandColor.shared.iconImageColor]) -> UIImage {
-//        return utility.loadImage(named: "stop.circle", colors: colors, size: 24)
-//    }
-//
-//    func getImageButtonMoreLock(colors: [UIColor] = [NCBrandColor.shared.iconImageColor]) -> UIImage {
-//        return utility.loadImage(named: "lock.fill", colors: colors, size: 24)
-//    }
+
     
     func getFolder() -> UIImage {
         return UIImage(named: "folder")!

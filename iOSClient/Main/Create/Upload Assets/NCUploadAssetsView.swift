@@ -174,7 +174,7 @@ struct NCUploadAssetsView: View {
                                             .frame(maxWidth: .infinity, alignment: .trailing)
                                     }
                                 } icon: {
-                                    Image(uiImage: NCImageCache.shared.getFolder(account: model.session.account))
+                                    Image(uiImage: NCImageCache.shared.getFolder())
                                         .resizable()
                                         .scaledToFit()
                                 }

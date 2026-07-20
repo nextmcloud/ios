@@ -64,7 +64,7 @@ final class NCBrandOptions: @unchecked Sendable {
     var brandUserAgent:             String = "MagentaCLOUD"
     var textCopyrightNextcloudiOS:       String = "MagentaCLOUD for iOS %@"
     var textCopyrightNextcloudServer:    String = "MagentaCLOUD Server %@"
-    var loginBaseUrl:                    String = "https://dev1.next.magentacloud.de" //"https://magentacloud.de"
+    var loginBaseUrl:                    String = "https://magentacloud.de"
     var pushNotificationServerProxy: String = ""
     var linkLoginHost: String = "https://nextcloud.com/install"
     var linkloginPreferredProviders: String = "https://nextcloud.com/signup-ios"
@@ -94,7 +94,7 @@ final class NCBrandOptions: @unchecked Sendable {
         
     // BRAND ONLY
     // Set use_login_web_personalized to true for prod and false for configurable path
-    var use_login_web_personalized: Bool = true                               // Don't touch me !!
+    var use_login_web_personalized: Bool = false                               // Don't touch me !!
     var use_GroupApps: Bool = true
     
     var use_AppConfig: Bool = false                                                         // Don't touch me !!
@@ -114,7 +114,7 @@ final class NCBrandOptions: @unchecked Sendable {
     var doNotAskPasscodeAtStartup: Bool = false
     var disable_source_code_in_settings: Bool = false
     var enforce_passcode_lock = false
-    var enforce_privacyScreenEnabled = false
+    var enforce_privacyScreenEnabled = true
 
     // Example: (name: "Name 1", url: "https://cloud.nextcloud.com"),(name: "Name 2", url: "https://cloud.nextcloud.com")
     var enforce_servers: [(name: String, url: String)] = []

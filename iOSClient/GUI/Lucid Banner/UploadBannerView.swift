@@ -178,7 +178,7 @@ struct UploadBannerView: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
 
                     ProgressView(value: state.payload.progress ?? 0)
-                        .tint(.accentColor)
+                        .tint(Color(NCBrandColor.shared.brand))
                         .opacity(state.payload.progress == nil ? 0 : 1)
                         .animation(.easeInOut(duration: 0.2), value: state.payload.progress == nil)
                         .padding(.horizontal, 5)

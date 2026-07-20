@@ -123,7 +123,7 @@ struct NCSettingsView: View {
                 .tint(Color(NCBrandColor.shared.getElement(account: model.session.account)))
             }
 
-            if !NCBrandOptions.shared.enforce_privacyScreenEnabled {
+//            if !NCBrandOptions.shared.enforce_privacyScreenEnabled {
                 Section(content: {
                     // Splash screen when app inactive
                     Toggle(NSLocalizedString("_privacy_screen_", comment: ""), isOn: $model.privacyScreen)
@@ -136,7 +136,7 @@ struct NCSettingsView: View {
                         .font(.footnote)
                 })
                 .tint(Color(NCBrandColor.shared.getElement(account: model.session.account)))
-            }
+//            }
 
             // Display
             Section(header: Text(NSLocalizedString("_display_", comment: "")).font(.headline), content: {

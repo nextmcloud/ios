@@ -47,7 +47,6 @@ class NCOffline: NCCollectionViewCommon {
         super.viewWillAppear(animated)
 
         Task {
-//            await self.reloadDataSource()
             await getServerData()
         }
         AnalyticsHelper.shared.trackEvent(eventName: .SCREEN_EVENT__OFFLINE_FILES)

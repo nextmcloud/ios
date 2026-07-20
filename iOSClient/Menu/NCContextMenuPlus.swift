@@ -53,7 +53,7 @@ class NCContextMenuPlus: NSObject {
         let directory = await NCManageDatabase.shared.getTableDirectoryAsync(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@", session.account, serverUrl))
         let isNetworkReachable = NextcloudKit.shared.isNetworkReachable()
         let titleCreateFolder = isDirectoryE2EE ? NSLocalizedString("_create_folder_e2ee_", comment: "") : NSLocalizedString("_create_folder_", comment: "")
-        let imageCreateFolder = isDirectoryE2EE ? NCImageCache.shared.getFolderEncrypted(account: session.account) : NCImageCache.shared.getFolder(account: session.account)
+        let imageCreateFolder = isDirectoryE2EE ? NCImageCache.shared.getFolderEncrypted() : NCImageCache.shared.getFolder()
 
         var menuActionElement: [UIMenuElement] = []
         var menuE2EEElement: [UIMenuElement] = []
@@ -131,7 +131,7 @@ class NCContextMenuPlus: NSObject {
            NCPreferences().isEndToEndEnabled(account: session.account),
            isNetworkReachable {
             menuE2EEElement.append(UIAction(title: NSLocalizedString("_create_folder_e2ee_", comment: ""),
-                                            image: NCImageCache.shared.getFolderEncrypted(account: session.account)) { _ in
+                                            image: NCImageCache.shared.getFolderEncrypted()) { _ in
                 DispatchQueue.main.async {
                     let alertController = UIAlertController.createFolderWith(
                         serverUrl: serverUrl,

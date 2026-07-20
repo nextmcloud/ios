@@ -199,10 +199,10 @@ class NCContextMenuMain: NSObject {
         }
 
         // Color folder
-        if viewController is NCFiles,
-           metadata.directory {
-            mainActionsMenu.append(makeColorFolderAction(metadata: metadata))
-        }
+//        if viewController is NCFiles,
+//           metadata.directory {
+//            mainActionsMenu.append(makeColorFolderAction(metadata: metadata))
+//        }
 
         return mainActionsMenu
     }

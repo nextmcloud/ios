@@ -1168,8 +1168,8 @@
 "_copied_path_"             = "Copied path";
 "_copy_path_"               = "Copy path";
 "_certificates_"            = "Certificates";
-//"_privacy_screen_"          = "Splash screen when app inactive";
-"_privacy_screen_"          = "Hide content when app is inactive";
+"_privacy_screen_"          = "Splash screen when app inactive";
+//"_privacy_screen_"          = "Hide content when app is inactive";
 "_privacy_screen_footer_"   = "Hide the content in the app and show a splash screen when the app is inactive.";
 "_saving_"                  = "Saving …";
 "_video_not_streamed_"      = "The server does not allow video streaming, do you want to download it?";
