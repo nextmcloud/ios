@@ -112,7 +112,7 @@ import XLForm
         XLFormViewController.cellClassesForRowDescriptorTypes()["kNMCFolderCustomCellType"] = FolderPathCustomCell.self
         row = XLFormRowDescriptor(tag: "ButtonDestinationFolder", rowType: "kNMCFolderCustomCellType", title: "")
         row.action.formSelector = #selector(changeDestinationFolder(_:))
-        row.cellConfig["folderImage.image"] =  UIImage(named: "folder")!.withTintColor(NCBrandColor.shared.customer)
+        row.cellConfig["folderImage.image"] =  NCImageCache.shared.getFolder().withTintColor(NCBrandColor.shared.customer)
         row.cellConfig["photoLabel.textAlignment"] = NSTextAlignment.left.rawValue
         row.cellConfig["photoLabel.font"] = UIFont.systemFont(ofSize: 15.0)
         row.cellConfig["photoLabel.textColor"] = UIColor.label //photos

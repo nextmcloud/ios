@@ -99,16 +99,16 @@ extension NCUtility {
             }
         }
 
-        if let image { return image }
+        if let image { return image.withTintColor(NCBrandColor.shared.iconImageColor) }
 
         // SF IMAGE
         if let colors {
-            image = UIImage(systemName: imageName, withConfiguration: UIImage.SymbolConfiguration(weight: systemNameWeight))?.applyingSymbolConfiguration(UIImage.SymbolConfiguration(paletteColors: colors))
+            image = UIImage(systemName: imageName, withConfiguration: UIImage.SymbolConfiguration(weight: .light))?.applyingSymbolConfiguration(UIImage.SymbolConfiguration(paletteColors: colors))
         } else {
-            image = UIImage(systemName: imageName, withConfiguration: UIImage.SymbolConfiguration(weight: systemNameWeight))
+            image = UIImage(systemName: imageName, withConfiguration: UIImage.SymbolConfiguration(weight: .light))
         }
 
-        if let image { return image }
+        if let image { return image.withTintColor(NCBrandColor.shared.iconImageColor) }
 
         // IMAGES
         if let color = colors?.first, let size {
@@ -120,13 +120,13 @@ extension NCUtility {
         } else if colors == nil, let size {
             image = UIImage(named: imageName)?.resizeImage(size: CGSize(width: size, height: size))
         }
-        if let image { return image }
+        if let image { return image.withTintColor(NCBrandColor.shared.iconImageColor) }
 
         // NO IMAGES FOUND
         if let color = colors?.first, let size {
-            return UIImage(systemName: "doc")!.image(color: color, size: size)
+            return UIImage(named: "file")!.image(color: color, size: size).withTintColor(NCBrandColor.shared.iconImageColor)
         } else {
-            return UIImage(systemName: "doc")!
+            return UIImage(named: "file")!.withTintColor(NCBrandColor.shared.iconImageColor)
         }
     }
 

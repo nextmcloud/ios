@@ -74,7 +74,7 @@ class NCMainNavigationController: UINavigationController, UINavigationController
         setNavigationBarHidden(false, animated: true)
 
         Task {
-            optionButtonItem.image = UIImage(systemName: "ellipsis")
+            optionButtonItem.image = UIImage(systemName: "ellipsis.circle")
             optionButtonItem.tintColor = NCBrandColor.shared.iconImageColor
             optionButtonItem.menu = await createOptionMenu()
         }
@@ -189,6 +189,7 @@ class NCMainNavigationController: UINavigationController, UINavigationController
                 }
                 await self.collectionViewCommonTrailingItemGroups()
                 await self.menuPlus?.create(session: session)
+                AnalyticsHelper.shared.trackEvent(eventName: .EVENT__ACTION_BUTTON)
             }
         }
 
@@ -200,6 +201,7 @@ class NCMainNavigationController: UINavigationController, UINavigationController
 
                 // Menu Plus
                 await self.menuPlus?.create(session: session)
+                AnalyticsHelper.shared.trackEvent(eventName: .EVENT__ACTION_BUTTON)
             }
         }
     }

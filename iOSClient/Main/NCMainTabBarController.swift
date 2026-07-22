@@ -119,8 +119,8 @@ class NCMainTabBarController: UITabBarController {
 
         navigationController.tabBarItem = UITabBarItem(
             title: NSLocalizedString("_more_", comment: ""),
-            image: UIImage(systemName: "ellipsis.circle.fill"),
-            selectedImage: UIImage(systemName: "ellipsis.circle.fill")
+            image: UIImage(named: "more"),
+            selectedImage: UIImage(named: "more")
         )
         navigationController.tabBarItem.tag = 104
 
@@ -131,28 +131,28 @@ class NCMainTabBarController: UITabBarController {
         configureTabBarItem(
             at: 0,
             title: "_home_",
-            imageName: "folder.fill",
+            imageName: "home",
             tag: 100
         )
 
         configureTabBarItem(
             at: 1,
             title: "_favorites_",
-            imageName: "star.fill",
+            imageName: "star",
             tag: 101
         )
 
         configureTabBarItem(
             at: 2,
             title: "_media_",
-            imageName: "photo",
+            imageName: "media",
             tag: 102
         )
 
         configureTabBarItem(
             at: 3,
             title: "_albums_",
-            imageName: "mediaSelected",
+            imageName: "album",
             tag: 103
         )
     }
@@ -162,7 +162,7 @@ class NCMainTabBarController: UITabBarController {
 
         let item = items[index]
         item.title = NSLocalizedString(title, comment: "")
-        item.image = title == "_albums_" ? UIImage(named: "mediaSelected")?.image(color: NCBrandColor.shared.brandElement, size: 25) : UIImage(systemName: imageName)
+        item.image = title == "_albums_" ? UIImage(named: "album")?.image(color: NCBrandColor.shared.textColor, size: 25) : UIImage(named: imageName)
         item.selectedImage = item.image
         item.tag = tag
     }

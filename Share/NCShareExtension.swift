@@ -224,9 +224,11 @@ class NCShareExtension: UIViewController {
 
         // BACK BUTTON
         let backButton = UIButton(type: .custom)
-        let backImage = UIImage(named: "back")?.withRenderingMode(.alwaysTemplate)
-        backButton.setImage(backImage, for: .normal)
-        backButton.tintColor = NCBrandColor.shared.customer
+        backButton.setImage(UIImage(named: "back")?.withTintColor(NCBrandColor.shared.iconImageColor), for: .normal)
+        backButton.tintColor = NCBrandColor.shared.label
+//        let backImage = UIImage(named: "back")?.withRenderingMode(.alwaysTemplate)
+//        backButton.setImage(backImage, for: .normal)
+//        backButton.tintColor = NCBrandColor.shared.customer
         backButton.semanticContentAttribute = .forceLeftToRight
         backButton.setTitle(" " + NSLocalizedString("_back_", comment: ""), for: .normal)
         backButton.setTitleColor(NCBrandColor.shared.customer, for: .normal)

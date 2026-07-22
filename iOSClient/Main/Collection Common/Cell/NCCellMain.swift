@@ -163,6 +163,7 @@ extension NCCollectionViewCommon {
             default:
                 cell.previewImg?.image = utility.loadImage(named: "doc", colors: [NCBrandColor.shared.iconImageColor])
             }
+            /*
             if !metadata.iconUrl.isEmpty {
                 if let ownerId = getAvatarFromIconUrl(metadata: metadata) {
                     let fileName = NCSession.shared.getFileName(urlBase: metadata.urlBase, user: ownerId)
@@ -185,6 +186,7 @@ extension NCCollectionViewCommon {
                     }
                 }
             }
+             */
         }
 
         // Local image: offline

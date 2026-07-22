@@ -85,35 +85,35 @@ extension NCCollectionViewCommon: NCCollectionViewCommonSelectTabBarDelegate {
             })
         }
 
-        alertController.addAction(UIAlertAction(title: NSLocalizedString("_remove_local_file_", comment: ""), style: .default) { (_: UIAlertAction) in
-            Task {
-                var token: Int?
-                var banner: LucidBanner?
-                let containsDirectory = metadatas.contains { $0.isDirectory }
-                if containsDirectory {
-                    (banner, token) = showHudBanner(windowScene: self.windowScene, title: "_delete_in_progress_")
-                }
-
-                for metadata in metadatas {
-                    await self.networking.deleteCache(metadata, progress: { progress in
-                        Task {
-                            if let token {
-                                banner?.update(
-                                    payload: LucidBannerPayload.Update(progress: progress),
-                                    for: token
-                                )
-                            }
-                        }
-
-                    })
-
-                    if let banner {
-                        banner.dismiss()
-                    }
-                }
-                await self.setEditMode(false)
-            }
-        })
+//        alertController.addAction(UIAlertAction(title: NSLocalizedString("_remove_local_file_", comment: ""), style: .default) { (_: UIAlertAction) in
+//            Task {
+//                var token: Int?
+//                var banner: LucidBanner?
+//                let containsDirectory = metadatas.contains { $0.isDirectory }
+//                if containsDirectory {
+//                    (banner, token) = showHudBanner(windowScene: self.windowScene, title: "_delete_in_progress_")
+//                }
+//
+//                for metadata in metadatas {
+//                    await self.networking.deleteCache(metadata, progress: { progress in
+//                        Task {
+//                            if let token {
+//                                banner?.update(
+//                                    payload: LucidBannerPayload.Update(progress: progress),
+//                                    for: token
+//                                )
+//                            }
+//                        }
+//
+//                    })
+//
+//                    if let banner {
+//                        banner.dismiss()
+//                    }
+//                }
+//                await self.setEditMode(false)
+//            }
+//        })
 
         alertController.addAction(UIAlertAction(title: NSLocalizedString("_cancel_", comment: ""), style: .cancel) { (_: UIAlertAction) in })
         self.present(alertController, animated: true, completion: nil)

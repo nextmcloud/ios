@@ -9,16 +9,25 @@ enum ContextMenuActions {
     static func delete(metadatas: [tableMetadata],
                        controller: NCMainTabBarController?,
                        completion: (() -> Void)? = nil) -> UIAction {
+        var titleDelete = NSLocalizedString("_delete_", comment: "")
+        if controller?.getSelectedTabIndex() == NCGlobal.shared.selectedTabIndexAlbum {
+            titleDelete = NSLocalizedString("_remove_from_album_", comment: "")
+        } else if ((metadatas.first?.directory) != nil) {
+            titleDelete = NSLocalizedString("_delete_folder_", comment: "")
+        } else {
+            titleDelete = NSLocalizedString("_delete_file_", comment: "")
+        }
          return UIAction(
              title: NSLocalizedString("_delete_", comment: ""),
              image: UIImage(systemName: "trash"),
              attributes: [.destructive]
          ) { _ in
              let alert = UIAlertController.alertDeleteFileOrFolder(
-                 titleString: NSLocalizedString("_delete_", comment: "") + "?",
+                 titleString: titleDelete + "?",
                  message: NSLocalizedString("_want_delete_", comment: ""),
                  canDeleteServer: true,
-                 metadatas: metadatas
+                 metadatas: metadatas,
+                 controller: controller
              ) { _ in
                  completion?()
              }
@@ -31,8 +40,8 @@ enum ContextMenuActions {
                        sender: Any?,
                        completion: (() -> Void)? = nil) -> UIAction {
          UIAction(
-             title: NSLocalizedString("_share_", comment: ""),
-             image: UIImage(systemName: "square.and.arrow.up")
+             title: NSLocalizedString("_open_in_", comment: ""),
+             image: UIImage(named: "open_file")?.withTintColor(NCBrandColor.shared.iconImageColor)
          ) { _ in
              Task {
                  await NCCreate().createActivityViewController(
@@ -53,7 +62,7 @@ enum ContextMenuActions {
              title: isAnyOffline
                  ? NSLocalizedString("_remove_available_offline_", comment: "")
                  : NSLocalizedString("_set_available_offline_", comment: ""),
-             image: UIImage(systemName: "icloud.and.arrow.down")
+             image: UIImage(named: "cloudDownload")?.withTintColor(NCBrandColor.shared.iconImageColor)
          ) { _ in
              if !isAnyOffline, metadatas.count > 3 {
                  let alert = UIAlertController(
@@ -88,7 +97,7 @@ enum ContextMenuActions {
                             completion: (() -> Void)? = nil) -> UIAction {
          UIAction(
              title: NSLocalizedString("_move_or_copy_", comment: ""),
-             image: UIImage(systemName: "rectangle.portrait.and.arrow.right")
+             image: NCUtility().loadImage(named: "move", colors: [NCBrandColor.shared.iconImageColor]).withTintColor(NCBrandColor.shared.iconImageColor)
          ) { _ in
              Task { @MainActor in
                  guard let controller else {
@@ -129,7 +138,7 @@ enum ContextMenuActions {
         let image: UIImage?
         if !metadata.canUnlock(as: metadata.userId), isLocked {
             titleKey = String(format: NSLocalizedString("_locked_by_", comment: ""), metadata.lockOwnerDisplayName)
-            image = UIImage(systemName: "lock")
+            image = UIImage(systemName: "lock")?.withTintColor(NCBrandColor.shared.iconImageColor)
         } else {
             titleKey = isLocked ? "_unlock_file_" : "_lock_file_"
             image = UIImage(systemName: isLocked ? "lock.open" : "lock")

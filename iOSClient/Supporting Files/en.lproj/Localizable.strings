@@ -797,7 +797,7 @@
 "_delete_comment_"              = "Delete comment";
 "_share_read_only_"             = "View only";
 "_share_reshare_allowed_"       = "Resharing is allowed.";
-"_share_reshare_not_allowed_"   = "Resharing is not allowed.";
+//"_share_reshare_not_allowed_"   = "Resharing is not allowed.";
 "_sharing_message_"             = "You can create links or send shares by mail. If you invite MagentaCLOUD users, you have more opportunities for collaboration.";
 "_create_link_"                 = "Create Link";
 "personal_share_by_mail"        = "Personal share by mail";
@@ -832,7 +832,7 @@
 "_shareLinksearch_placeholder_" = "Contact name or email address";
 "_shareLinksearch_mail_placeholder_" = "Type a name or an email and press Enter";
 "_share_reshare_allowed_"       = "Resharing is allowed.";
-"_share_reshare_not_allowed_"   = "Resharing is not allowed.";
+//"_share_reshare_not_allowed_"   = "Resharing is not allowed.";
 "_sharing_message_"             = "You can create links or send shares by mail. If you invite MagentaCLOUD users, you have more opportunities for collaboration.";
 "_create_link_"                 = "Create Link";
 "personal_share_by_mail"        = "Personal share by mail";

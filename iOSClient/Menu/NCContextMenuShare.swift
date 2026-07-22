@@ -34,15 +34,15 @@ class NCContextMenuShare: NSObject {
         var actions: [UIMenuElement] = []
 
         // Add share link (only for public links with reshare permission)
-//        if share.shareType == NKShare.ShareType.publicLink.rawValue, canReshare {
-//            let addLinkAction = UIAction(
-//                title: NSLocalizedString("_share_add_sharelink_", comment: ""),
-//                image: utility.loadImage(named: "plus", colors: [NCBrandColor.shared.brandElement])
-//            ) { [self] _ in
-//                shareController.makeNewLinkShare()
-//            }
-//            actions.append(addLinkAction)
-//        }
+        if share.shareType == NKShare.ShareType.publicLink.rawValue, canReshare {
+            let addLinkAction = UIAction(
+                title: NSLocalizedString("_share_add_sharelink_", comment: ""),
+                image: utility.loadImage(named: "plus", colors: [NCBrandColor.shared.brandElement])
+            ) { [self] _ in
+                shareController.makeNewLinkShare()
+            }
+            actions.append(addLinkAction)
+        }
 
         // Add share link (only for public links with reshare permission)
         if share.shareType == NKShare.ShareType.publicLink.rawValue, canReshare {
@@ -67,14 +67,14 @@ class NCContextMenuShare: NSObject {
             actions.append(sendNewEmailAction)
         }
         
-        // Details action
-        let detailsAction = UIAction(
-            title: NSLocalizedString("_details_", comment: ""),
-            image: utility.loadImage(named: "pencil", colors: [NCBrandColor.shared.brandElement])
-        ) { [self] _ in
-            openAdvancePermission(shareController: shareController)
-        }
-        actions.append(detailsAction)
+//        // Details action
+//        let detailsAction = UIAction(
+//            title: NSLocalizedString("_details_", comment: ""),
+//            image: utility.loadImage(named: "pencil", colors: [NCBrandColor.shared.brandElement])
+//        ) { [self] _ in
+//            openAdvancePermission(shareController: shareController)
+//        }
+//        actions.append(detailsAction)
 
         // Unshare action (destructive)
         let unshareAction = UIAction(
@@ -134,13 +134,13 @@ class NCContextMenuShare: NSObject {
         }
 
         // Custom Permissions
-        let customAction = UIAction(
-            title: NSLocalizedString("_custom_permissions_", comment: ""),
-            image: utility.loadImage(named: "ellipsis", colors: [NCBrandColor.shared.iconImageColor])
-        ) { [self] _ in
-            openAdvancePermission(shareController: shareController)
-        }
-        actions.append(customAction)
+//        let customAction = UIAction(
+//            title: NSLocalizedString("_custom_permissions_", comment: ""),
+//            image: utility.loadImage(named: "ellipsis", colors: [NCBrandColor.shared.iconImageColor])
+//        ) { [self] _ in
+//            openAdvancePermission(shareController: shareController)
+//        }
+//        actions.append(customAction)
 
         return UIMenu(title: "", children: actions)
     }
