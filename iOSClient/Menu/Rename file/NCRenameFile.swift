@@ -90,7 +90,7 @@ class NCRenameFile: UIViewController, UITextFieldDelegate {
             if metadata.directory {
 
                 if imagePreview == nil {
-                    previewFile.image = imageCache.getFolder()
+                    previewFile.image = imageCache.getFolder(account: metadata.account)
                 }
 
                 ext.isHidden = true
@@ -143,9 +143,6 @@ class NCRenameFile: UIViewController, UITextFieldDelegate {
 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-
-        // Re-evaluate in-app messages after viewDidAppear
-        MoEngageAnalytics.shared.displayInAppNotificationSafely(reason: "viewDidAppear")
 
         if metadata == nil && fileName == nil {
             dismiss(animated: true)
@@ -251,8 +248,7 @@ class NCRenameFile: UIViewController, UITextFieldDelegate {
         NCActivityIndicator.shared.start()
 
 //        NCNetworking.shared.renameMetadata(metadata, fileNameNew: fileNameNew)
-        let windowScene = self.view.window?.windowScene
-        NCNetworking.shared.renameMetadata(metadata, fileNameNew: fileNameNew, indexPath: indexPath, viewController: self, windowScene: windowScene) { error in
+        NCNetworking.shared.renameMetadata(metadata, fileNameNew: fileNameNew, indexPath: indexPath, viewController: self) { error in
 
             NCActivityIndicator.shared.stop()
 

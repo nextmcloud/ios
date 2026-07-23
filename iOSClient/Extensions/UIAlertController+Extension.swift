@@ -76,6 +76,9 @@ extension UIAlertController {
                                 completeHudIndeterminateBannerSuccess(token: token, banner: banner)
                             } else {
                                 banner.dismiss()
+#if !EXTENSION
+                            AnalyticsHelper.shared.trackCreateFolder(isEncrypted: true, creationDate: Date())
+#endif
                             }
                         }
                         completion?(error)

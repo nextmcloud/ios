@@ -576,18 +576,50 @@ class NCContextMenuMain: NSObject {
                 if shouldShowMenu {
                     let deferredElement = UIDeferredMenuElement { completion in
                         Task {
-                            var iconImage = UIImage(systemName: "exclamationmark.triangle.fill")
+                            var iconImage = (UIImage(systemName: "archivebox") ?? UIImage(systemName: "tray.and.arrow.down"))?.withRenderingMode(.alwaysTemplate)
 
                             if let iconUrl = item.icon {
-                                let results = await NextcloudKit.shared.downloadContentAsync(serverUrl: metadata.urlBase + iconUrl, account: metadata.account)
-                                if results.error == .success, let data = results.responseData?.data,
-                                   let image = try? await NCSVGRenderer().renderSVGToUIImage(
-                                    svgData: data,
-                                    size: CGSize(width: UIScreen.main.scale * 20,
-                                                 height: UIScreen.main.scale * 20),
-                                    tintColor: NCBrandColor.shared.iconImageColor,
-                                    trimTransparentPixels: false) {
-                                    iconImage = image
+                                // Normalize base and path to avoid double slashes and wrong bases
+                                let rawBase = metadata.urlBase
+                                // If urlBase points to remote.php or ocs, try to derive the server root by stripping those components
+                                let serverRoot: String = {
+                                    if let url = URL(string: rawBase) {
+                                        var comps = URLComponents(url: url, resolvingAgainstBaseURL: false)
+                                        var path = comps?.path ?? ""
+                                        // Remove known service prefixes to get to the site root
+                                        if let range = path.range(of: "/remote.php") {
+                                            path.removeSubrange(range.lowerBound..<path.endIndex)
+                                        } else if let range = path.range(of: "/ocs/") {
+                                            path.removeSubrange(range.lowerBound..<path.endIndex)
+                                        }
+                                        comps?.path = path
+                                        return comps?.url?.absoluteString ?? rawBase
+                                    }
+                                    return rawBase
+                                }()
+
+                                // Build the icon URL using URL resolution to avoid path issues
+                                var fullURLString: String = iconUrl
+                                if let baseURL = URL(string: serverRoot) {
+                                    if let resolved = URL(string: iconUrl, relativeTo: baseURL)?.absoluteURL {
+                                        fullURLString = resolved.absoluteString
+                                    }
+                                }
+
+                                let results = await NextcloudKit.shared.downloadContentAsync(serverUrl: fullURLString, account: metadata.account)
+                                if results.error == .success, let data = results.responseData?.data {
+                                    // Try SVG render first
+                                    if let svgImage = try? await NCSVGRenderer().renderSVGToUIImage(
+                                        svgData: data,
+                                        size: CGSize(width: 50, height: 50),
+                                        tintColor: NCBrandColor.shared.iconImageColor,
+                                        trimTransparentPixels: false
+                                    ) {
+                                        iconImage = svgImage.withRenderingMode(.alwaysTemplate)
+                                    } else if let rasterImage = UIImage(data: data) {
+                                        // Fallback for non-SVG icons (PNG/JPEG)
+                                        iconImage = rasterImage.withRenderingMode(.alwaysTemplate)
+                                    }
                                 }
                             }
 
@@ -644,3 +676,4 @@ class NCContextMenuMain: NSObject {
         return clientIntegrationMenu
     }
 }
+

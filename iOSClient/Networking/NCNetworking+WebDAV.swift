@@ -503,6 +503,45 @@ extension NCNetworking {
         return results.error
     }
 
+    func renameMetadata(_ metadata: tableMetadata,
+                        fileNameNew: String,
+                        indexPath: IndexPath,
+                        viewController: UIViewController?,
+                        windowScene: UIWindowScene?,
+                        completion: @escaping (_ error: NKError) -> Void) {
+        
+        let permission = NCMetadataPermissions.permissionsContainsString(metadata.permissions, permissions: NCMetadataPermissions.permissionCanRename)
+        if (!metadata.permissions.isEmpty && permission == false) ||
+            (metadata.status != global.metadataStatusNormal && metadata.status != global.metadataStatusWaitRename) {
+            completion(NKError(errorCode: NCGlobal.shared.errorInternalError, errorDescription: "_no_permission_modify_file_"))
+        }
+
+        if metadata.isDirectoryE2EE {
+#if !EXTENSION
+            if isOffline {
+                completion(NKError(errorCode: NCGlobal.shared.errorInternalError, errorDescription: "_offline_not_allowed_"))
+            }
+            Task {
+                let error = await NCNetworkingE2EERename().rename(metadata: metadata, fileNameNew: fileNameNew, windowScene: windowScene)
+                if error != .success {
+                    completion(error)
+                }
+            }
+#endif
+        } else {
+            Task {
+                let ocId = metadata.ocId
+                let serverUrl = metadata.serverUrl
+                await self.transferDispatcher.notifyAllDelegatesAsync { delegate in
+                    await NCManageDatabase.shared.renameMetadata(fileNameNew: fileNameNew, ocId: ocId, status: self.global.metadataStatusWaitRename)
+                    delegate.transferReloadDataSource(serverUrl: serverUrl, requestData: false, status: self.global.metadataStatusWaitRename)
+                }
+            }
+            
+            completion(NKError(errorCode: 0, errorDescription: ""))
+        }
+    }
+    
     // MARK: - Move
 
     func setStatusWaitMove(_ metadata: tableMetadata, destination: String, overwrite: Bool) async -> NKError {
@@ -643,6 +682,11 @@ extension NCNetworking {
         let serverUrl = metadata.serverUrl
         let favorite = metadata.favorite
         await self.transferDispatcher.notifyAllDelegatesAsync { delegate in
+#if !EXTENSION
+                if !metadata.favorite, !metadata.contentType.contains("directory") {
+                    AnalyticsHelper.shared.trackEventWithMetadata(eventName: .EVENT__ADD_FAVORITE ,metadata: metadata)
+                }
+#endif
             await NCManageDatabase.shared.setMetadataFavoriteAsync(ocId: ocId, favorite: !favorite, saveOldFavorite: favorite.description, status: self.global.metadataStatusWaitFavorite)
             delegate.transferReloadDataSource(serverUrl: serverUrl, requestData: false, status: self.global.metadataStatusWaitFavorite)
         }

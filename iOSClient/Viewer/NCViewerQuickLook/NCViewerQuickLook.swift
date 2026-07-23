@@ -79,6 +79,10 @@ private var hasChangesQuickLook: Bool = false
 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+        
+        // Re-evaluate in-app messages after viewDidAppear
+        MoEngageAnalytics.shared.displayInAppNotificationSafely(reason: "viewDidAppear")
+
         // needs to be saved bc in didDisappear presentingVC is already nil
         parentVC = presentingViewController
     }

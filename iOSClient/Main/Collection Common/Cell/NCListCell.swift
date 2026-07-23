@@ -519,7 +519,7 @@ extension NCCollectionViewCommon {
             // Shared by me or has link/email shares
             cell.buttonShared.setImage(imageCache.getImageShared().image(color: NCBrandColor.shared.customer), for: .normal)
         } else {
-            cell.buttonShared.setImage(imageCache.getImageCanShare().image(color: NCBrandColor.shared.gray60), for: .normal)
+            cell.buttonShared.setImage(imageCache.getImageCanShare().image(color: NCBrandColor.shared.nmcGray0), for: .normal)
         }
         
         // Button More

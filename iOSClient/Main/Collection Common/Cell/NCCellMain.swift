@@ -85,15 +85,24 @@ extension NCCollectionViewCommon {
                            isMounted: Bool) {
         let tblDirectory = database.getTableDirectory(ocId: metadata.ocId)
 
+        let shares = NCManageDatabase.shared.getTableShares(metadata: metadata)
+        let shareItems = shares.share ?? []
+
+        // Determine Link Shares: true if firstShareLink is public OR if any item in shareItems is public
+        let hasLinkShares = (shares.firstShareLink?.shareType == NKShare.ShareType.publicLink.rawValue) ||
+                            shareItems.contains { $0.shareType == NKShare.ShareType.publicLink.rawValue }
+
+        // Determine Email Shares: true if any item in shareItems is email type
+        let hasEmailShares = shareItems.contains { $0.shareType == NKShare.ShareType.email.rawValue }
+
+        // Combined Logic
+        let hasEmailAndLinkShares = hasLinkShares && hasEmailShares
+
         if metadata.e2eEncrypted {
             cell.previewImg?.image = imageCache.getFolderEncrypted()
-        } else if isShare {
+        } else if metadata.permissions.contains("S"), (metadata.permissions.range(of: "S") != nil) {
             cell.previewImg?.image = imageCache.getFolderSharedWithMe()
-        } else if !metadata.shareType.isEmpty {
-            metadata.shareType.contains(NKShare.ShareType.publicLink.rawValue) ?
-            (cell.previewImg?.image = imageCache.getFolderPublic()) :
-            (cell.previewImg?.image = imageCache.getFolderSharedWithMe())
-        } else if !metadata.shareType.isEmpty && metadata.shareType.contains(NKShare.ShareType.publicLink.rawValue) {
+        } else if (!metadata.shareType.isEmpty || !(shares.share?.isEmpty ?? true) || (shares.firstShareLink != nil)) || isShare || hasEmailAndLinkShares {
             cell.previewImg?.image = imageCache.getFolderPublic()
         } else if metadata.mountType == "group" {
             cell.previewImg?.image = imageCache.getFolderGroup()
@@ -104,7 +113,7 @@ extension NCCollectionViewCommon {
         } else {
             cell.previewImg?.image = imageCache.getFolder()
         }
-
+        
         // Local image: offline
         metadata.isOffline = tblDirectory?.offline ?? false
 
