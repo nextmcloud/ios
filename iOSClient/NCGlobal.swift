@@ -228,9 +228,11 @@ final class NCGlobal: Sendable {
     let errorE2EENotEnabled: Int                = -98000
     let errorE2EEVersion: Int                   = -98001
     let errorE2EEKeyChecksums: Int              = -98002
+    let errorE2EEKeyChecksumsEmpty: Int         = -98003
     let errorE2EEKeyEncodeMetadata: Int         = -98003
     let errorE2EEKeyDecodeMetadataV12: Int      = -98004
     let errorE2EEKeyVerifySignature: Int        = -98005
+    let errorE2EEKeyVerifySignatureEmpty: Int   = -98007
     let errorE2EEKeyCiphertext: Int             = -98006
     let errorE2EEKeyFiledropCiphertext: Int     = -98007
     let errorE2EEJSon: Int                      = -98008

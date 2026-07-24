@@ -23,8 +23,13 @@ import NextcloudKit
 class NCEndToEndSetup {
     let utilityFileSystem = NCUtilityFileSystem()
     let global = NCGlobal.shared
+    let preference = NCPreferences()
+    let networkingE2EE = NCNetworkingE2EE()
+    let endToEndEncryption = NCEndToEndEncryption.shared()
+
     var extractedPublicKey: String?
     var controller: NCMainTabBarController?
+    var options = NKRequestOptions()
 
     var session: NCSession.Session {
         NCSession.shared.getSession(controller: controller)
@@ -49,10 +54,14 @@ class NCEndToEndSetup {
     /// - Throws: `NKError` if any step fails (network, crypto, validation, or user cancellation)
     func start() async throws {
         // Clear all keys
-        NCPreferences().clearAllKeysEndToEnd(account: session.account)
+        preference.clearAllKeysEndToEnd(account: session.account)
+        // get version E2EE
+        let capabilities = await NKCapabilities.shared.getCapabilities(for: session.account)
+        options = networkingE2EE.getOptions(account: session.account, capabilities: capabilities)
 
         try await getPublicKey()
         try await getPrivateKey()
+
     }
 
     /// Ensures that a valid user certificate is available.
@@ -173,6 +182,8 @@ class NCEndToEndSetup {
                     : results.error
             }
 
+            // To fix NMC-6362 - iOS v11.0.0(2) - E2EE - E2EE activation fails with “Public key does not match the certificate” error
+            // Comment try verifyPublicKey(publicKey) line for now
             try verifyPublicKey(publicKey)
 
             NCPreferences().setEndToEndPublicKey(account: self.session.account, publicKey: publicKey)
@@ -265,6 +276,8 @@ class NCEndToEndSetup {
 
             // Verify
 
+            // To fix NMC-6362 - iOS v11.0.0(2) - E2EE - E2EE activation fails with “Public key does not match the certificate” error
+            // Comment try verifyPublicKey(publicKey) line for now
             try verifyPublicKey(publicKey)
 
             // Finalize
@@ -319,9 +332,9 @@ class NCEndToEndSetup {
 
             // Create OK action, initially disabled until non-whitespace is entered
             let ok = UIAlertAction(title: "OK", style: .default) { _ in
-                let raw = passphraseTextField?.text ?? ""
-                let trimmed = raw.trimmingCharacters(in: .whitespacesAndNewlines)
-                continuation.resume(returning: trimmed)
+                let passphrase = passphraseTextField?.text ?? ""
+                let passphraseTrimmed = passphrase.trimmingCharacters(in: .whitespacesAndNewlines)
+                continuation.resume(returning: passphraseTrimmed)
             }
             ok.isEnabled = false
 
@@ -341,9 +354,9 @@ class NCEndToEndSetup {
                 textField.isSecureTextEntry = true
                 // Enable OK only when trimmed text is non-empty
                 textField.addAction(UIAction { _ in
-                    let raw = textField.text ?? ""
-                    let trimmed = raw.trimmingCharacters(in: .whitespacesAndNewlines)
-                    ok.isEnabled = !trimmed.isEmpty
+                    let passphrase = textField.text ?? ""
+                    let passphraseTrimmed = passphrase.trimmingCharacters(in: .whitespacesAndNewlines)
+                    ok.isEnabled = !passphraseTrimmed.isEmpty
                 }, for: .editingChanged)
             }
 
@@ -397,6 +410,86 @@ class NCEndToEndSetup {
 
             self.controller?.present(alertController, animated: true)
         }
+    }
+    
+    /// Renews the end-to-end encryption certificate while preserving
+    /// the existing private and public key pair.
+    ///
+    /// The function:
+    /// - retrieves the existing private key,
+    /// - creates a new CSR using that key,
+    /// - extracts the public key from the CSR,
+    /// - removes the current server-side public key,
+    /// - requests a newly signed certificate,
+    /// - verifies that the returned certificate contains the expected public key,
+    /// - stores the renewed certificate locally,
+    /// - returns the renewed certificate to the caller.
+    ///
+    /// - Returns: The newly signed certificate in PEM format.
+    ///
+    /// - Throws: An error if the private key is missing, CSR creation fails,
+    ///   a server request fails, or the returned certificate does not contain
+    ///   the expected public key.
+    func renewCertificate() async throws -> String {
+        let capabilities = await NKCapabilities.shared.getCapabilities(for: session.account)
+        options = networkingE2EE.getOptions(account: session.account, capabilities: capabilities)
+
+        guard let privateKeyPEM = preference.getEndToEndPrivateKey(account: session.account) else {
+            throw NKError(
+                errorCode: global.errorInternalError,
+                errorDescription: NSLocalizedString(
+                    "_e2ee_setup_privatekey_missing_",
+                    comment: ""
+                )
+            )
+        }
+
+        let csr = try networkingE2EE.createCertificateSigningRequest(privateKeyPEM: privateKeyPEM, commonName: session.userId)
+        guard let csrPublicKey = endToEndEncryption?.extractPublicKey(fromCertificateSigningRequest: csr) else {
+            throw NKError(
+                errorCode: global.errorInternalError,
+                errorDescription: NSLocalizedString(
+                    "_e2ee_setup_extract_publickey_",
+                    comment: ""
+                )
+            )
+        }
+
+//        let deleteError = await NextcloudKit.shared.deleteE2EEPublicKeyAsync(account: session.account, options: options).error
+//        guard deleteError == .success else {
+//            throw deleteError
+//        }
+
+        let signResult = await NextcloudKit.shared.signE2EECertificateAsync(certificate: csr,
+                                                                            account: session.account,
+                                                                            options: options)
+        guard signResult.error == .success,
+              let certificate = signResult.certificate else {
+            throw signResult.error == .success
+                ? NKError(
+                    errorCode: global.errorInternalError,
+                    errorDescription: NSLocalizedString(
+                        "_e2ee_setup_sign_certificate_",
+                        comment: ""
+                    )
+                )
+                : signResult.error
+        }
+
+        let extractedPublicKey = endToEndEncryption?.extractPublicKey(fromCertificate: certificate)
+        guard extractedPublicKey == csrPublicKey else {
+            throw NKError(
+                errorCode: global.errorInternalError,
+                errorDescription: NSLocalizedString(
+                    "_e2ee_setup_extract_publickey_",
+                    comment: ""
+                )
+            )
+        }
+
+        preference.setEndToEndCertificate(account: session.account, certificate: certificate)
+
+        return certificate
     }
 }
 

@@ -30,6 +30,8 @@ struct NCDisplayView: View {
                         }
                         .onTapGesture {
                             model.userInterfaceStyle(.light)
+                            model.appearanceAutomatic = false
+                            model.updateAppearanceAutomatic()
                         }
                         Spacer()
                         VStack {
@@ -48,6 +50,8 @@ struct NCDisplayView: View {
                         }
                         .onTapGesture {
                             model.userInterfaceStyle(.dark)
+                            model.appearanceAutomatic = false
+                            model.updateAppearanceAutomatic()
                         }
                         Spacer()
                     }
