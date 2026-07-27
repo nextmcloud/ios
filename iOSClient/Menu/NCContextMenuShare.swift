@@ -45,15 +45,15 @@ class NCContextMenuShare: NSObject {
         }
 
         // Add share link (only for public links with reshare permission)
-        if share.shareType == NKShare.ShareType.publicLink.rawValue, canReshare {
-            let advancePermissionAction = UIAction(
-                title: NSLocalizedString("_advance_permissions_", comment: ""),
-                image: utility.loadImage(named: "rename", colors: [NCBrandColor.shared.brandElement])
-            ) { [self] _ in
-                openAdvancePermission(shareController: shareController)
-            }
-            actions.append(advancePermissionAction)
+//        if share.shareType == NKShare.ShareType.publicLink.rawValue, canReshare {
+        let advancePermissionAction = UIAction(
+            title: NSLocalizedString("_advance_permissions_", comment: ""),
+            image: utility.loadImage(named: "rename", colors: [NCBrandColor.shared.brandElement])
+        ) { [self] _ in
+            openAdvancePermission(shareController: shareController)
         }
+        actions.append(advancePermissionAction)
+//        }
         
         // Send email
         if (share.shareType != NKShare.ShareType.publicLink.rawValue) {

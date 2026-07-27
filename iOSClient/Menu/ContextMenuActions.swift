@@ -161,4 +161,38 @@ enum ContextMenuActions {
             }
         }
     }
+    
+    /// Save selected files to user's photo library
+    static func saveMediaAction(selectedMediaMetadatas: [tableMetadata], controller: NCMainTabBarController?, completion: (() -> Void)? = nil) -> UIAction {
+        return UIAction(
+            title: NSLocalizedString("_save_selected_files_", comment: ""),
+            image: NCUtility().loadImage(named: "save_files",colors: [NCBrandColor.shared.iconImageColor]).withTintColor(NCBrandColor.shared.iconImageColor),
+        ) { _ in
+            
+            for metadata in selectedMediaMetadatas {
+                Task {
+                    if NCUtilityFileSystem().fileProviderStorageExists(metadata) {
+                        await NCNetworking.shared.transferDispatcher.notifyAllDelegates { delegate in
+                            delegate.transferChange(status: NCGlobal.shared.networkingStatusDownloaded,
+                                                    account: metadata.account,
+                                                    fileName: metadata.fileName,
+                                                    serverUrl: metadata.serverUrl,
+                                                    selector: NCGlobal.shared.selectorSaveAlbum,
+                                                    ocId: metadata.ocId,
+                                                    destination: nil,
+                                                    error: .success)
+                        }
+                    } else {
+                        if let metadata = await NCManageDatabase.shared.setMetadataSessionInWaitDownloadAsync(ocId: metadata.ocId,
+                                                                                                    session: NCNetworking.shared.sessionDownload,
+                                                                                                    selector: NCGlobal.shared.selectorSaveAlbum,
+                                                                                                              sceneIdentifier: controller?.sceneIdentifier) {
+                            await NCNetworking.shared.downloadFile(metadata: metadata)
+                        }
+                    }
+                }
+            }
+            completion?()
+        }
+    }
 }
