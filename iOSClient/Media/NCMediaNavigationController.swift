@@ -252,6 +252,7 @@ class NCMediaNavigationController: NCMainNavigationController {
                     } else {
                         media.fileSelect = media.dataSource.metadatas.compactMap({ $0.ocId })
                     }
+                    media.tabBarSelect.selectCount = media.fileSelect.count
                     Task {
                         await media.loadDataSource()
                         await media.networkRemoveAll()
