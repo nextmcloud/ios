@@ -9,6 +9,7 @@
 import SwiftUI
 import NextcloudKit
 import UniformTypeIdentifiers
+import Photos
 
 struct NCUploadAssetsView: View {
     @ObservedObject var model: NCUploadAssetsModel
@@ -57,7 +58,7 @@ struct NCUploadAssetsView: View {
                                         }
                                         if item.data != nil {
                                             Button(action: {
-                                                if let image = model.previewStore[index].asset.fullResolutionImage?.resizeImage(size: CGSize(width: 240, height: 240), isAspectRation: true) {
+                                                if let image = model.previewStore[index].asset.fullResolutionImage?.resizeImage(size: CGSize(width: 320, height: 320), isAspectRation: true) {
                                                     model.previewStore[index].image = image
                                                     model.previewStore[index].data = nil
                                                     model.previewStore[index].assetType = model.previewStore[index].asset.type
@@ -248,6 +249,22 @@ struct NCUploadAssetsView: View {
         @ObservedObject var model: NCUploadAssetsModel
         @State var index: Int
 
+        private var thumbnailSize: CGSize {
+            let scale = UIScreen.main.scale
+            return CGSize(width: 80 * scale * 1.5, height: 80 * scale * 1.5)
+        }
+
+        private func requestThumbnail(for asset: PHAsset, targetSize: CGSize, completion: @escaping (UIImage?) -> Void) {
+            let options = PHImageRequestOptions()
+            options.deliveryMode = .highQualityFormat
+            options.resizeMode = .fast
+            options.isSynchronous = false
+            options.isNetworkAccessAllowed = true
+            PHImageManager.default().requestImage(for: asset, targetSize: targetSize, contentMode: .aspectFill, options: options) { image, _ in
+                completion(image)
+            }
+        }
+
         var body: some View {
             ZStack(alignment: .bottomTrailing) {
                 if index < model.previewStore.count {
@@ -255,8 +272,11 @@ struct NCUploadAssetsView: View {
                     if let image = item.image {
                         Image(uiImage: image)
                             .resizable()
+                            .interpolation(.high)
+                            .antialiased(true)
                             .aspectRatio(contentMode: .fill)
                             .frame(width: 80, height: 80, alignment: .center)
+                            .clipped()
                             .cornerRadius(10)
                     } else {
                         Color(.lightGray) // Placeholder
@@ -264,9 +284,17 @@ struct NCUploadAssetsView: View {
                             .cornerRadius(10)
                             .onAppear {
                                 DispatchQueue.main.async {
-                                    if let asset = item.asset.phAsset,
-                                       let image = model.lowResolutionImage(asset: asset) {
-                                        model.previewStore[index].image = image
+                                    if index < model.previewStore.count {
+                                        let current = model.previewStore[index]
+                                        if let asset = current.asset.phAsset {
+                                            requestThumbnail(for: asset, targetSize: thumbnailSize) { image in
+                                                if let image = image {
+                                                    model.previewStore[index].image = image
+                                                } else if let fallback = model.lowResolutionImage(asset: asset) {
+                                                    model.previewStore[index].image = fallback
+                                                }
+                                            }
+                                        }
                                     }
                                 }
                             }
