@@ -100,8 +100,8 @@ extension NCCollectionViewCommon {
 
         if metadata.e2eEncrypted {
             cell.previewImg?.image = imageCache.getFolderEncrypted()
-        } else if metadata.permissions.contains("S"), (metadata.permissions.range(of: "S") != nil) {
-            cell.previewImg?.image = imageCache.getFolderSharedWithMe()
+//        } else if metadata.permissions.contains("S"), (metadata.permissions.range(of: "S") != nil) {
+//            cell.previewImg?.image = imageCache.getFolderSharedWithMe()
         } else if (!metadata.shareType.isEmpty || !(shares.share?.isEmpty ?? true) || (shares.firstShareLink != nil)) || isShare || hasEmailAndLinkShares {
             cell.previewImg?.image = imageCache.getFolderPublic()
         } else if metadata.mountType == "group" {

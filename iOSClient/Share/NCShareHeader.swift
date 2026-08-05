@@ -134,8 +134,8 @@ class NCShareAdvancePermissionHeader: UITableViewHeaderFooterView {
                 
                 if metadata.e2eEncrypted {
                     imageView.image = NCImageCache.shared.getFolderEncrypted()
-                } else if metadata.permissions.contains("S"), (metadata.permissions.range(of: "S") != nil) {
-                    imageView.image = NCImageCache.shared.getFolderSharedWithMe()
+//                } else if metadata.permissions.contains("S"), (metadata.permissions.range(of: "S") != nil) {
+//                    imageView.image = NCImageCache.shared.getFolderSharedWithMe()
                 } else if (!metadata.shareType.isEmpty || !(shares.share?.isEmpty ?? true) || (shares.firstShareLink != nil)) || isShare || hasEmailAndLinkShares {
                     imageView.image = NCImageCache.shared.getFolderPublic()
                 } else if metadata.mountType == "group" {

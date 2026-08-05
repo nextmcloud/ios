@@ -184,7 +184,7 @@ class NCEndToEndSetup {
 
             // To fix NMC-6362 - iOS v11.0.0(2) - E2EE - E2EE activation fails with “Public key does not match the certificate” error
             // Comment try verifyPublicKey(publicKey) line for now
-            try verifyPublicKey(publicKey)
+//            try verifyPublicKey(publicKey)
 
             NCPreferences().setEndToEndPublicKey(account: self.session.account, publicKey: publicKey)
             NCManageDatabase.shared.clearTablesE2EE(account: self.session.account)
@@ -278,7 +278,7 @@ class NCEndToEndSetup {
 
             // To fix NMC-6362 - iOS v11.0.0(2) - E2EE - E2EE activation fails with “Public key does not match the certificate” error
             // Comment try verifyPublicKey(publicKey) line for now
-            try verifyPublicKey(publicKey)
+//            try verifyPublicKey(publicKey)
 
             // Finalize
 

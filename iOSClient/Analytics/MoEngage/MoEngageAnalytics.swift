@@ -120,22 +120,22 @@ class MoEngageAnalytics: NSObject {
             self.triggerMoEngage()
         }
         else {
-#if targetEnvironment(simulator)
-            // Simulator: Always show fallback alert
-            print("In-App  shown: showInApp)")
-            let appID = "312838242"
-            
-            // Correct URLs with /app/id/ prefix
-            let webURLString = "https://apps.apple.com\(appID)?action=write-review"
-            
-            self.showSimulatorAlert(link: webURLString)
-#else
+//#if targetEnvironment(simulator)
+//            // Simulator: Always show fallback alert
+//            print("In-App  shown: showInApp)")
+//            let appID = "312838242"
+//            
+//            // Correct URLs with /app/id/ prefix
+//            let webURLString = "https://apps.apple.com\(appID)?action=write-review"
+//            
+//            self.showSimulatorAlert(link: webURLString)
+//#else
             // iPad Fallback: Scene might be transitioning. Retry once.
             print("iPad Scene transition detected. Retrying...")
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                 self.triggerMoEngage()
             }
-#endif
+//#endif
         }
     }
 

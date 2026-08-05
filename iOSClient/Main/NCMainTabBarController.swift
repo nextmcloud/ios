@@ -39,6 +39,8 @@ class NCMainTabBarController: UITabBarController {
         return tabBar.frame.height - tabBar.safeAreaInsets.top
     }
 
+    private var isSelectionModeActive: Bool = false
+
     override func viewDidLoad() {
         super.viewDidLoad()
         delegate = self
@@ -78,6 +80,23 @@ class NCMainTabBarController: UITabBarController {
                 self.timerTask = Task { @MainActor [weak self] in
                     await self?.timerCheck()
                 }
+            }
+        }
+        
+        // Observe selection mode changes to manage tab bar visibility and avoid overlap with action bar
+        NotificationCenter.default.addObserver(self, selector: #selector(handleSelectionModeDidBegin(_:)), name: Notification.Name("NCSelectionModeDidBegin"), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(handleSelectionModeDidEnd(_:)), name: Notification.Name("NCSelectionModeDidEnd"), object: nil)
+        
+        Task { @MainActor in
+            let session = NCSession.shared.getSession(controller: self)
+            // Option 1: Use a preloader service
+//            await NCMediaPreloader.shared.preload(for: session)
+            
+            // Option 2: If you can access the media VC instance directly:
+            if let mediaNav = self.viewControllers?.first(where: { ($0 as? UINavigationController)?.topViewController is NCMedia }) as? UINavigationController,
+               let mediaVC = mediaNav.topViewController as? NCMedia {
+                await mediaVC.loadDataSource()
+                await mediaVC.searchMediaUI(true)
             }
         }
     }
@@ -229,6 +248,16 @@ class NCMainTabBarController: UITabBarController {
             tabBar.isHidden = false
         }
     }
+    
+    @objc private func handleSelectionModeDidBegin(_ notification: Notification) {
+        isSelectionModeActive = true
+        hide()
+    }
+
+    @objc private func handleSelectionModeDidEnd(_ notification: Notification) {
+        isSelectionModeActive = false
+        show()
+    }
 }
 
 extension NCMainTabBarController: UITabBarControllerDelegate {
@@ -237,6 +266,10 @@ extension NCMainTabBarController: UITabBarControllerDelegate {
             scrollToTop(viewController: viewController)
         }
         previousIndex = tabBarController.selectedIndex
+        // Always ensure the tab bar is visible when switching tabs
+        if let main = tabBarController as? NCMainTabBarController, !main.isSelectionModeActive {
+            main.show()
+        }
     }
 
     private func scrollToTop(viewController: UIViewController) {

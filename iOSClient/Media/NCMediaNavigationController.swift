@@ -353,16 +353,28 @@ class NCMediaNavigationController: NCMainNavigationController {
      
      static private func createNewAlbum(for name: String, selectedPhotos: [String], controller: UIViewController, account: String) {
          
-         guard  let delegate = UIApplication.shared.delegate as? AppDelegate else { return }
+         // Use the provided account to avoid mismatches between UI and networking
+         // (Do not rely on AppDelegate.account here)
          
          controller.showLoader()
-         NextcloudKit.shared.createNewAlbum(for: delegate.account, albumName: name) { result in
+         NextcloudKit.shared.createNewAlbum(for: account, albumName: name) { result in
              controller.hideLoader()
              switch result {
              case .success(_):
                  AlbumsManager.shared.syncAlbums { resultAlbums in
                      if let newAlbum = resultAlbums.first(where: { $0.name == name }) {
-                         addPhotosToAlbum(album: newAlbum, selectedPhotos: selectedPhotos, account: delegate.account)
+                         if selectedPhotos.isEmpty {
+                             // Ensure Albums tab is selected and show the newly created album
+                             NCMediaNavigationController.ensureAlbumsContextSelected()
+                             AlbumsNavigator.shared.push(.albumDetails(album: newAlbum))
+                             // Also notify to refresh any list views
+                             NotificationCenter.default.post(name: NCMediaNavigationController.photosAddedToAlbumNotification, object: nil)
+                         } else {
+                             addPhotosToAlbum(album: newAlbum, selectedPhotos: selectedPhotos, account: account)
+                         }
+                     } else {
+                         // Album not yet visible in the sync result; still notify UI to refresh
+                         NotificationCenter.default.post(name: NCMediaNavigationController.photosAddedToAlbumNotification, object: nil)
                      }
                  }
                  
@@ -403,7 +415,10 @@ class NCMediaNavigationController: NCMainNavigationController {
     static func addPhotosToAlbum(album: Album, selectedPhotos: [String], account: String) {
         
         if selectedPhotos.isEmpty {
+            // Ensure Albums tab and navigate to details; also notify lists to refresh
+            NCMediaNavigationController.ensureAlbumsContextSelected()
             AlbumsNavigator.shared.push(.albumDetails(album: album))
+            NotificationCenter.default.post(name: NCMediaNavigationController.photosAddedToAlbumNotification, object: nil)
             return
         }
         

@@ -626,7 +626,11 @@ class NCContextMenuMain: NSObject {
                 if shouldShowMenu {
                     let deferredElement = UIDeferredMenuElement { completion in
                         Task {
-                            var iconImage = (UIImage(systemName: "archivebox") ?? UIImage(systemName: "tray.and.arrow.down"))?.withRenderingMode(.alwaysTemplate)
+                            var iconImage: UIImage? = {
+                                let base = UIImage(systemName: "archivebox") ?? UIImage(systemName: "tray.and.arrow.down")
+                                let config = UIImage.SymbolConfiguration(pointSize: 24, weight: .regular)
+                                return base?.applyingSymbolConfiguration(config)?.withRenderingMode(.alwaysTemplate) ?? UIImage(systemName: "square")
+                            }()
 
                             if let iconUrl = item.icon {
                                 // Normalize base and path to avoid double slashes and wrong bases
@@ -673,9 +677,26 @@ class NCContextMenuMain: NSObject {
                                 }
                             }
 
+                            // Normalize icon size to a fixed 24x24pt canvas to avoid misalignment
+                            if let img = iconImage {
+                                let targetSize = CGSize(width: 24, height: 24)
+                                let format = UIGraphicsImageRendererFormat.default()
+                                format.opaque = false
+                                format.scale = UIScreen.main.scale
+                                let renderer = UIGraphicsImageRenderer(size: targetSize, format: format)
+                                let rendered = renderer.image { _ in
+                                    // Compute aspect-fit rect
+                                    let aspect = min(targetSize.width / max(img.size.width, 1), targetSize.height / max(img.size.height, 1))
+                                    let newSize = CGSize(width: img.size.width * aspect, height: img.size.height * aspect)
+                                    let origin = CGPoint(x: (targetSize.width - newSize.width) / 2.0, y: (targetSize.height - newSize.height) / 2.0)
+                                    img.withRenderingMode(.alwaysTemplate).draw(in: CGRect(origin: origin, size: newSize))
+                                }
+                                iconImage = rendered.withRenderingMode(.alwaysTemplate)
+                            }
+
                             let action = UIAction(
-                                title: item.name,
-                                image: iconImage
+                                title: item.name.trimmingCharacters(in: .whitespacesAndNewlines),
+                                image: iconImage ?? UIImage(systemName: "square")
                             ) { _ in
                                 Task {
                                     let results = await NextcloudKit.shared.sendRequestAsync(

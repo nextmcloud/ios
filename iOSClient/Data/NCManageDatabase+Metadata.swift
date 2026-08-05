@@ -235,7 +235,7 @@ extension tableMetadata {
         if !capabilities.fileSharingApiEnabled || (capabilities.e2EEEnabled && isDirectoryE2EE) {
             return false
         }
-        return true
+        return !e2eEncrypted
     }
 
     var hasPreviewBorder: Bool {

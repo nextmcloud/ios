@@ -94,7 +94,7 @@ final class NCBrandOptions: @unchecked Sendable {
         
     // BRAND ONLY
     // Set use_login_web_personalized to true for prod and false for configurable path
-    var use_login_web_personalized: Bool = false                               // Don't touch me !!
+    var use_login_web_personalized: Bool = true                               // Don't touch me !!
     var use_GroupApps: Bool = true
     
     var use_AppConfig: Bool = false                                                         // Don't touch me !!

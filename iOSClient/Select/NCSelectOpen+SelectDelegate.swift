@@ -20,6 +20,11 @@ final class NCSelectOpen: NCSelectDelegate {
 
                 } else if move {
                     for case let metadata as tableMetadata in items {
+                        // Prevent moving an item to the same folder
+                        if metadata.serverUrl == destination {
+                            await controller?.present(UIAlertController.warning(message: NSLocalizedString("_cannot_move_to_same_folder_", comment: "Cannot move to the same folder")), animated: true)
+                            continue
+                        }
                         if metadata.status != NCGlobal.shared.metadataStatusNormal, metadata.status != NCGlobal.shared.metadataStatusWaitMove {
                             continue
                         }
@@ -97,3 +102,4 @@ final class NCSelectOpen: NCSelectDelegate {
         }
     }
 }
+

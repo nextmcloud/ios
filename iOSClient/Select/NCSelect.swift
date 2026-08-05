@@ -418,8 +418,8 @@ extension NCSelect: UICollectionViewDataSource {
         if metadata.directory {
             if metadata.e2eEncrypted {
                 cell.imageItem.image = NCImageCache.shared.getFolderEncrypted()
-            } else if metadata.permissions.contains("S"), (metadata.permissions.range(of: "S") != nil) {
-                cell.imageItem.image = NCImageCache.shared.getFolderSharedWithMe()
+//            } else if metadata.permissions.contains("S"), (metadata.permissions.range(of: "S") != nil) {
+//                cell.imageItem.image = NCImageCache.shared.getFolderSharedWithMe()
             } else if isShare || !metadata.shareType.isEmpty {
                 cell.imageItem.image = NCImageCache.shared.getFolderPublic()
             } else if metadata.mountType == "group" {
