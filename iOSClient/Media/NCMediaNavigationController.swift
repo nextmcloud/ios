@@ -9,6 +9,7 @@ import SwiftUI
 class NCMediaNavigationController: NCMainNavigationController {
 
     static let photosAddedToAlbumNotification = Notification.Name("NCMediaPhotosAddedToAlbumNotification")
+    static let showAlbumDetailsNotification = Notification.Name("NCMediaShowAlbumDetailsNotification")
 
     // MARK: - Right
 
@@ -364,11 +365,11 @@ class NCMediaNavigationController: NCMainNavigationController {
                  AlbumsManager.shared.syncAlbums { resultAlbums in
                      if let newAlbum = resultAlbums.first(where: { $0.name == name }) {
                          if selectedPhotos.isEmpty {
-                             // Ensure Albums tab is selected and show the newly created album
-                             NCMediaNavigationController.ensureAlbumsContextSelected()
-                             AlbumsNavigator.shared.push(.albumDetails(album: newAlbum))
-                             // Also notify to refresh any list views
-                             NotificationCenter.default.post(name: NCMediaNavigationController.photosAddedToAlbumNotification, object: nil)
+                             DispatchQueue.main.async {
+                                 _ = NCMediaNavigationController.ensureAlbumsContextSelected()
+                                 NotificationCenter.default.post(name: NCMediaNavigationController.showAlbumDetailsNotification, object: newAlbum)
+                                 NotificationCenter.default.post(name: NCMediaNavigationController.photosAddedToAlbumNotification, object: nil)
+                             }
                          } else {
                              addPhotosToAlbum(album: newAlbum, selectedPhotos: selectedPhotos, account: account)
                          }
@@ -415,9 +416,8 @@ class NCMediaNavigationController: NCMainNavigationController {
     static func addPhotosToAlbum(album: Album, selectedPhotos: [String], account: String) {
         
         if selectedPhotos.isEmpty {
-            // Ensure Albums tab and navigate to details; also notify lists to refresh
-            NCMediaNavigationController.ensureAlbumsContextSelected()
-            AlbumsNavigator.shared.push(.albumDetails(album: album))
+            _ = NCMediaNavigationController.ensureAlbumsContextSelected()
+            NotificationCenter.default.post(name: NCMediaNavigationController.showAlbumDetailsNotification, object: album)
             NotificationCenter.default.post(name: NCMediaNavigationController.photosAddedToAlbumNotification, object: nil)
             return
         }
@@ -427,6 +427,8 @@ class NCMediaNavigationController: NCMainNavigationController {
         func finishIfDone() {
             completed += 1
             if completed >= total {
+                NotificationCenter.default.post(name: NCMediaNavigationController.showAlbumDetailsNotification, object: album)
+                AlbumsManager.shared.syncAlbums()
                 NotificationCenter.default.post(name: NCMediaNavigationController.photosAddedToAlbumNotification, object: nil)
             }
         }
@@ -449,9 +451,6 @@ class NCMediaNavigationController: NCMainNavigationController {
                     tabbarController.selectedIndex = NCGlobal.shared.selectedTabIndexAlbum
                     // Pop the current navigation stack in Albums to root (dashboard)
                     tabbarController.navigationController?.popToRootViewController(animated: false)
-                    // Push the album details route through AlbumsNavigator
-                    AlbumsNavigator.shared.push(.albumDetails(album: album))
-                    AlbumsManager.shared.syncAlbums()
                     finishIfDone()
                 case .failure(let error):
                     let nkError = NKError(error: error)
@@ -479,4 +478,3 @@ class NCMediaNavigationController: NCMainNavigationController {
         NotificationCenter.default.removeObserver(self, name: Self.photosAddedToAlbumNotification, object: nil)
     }
 }
-
