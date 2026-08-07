@@ -304,16 +304,15 @@ class NCShareAdvancePermission: UITableViewController, NCShareAdvanceFotterDeleg
         }
 
         Task {
-            if (share.shareType == NKShare.ShareType.publicLink.rawValue || share.shareType == NKShare.ShareType.email.rawValue) && NCSharePermissions.hasPermissionToShare(share.permissions) {
+            if (share.shareType == NKShare.ShareType.publicLink.rawValue) && NCSharePermissions.hasPermissionToShare(share.permissions) {
                 share.permissions = share.permissions - NKShare.Permission.share.rawValue
             }
-
-//            guard share.permissions > 0 else {
-//                NCContentPresenter().showInfo(title: "_share_permission_should_not_be_empty_")
-//                return
-//            }
             
             if isNewShare {
+
+                if (share.shareType == NKShare.ShareType.email.rawValue) {
+                    share.permissions = NKShare.Permission.read.rawValue
+                }
                 let capabilities = await NKCapabilities.shared.getCapabilities(for: metadata.account)
 
                 if share.shareType != NKShare.ShareType.publicLink.rawValue, metadata.e2eEncrypted,

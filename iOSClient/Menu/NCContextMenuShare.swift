@@ -176,7 +176,7 @@ class NCContextMenuShare: NSObject {
 
         navigationController.pushViewController(advancePermission, animated: true)
         // Prime Advanced Permissions header to reflect latest favorite/share state
-        NotificationCenter.default.post(name: Notification.Name("NCMetadataFavoriteDidChange"), object: nil, userInfo: ["ocId": metadata.ocId, "favorite": metadata.favorite])
+//        NotificationCenter.default.post(name: Notification.Name("NCMetadataFavoriteDidChange"), object: nil, userInfo: ["ocId": metadata.ocId, "favorite": metadata.favorite])
     }
 
     @MainActor

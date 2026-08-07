@@ -99,6 +99,29 @@ class NCShareUserCell: UITableViewCell, NCCellProtocol {
     }
 
     // MARK: - UI Setup
+    
+    private func setupCellUI(userId: String) {
+        guard let tableShare = tableShare else { return }
+
+        labelTitle.text = tableShare.shareWithDisplayname
+
+        let isOwner = tableShare.uidOwner == userId || tableShare.uidFileOwner == userId
+        isUserInteractionEnabled = isOwner
+        buttonMenu.isHidden = !isOwner
+        buttonMenu.accessibilityLabel = NSLocalizedString("_more_", comment: "")
+
+        btnQuickStatus.setTitle("", for: .normal)
+        btnQuickStatus.isEnabled = true
+        btnQuickStatus.accessibilityHint = NSLocalizedString("_user_sharee_footer_", comment: "")
+        btnQuickStatus.contentHorizontalAlignment = .left
+
+        imageExpiredDateSet.isHidden = true
+        imagePasswordSet.isHidden = true
+        
+        setupCellUIAppearance()
+        updatePermissionUI()
+    }
+    
     private func setupCellUIAppearance() {
         labelQuickStatus.textColor = NCBrandColor.shared.shareBlueColor
         labelTitle.textColor = NCBrandColor.shared.label
@@ -131,25 +154,6 @@ class NCShareUserCell: UITableViewCell, NCCellProtocol {
         imageExpiredDateSet.isHidden = (tableShare.expirationDate == nil)
         
         leadingContraintofImageRightArrow.constant = (imagePasswordSet.isHidden && imageExpiredDateSet.isHidden) ? 0 : 5
-    }
-
-    private func setupCellUI(userId: String) {
-        guard let tableShare = tableShare else { return }
-
-        labelTitle.text = tableShare.shareWithDisplayname
-
-        let isOwner = tableShare.uidOwner == userId || tableShare.uidFileOwner == userId
-        isUserInteractionEnabled = isOwner
-        buttonMenu.isHidden = !isOwner
-        buttonMenu.accessibilityLabel = NSLocalizedString("_more_", comment: "")
-
-        btnQuickStatus.setTitle("", for: .normal)
-        btnQuickStatus.isEnabled = true
-        btnQuickStatus.accessibilityHint = NSLocalizedString("_user_sharee_footer_", comment: "")
-        btnQuickStatus.contentHorizontalAlignment = .left
-
-        setupCellUIAppearance()
-        updatePermissionUI()
     }
 
     private func getTypeString(_ tableShare: tableShareV2) -> String {

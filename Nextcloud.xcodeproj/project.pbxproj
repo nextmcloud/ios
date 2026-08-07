@@ -88,6 +88,8 @@
 		B514D20C3010F42000E9CF05 /* NCViewerNextcloudText.swift in Sources */ = {isa = PBXBuildFile; fileRef = B514D20A3010F42000E9CF05 /* NCViewerNextcloudText.swift */; };
 		B514D20D3010F42000E9CF05 /* NCViewerNextcloudText.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B514D2093010F42000E9CF05 /* NCViewerNextcloudText.storyboard */; };
 		B533EDF42FD80C8F00D430A5 /* Queuer in Frameworks */ = {isa = PBXBuildFile; productRef = B533EDF32FD80C8F00D430A5 /* Queuer */; };
+		B55D499B3025D3F900CF844D /* JGProgressHUD in Frameworks */ = {isa = PBXBuildFile; productRef = B55D499A3025D3F900CF844D /* JGProgressHUD */; };
+		B55D499D3025D52100CF844D /* JGProgressHUD in Frameworks */ = {isa = PBXBuildFile; productRef = B55D499C3025D52100CF844D /* JGProgressHUD */; };
 		B55F81B72FF4E0AA0053242A /* TextTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = B55F81B62FF4E0AA0053242A /* TextTableViewCell.xib */; };
 		B55F81B82FF4E0AA0053242A /* NCCreateFormUploadVoiceNote.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B55F81B22FF4E0AA0053242A /* NCCreateFormUploadVoiceNote.storyboard */; };
 		B55F81B92FF4E0AA0053242A /* NCCreateFormUploadDocuments.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B55F81B02FF4E0AA0053242A /* NCCreateFormUploadDocuments.storyboard */; };
@@ -1907,6 +1909,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				F710FC80277B7D2700AA9FBF /* RealmSwift in Frameworks */,
+				B55D499D3025D52100CF844D /* JGProgressHUD in Frameworks */,
 				F74C863D2AEFBFD9009A1D4A /* LRUCache in Frameworks */,
 				F70557B92ED44E4700135623 /* LucidBanner in Frameworks */,
 				F72AD70F28C24BA1006CB92D /* NextcloudKit in Frameworks */,
@@ -1978,6 +1981,7 @@
 				F70557B72ED44E2700135623 /* LucidBanner in Frameworks */,
 				B5E2E0572FDACC8200FAA4FD /* MoEngageSDK in Frameworks */,
 				B5E2E07A2FDAD02500FAA4FD /* SwiftEntryKit in Frameworks */,
+				B55D499B3025D3F900CF844D /* JGProgressHUD in Frameworks */,
 				B5E2E0662FDACE1700FAA4FD /* TealiumInAppPurchase in Frameworks */,
 				F3374AF42D78B01B002A38F9 /* DequeModule in Frameworks */,
 				F7160A822BE933390034DCB3 /* RealmSwift in Frameworks */,
@@ -3829,6 +3833,7 @@
 				F33EE6E62BF4C02600CA1A51 /* NIOSSL */,
 				F70557B82ED44E4700135623 /* LucidBanner */,
 				B5E2E07B2FDAD06500FAA4FD /* SwiftEntryKit */,
+				B55D499C3025D52100CF844D /* JGProgressHUD */,
 			);
 			productName = "Share Ext";
 			productReference = F7CE8AFB1DC1F8D8009CAE48 /* Share.appex */;
@@ -3946,6 +3951,7 @@
 				B5E2E0992FDAD9CC00FAA4FD /* FirebaseMessaging */,
 				B5E2E09B2FDAD9CC00FAA4FD /* FirebaseRemoteConfig */,
 				B5FF03E92FE90A3200E21622 /* XLForm */,
+				B55D499A3025D3F900CF844D /* JGProgressHUD */,
 			);
 			productName = "Crypto Cloud";
 			productReference = F7CE8AFA1DC1F8D8009CAE48 /* Nextcloud.app */;
@@ -4093,6 +4099,7 @@
 				B5E2E0782FDAD02500FAA4FD /* XCRemoteSwiftPackageReference "SwiftEntryKit" */,
 				B5E2E0882FDAD50400FAA4FD /* XCRemoteSwiftPackageReference "MarqueeLabel" */,
 				B5FF03E82FE90A3200E21622 /* XCRemoteSwiftPackageReference "XLForm" */,
+				B55D49993025D3F900CF844D /* XCRemoteSwiftPackageReference "JGProgressHUD" */,
 			);
 			productRefGroup = F7F67B9F1A24D27800EE80DA;
 			projectDirPath = "";
@@ -6006,6 +6013,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		B55D49993025D3F900CF844D /* XCRemoteSwiftPackageReference "JGProgressHUD" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/JonasGessner/JGProgressHUD.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.2.0;
+			};
+		};
 		B5E2E03E2FDACBC000FAA4FD /* XCRemoteSwiftPackageReference "ios_sdk" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/adjust/ios_sdk";
@@ -6253,6 +6268,16 @@
 			isa = XCSwiftPackageProductDependency;
 			package = F76DA961277B760E0082465B /* XCRemoteSwiftPackageReference "Queuer" */;
 			productName = Queuer;
+		};
+		B55D499A3025D3F900CF844D /* JGProgressHUD */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B55D49993025D3F900CF844D /* XCRemoteSwiftPackageReference "JGProgressHUD" */;
+			productName = JGProgressHUD;
+		};
+		B55D499C3025D52100CF844D /* JGProgressHUD */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B55D49993025D3F900CF844D /* XCRemoteSwiftPackageReference "JGProgressHUD" */;
+			productName = JGProgressHUD;
 		};
 		B5E2E03F2FDACBC000FAA4FD /* AdjustSdk */ = {
 			isa = XCSwiftPackageProductDependency;

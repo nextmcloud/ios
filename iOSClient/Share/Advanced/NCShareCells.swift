@@ -66,10 +66,8 @@ enum NCUserPermission: CaseIterable, NCPermission {
     var permissionBitFlag: Int {
         return switch self {
         case .read: NKShare.Permission.read.rawValue
-        case .reshare: NKShare.Permission.share.rawValue
         case .edit: NKShare.Permission.update.rawValue
         case .create: NKShare.Permission.create.rawValue
-//        case .delete: NKShare.Permission.delete.rawValue
         }
     }
 
@@ -89,17 +87,15 @@ enum NCUserPermission: CaseIterable, NCPermission {
         return []
     }
 
-    case read, reshare, edit, create//, delete
+    case read, edit, create
     static let forDirectory: [NCUserPermission] = NCUserPermission.allCases
-    static let forFile: [NCUserPermission] = [.read, .reshare, .edit]
+    static let forFile: [NCUserPermission] = [.read, .edit]
 
     var title: String {
         switch self {
         case .read: return NSLocalizedString("_share_can_read_", comment: "")
-        case .reshare: return NSLocalizedString("_share_can_reshare_", comment: "")
         case .edit: return NSLocalizedString("_share_can_change_", comment: "")
         case .create: return NSLocalizedString("_share_can_create_", comment: "")
-//        case .delete: return NSLocalizedString("_share_can_delete_", comment: "")
         }
     }
 }
@@ -125,8 +121,9 @@ enum NCLinkEmailPermission: CaseIterable, NCPermission {
         return switch self {
         case .read: NKShare.Permission.read.rawValue
         case .edit: NKShare.Permission.update.rawValue
-        case .create: NKShare.Permission.create.rawValue
-//        case .delete: NKShare.Permission.delete.rawValue
+        case .uploadEdit: NKShare.Permission.create.rawValue
+        case .fileDrop: NKShare.Permission.create.rawValue
+        case .secureFileDrop: NKShare.Permission.create.rawValue
         }
     }
 
@@ -137,18 +134,31 @@ enum NCLinkEmailPermission: CaseIterable, NCPermission {
     func isOn(for share: Shareable) -> Bool {
         return (share.permissions & permissionBitFlag) != 0
     }
+    
+//    func didChange(_ share: Shareable, to newValue: Bool) {
+//        guard self != .edit || newValue else {
+//            share.permissions = NKShare.Permission.read.rawValue
+//            return
+//        }
+//        share.permissions = permissionBitFlag
+//    }
+
+    func hasResharePermission(for parentPermission: Int) -> Bool {
+        permissionBitFlag & parentPermission == permissionBitFlag
+    }
 
     var title: String {
         switch self {
         case .read: return NSLocalizedString("_share_can_read_", comment: "")
         case .edit: return NSLocalizedString("_share_can_change_", comment: "")
-        case .create: return NSLocalizedString("_share_can_create_", comment: "")
-//        case .delete: return NSLocalizedString("_share_can_delete_", comment: "")
+        case .uploadEdit: return NSLocalizedString("_share_allow_upload_", comment: "")
+        case .fileDrop: return NSLocalizedString("_share_file_drop_", comment: "")
+        case .secureFileDrop: return NSLocalizedString("_share_secure_file_drop_", comment: "")
         }
     }
 
-    case edit, read, create//, delete
-    static let forDirectory: [NCLinkEmailPermission] = NCLinkEmailPermission.allCases
+    case edit, read, uploadEdit, fileDrop, secureFileDrop
+    static let forDirectory: [NCLinkEmailPermission] = [.read, .uploadEdit, .fileDrop]
     static let forFile: [NCLinkEmailPermission] = [.read, .edit]
 }
 
@@ -224,7 +234,8 @@ struct NCShareConfig {
         self.shareable = share
         self.sharePermission = parentMetadata.sharePermissionsCollaborationServices
         self.isDirectory = parentMetadata.directory
-        let type: NCPermission.Type = (share.shareType == NKShare.ShareType.publicLink.rawValue || share.shareType == NKShare.ShareType.email.rawValue) ? NCLinkEmailPermission.self : NCUserPermission.self
+//        let type: NCPermission.Type = (share.shareType == NKShare.ShareType.publicLink.rawValue || share.shareType == NKShare.ShareType.email.rawValue) ? NCLinkEmailPermission.self : NCUserPermission.self
+        let type: NCPermission.Type = share.shareType == NKShare.ShareType.publicLink.rawValue ? NCLinkEmailPermission.self : NCUserPermission.self
         self.permissions = parentMetadata.directory ? (parentMetadata.e2eEncrypted ? type.forDirectoryE2EE(account: parentMetadata.account) : type.forDirectory) : type.forFile
 
         switch share.shareType {

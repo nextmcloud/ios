@@ -174,6 +174,8 @@ class NCShareAdvancePermissionHeader: UITableViewHeaderFooterView {
                     await MainActor.run {
                         self.updateFavoriteIcon(isFavorite: updated.favorite)
                     }
+                    // Broadcast favorite change so other screens can update their headers
+//                    NotificationCenter.default.post(name: NSNotification.Name("NCMetadataFavoriteDidChange"), object: updated, userInfo: ["ocId": updated.ocId])
                 }
             } else {
                 await MainActor.run {
