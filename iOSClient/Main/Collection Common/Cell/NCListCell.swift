@@ -107,6 +107,10 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellMainP
 
         buttonShared.setImage(nil, for: .normal)
         buttonShared.imageEdgeInsets = .zero
+        buttonShared.adjustsImageWhenHighlighted = false
+        buttonShared.adjustsImageWhenDisabled = false
+        buttonShared.alpha = 1.0
+        buttonShared.tintAdjustmentMode = .normal
 
         buttonMore.setImage(nil, for: .normal)
         buttonMore.menu = nil
@@ -376,6 +380,17 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellMainP
             imageStatus.layer.cornerRadius = imageStatus.bounds.width / 2
         }
     }
+    
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        // Ensure share button stays fully visible across light/dark switches
+        buttonShared.alpha = 1.0
+        buttonShared.tintAdjustmentMode = .normal
+        // If the image uses template rendering elsewhere, enforce alwaysOriginal here as a safeguard
+        if let image = buttonShared.image(for: .normal) {
+            buttonShared.setImage(image.withRenderingMode(.alwaysOriginal), for: .normal)
+        }
+    }
 }
 
 // MARK: - List Layout
@@ -517,9 +532,9 @@ extension NCCollectionViewCommon {
             cell.buttonShared.setImage(imageCache.getImageShared(), for: .normal)
         } else if hasAnyShare || isShare {
             // Shared by me or has link/email shares
-            cell.buttonShared.setImage(imageCache.getImageShared().image(color: NCBrandColor.shared.customer), for: .normal)
+            cell.buttonShared.setImage(imageCache.getImageShared().withTintColor(NCBrandColor.shared.customer, renderingMode: .alwaysOriginal), for: .normal)
         } else {
-            cell.buttonShared.setImage(imageCache.getImageCanShare().image(color: NCBrandColor.shared.customerDarkGrey), for: .normal)
+            cell.buttonShared.setImage(imageCache.getImageCanShare().withTintColor(.label, renderingMode: .alwaysOriginal), for: .normal)
         }
         
         // Button More
@@ -625,3 +640,5 @@ extension NCCollectionViewCommon {
     }
 }
 #endif
+
+
