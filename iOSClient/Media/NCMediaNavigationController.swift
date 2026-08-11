@@ -365,11 +365,7 @@ class NCMediaNavigationController: NCMainNavigationController {
                  AlbumsManager.shared.syncAlbums { resultAlbums in
                      if let newAlbum = resultAlbums.first(where: { $0.name == name }) {
                          if selectedPhotos.isEmpty {
-                             DispatchQueue.main.async {
-                                 _ = NCMediaNavigationController.ensureAlbumsContextSelected()
-                                 NotificationCenter.default.post(name: NCMediaNavigationController.showAlbumDetailsNotification, object: newAlbum)
-                                 NotificationCenter.default.post(name: NCMediaNavigationController.photosAddedToAlbumNotification, object: nil)
-                             }
+                             showAlbumAndNotify(newAlbum)
                          } else {
                              addPhotosToAlbum(album: newAlbum, selectedPhotos: selectedPhotos, account: account)
                          }
@@ -413,12 +409,23 @@ class NCMediaNavigationController: NCMainNavigationController {
         presentingController.present(navController, animated: true, completion: nil)
     }
     
+    private static func showAlbumAndNotify(_ album: Album) {
+        DispatchQueue.main.async {
+            // Ensure Albums tab is selected and get its navigation controller
+            let nav = ensureAlbumsContextSelectedAndGetNavController()
+            // Pop the Albums navigation stack to root (e.g., dashboard) to ensure a clean state
+            nav?.popToRootViewController(animated: false)
+            // Notify listeners to show the album details
+            NotificationCenter.default.post(name: NCMediaNavigationController.showAlbumDetailsNotification, object: album)
+            // Let Media UI exit edit mode and refresh
+            NotificationCenter.default.post(name: NCMediaNavigationController.photosAddedToAlbumNotification, object: nil)
+        }
+    }
+    
     static func addPhotosToAlbum(album: Album, selectedPhotos: [String], account: String) {
         
         if selectedPhotos.isEmpty {
-            _ = NCMediaNavigationController.ensureAlbumsContextSelected()
-            NotificationCenter.default.post(name: NCMediaNavigationController.showAlbumDetailsNotification, object: album)
-            NotificationCenter.default.post(name: NCMediaNavigationController.photosAddedToAlbumNotification, object: nil)
+            showAlbumAndNotify(album)
             return
         }
         
@@ -427,9 +434,8 @@ class NCMediaNavigationController: NCMainNavigationController {
         func finishIfDone() {
             completed += 1
             if completed >= total {
-                NotificationCenter.default.post(name: NCMediaNavigationController.showAlbumDetailsNotification, object: album)
                 AlbumsManager.shared.syncAlbums()
-                NotificationCenter.default.post(name: NCMediaNavigationController.photosAddedToAlbumNotification, object: nil)
+                showAlbumAndNotify(album)
             }
         }
         
@@ -446,11 +452,6 @@ class NCMediaNavigationController: NCMainNavigationController {
                 
                 switch result {
                 case .success:
-                    // Ensure user remains in Albums tab and navigation stack is valid
-                    guard let tabbarController = UIApplication.shared.firstWindow?.rootViewController as? NCMainTabBarController else { return }
-                    tabbarController.selectedIndex = NCGlobal.shared.selectedTabIndexAlbum
-                    // Pop the current navigation stack in Albums to root (dashboard)
-                    tabbarController.navigationController?.popToRootViewController(animated: false)
                     finishIfDone()
                 case .failure(let error):
                     let nkError = NKError(error: error)
@@ -469,12 +470,19 @@ class NCMediaNavigationController: NCMainNavigationController {
         }
     }
     
-    static func ensureAlbumsContextSelected() {
-        guard let tabbarController = UIApplication.shared.firstWindow?.rootViewController as? NCMainTabBarController else { return }
+    static func ensureAlbumsContextSelectedAndGetNavController() -> UINavigationController? {
+        guard let tabbarController = UIApplication.shared.firstWindow?.rootViewController as? NCMainTabBarController else { return nil }
         tabbarController.selectedIndex = NCGlobal.shared.selectedTabIndexAlbum
+        // Try to fetch the selected view controller as a navigation controller
+        if let nav = tabbarController.selectedViewController as? UINavigationController {
+            return nav
+        }
+        // Fallback: if the tab bar controller has embedded navigation controllers
+        return tabbarController.navigationController ?? tabbarController.selectedViewController?.navigationController
     }
     
     deinit {
         NotificationCenter.default.removeObserver(self, name: Self.photosAddedToAlbumNotification, object: nil)
     }
 }
+
