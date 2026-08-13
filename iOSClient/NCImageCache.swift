@@ -236,6 +236,14 @@ final class NCImageCache: @unchecked Sendable {
         return UIImage(systemName: "circle", withConfiguration: config)
     }
 
+    func getImageCheckedYes(colors: [UIColor] = [NCBrandColor.shared.iconImageColor]) -> UIImage {
+        return UIImage(named: "checkedYes")!
+    }
+
+    func getImageCheckedNo(colors: [UIColor] = [NCBrandColor.shared.iconImageColor]) -> UIImage {
+        return utility.loadImage(named: "circle", colors: colors, size: 24)
+    }
+    
     func getImageButtonMore(colors: [UIColor] = [NCBrandColor.shared.iconImageColor]) -> UIImage {
 //        return utility.loadImage(named: "ellipsis", colors: colors)
         return UIImage(named: "more")!.image(color: .systemGray, size: 24)

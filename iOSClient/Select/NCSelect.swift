@@ -415,6 +415,8 @@ extension NCSelect: UICollectionViewDataSource {
         cell.setButtonsHidden(true)
         cell.writeInfoDateSize(date: metadata.date, size: metadata.size)
 
+        cell.imageSelect.image = nil
+
         if metadata.directory {
             if metadata.e2eEncrypted {
                 cell.imageItem.image = NCImageCache.shared.getFolderEncrypted()
@@ -452,11 +454,11 @@ extension NCSelect: UICollectionViewDataSource {
             cell.imageFavorite.image = NCImageCache.shared.getImageFavorite()
         }
 
-//        cell.imageSelect.isHidden = true
-//        cell.backgroundView = nil
+        cell.imageSelect.isHidden = true
+        cell.backgroundView = nil
 //        cell.hideButtonMore(true)
-//        cell.hideButtonShare(true)
-//        cell.selected(false, isEditMode: false)
+        cell.hideButtonShare(true)
+        cell.selected(false, isEditMode: false, color: NCBrandColor.shared.getElement(account: session.account))
         
         // Live Photo
         if metadata.isLivePhoto {

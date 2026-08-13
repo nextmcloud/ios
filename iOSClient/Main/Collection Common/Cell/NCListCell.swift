@@ -39,6 +39,9 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellMainP
 
     weak var delegate: NCListCellDelegate?
 
+    // Added property to override allowSelection logic
+    fileprivate var allowSelectionOverride: Bool?
+
     // Cell Protocol
     var metadata: tableMetadata? {
         didSet {
@@ -90,6 +93,7 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellMainP
         super.prepareForReuse()
 
         initCell()
+        allowSelectionOverride = nil
     }
 
     func initCell() {
@@ -227,31 +231,32 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellMainP
     }
 
     func selected(_ status: Bool, isEditMode: Bool, color: UIColor) {
-//        // E2EE - remove encrypt folder selection
-//        if let metadata = NCManageDatabase.shared.getMetadataFromOcId(self.metadata?.ocId), metadata.e2eEncrypted {
-//            imageSelect.isHidden = true
-//        } else {
-//            imageSelect.isHidden = isEditMode ? false : true
-//        }
+        // Determine allowance from override set by data source (defaults to true if not provided)
+        let allowSelection = allowSelectionOverride ?? true
 
+        // Hide selection control for disallowed items; otherwise show only in edit mode
+        imageSelect.isHidden = allowSelection ? !isEditMode : true
+
+        // Layout: shift in edit mode irrespective of selection control visibility
+        imageItemLeftConstraint.constant = isEditMode ? 45 : 10
+
+        // Buttons visibility respects edit mode
         if isEditMode {
-            imageItemLeftConstraint.constant = 45
-            imageSelect.isHidden = false
             buttonShared.isHidden = true
             buttonMore.isHidden = true
             shareContainer.isHidden = true
             moreContainer.isHidden = true
             accessibilityCustomActions = nil
         } else {
-            imageItemLeftConstraint.constant = 10
-            imageSelect.isHidden = true
             buttonShared.isHidden = false
             buttonMore.isHidden = false
             shareContainer.isHidden = false
             moreContainer.isHidden = false
             backgroundView = nil
         }
-        if status {
+
+        // Selected state visuals: only apply when selection is allowed and in edit mode
+        if status && allowSelection && isEditMode {
             var blurEffectView: UIView?
             blurEffectView = UIVisualEffectView(effect: UIBlurEffect(style: .systemMaterial))
             blurEffectView?.backgroundColor = .lightGray
@@ -265,7 +270,6 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellMainP
             backgroundView = nil
             separator.isHidden = false
         }
-
     }
 
     func writeInfoDateSize(date: NSDate, size: Int64) {
@@ -586,13 +590,13 @@ extension NCCollectionViewCommon {
             cell.separator?.isHidden = false
         }
 
-        // Edit mode
-        if fileSelect.contains(metadata.ocId) {
-            cell.selected(true, isEditMode: isEditMode, color: NCBrandColor.shared.getElement(account: session.account))
-            a11yValues.append(NSLocalizedString("_selected_", comment: ""))
-        } else {
-            cell.selected(false, isEditMode: isEditMode, color: NCBrandColor.shared.getElement(account: session.account))
-        }
+        // Set allowSelection override on cell
+        cell.allowSelectionOverride = !metadata.e2eEncrypted
+
+        // Edit mode / selection handling
+        let isSelected = (cell.allowSelectionOverride ?? true) && fileSelect.contains(metadata.ocId)
+        cell.selected(isSelected, isEditMode: isEditMode, color: NCBrandColor.shared.getElement(account: session.account))
+        if isSelected { a11yValues.append(NSLocalizedString("_selected_", comment: "")) }
 
         // Accessibility
         cell.setAccessibility(label: metadata.fileNameView + ", " + (cell.labelInfo?.text ?? "") + (cell.labelSubinfo?.text ?? ""), value: a11yValues.joined(separator: ", "))
@@ -640,5 +644,6 @@ extension NCCollectionViewCommon {
     }
 }
 #endif
+
 
 

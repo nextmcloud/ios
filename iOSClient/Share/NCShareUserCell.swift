@@ -50,9 +50,7 @@ class NCShareUserCell: UITableViewCell, NCCellProtocol {
             // Also update title if display name changed.
             if let share = tableShare {
                 labelTitle.text = share.shareWithDisplayname
-                imagePasswordSet.isHidden = share.password.isEmpty
-                imageExpiredDateSet.isHidden = (share.expirationDate == nil)
-                leadingContraintofImageRightArrow.constant = (imagePasswordSet.isHidden && imageExpiredDateSet.isHidden) ? 0 : 5
+                applyIconsIfNeeded()
             }
         }
     }
@@ -91,11 +89,13 @@ class NCShareUserCell: UITableViewCell, NCCellProtocol {
         self.tableShare = share
         self.isDirectory = isDirectory
         setupCellUI(userId: userId)
+        applyIconsIfNeeded()
     }
 
     func refresh(with share: tableShare?, userId: String) {
         self.tableShare = share
         setupCellUI(userId: userId)
+        applyIconsIfNeeded()
     }
 
     // MARK: - UI Setup
@@ -150,9 +150,16 @@ class NCShareUserCell: UITableViewCell, NCCellProtocol {
             imagePermissionType.image = UIImage(named: "showPasswordNew")?.image(color: NCBrandColor.shared.shareBlueColor)
         }
 
+        applyIconsIfNeeded()
+    }
+    
+    // Ensures calendar icon visibility is correctly applied after configure/refresh
+    func applyIconsIfNeeded() {
+        guard let tableShare = tableShare else { return }
         imagePasswordSet.isHidden = tableShare.password.isEmpty
+        // Show calendar icon when an expiration date is set
         imageExpiredDateSet.isHidden = (tableShare.expirationDate == nil)
-        
+        // Adjust spacing accordingly
         leadingContraintofImageRightArrow.constant = (imagePasswordSet.isHidden && imageExpiredDateSet.isHidden) ? 0 : 5
     }
 

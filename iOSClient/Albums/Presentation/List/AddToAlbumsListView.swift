@@ -33,7 +33,7 @@ struct AddToAlbumsListView: View {
                     Section(header: Text(NSLocalizedString("_albums_list_own_albums_heading_", comment: ""))
                         .listRowInsets(EdgeInsets())
                         .font(.system(size: 17, weight: .bold))
-                        .foregroundColor(.black)
+                        .foregroundColor(.primary)
                         .padding(.horizontal, 16)
                         .frame(maxWidth: .infinity, alignment: .leading)) {
                             ForEach(viewModel.albums) { album in
@@ -132,7 +132,7 @@ struct AlbumRow: View {
                 if let subtitle = makeSubtitle(for: album), !subtitle.isEmpty {
                     Text(subtitle)
                         .font(.system(size: 13))
-                        .foregroundColor(Color(UIColor.systemGray))
+                        .foregroundColor(.secondary)
                         .lineLimit(1)
                 }
             }
@@ -232,3 +232,4 @@ struct AlbumRow: View {
 //    }
 //}
 //#endif
+

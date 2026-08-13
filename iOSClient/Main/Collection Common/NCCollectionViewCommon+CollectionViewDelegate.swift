@@ -143,7 +143,7 @@ extension NCCollectionViewCommon: UICollectionViewDelegate {
         }
 
         if self.isEditMode {
-//            if !metadata.e2eEncrypted {
+            if !metadata.e2eEncrypted {
                 if let index = self.fileSelect.firstIndex(of: metadata.ocId) {
                     self.fileSelect.remove(at: index)
                 } else {
@@ -151,7 +151,7 @@ extension NCCollectionViewCommon: UICollectionViewDelegate {
                 }
                 self.collectionView.reloadItems(at: [indexPath])
                 self.tabBarSelect?.update(fileSelect: self.fileSelect, metadatas: self.getSelectedMetadatas(), userId: metadata.userId)
-//            }
+            }
             self.collectionView.collectionViewLayout.invalidateLayout()
             return
         }
