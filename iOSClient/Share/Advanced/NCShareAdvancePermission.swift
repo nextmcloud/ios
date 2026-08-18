@@ -72,6 +72,27 @@ class NCShareAdvancePermission: UITableViewController, NCShareAdvanceFotterDeleg
         super.viewDidLoad()
         self.shareConfig = NCShareConfig(parentMetadata: metadata, share: share)
 
+        // Default UI selection for new shares: View-only (read) by default
+        if isNewShare {
+            // For link or email shares, default to read-only so only the Read option is selected initially.
+            if (share.shareType == NKShare.ShareType.publicLink.rawValue) || (share.shareType == NKShare.ShareType.email.rawValue) {
+                let readOnly = NCSharePermissions.getPermissionValue(
+                    canCreate: false,
+                    canEdit: false,
+                    canDelete: false,
+                    canShare: false,
+                    isDirectory: metadata.directory
+                )
+                share.permissions = readOnly
+                // Also default the expiration date to today so the UI shows the calendar icon and date.
+                if share.expirationDate == nil {
+                    if let nextYear = Calendar.current.date(byAdding: .year, value: 1, to: Date()) {
+                        share.expirationDate = nextYear as NSDate
+                    }
+                }
+            }
+        }
+
         // Only persisted shares have tokens which are provided by the server.
         // A download limit requires a token to exist.
         // Hence it can only be looked up if the share is already persisted at this point.
@@ -93,6 +114,9 @@ class NCShareAdvancePermission: UITableViewController, NCShareAdvanceFotterDeleg
         self.navigationItem.hidesBackButton = true
         // disable pull to dimiss
         isModalInPresentation = true
+
+        self.tableView.reloadData()
+        self.refreshHeaderView()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -219,6 +243,12 @@ class NCShareAdvancePermission: UITableViewController, NCShareAdvanceFotterDeleg
             tableView.reloadData()
             self.refreshHeaderView()
         case .expirationDate:
+            // If no expiration date set yet, default to one year from now so the date cell shows a value
+            if share.expirationDate == nil {
+                if let nextYear = Calendar.current.date(byAdding: .year, value: 1, to: Date()) {
+                    share.expirationDate = nextYear as NSDate
+                }
+            }
             let cell = tableView.cellForRow(at: indexPath) as? NCShareDateCell
             cell?.textField.becomeFirstResponder()
             cell?.checkMaximumDate(account: metadata.account)
@@ -310,7 +340,7 @@ class NCShareAdvancePermission: UITableViewController, NCShareAdvanceFotterDeleg
             
             if isNewShare {
 
-                if (share.shareType == NKShare.ShareType.email.rawValue) {
+                if (share.shareType == NKShare.ShareType.publicLink.rawValue) || (share.shareType == NKShare.ShareType.email.rawValue) {
                     share.permissions = NKShare.Permission.read.rawValue
                 }
                 let capabilities = await NKCapabilities.shared.getCapabilities(for: metadata.account)

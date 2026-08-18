@@ -81,7 +81,7 @@ enum NCUserPermission: CaseIterable, NCPermission {
 
     static func forDirectoryE2EE(account: String) -> [NCPermission] {
         let capabilities = NCNetworking.shared.capabilities[account] ?? NKCapabilities.Capabilities()
-        if NCGlobal.shared.isE2eeVersion2(capabilities.e2EEApiVersion) {
+        if capabilities.e2EEApiVersion.hasPrefix("2.") {
             return NCUserPermission.allCases
         }
         return []
@@ -103,7 +103,7 @@ enum NCUserPermission: CaseIterable, NCPermission {
 enum NCLinkEmailPermission: CaseIterable, NCPermission {
     static func forDirectoryE2EE(account: String) -> [any NCPermission] {
         let capabilities = NCNetworking.shared.capabilities[account] ?? NKCapabilities.Capabilities()
-        if NCGlobal.shared.isE2eeVersion2(capabilities.e2EEApiVersion) {
+        if capabilities.e2EEApiVersion.hasPrefix("2.") {
             return NCUserPermission.allCases
         }
         return []
@@ -158,7 +158,7 @@ enum NCLinkEmailPermission: CaseIterable, NCPermission {
     }
 
     case edit, read, uploadEdit, fileDrop, secureFileDrop
-    static let forDirectory: [NCLinkEmailPermission] = [.read, .uploadEdit, .fileDrop]
+    static let forDirectory: [NCLinkEmailPermission] = [.read, .edit, .fileDrop]
     static let forFile: [NCLinkEmailPermission] = [.read, .edit]
 }
 
@@ -234,8 +234,8 @@ struct NCShareConfig {
         self.shareable = share
         self.sharePermission = parentMetadata.sharePermissionsCollaborationServices
         self.isDirectory = parentMetadata.directory
-//        let type: NCPermission.Type = (share.shareType == NKShare.ShareType.publicLink.rawValue || share.shareType == NKShare.ShareType.email.rawValue) ? NCLinkEmailPermission.self : NCUserPermission.self
-        let type: NCPermission.Type = share.shareType == NKShare.ShareType.publicLink.rawValue ? NCLinkEmailPermission.self : NCUserPermission.self
+        let type: NCPermission.Type = (share.shareType == NKShare.ShareType.publicLink.rawValue || share.shareType == NKShare.ShareType.email.rawValue) ? NCLinkEmailPermission.self : NCUserPermission.self
+//        let type: NCPermission.Type = share.shareType == NKShare.ShareType.publicLink.rawValue ? NCLinkEmailPermission.self : NCUserPermission.self
         self.permissions = parentMetadata.directory ? (parentMetadata.e2eEncrypted ? type.forDirectoryE2EE(account: parentMetadata.account) : type.forDirectory) : type.forFile
 
         switch share.shareType {

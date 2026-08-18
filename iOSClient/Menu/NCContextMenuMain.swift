@@ -289,7 +289,7 @@ class NCContextMenuMain: NSObject {
     private func makeSetFolderE2EEAction(metadata: tableMetadata) -> UIAction {
         return UIAction(
             title: NSLocalizedString("_e2e_set_folder_encrypted_", comment: ""),
-            image: utility.loadImage(named: "lock", colors: [NCBrandColor.shared.iconImageColor]).withTintColor(NCBrandColor.shared.iconImageColor)
+            image: utility.loadImage(named: "lock", colors: [NCBrandColor.shared.iconImageColor], size: 24).withTintColor(NCBrandColor.shared.iconImageColor)
         ) { _ in
             Task {
                 let error = await NCNetworkingE2EEMarkFolder().markFolderE2ee(
@@ -308,7 +308,7 @@ class NCContextMenuMain: NSObject {
     private func makeUnsetFolderE2EEAction(metadata: tableMetadata) -> UIAction {
         return UIAction(
             title: NSLocalizedString("_e2e_remove_folder_encrypted_", comment: ""),
-            image: utility.loadImage(named: "lock", colors: [NCBrandColor.shared.iconImageColor]).withTintColor(NCBrandColor.shared.iconImageColor)
+            image: utility.loadImage(named: "lock.open", colors: [NCBrandColor.shared.iconImageColor], size: 24).withTintColor(NCBrandColor.shared.iconImageColor)
         ) { _ in
             Task {
                 let results = await NextcloudKit.shared.markE2EEFolderAsync(
@@ -359,7 +359,7 @@ class NCContextMenuMain: NSObject {
     private func makeSaveAsScanAction(metadata: tableMetadata) -> UIAction {
         return UIAction(
             title: NSLocalizedString("_save_as_scan_", comment: ""),
-            image: utility.loadImage(named: "doc.viewfinder", colors: [NCBrandColor.shared.iconImageColor]).withTintColor(NCBrandColor.shared.iconImageColor)
+            image: utility.loadImage(named: "doc.viewfinder", colors: [NCBrandColor.shared.iconImageColor], size: 24).withTintColor(NCBrandColor.shared.iconImageColor)
         ) { _ in
             Task {
                 if self.utilityFileSystem.fileProviderStorageExists(metadata) {
@@ -429,7 +429,7 @@ class NCContextMenuMain: NSObject {
     private func makeModifyWithQuickLookAction(metadata: tableMetadata) -> UIAction {
         return UIAction(
             title: NSLocalizedString("_modify_", comment: ""),
-            image: utility.loadImage(named: "pencil.tip.crop.circle", colors: [NCBrandColor.shared.iconImageColor]).withTintColor(NCBrandColor.shared.iconImageColor)
+            image: utility.loadImage(named: "pencil.tip.crop.circle", colors: [NCBrandColor.shared.iconImageColor], size: 24).withTintColor(NCBrandColor.shared.iconImageColor)
         ) { _ in
             Task {
                 if self.utilityFileSystem.fileProviderStorageExists(metadata) {
@@ -667,7 +667,7 @@ class NCContextMenuMain: NSObject {
                                         svgData: data,
                                         size: CGSize(width: 50, height: 50),
                                         tintColor: NCBrandColor.shared.iconImageColor,
-                                        trimTransparentPixels: false
+                                        trimTransparentPixels: true
                                     ) {
                                         iconImage = svgImage.withRenderingMode(.alwaysTemplate)
                                     } else if let rasterImage = UIImage(data: data) {
@@ -687,9 +687,18 @@ class NCContextMenuMain: NSObject {
                                 let rendered = renderer.image { _ in
                                     // Compute aspect-fit rect
                                     let aspect = min(targetSize.width / max(img.size.width, 1), targetSize.height / max(img.size.height, 1))
-                                    let newSize = CGSize(width: img.size.width * aspect, height: img.size.height * aspect)
-                                    let origin = CGPoint(x: (targetSize.width - newSize.width) / 2.0, y: (targetSize.height - newSize.height) / 2.0)
-                                    img.withRenderingMode(.alwaysTemplate).draw(in: CGRect(origin: origin, size: newSize))
+                                    let fittedSize = CGSize(width: img.size.width * aspect, height: img.size.height * aspect)
+                                    // Apply a conservative visual up-scale but avoid touching canvas edges to prevent perceived distortion
+                                    var visualScale: CGFloat = 1.10
+                                    // Compute the maximum scale that still fits entirely within the canvas for both axes
+                                    let maxScaleX = targetSize.width / max(fittedSize.width, 0.0001)
+                                    let maxScaleY = targetSize.height / max(fittedSize.height, 0.0001)
+                                    let maxSafeScale = min(maxScaleX, maxScaleY)
+                                    visualScale = min(visualScale, maxSafeScale * 0.98) // keep a tiny inset to avoid edge clamp
+                                    let scaledSize = CGSize(width: fittedSize.width * visualScale, height: fittedSize.height * visualScale)
+                                    let origin = CGPoint(x: (targetSize.width - scaledSize.width) / 2.0,
+                                                         y: (targetSize.height - scaledSize.height) / 2.0)
+                                    img.withRenderingMode(.alwaysTemplate).draw(in: CGRect(origin: origin, size: scaledSize))
                                 }
                                 iconImage = rendered.withRenderingMode(.alwaysTemplate)
                             }

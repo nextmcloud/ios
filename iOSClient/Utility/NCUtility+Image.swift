@@ -41,12 +41,16 @@ extension NCUtility {
         // see https://stackoverflow.com/questions/71764255
 //        let sfSymbolName = imageName.replacingOccurrences(of: "_", with: ".")
 //        let color = colors?.first ?? UIColor.systemGray
+        let symbolPointSize = size ?? 24
 
         // SF IMAGE
         if let colors {
-            image = UIImage(systemName: imageName, withConfiguration: UIImage.SymbolConfiguration(weight: systemNameWeight))?.applyingSymbolConfiguration(UIImage.SymbolConfiguration(paletteColors: colors))
+//            image = UIImage(systemName: imageName, withConfiguration: UIImage.SymbolConfiguration(weight: systemNameWeight))?.applyingSymbolConfiguration(UIImage.SymbolConfiguration(paletteColors: colors))
+            image = UIImage(systemName: imageName, withConfiguration: UIImage.SymbolConfiguration(pointSize: symbolPointSize, weight: systemNameWeight))?.applyingSymbolConfiguration(UIImage.SymbolConfiguration(paletteColors: colors))
+
         } else {
-            image = UIImage(systemName: imageName, withConfiguration: UIImage.SymbolConfiguration(weight: systemNameWeight))
+//            image = UIImage(systemName: imageName, withConfiguration: UIImage.SymbolConfiguration(weight: systemNameWeight))
+            image = UIImage(systemName: imageName, withConfiguration: UIImage.SymbolConfiguration(pointSize: symbolPointSize, weight: systemNameWeight))
         }
         
         if let image { return image }//.withTintColor(NCBrandColor.shared.iconImageColor) }

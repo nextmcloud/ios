@@ -226,7 +226,7 @@ class NCContextMenuViewer: NSObject {
     private func makeModifyWithQuickLookAction(metadata: tableMetadata) -> UIAction {
         return UIAction(
             title: NSLocalizedString("_modify_", comment: ""),
-            image: utility.loadImage(named: "pencil.tip.crop.circle", colors: [NCBrandColor.shared.iconImageColor]).withTintColor(NCBrandColor.shared.iconImageColor)
+            image: utility.loadImage(named: "pencil.tip.crop.circle", colors: [NCBrandColor.shared.iconImageColor], size: 24).withTintColor(NCBrandColor.shared.iconImageColor)
         ) { _ in
             Task {
                 if NCUtilityFileSystem().fileProviderStorageExists(metadata) {
