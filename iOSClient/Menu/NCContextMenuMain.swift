@@ -269,14 +269,31 @@ class NCContextMenuMain: NSObject {
         capabilities: NKCapabilities.Capabilities,
         mainActionsMenu: inout [UIMenuElement]
     ) {
-        // Set folder E2EE
+        // This uses a sync query intentionally for compatibility with menu building.
+        // We check if the folder is truly empty before presenting the "Set folder E2EE" action.
+        // This avoids offering encryption for folders that contain files or subfolders which might cause issues.
+
         if NCNetworking.shared.isOnline,
            metadata.directory,
            metadata.size == 0,
            !metadata.e2eEncrypted,
            NCPreferences().isEndToEndEnabled(account: metadata.account),
            metadata.serverUrl == self.utilityFileSystem.getHomeServer(urlBase: metadata.urlBase, userId: metadata.userId) {
-            mainActionsMenu.append(makeSetFolderE2EEAction(metadata: metadata))
+
+            // Query all children files/folders for this account and serverUrl except the root.
+            let children = NCManageDatabase.shared.getMetadatas(
+                predicate: NSPredicate(
+                    format: "account == %@ AND serverUrl == %@ AND fileName != %@",
+                    metadata.account,
+                    metadata.serverUrlFileName,
+                    NextcloudKit.shared.nkCommonInstance.rootFileName
+                )
+            )
+            
+            // Only add the "Set folder E2EE" action if the folder is truly empty
+            if children.isEmpty {
+                mainActionsMenu.append(makeSetFolderE2EEAction(metadata: metadata))
+            }
         }
 
         // Unset folder E2EE

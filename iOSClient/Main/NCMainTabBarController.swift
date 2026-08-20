@@ -185,8 +185,39 @@ class NCMainTabBarController: UITabBarController {
 
         let item = items[index]
         item.title = NSLocalizedString(title, comment: "")
-        item.image = title == "_albums_" ? UIImage(named: "album")?.image(color: NCBrandColor.shared.textColor, size: 25) : UIImage(named: imageName)
-        item.selectedImage = item.image
+
+        // Determine base image
+        var baseImage: UIImage?
+        if title == "_albums_" {
+            // Albums keeps the custom colored asset
+            baseImage = UIImage(named: "album")?.image(color: NCBrandColor.shared.textColor, size: 25)
+        } else {
+            baseImage = UIImage(named: imageName)
+        }
+
+        // Fallbacks if asset is missing
+        if baseImage == nil {
+            // Provide sensible SF Symbol fallbacks by title/imageName
+            switch (title, imageName) {
+            case ("_favorites_", _):
+                baseImage = UIImage(systemName: "star")
+            case ("_home_", _):
+                baseImage = UIImage(systemName: "house")
+            case ("_media_", _):
+                baseImage = UIImage(systemName: "photo.on.rectangle")
+            case ("_albums_", _):
+                baseImage = UIImage(systemName: "rectangle.stack")
+            default:
+                baseImage = UIImage(systemName: imageName)
+            }
+        }
+
+        // Ensure the image renders with tab bar tint (template)
+        if let baseImage {
+            item.image = baseImage.withRenderingMode(.alwaysTemplate)
+            item.selectedImage = item.image
+        }
+
         item.tag = tag
     }
 
@@ -281,3 +312,4 @@ extension NCMainTabBarController: UITabBarControllerDelegate {
         }
     }
 }
+

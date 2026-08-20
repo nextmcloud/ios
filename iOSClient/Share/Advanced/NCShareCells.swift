@@ -66,8 +66,9 @@ enum NCUserPermission: CaseIterable, NCPermission {
     var permissionBitFlag: Int {
         return switch self {
         case .read: NKShare.Permission.read.rawValue
+        case .reshare: NKShare.Permission.share.rawValue
         case .edit: NKShare.Permission.update.rawValue
-        case .create: NKShare.Permission.create.rawValue
+//        case .create: NKShare.Permission.create.rawValue
         }
     }
 
@@ -87,15 +88,16 @@ enum NCUserPermission: CaseIterable, NCPermission {
         return []
     }
 
-    case read, edit, create
+    case read, reshare, edit//, create
     static let forDirectory: [NCUserPermission] = NCUserPermission.allCases
-    static let forFile: [NCUserPermission] = [.read, .edit]
+    static let forFile: [NCUserPermission] = [.read, .reshare, .edit]
 
     var title: String {
         switch self {
         case .read: return NSLocalizedString("_share_can_read_", comment: "")
+        case .reshare: return NSLocalizedString("_share_can_reshare_", comment: "")
         case .edit: return NSLocalizedString("_share_can_change_", comment: "")
-        case .create: return NSLocalizedString("_share_can_create_", comment: "")
+//        case .create: return NSLocalizedString("_share_can_create_", comment: "")
         }
     }
 }
@@ -266,17 +268,17 @@ struct NCShareConfig {
             cell?.textLabel?.isEnabled = false
         }
 
-        // For user permissions: Read permission is always enabled and we show it as a non-interactable permission for brevity.
-        if let cellConfig = cellConfig as? NCUserPermission, cellConfig.hasReadPermission() {
-            cell?.isUserInteractionEnabled = false
-            cell?.textLabel?.isEnabled = false
-        }
-
-        // For link permissions: Read permission is always enabled and we show it as a non-interactable permission in files only for brevity.
-        if let cellConfig = cellConfig as? NCLinkEmailPermission, cellConfig.hasReadPermission(), !isDirectory {
-            cell?.isUserInteractionEnabled = false
-            cell?.textLabel?.isEnabled = false
-        }
+//        // For user permissions: Read permission is always enabled and we show it as a non-interactable permission for brevity.
+//        if let cellConfig = cellConfig as? NCUserPermission, cellConfig.hasReadPermission() {
+//            cell?.isUserInteractionEnabled = false
+//            cell?.textLabel?.isEnabled = false
+//        }
+//
+//        // For link permissions: Read permission is always enabled and we show it as a non-interactable permission in files only for brevity.
+//        if let cellConfig = cellConfig as? NCLinkEmailPermission, cellConfig.hasReadPermission(), !isDirectory {
+//            cell?.isUserInteractionEnabled = false
+//            cell?.textLabel?.isEnabled = false
+//        }
 
         return cell
     }

@@ -9,11 +9,21 @@ import LucidBanner
 
 extension NCCollectionViewCommon: NCCollectionViewCommonSelectTabBarDelegate {
     func selectAll() {
-        if !fileSelect.isEmpty, self.dataSource.getMetadatas().count == fileSelect.count {
+        // Build the list of selectable ocIds excluding E2EE directories
+        let selectableOcIds: [String] = self.dataSource.getMetadatas()
+            .filter { metadata in
+                // Exclude E2EE directories from selection
+                !(metadata.isDirectory && metadata.e2eEncrypted)
+            }
+            .compactMap { $0.ocId }
+
+        // Toggle selection: if everything selectable is already selected, clear; otherwise select all eligible items
+        if !fileSelect.isEmpty, Set(fileSelect) == Set(selectableOcIds) {
             fileSelect = []
         } else {
-            fileSelect = self.dataSource.getMetadatas().compactMap({ $0.ocId })
+            fileSelect = selectableOcIds
         }
+
         tabBarSelect?.update(fileSelect: fileSelect, metadatas: getSelectedMetadatas(), userId: session.userId)
         self.collectionView.reloadData()
     }
