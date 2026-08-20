@@ -536,6 +536,7 @@ extension NCNetworking {
                     await NCManageDatabase.shared.renameMetadata(fileNameNew: fileNameNew, ocId: ocId, status: self.global.metadataStatusWaitRename)
                     delegate.transferReloadDataSource(serverUrl: serverUrl, requestData: false, status: self.global.metadataStatusWaitRename)
                 }
+                NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterRenameFile, userInfo: ["serverUrl": metadata.serverUrl, "account": metadata.account, "error": NKError(errorCode: 0, errorDescription: ""), "ocId": metadata.ocId, "indexPath": indexPath])
             }
             
             completion(NKError(errorCode: 0, errorDescription: ""))

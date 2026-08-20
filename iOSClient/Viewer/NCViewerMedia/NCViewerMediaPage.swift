@@ -125,6 +125,8 @@ class NCViewerMediaPage: UIViewController {
         NotificationCenter.default.addObserver(self, selector: #selector(pageViewController.disableSwipeGesture), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterDisableSwipeGesture), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(applicationDidBecomeActive(_:)), name: UIApplication.didBecomeActiveNotification, object: nil)
 
+        NotificationCenter.default.addObserver(self, selector: #selector(renameFile(_:)), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterRenameFile), object: nil)
+
         if currentViewController.metadata.isImage {
             navigationItem.rightBarButtonItems = [moreNavigationItem, imageDetailNavigationItem]
         } else {
@@ -282,6 +284,11 @@ class NCViewerMediaPage: UIViewController {
         }
 
         viewerMediaScreenMode = mode
+        // Re-assert the title after any nav bar visibility/appearance changes
+        self.navigationItem.title = currentViewController.metadata.fileNameView
+        self.navigationController?.navigationBar.setNeedsLayout()
+        self.navigationController?.navigationBar.layoutIfNeeded()
+
         print("Screen mode: \(viewerMediaScreenMode)")
 
         startTimerAutoHide()
@@ -309,6 +316,34 @@ class NCViewerMediaPage: UIViewController {
         changeScreenMode(mode: .normal)
     }
 
+    @objc func renameFile(_ notification: NSNotification) {
+
+        guard let userInfo = notification.userInfo as NSDictionary?,
+              let ocId = userInfo["ocId"] as? String,
+//              let index = metadatas.firstIndex(where: {$0.ocId == ocId}),
+//              let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId)
+                let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId)
+
+        else { return }
+
+        DispatchQueue.main.async {
+            // Stop media
+            if let ncplayer = self.currentViewController.ncplayer, ncplayer.isPlaying() {
+                ncplayer.playerPause()
+            }
+
+            self.navigationItem.title = metadata.fileNameView
+            self.currentViewController.metadata = metadata
+
+            // Force navigation bar to refresh its layout so title updates visually
+            self.navigationController?.navigationBar.setNeedsLayout()
+            self.navigationController?.navigationBar.layoutIfNeeded()
+
+            // If detail UI depends on filename, refresh it
+            self.currentViewController.reloadDetail()
+        }
+    }
+    
     // MARK: - Command Center
 
     func updateCommandCenter(ncplayer: NCPlayer, title: String) {
@@ -653,3 +688,4 @@ extension NCViewerMediaPage: NCTransferDelegate {
         }
     }
 }
+
