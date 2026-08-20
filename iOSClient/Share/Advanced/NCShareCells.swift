@@ -268,17 +268,17 @@ struct NCShareConfig {
             cell?.textLabel?.isEnabled = false
         }
 
-//        // For user permissions: Read permission is always enabled and we show it as a non-interactable permission for brevity.
-//        if let cellConfig = cellConfig as? NCUserPermission, cellConfig.hasReadPermission() {
-//            cell?.isUserInteractionEnabled = false
-//            cell?.textLabel?.isEnabled = false
-//        }
-//
-//        // For link permissions: Read permission is always enabled and we show it as a non-interactable permission in files only for brevity.
-//        if let cellConfig = cellConfig as? NCLinkEmailPermission, cellConfig.hasReadPermission(), !isDirectory {
-//            cell?.isUserInteractionEnabled = false
-//            cell?.textLabel?.isEnabled = false
-//        }
+        // For user permissions: Read permission is always enabled and we show it as a non-interactable permission for brevity.
+        if let cellConfig = cellConfig as? NCUserPermission, cellConfig.hasReadPermission() {
+            cell?.isUserInteractionEnabled = false
+            cell?.textLabel?.isEnabled = false
+        }
+
+        // For link permissions: Read permission is always enabled and we show it as a non-interactable permission in files only for brevity.
+        if let cellConfig = cellConfig as? NCLinkEmailPermission, cellConfig.hasReadPermission(), !isDirectory {
+            cell?.isUserInteractionEnabled = false
+            cell?.textLabel?.isEnabled = false
+        }
 
         return cell
     }
