@@ -88,6 +88,34 @@ class NCSelect: UIViewController, UIGestureRecognizerDelegate, UIAdaptivePresent
 
     private var activeAccount: tableAccount!
 
+    // MARK: - Move availability
+    private func isMovingToSameDestination() -> Bool {
+        // If there are no items or we are not in copy/move mode, moving is allowed
+        guard typeOfCommandView == .copyMove, !items.isEmpty else { return false }
+        // Determine the source serverUrl for all items; if any item has a different source, moving is allowed
+        // tableMetadata has `serverUrl` and `account` that denote its current folder
+        let uniqueSources: Set<String> = Set(items.map { $0.serverUrl })
+        // If all items come from the same folder and that folder equals current destination, moving should be disabled
+        if uniqueSources.count == 1, let source = uniqueSources.first {
+            return source == serverUrl
+        }
+        return false
+    }
+
+    private func updateMoveButtonState() {
+        let shouldDisableMove = isMovingToSameDestination()
+        guard let cmd = selectCommandViewSelect, let button = cmd.moveButton else { return }
+
+        button.isEnabled = !shouldDisableMove
+
+        // Swap background color to communicate disabled state clearly
+        if shouldDisableMove {
+            button.backgroundColor = .secondarySystemFill
+        } else {
+            button.backgroundColor = NCBrandColor.shared.getElement(account: session.account)
+        }
+    }
+
     // MARK: - View Life Cycle
 
     override func viewDidLoad() {
@@ -159,6 +187,9 @@ class NCSelect: UIViewController, UIGestureRecognizerDelegate, UIAdaptivePresent
             selectCommandViewSelect?.heightAnchor.constraint(equalToConstant: 150).isActive = true
 
             bottomContraint?.constant = 150
+
+            // Initial state based on current destination
+            updateMoveButtonState()
         }
     }
 
@@ -178,6 +209,8 @@ class NCSelect: UIViewController, UIGestureRecognizerDelegate, UIAdaptivePresent
             autoUploadDirectory = await self.database.getAccountAutoUploadDirectoryAsync(account: session.account, urlBase: session.urlBase, userId: session.userId)
 
             self.navigationItem.title = titleCurrentFolder
+
+            self.updateMoveButtonState()
 
             await reloadDataSource()
         }
@@ -332,6 +365,9 @@ class NCSelect: UIViewController, UIGestureRecognizerDelegate, UIAdaptivePresent
             viewController.titleCurrentFolder = metadata.fileNameView
             viewController.serverUrl = serverUrlPush
             viewController.session = session
+            
+            // Ensure the next view controller updates Move availability
+            viewController.items = items
 
             if let fileNameError = FileNameValidator.checkFileName(metadata.fileNameView, account: session.account, capabilities: capabilities) {
                 let message = "\(fileNameError.errorDescription) \(NSLocalizedString("_please_rename_file_", comment: ""))"
@@ -563,6 +599,8 @@ extension NCSelect {
         self.dataSource = NCCollectionViewDataSource(metadatas: metadatas,
                                                      account: session.account)
         self.collectionView.reloadData()
+        
+        self.updateMoveButtonState()
     }
 
     func getServerData() async {
@@ -623,21 +661,35 @@ class NCSelectCommandView: UIView {
     func setColor(account: String) {
         overwriteSwitch?.onTintColor = NCBrandColor.shared.getElement(account: account)
 
+        // Select button
         selectButton?.backgroundColor = NCBrandColor.shared.getElement(account: account)
         selectButton?.setTitleColor(UIColor(white: 1, alpha: 0.3), for: .highlighted)
         selectButton?.setTitleColor(.white, for: .normal)
 
+        // Create folder button
         createFolderButton?.backgroundColor = NCBrandColor.shared.getElement(account: account)
         createFolderButton?.setTitleColor(UIColor(white: 1, alpha: 0.3), for: .highlighted)
         createFolderButton?.setTitleColor(NCBrandColor.shared.getText(account: account), for: .normal)
 
+        // Copy button
         copyButton?.backgroundColor = NCBrandColor.shared.getElement(account: account)
         copyButton?.setTitleColor(UIColor(white: 1, alpha: 0.3), for: .highlighted)
         copyButton?.setTitleColor(NCBrandColor.shared.getText(account: account), for: .normal)
 
-        moveButton?.backgroundColor = NCBrandColor.shared.getElement(account: account)
+        // Move button normal/disabled colors
+        let normalBG = NCBrandColor.shared.getElement(account: account)
+        let normalTitle = NCBrandColor.shared.getText(account: account)
+        let disabledBG = UIColor.secondarySystemFill
+        let disabledTitle = UIColor.secondaryLabel
+
         moveButton?.setTitleColor(UIColor(white: 1, alpha: 0.3), for: .highlighted)
-        moveButton?.setTitleColor(NCBrandColor.shared.getText(account: account), for: .normal)
+        moveButton?.setTitleColor(normalTitle, for: .normal)
+        moveButton?.setTitleColor(disabledTitle, for: .disabled)
+
+        // Apply background according to current enabled state
+        if let moveButton = moveButton {
+            moveButton.backgroundColor = moveButton.isEnabled ? normalBG : disabledBG
+        }
     }
 
     @IBAction func createFolderButtonPressed(_ sender: UIButton) {
@@ -725,3 +777,4 @@ struct SelectView: UIViewControllerRepresentable {
         Coordinator(self)
     }
 }
+
