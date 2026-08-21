@@ -376,7 +376,21 @@ class NCMediaNavigationController: NCMainNavigationController {
                  }
                  
              case .failure(let error):
-                 NCContentPresenter().showError(error: NKError(error: error))
+                 let nkError = NKError(error: error)
+                 // Prefer friendly info alert for duplicate album names (409)
+                 if let inner = nkError.error as? NKError, inner.errorCode == NCGlobal.shared.errorConflict {
+                     let message = NSLocalizedString("_album_already_exists_", comment: "Album already exists")
+                     let conflict = NKError(errorCode: NCGlobal.shared.errorConflict, errorDescription: message)
+                     NCContentPresenter().showInfo(error: conflict)
+                 } else if nkError.errorCode == NCGlobal.shared.errorConflict {
+                     // Top-level conflict
+                     let message = NSLocalizedString("_album_already_exists_", comment: "Album already exists")
+                     let conflict = NKError(errorCode: NCGlobal.shared.errorConflict, errorDescription: message)
+                     NCContentPresenter().showInfo(error: conflict)
+                 } else {
+                     // Other errors
+                     NCContentPresenter().showError(error: nkError)
+                 }
              }
          }
      }
