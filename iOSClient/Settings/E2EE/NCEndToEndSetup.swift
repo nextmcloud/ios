@@ -338,7 +338,7 @@ class NCEndToEndSetup {
             }
             ok.isEnabled = false
 
-            let cancel = UIAlertAction(title: "Cancel", style: .cancel) { _ in
+            let cancel = UIAlertAction(title: NSLocalizedString("_cancel_", comment: ""), style: .cancel) { _ in
                 continuation.resume(throwing: NKError(
                     errorCode: NSUserCancelledError,
                     errorDescription: "User cancelled"
