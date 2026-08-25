@@ -658,8 +658,9 @@ class NCContextMenuMain: NSObject {
                     shouldShowMenu = true // if app has no mimetypes, then menu should be shown for every file/folder
                 }
 
-                // Hide ZIP-related actions when passphrase is missing for an E2EE folder
-                if shouldShowMenu, isE2EEFolder, !isE2EEPassphraseAvailable(for: metadata.account) {
+                // Hide ZIP-related actions for an E2EE folder
+//                 Hide ZIP-related actions when passphrase is missing for an E2EE folder
+                if shouldShowMenu, isE2EEFolder {//}, !isE2EEPassphraseAvailable(for: metadata.account) {
                     if isZipAction(item.name, item.url) {
                         shouldShowMenu = false
                     }

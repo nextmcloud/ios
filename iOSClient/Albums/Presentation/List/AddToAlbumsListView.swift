@@ -46,7 +46,7 @@ struct AddToAlbumsListView: View {
                             .padding(.horizontal, 16)
                             .background(
                                 RoundedRectangle(cornerRadius: 10)
-                                    .fill(Color.accentColor.opacity(0.08))
+                                    .fill(Color(.secondarySystemGroupedBackground).opacity(0.08))
                             )
                         }
                         .buttonStyle(PlainButtonStyle())
