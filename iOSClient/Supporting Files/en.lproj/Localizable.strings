@@ -66,6 +66,7 @@
 "_function_in_testing_"     = "Function in testing, please send information about any problems you run into.";
 "_done_"                    = "Done";
 "_clear_"                   = "Clear";
+"_continue_anyway_"         = "Continue anyway";
 "_passcode_too_short_"      = "Passcode too short, at least 4 characters required";
 "_selected_"                = "Selected";
 "_scan_fingerprint_"        = "Scan fingerprint to authenticate";
@@ -112,6 +113,8 @@
 "_no_albums_"               = "No albums";
 "_denied_album_"            = "This app does not have access to \"Photos\". You can enable access in Privacy Settings.";
 "_denied_camera_"           = "This app does not have access to the \"Camera\". You can enable access in Privacy Settings.";
+"_save_to_camera_roll_"        = "Save to camera roll";
+"_save_to_camera_roll_desc_"   = "When enabled, photos and videos taken with the in-app camera will also be saved to your iOS camera roll.";
 "_start_"                   = "Start";
 "_force_start_"             = "Force the start";
 "_account_does_not_exist_"  = "The account %@ does not exist. Please log in again.";
@@ -143,6 +146,7 @@
 "_request_upload_new_ver_"  = "The file has been modified, do you want to upload the new version?";
 "_add_folder_info_"         = "Add folder info";
 "_back_"                    = "Back";
+"_go_back_"                 = "Go Back";
 "_search_"                  = "Search";
 "_search_or_create_tags"    = "Search or create tag";
 "_tags_"                    = "Tags";
@@ -194,6 +198,7 @@
 "_enable_background_location_title_"    = "Enable Background Location";
 "_enable_background_location_message_"  = "To allow automatic file uploads in the background, please enable 'Always' for location access in Settings.";
 "_enable_background_location_footer_"   = "To keep your photo library up to date automatically, this app can use background location access.\nThis allows it to detect when you’re in a new area and check for new photos to upload.\nGPS is not used, and your location is never stored or tracked.";
+"_compress_to_zip_" = "Compress to Zip";
 
 /* MARK: Files lock */
 
@@ -904,6 +909,13 @@
 
 "_no_transfer_"                     = "No transfers yet";
 "_no_transfer_sub_"                 = "Uploads and downloads from this device will show up here";
+"_no_transfer_in_progress_"     = "No transfers in progress";
+"_no_transfer_in_progress_sub_" = "Active uploads and downloads from this device will appear here.";
+"_no_transfer_in_waiting_"      = "No transfers waiting";
+"_no_transfer_in_waiting_sub_"  = "Transfers waiting to start will appear here.";
+"_no_transfer_in_error_"        = "No transfer errors";
+"_no_transfer_in_error_sub_"    = "Transfers that need your attention will appear here.";
+"_transfers_waiting_shown_"     = "%1$d of %2$d transfers waiting";
 "_no_activity_"                     = "No activity yet";
 "_no_activity_footer_"              = "No more activities to load";
 "_transfers_"                       = "Transfers";
@@ -1350,7 +1362,23 @@
 "_e2ee_upload_tip_"         = "End-to-end files require the app to remain open until the transfer is complete";
 "_finalizing_wait_"         = "Waiting for finalization …";
 "_in_this_folder_"          = "In this folder";
+"_media_no_longer_available_" = "Media no longer available";
+"_this_item_has_been_deleted_" = "This item has been deleted.";
+"_video_not_available_" = "Video not available";
+"_disable_" = "Disable";
+"_no_subtitles_available_" = "No subtitles available";
+"_no_audio_tracks_available_" = "No audio tracks available";
+"_add_external_subtitle_" = "Add external subtitle";
+"_image_load_failed_" = "Image load failed";
+"_image_load_failed_" = "Image load failed";
+"_gif_file_could_not_be_decoded_" = "GIF file could not be decoded";
+"_svg_file_could_not_be_rendered_" = "SVG file could not be rendered";
+"_image_file_could_not_be_decoded_" = "Image file could not be decoded";
+"_media_not_available_" = "Media not available";
 "_no_assistant_installed_"  = "Assistant is not installed on this server. Ask your administrator to install the Assistant app";
+"_open_in_office_" = "Open in Office";
+"_select_date_" = "Select date";
+"_always_play_with_vlc_" = "Always play with VLC";
 
 // Tip
 "_tip_pdf_thumbnails_"      = "Swipe left from the right edge of the screen to show the thumbnails";
@@ -1620,3 +1648,13 @@ You can stop it at any time, adjust the settings, and enable it again.";
 "_add_to_album"                                     = "Add to Album";
 "_remove_from_album_"                               = "Remove from Album";
 "_album_already_exists_"                            = "Could not complete the operation, album with the same name exists";
+
+// Share details — Governance
+"_governance_"                      = "Governance";
+"_sensitivity_label_"               = "Sensitivity label";
+"_file_retention_"                  = "File retention";
+"_legal_hold_"                      = "Legal hold";
+"_none_"                            = "None";
+"_sections_"                        = "Sections";
+"_governance_labels_load_error_"    = "Governance labels could not be loaded.";
+

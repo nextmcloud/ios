@@ -46,13 +46,15 @@ struct NCManageE2EEView: View {
                     }
                     .contentShape(Rectangle())
                     .onTapGesture {
-                        if NCPreferences().passcode != nil {
-                            model.requestPasscodeType("readPassphrase")
-                        } else {
-                            Task {
-                                await showInfoBanner(windowScene: model.windowScene, text: "_e2e_settings_lock_not_active_")
-                            }
-                        }
+//                        if NCPreferences().passcode != nil {
+//                            model.requestPasscodeType("readPassphrase")
+//                        } else {
+//                            Task {
+//                                await showInfoBanner(windowScene: model.windowScene, text: "_e2e_settings_lock_not_active_")
+//                            }
+//                        }
+                        // Allow reading passphrase even if app lock is not active
+                        model.requestPasscodeType("readPassphrase")
                     }
                     HStack {
                         Label {
@@ -71,13 +73,15 @@ struct NCManageE2EEView: View {
                     }
                     .contentShape(Rectangle())
                     .onTapGesture {
-                        if NCPreferences().passcode != nil {
-                            model.requestPasscodeType("removeLocallyEncryption")
-                        } else {
-                            Task {
-                                await showInfoBanner(windowScene: model.windowScene, text: "_e2e_settings_lock_not_active_")
-                            }
-                        }
+//                        if NCPreferences().passcode != nil {
+//                            model.requestPasscodeType("removeLocallyEncryption")
+//                        } else {
+//                            Task {
+//                                await showInfoBanner(windowScene: model.windowScene, text: "_e2e_settings_lock_not_active_")
+//                            }
+//                        }
+                        // Allow removing local encryption even if app lock is not active
+                        model.requestPasscodeType("removeLocallyEncryption")
                     }
 #if DEBUG
                     if let certificateValidity = model.certificateValidity {
@@ -164,13 +168,15 @@ struct NCManageE2EEView: View {
                         }
                         .contentShape(Rectangle())
                         .onTapGesture {
-                            if NCPreferences().passcode != nil {
-                                model.requestPasscodeType("startE2E")
-                            } else {
-                                Task {
-                                    await showInfoBanner(windowScene: model.windowScene, text: "_e2e_settings_lock_not_active_")
-                                }
-                            }
+//                            if NCPreferences().passcode != nil {
+//                                model.requestPasscodeType("startE2E")
+//                            } else {
+//                                Task {
+//                                    await showInfoBanner(windowScene: model.windowScene, text: "_e2e_settings_lock_not_active_")
+//                                }
+//                            }
+                            // Allow starting E2E even if app lock is not active; will prompt for passphrase
+                            model.requestPasscodeType("startE2E")
                         }
                     }
 #if DEBUG

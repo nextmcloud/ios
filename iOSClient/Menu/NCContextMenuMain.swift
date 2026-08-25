@@ -622,6 +622,24 @@ class NCContextMenuMain: NSObject {
         var clientIntegrationMenu: [UIMenuElement] = []
         guard let apps = capabilities.clientIntegration?.apps else { return [] }
 
+        let isE2EEFolder = metadata.isDirectoryE2EE || metadata.e2eEncrypted
+
+        // Heuristic to detect ZIP actions from client integration by name or URL
+        let isZipAction: (String, String?) -> Bool = { title, url in
+            let lower = title.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+            let zipKeywords = [
+                "zip",                    // en
+                "zip-datei",              // de
+                "cré", "compresser",     // fr (partial to catch variants)
+                "comprimir",              // es/pt
+                "archiv",                 // de (archivieren)
+                "archive"                 // en
+            ]
+            let titleMatches = zipKeywords.contains(where: { lower.contains($0) })
+            let urlMatches = (url ?? "").lowercased().contains("zip") || (url ?? "").lowercased().contains("archive")
+            return titleMatches || urlMatches
+        }
+
         for (_, context) in apps {
             for item in context.contextMenu {
                 var shouldShowMenu = false
@@ -638,6 +656,13 @@ class NCContextMenuMain: NSObject {
                     })
                 } else {
                     shouldShowMenu = true // if app has no mimetypes, then menu should be shown for every file/folder
+                }
+
+                // Hide ZIP-related actions when passphrase is missing for an E2EE folder
+                if shouldShowMenu, isE2EEFolder, !isE2EEPassphraseAvailable(for: metadata.account) {
+                    if isZipAction(item.name, item.url) {
+                        shouldShowMenu = false
+                    }
                 }
 
                 if shouldShowMenu {
@@ -720,10 +745,29 @@ class NCContextMenuMain: NSObject {
                                 iconImage = rendered.withRenderingMode(.alwaysTemplate)
                             }
 
+                            // Normalize title to app language for known actions (e.g., Compress to Zip)
+                            let rawTitle = item.name.trimmingCharacters(in: .whitespacesAndNewlines)
+                            let normalizedTitle: String = {
+                                if isZipAction(rawTitle, item.url) {
+                                    // Use app-localized string key for compress to zip
+                                    return NSLocalizedString("_compress_to_zip_", comment: "Compress to Zip")
+                                }
+                                return rawTitle
+                            }()
+
                             let action = UIAction(
-                                title: item.name.trimmingCharacters(in: .whitespacesAndNewlines),
+                                title: normalizedTitle,
                                 image: iconImage ?? UIImage(systemName: "square")
                             ) { _ in
+//                                // Defensive guard: prevent ZIP actions when E2EE passphrase is missing
+//                                if isE2EEFolder, !self.isE2EEPassphraseAvailable(for: metadata.account), isZipAction(normalizedTitle, item.url) {
+//                                    Task { @MainActor in
+//                                        await showErrorBanner(windowScene: self.windowScene,
+//                                                              text: "_offline_not_allowed_",
+//                                                              errorCode: NCGlobal.shared.errorOfflineNotAllowed)
+//                                    }
+//                                    return
+//                                }
                                 Task {
                                     let results = await NextcloudKit.shared.sendRequestAsync(
                                         account: metadata.account,
@@ -771,6 +815,16 @@ class NCContextMenuMain: NSObject {
         }
 
         return clientIntegrationMenu
+    }
+    
+    // MARK: - Helpers
+    /// Returns true if an E2EE passphrase is available for the given account, false otherwise.
+    private func isE2EEPassphraseAvailable(for account: String) -> Bool {
+        // Prefer NCPreferences API if available
+        if let passphrase = NCPreferences().getEndToEndPassphrase(account: account) {
+            return !passphrase.isEmpty
+        }
+        return false
     }
 }
 
