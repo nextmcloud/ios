@@ -412,15 +412,12 @@ class NCMediaNavigationController: NCMainNavigationController {
         })
         
         let hostingController = UIHostingController(rootView: albumListView)
-        let navController = UINavigationController(rootViewController: hostingController)
-        
-        if let sheet = navController.sheetPresentationController {
+        if let sheet = hostingController.sheetPresentationController {
             sheet.detents = [.large()]
             sheet.prefersGrabberVisible = true
             sheet.preferredCornerRadius = 24
         }
-//        presentingController.present(hostingController, animated: true, completion: nil)
-        presentingController.present(navController, animated: true, completion: nil)
+        presentingController.present(hostingController, animated: true, completion: nil)
     }
     
     private static func showAlbumAndNotify(_ album: Album) {

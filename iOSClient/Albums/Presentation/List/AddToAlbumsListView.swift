@@ -27,9 +27,33 @@ struct AddToAlbumsListView: View {
     }
     
     var body: some View {
-        NavigationView {
+        NavigationStack {
             ZStack {
                 List {
+                    Section {
+                        Button(action: {
+                            onCreateAlbum()
+                        }) {
+                            HStack(spacing: 8) {
+                                Image(systemName: "plus.circle.fill")
+                                    .foregroundColor(Color(NCBrandColor.shared.customer))
+                                Text(NSLocalizedString("_albums_list_new_album_popup_title_", comment: "Create new album"))
+                                    .font(.system(size: 16, weight: .semibold))
+                                    .foregroundColor(Color(NCBrandColor.shared.customer))
+                            }
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(.vertical, 10)
+                            .padding(.horizontal, 16)
+                            .background(
+                                RoundedRectangle(cornerRadius: 10)
+                                    .fill(Color.accentColor.opacity(0.08))
+                            )
+                        }
+                        .buttonStyle(PlainButtonStyle())
+                        .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
+                        .listRowSeparator(.hidden)
+                    }
+                    
                     Section(header: Text(NSLocalizedString("_albums_list_own_albums_heading_", comment: ""))
                         .listRowInsets(EdgeInsets())
                         .font(.system(size: 17, weight: .bold))
@@ -52,8 +76,10 @@ struct AddToAlbumsListView: View {
                             }
                         }
                 }
-                .listStyle(PlainListStyle())
-                .navigationBarTitle(NSLocalizedString("_add_to_album", comment: ""), displayMode: .inline)
+                .listStyle(.plain)
+                .scrollContentBackground(.hidden)
+                .navigationTitle(NSLocalizedString("_add_to_album", comment: ""))
+                .navigationBarTitleDisplayMode(.inline)
                 .toolbar {
                     ToolbarItem(placement: .navigationBarLeading) {
                         Button(action: onDismiss) {
@@ -83,8 +109,6 @@ struct AddToAlbumsListView: View {
                 AlbumsManager.shared.syncAlbums()
             }
         }
-//        .navigationViewStyle(StackNavigationViewStyle())
-        .navigationViewStyle(.stack)
     }
     
     @ViewBuilder
