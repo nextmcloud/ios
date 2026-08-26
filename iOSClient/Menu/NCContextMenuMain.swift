@@ -534,11 +534,13 @@ class NCContextMenuMain: NSObject {
     private func makeDeleteFileAction(metadata: tableMetadata) -> UIAction {
         var titleDelete = NSLocalizedString("_delete_", comment: "")
 
+        // Only when opened from Albums context, show "Remove from album" (no file deletion)
         if controller?.getSelectedTabIndex() == NCGlobal.shared.selectedTabIndexAlbum {
             titleDelete = NSLocalizedString("_remove_from_album_", comment: "")
         } else {
             titleDelete = NSLocalizedString("_delete_file_", comment: "")
         }
+
         return UIAction(
             title: NSLocalizedString(
                 metadata.directory ? "_delete_folder_" : titleDelete,
