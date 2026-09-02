@@ -163,8 +163,9 @@ class NCContextMenuMain: NSObject {
         addE2EEActions(metadata: metadata, capabilities: capabilities, mainActionsMenu: &mainActionsMenu)
 
         // Offline
-        if NCNetworking.shared.isOnline,
-           metadata.canSetAsAvailableOffline {
+        if NCNetworking.shared.isOnline {
+//        if NCNetworking.shared.isOnline,
+//           metadata.canSetAsAvailableOffline {
             mainActionsMenu.append(
                 ContextMenuActions.setAvailableOffline(
                     metadatas: [metadata],
