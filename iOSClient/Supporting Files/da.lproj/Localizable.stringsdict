@@ -13,89 +13,9 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>%d tilladt download tilbage</string>
-			<key>other</key>
 			<string>%d tilladte downloads tilbage</string>
-		</dict>
-	</dict>
-	<key>_auto_upload_files_in_queue_</key>
-	<dict>
-		<key>NSStringLocalizedFormatKey</key>
-		<string>%#@files@</string>
-		<key>files</key>
-		<dict>
-			<key>NSStringFormatSpecTypeKey</key>
-			<string>NSStringPluralRuleType</string>
-			<key>NSStringFormatValueTypeKey</key>
-			<string>d</string>
-			<key>one</key>
-			<string>%d fil i kø</string>
 			<key>other</key>
-			<string>%d filer i kø</string>
-		</dict>
-	</dict>
-	<key>_focused_auto_upload_photos_to_back_up_</key>
-	<dict>
-		<key>NSStringLocalizedFormatKey</key>
-		<string>%#@photos@</string>
-		<key>photos</key>
-		<dict>
-			<key>NSStringFormatSpecTypeKey</key>
-			<string>NSStringPluralRuleType</string>
-			<key>NSStringFormatValueTypeKey</key>
-			<string>d</string>
-			<key>one</key>
-			<string>Du har %d element, der skal sikkerhedskopieres</string>
-			<key>other</key>
-			<string>Du har %d elementer, der skal sikkerhedskopieres</string>
-		</dict>
-	</dict>
-	<key>_focused_auto_upload_failed_</key>
-	<dict>
-		<key>NSStringLocalizedFormatKey</key>
-		<string>%#@failed@</string>
-		<key>failed</key>
-		<dict>
-			<key>NSStringFormatSpecTypeKey</key>
-			<string>NSStringPluralRuleType</string>
-			<key>NSStringFormatValueTypeKey</key>
-			<string>d</string>
-			<key>one</key>
-			<string>%d mislykkedes</string>
-			<key>other</key>
-			<string>%d mislykkedes</string>
-		</dict>
-	</dict>
-	<key>_albums_photos_count_</key>
-	<dict>
-		<key>NSStringLocalizedFormatKey</key>
-		<string>%#@photos@</string>
-		<key>photos</key>
-		<dict>
-			<key>NSStringFormatSpecTypeKey</key>
-			<string>NSStringPluralRuleType</string>
-			<key>NSStringFormatValueTypeKey</key>
-			<string>d</string>
-			<key>one</key>
-			<string>%d foto</string>
-			<key>other</key>
-			<string>%d fotos</string>
-		</dict>
-	</dict>
-	<key>_albums_list_photos_and_videos_count_</key>
-	<dict>
-		<key>NSStringLocalizedFormatKey</key>
-		<string>%#@media@</string>
-		<key>media</key>
-		<dict>
-			<key>NSStringFormatSpecTypeKey</key>
-			<string>NSStringPluralRuleType</string>
-			<key>NSStringFormatValueTypeKey</key>
-			<string>d</string>
-			<key>one</key>
-			<string>%d foto eller video</string>
-			<key>other</key>
-			<string>%d fotos og videoer</string>
+			<string>%d resterende tilladte downloads</string>
 		</dict>
 	</dict>
 </dict>

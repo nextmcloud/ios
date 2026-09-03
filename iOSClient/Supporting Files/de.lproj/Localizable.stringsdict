@@ -18,20 +18,20 @@
 			<string>%d verbleibende Downloads erlaubt</string>
 		</dict>
 	</dict>
-	<key>_auto_upload_files_in_queue_</key>
+	<key>_focused_auto_upload_items_left_</key>
 	<dict>
 		<key>NSStringLocalizedFormatKey</key>
-		<string>%#@files@</string>
-		<key>files</key>
+		<string>%#@items@</string>
+		<key>items</key>
 		<dict>
 			<key>NSStringFormatSpecTypeKey</key>
 			<string>NSStringPluralRuleType</string>
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>%d Datei in der Warteschlange</string>
+			<string>%d Element übrig</string>
 			<key>other</key>
-			<string>%d Dateien in der Warteschlange</string>
+			<string>%d Elemente übrig</string>
 		</dict>
 	</dict>
 	<key>_focused_auto_upload_photos_to_back_up_</key>
@@ -64,38 +64,6 @@
 			<string>%d fehlgeschlagen</string>
 			<key>other</key>
 			<string>%d fehlgeschlagen</string>
-		</dict>
-	</dict>
-	<key>_albums_photos_count_</key>
-	<dict>
-		<key>NSStringLocalizedFormatKey</key>
-		<string>%#@photos@</string>
-		<key>photos</key>
-		<dict>
-			<key>NSStringFormatSpecTypeKey</key>
-			<string>NSStringPluralRuleType</string>
-			<key>NSStringFormatValueTypeKey</key>
-			<string>d</string>
-			<key>one</key>
-			<string>%d Foto</string>
-			<key>other</key>
-			<string>%d Fotos</string>
-		</dict>
-	</dict>
-	<key>_albums_list_photos_and_videos_count_</key>
-	<dict>
-		<key>NSStringLocalizedFormatKey</key>
-		<string>%#@media@</string>
-		<key>media</key>
-		<dict>
-			<key>NSStringFormatSpecTypeKey</key>
-			<string>NSStringPluralRuleType</string>
-			<key>NSStringFormatValueTypeKey</key>
-			<string>d</string>
-			<key>one</key>
-			<string>%d Foto oder Video</string>
-			<key>other</key>
-			<string>%d Fotos und Videos</string>
 		</dict>
 	</dict>
 </dict>
