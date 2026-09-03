@@ -102,22 +102,19 @@ class NCBackgroundLocationUploadManager: NSObject, CLLocationManagerDelegate {
     }
 
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        // Must work only in background
         guard isAppInBackground else {
             return
         }
 
         // Open Realm
-        guard NCManageDatabase.shared.openRealmBackground() else {
-            nkLog(tag: self.global.logTagLocation, emoji: .error, message: "Failed to open Realm in Location Manager")
-            return
-        }
-
-        let location = locations.last
-        nkLog(tag: self.global.logTagLocation, emoji: .start, message: "Triggered by location change: \(location?.coordinate.latitude ?? 0), \(location?.coordinate.longitude ?? 0)")
-
-        Task.detached {
-            await NCAutoUpload.shared.autoUploadBackgroundSync()
+        if database.openRealmBackground() {
+            let appDelegate = (UIApplication.shared.delegate as? AppDelegate)!
+            let location = locations.last
+            nkLog(tag: self.global.logTagLocation, emoji: .start, message: "Triggered by location change: \(location?.coordinate.latitude ?? 0), \(location?.coordinate.longitude ?? 0)")
+            
+            Task.detached {
+                await NCAutoUpload.shared.autoUploadBackgroundSync()
+            }
         }
     }
 
