@@ -265,6 +265,14 @@ class NCCollectionViewCommon: UIViewController, NCAccountSettingsModelDelegate, 
         let dropInteraction = UIDropInteraction(delegate: self)
         self.navigationController?.navigationItem.leftBarButtonItems?.first?.customView?.addInteraction(dropInteraction)
 
+        if(!UserDefaults.standard.bool(forKey: "isInitialPrivacySettingsShowed") || isApplicationUpdated()){
+            redirectToPrivacyViewController()
+            
+            //set current app version
+            let appVersion = Bundle.main.infoDictionary?["CFBundleInfoDictionaryVersion"] as? String
+            UserDefaults.standard.set(appVersion, forKey: "CurrentAppVersion")
+        }
+        
         registerForTraitChanges([UITraitUserInterfaceStyle.self]) { [weak self] (view: NCCollectionViewCommon, _) in
             guard let self else { return }
             sectionFirstHeader?.setRichWorkspaceColor(style: view.traitCollection.userInterfaceStyle)
@@ -284,6 +292,8 @@ class NCCollectionViewCommon: UIViewController, NCAccountSettingsModelDelegate, 
                 await self.debouncerReloadData.resume()
             }
         }
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(updateIcons), name: NSNotification.Name(rawValue: global.notificationCenterUpdateIcons), object: nil)
 
         DispatchQueue.main.async {
             self.collectionView?.collectionViewLayout.invalidateLayout()
@@ -325,7 +335,7 @@ class NCCollectionViewCommon: UIViewController, NCAccountSettingsModelDelegate, 
         Task {
             await NCNetworking.shared.transferDispatcher.addDelegate(self)
 
-            await (self.navigationController as? NCMainNavigationController)?.setNavigationLeftItems()
+//            await (self.navigationController as? NCMainNavigationController)?.setNavigationLeftItems()
             await (self.navigationController as? NCMainNavigationController)?.setNavigationRightItems()
         }
 
@@ -349,6 +359,9 @@ class NCCollectionViewCommon: UIViewController, NCAccountSettingsModelDelegate, 
 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+
+        // Re-evaluate in-app messages after viewDidAppear
+        MoEngageAnalytics.shared.displayInAppNotificationSafely(reason: "viewDidAppear")
 
         NotificationCenter.default.addObserver(self, selector: #selector(applicationWillResignActive(_:)), name: UIApplication.willResignActiveNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(closeRichWorkspaceWebView), name: NSNotification.Name(rawValue: global.notificationCenterCloseRichWorkspaceWebView), object: nil)
@@ -398,6 +411,25 @@ class NCCollectionViewCommon: UIViewController, NCAccountSettingsModelDelegate, 
         if viewController is NCViewerRichWorkspaceWebView {
             closeRichWorkspaceWebView()
         }
+    }
+    
+    @objc func updateIcons() {
+        Task {
+            await self.reloadDataSource()
+        }
+    }
+
+    func isApplicationUpdated() -> Bool {
+        let appVersion = Bundle.main.infoDictionary?["CFBundleInfoDictionaryVersion"] as? String ?? ""
+        let currentVersion = UserDefaults.standard.string(forKey: "CurrentAppVersion")
+        return currentVersion != appVersion
+    }
+
+    func redirectToPrivacyViewController() {
+        let storyBoard: UIStoryboard = UIStoryboard(name: "NCSettings", bundle: nil)
+        let newViewController = storyBoard.instantiateViewController(withIdentifier: "privacySettingsNavigation") as? UINavigationController
+        newViewController?.modalPresentationStyle = .fullScreen
+        self.present(newViewController!, animated: true, completion: nil)
     }
 
     // MARK: - NotificationCenter

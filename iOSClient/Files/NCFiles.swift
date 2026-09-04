@@ -88,7 +88,7 @@ class NCFiles: NCCollectionViewCommon {
                     self.titleCurrentFolder = self.getNavigationTitle()
                     self.navigationItem.title = self.titleCurrentFolder
 
-                    await (self.navigationController as? NCMainNavigationController)?.setNavigationLeftItems()
+//                    await (self.navigationController as? NCMainNavigationController)?.setNavigationLeftItems()
                     await self.reloadDataSource()
                     await self.getServerData()
                 }
@@ -106,6 +106,9 @@ class NCFiles: NCCollectionViewCommon {
 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+
+        // Re-evaluate in-app messages after viewDidAppear
+        MoEngageAnalytics.shared.displayInAppNotificationSafely(reason: "viewDidAppear")
 
         if !self.dataSource.isEmpty() {
             blinkCell(fileName: self.fileNameBlink)
@@ -406,8 +409,8 @@ class NCFiles: NCCollectionViewCommon {
             navigationItem.title = self.titleCurrentFolder
         }
 
-        Task {
-            await (self.navigationController as? NCMainNavigationController)?.setNavigationLeftItems()
-        }
+//        Task {
+//            await (self.navigationController as? NCMainNavigationController)?.setNavigationLeftItems()
+//        }
     }
 }

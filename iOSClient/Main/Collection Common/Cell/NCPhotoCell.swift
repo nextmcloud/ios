@@ -9,6 +9,8 @@ class NCPhotoCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellMain
     @IBOutlet weak var imageSelect: UIImageView!
     @IBOutlet weak var imageVisualEffect: UIVisualEffectView!
 
+    fileprivate var allowSelectionOverride: Bool?
+
     var metadata: tableMetadata?
     var previewImg: UIImageView? {
         get { return imageItem }
@@ -25,6 +27,7 @@ class NCPhotoCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellMain
         super.prepareForReuse()
 
         initCell()
+        allowSelectionOverride = nil
     }
 
     func initCell() {
@@ -33,6 +36,8 @@ class NCPhotoCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellMain
         accessibilityValue = nil
 
         imageItem.image = nil
+        imageSelect.isHidden = true
+        imageSelect.image = nil
 
         imageVisualEffect.isHidden = false
         imageVisualEffect.effect = nil
@@ -46,9 +51,21 @@ class NCPhotoCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellMain
     }
 
     func selected(_ status: Bool, isEditMode: Bool, color: UIColor) {
-        imageVisualEffect.alpha = status ? 1 : 0
-        imageSelect.alpha = status ? 1 : 0
-        imageSelect.image = NCImageCache.shared.getImageCheckedYes(color: color)
+        // Determine allowance from override set by data source (defaults to true if not provided)
+        let allowSelection = allowSelectionOverride ?? true
+
+        // Hide selection control for disallowed items; otherwise show only in edit mode
+        imageSelect.isHidden = allowSelection ? !isEditMode : true
+
+        // Selected state visuals: only apply when selection is allowed and in edit mode
+        if status && allowSelection && isEditMode {
+            imageSelect.image = NCImageCache.shared.getImageCheckedYes(color: color)
+            imageVisualEffect.isHidden = false
+        } else {
+            imageSelect.image = NCImageCache.shared.getImageCheckedNo(color: color)
+            imageVisualEffect.isHidden = true
+            backgroundView = nil
+        }
     }
 
     func setAccessibility(label: String, value: String) {
@@ -89,20 +106,20 @@ extension NCCollectionViewCommon {
                         if metadata.iconName.isEmpty {
                             cell.previewImg?.image = NCImageCache.shared.getImageFile()
                         } else {
-                            cell.previewImg?.image = self.utility.loadImage(named: metadata.iconName, useTypeIconFile: true, account: metadata.account)
+//                            cell.previewImg?.image = self.utility.loadImage(named: metadata.iconName, useTypeIconFile: true, account: metadata.account)
+                            cell.previewImg?.image = self.utility.previewIcon(for: metadata)
                         }
                     }
                 }
             }
         }
 
+        cell.allowSelectionOverride = !metadata.e2eEncrypted
+
         // Edit mode
         //
-        if fileSelect.contains(metadata.ocId) {
-            cell.selected(true, isEditMode: isEditMode, color: NCBrandColor.shared.getElement(account: session.account))
-        } else {
-            cell.selected(false, isEditMode: isEditMode, color: NCBrandColor.shared.getElement(account: session.account))
-        }
+        let isSelected = (cell.allowSelectionOverride ?? true) && fileSelect.contains(metadata.ocId)
+        cell.selected(isSelected, isEditMode: isEditMode, color: NCBrandColor.shared.getElement(account: session.account))
 
         return cell
     }

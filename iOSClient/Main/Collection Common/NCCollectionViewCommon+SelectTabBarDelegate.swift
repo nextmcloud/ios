@@ -9,11 +9,21 @@ import LucidBanner
 
 extension NCCollectionViewCommon: NCCollectionViewCommonSelectTabBarDelegate {
     func selectAll() {
-        if !fileSelect.isEmpty, self.dataSource.getMetadatas().count == fileSelect.count {
+        // Build the list of selectable ocIds excluding E2EE directories
+        let selectableOcIds: [String] = self.dataSource.getMetadatas()
+            .filter { metadata in
+                // Exclude E2EE directories from selection
+                !(metadata.isDirectory && metadata.e2eEncrypted)
+            }
+            .compactMap { $0.ocId }
+
+        // Toggle selection: if everything selectable is already selected, clear; otherwise select all eligible items
+        if !fileSelect.isEmpty, Set(fileSelect) == Set(selectableOcIds) {
             fileSelect = []
         } else {
-            fileSelect = self.dataSource.getMetadatas().compactMap({ $0.ocId })
+            fileSelect = selectableOcIds
         }
+
         tabBarSelect?.update(fileSelect: fileSelect, metadatas: getSelectedMetadatas(), userId: session.userId)
         self.collectionView.reloadData()
     }
@@ -85,35 +95,35 @@ extension NCCollectionViewCommon: NCCollectionViewCommonSelectTabBarDelegate {
             })
         }
 
-        alertController.addAction(UIAlertAction(title: NSLocalizedString("_remove_local_file_", comment: ""), style: .default) { (_: UIAlertAction) in
-            Task {
-                var token: Int?
-                var banner: LucidBanner?
-                let containsDirectory = metadatas.contains { $0.isDirectory }
-                if containsDirectory {
-                    (banner, token) = showHudBanner(windowScene: self.windowScene, title: "_delete_in_progress_")
-                }
-
-                for metadata in metadatas {
-                    await self.networking.deleteCache(metadata, progress: { progress in
-                        Task {
-                            if let token {
-                                banner?.update(
-                                    payload: LucidBannerPayload.Update(progress: progress),
-                                    for: token
-                                )
-                            }
-                        }
-
-                    })
-
-                    if let banner {
-                        banner.dismiss()
-                    }
-                }
-                await self.setEditMode(false)
-            }
-        })
+//        alertController.addAction(UIAlertAction(title: NSLocalizedString("_remove_local_file_", comment: ""), style: .default) { (_: UIAlertAction) in
+//            Task {
+//                var token: Int?
+//                var banner: LucidBanner?
+//                let containsDirectory = metadatas.contains { $0.isDirectory }
+//                if containsDirectory {
+//                    (banner, token) = showHudBanner(windowScene: self.windowScene, title: "_delete_in_progress_")
+//                }
+//
+//                for metadata in metadatas {
+//                    await self.networking.deleteCache(metadata, progress: { progress in
+//                        Task {
+//                            if let token {
+//                                banner?.update(
+//                                    payload: LucidBannerPayload.Update(progress: progress),
+//                                    for: token
+//                                )
+//                            }
+//                        }
+//
+//                    })
+//
+//                    if let banner {
+//                        banner.dismiss()
+//                    }
+//                }
+//                await self.setEditMode(false)
+//            }
+//        })
 
         alertController.addAction(UIAlertAction(title: NSLocalizedString("_cancel_", comment: ""), style: .cancel) { (_: UIAlertAction) in })
         self.present(alertController, animated: true, completion: nil)
@@ -204,7 +214,7 @@ extension NCCollectionViewCommon: NCCollectionViewCommonSelectTabBarDelegate {
         if editMode {
             navigationItem.leftBarButtonItems = nil
         } else {
-            await (self.navigationController as? NCMainNavigationController)?.setNavigationLeftItems()
+//            await (self.navigationController as? NCMainNavigationController)?.setNavigationLeftItems()
         }
         await (self.navigationController as? NCMainNavigationController)?.setNavigationRightItems()
 

@@ -39,6 +39,9 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellMainP
 
     weak var delegate: NCListCellDelegate?
 
+    // Added property to override allowSelection logic
+    fileprivate var allowSelectionOverride: Bool?
+
     // Cell Protocol
     var metadata: tableMetadata? {
         didSet {
@@ -90,6 +93,7 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellMainP
         super.prepareForReuse()
 
         initCell()
+        allowSelectionOverride = nil
     }
 
     func initCell() {
@@ -107,6 +111,10 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellMainP
 
         buttonShared.setImage(nil, for: .normal)
         buttonShared.imageEdgeInsets = .zero
+        buttonShared.adjustsImageWhenHighlighted = false
+        buttonShared.adjustsImageWhenDisabled = false
+        buttonShared.alpha = 1.0
+        buttonShared.tintAdjustmentMode = .normal
 
         buttonMore.setImage(nil, for: .normal)
         buttonMore.menu = nil
@@ -223,24 +231,32 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellMainP
     }
 
     func selected(_ status: Bool, isEditMode: Bool, color: UIColor) {
+        // Determine allowance from override set by data source (defaults to true if not provided)
+        let allowSelection = allowSelectionOverride ?? true
+
+        // Hide selection control for disallowed items; otherwise show only in edit mode
+        imageSelect.isHidden = allowSelection ? !isEditMode : true
+
+        // Layout: shift in edit mode irrespective of selection control visibility
+        imageItemLeftConstraint.constant = isEditMode ? 45 : 10
+
+        // Buttons visibility respects edit mode
         if isEditMode {
-            imageItemLeftConstraint.constant = 45
-            imageSelect.isHidden = false
             buttonShared.isHidden = true
             buttonMore.isHidden = true
             shareContainer.isHidden = true
             moreContainer.isHidden = true
             accessibilityCustomActions = nil
         } else {
-            imageItemLeftConstraint.constant = 10
-            imageSelect.isHidden = true
             buttonShared.isHidden = false
             buttonMore.isHidden = false
             shareContainer.isHidden = false
             moreContainer.isHidden = false
             backgroundView = nil
         }
-        if status {
+
+        // Selected state visuals: only apply when selection is allowed and in edit mode
+        if status && allowSelection && isEditMode {
             var blurEffectView: UIView?
             blurEffectView = UIVisualEffectView(effect: UIBlurEffect(style: .systemMaterial))
             blurEffectView?.backgroundColor = .lightGray
@@ -254,7 +270,6 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellMainP
             backgroundView = nil
             separator.isHidden = false
         }
-
     }
 
     func writeInfoDateSize(date: NSDate, size: Int64) {
@@ -369,6 +384,17 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellMainP
             imageStatus.layer.cornerRadius = imageStatus.bounds.width / 2
         }
     }
+    
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        // Ensure share button stays fully visible across light/dark switches
+        buttonShared.alpha = 1.0
+        buttonShared.tintAdjustmentMode = .normal
+        // If the image uses template rendering elsewhere, enforce alwaysOriginal here as a safeguard
+        if let image = buttonShared.image(for: .normal) {
+            buttonShared.setImage(image.withRenderingMode(.alwaysOriginal), for: .normal)
+        }
+    }
 }
 
 // MARK: - List Layout
@@ -423,7 +449,25 @@ extension NCCollectionViewCommon {
         var isMounted = false
         var a11yValues: [String] = []
         let existsImagePreview = utilityFileSystem.fileProviderStorageImageExists(metadata.ocId, etag: metadata.etag, userId: metadata.userId, urlBase: metadata.urlBase)
+        let shares = NCManageDatabase.shared.getTableShares(metadata: metadata)
+        let shareItems = shares.share ?? []
 
+        // Determine Link Shares: true if firstShareLink is public OR if any item in shareItems is public
+        let hasLinkShares = (shares.firstShareLink?.shareType == NKShare.ShareType.publicLink.rawValue) ||
+                            shareItems.contains { $0.shareType == NKShare.ShareType.publicLink.rawValue }
+
+        // Determine Email Shares: true if any item in shareItems is email type
+        let hasEmailShares = shareItems.contains { $0.shareType == NKShare.ShareType.email.rawValue }
+
+        // Combined Logic
+        let hasEmailAndLinkShares = hasLinkShares && hasEmailShares
+        
+        defer {
+            let capabilities = NCNetworking.shared.capabilities[session.account] ?? NKCapabilities.Capabilities()
+            if !metadata.isSharable() || (!capabilities.fileSharingApiEnabled && !capabilities.filesComments && capabilities.activity.isEmpty) {
+                cell.hideButtonShare(true)
+            }
+        }
         // CONTENT MODE
         cell.previewImg?.layer.borderWidth = 0
 
@@ -476,17 +520,27 @@ extension NCCollectionViewCommon {
             a11yValues.append(NSLocalizedString("_favorite_short_", comment: ""))
         }
 
-        // Share button image (SF Symbol)
-        if isShare {
-            cell.buttonShared.setImage(imageCache.getImageShared(), for: .normal)
-        } else if !metadata.shareType.isEmpty {
-            metadata.shareType.contains(NKShare.ShareType.publicLink.rawValue) ?
-            (cell.buttonShared.setImage(imageCache.getImageShareByLink(), for: .normal)) :
-            (cell.buttonShared.setImage(imageCache.getImageShared(), for: .normal))
-        } else {
-            cell.buttonShared.setImage(imageCache.getImageCanShare(), for: .normal)
-        }
+        // Configure Share Button Image with clear priority
+        // Priority order:
+        // 1) Shared-with-me indicator (permissions contains "S")
+        // 2) Cross-account item
+        // 3) Has any shares (public link, direct shares, or firstShareLink)
+        // 4) Default can-share icon (gray)
+        let isSharedWithMe = metadata.permissions.contains("S")
+        let isCrossAccount = session.account != metadata.account
+        let hasAnyShare = !metadata.shareType.isEmpty || !(shares.share?.isEmpty ?? true) || (shares.firstShareLink != nil)
 
+        if isSharedWithMe {
+            cell.buttonShared.setImage(imageCache.getImageSharedWithMe(), for: .normal)
+        } else if isCrossAccount {
+            cell.buttonShared.setImage(imageCache.getImageShared(), for: .normal)
+        } else if hasAnyShare || isShare {
+            // Shared by me or has link/email shares
+            cell.buttonShared.setImage(imageCache.getImageShared().withTintColor(NCBrandColor.shared.customer, renderingMode: .alwaysOriginal), for: .normal)
+        } else {
+            cell.buttonShared.setImage(imageCache.getImageCanShare().withTintColor(.label, renderingMode: .alwaysOriginal), for: .normal)
+        }
+        
         // Button More
         if metadata.lock == true {
             cell.setButtonMore(image: imageCache.getImageButtonMoreLock())
@@ -498,6 +552,7 @@ extension NCCollectionViewCommon {
         // Status
         cellMainStatus(cell: cell, metadata: metadata, a11yValues: &a11yValues)
 
+        /*
         // AVATAR
         if !metadata.ownerId.isEmpty, metadata.ownerId != metadata.userId {
             let fileName = NCSession.shared.getFileName(urlBase: metadata.urlBase, user: metadata.ownerId)
@@ -520,6 +575,7 @@ extension NCCollectionViewCommon {
                 }
             }
         }
+         */
 
         // URL
         if metadata.classFile == NKTypeClassFile.url.rawValue {
@@ -534,13 +590,13 @@ extension NCCollectionViewCommon {
             cell.separator?.isHidden = false
         }
 
-        // Edit mode
-        if fileSelect.contains(metadata.ocId) {
-            cell.selected(true, isEditMode: isEditMode, color: NCBrandColor.shared.getElement(account: session.account))
-            a11yValues.append(NSLocalizedString("_selected_", comment: ""))
-        } else {
-            cell.selected(false, isEditMode: isEditMode, color: NCBrandColor.shared.getElement(account: session.account))
-        }
+        // Set allowSelection override on cell
+        cell.allowSelectionOverride = !metadata.e2eEncrypted
+
+        // Edit mode / selection handling
+        let isSelected = (cell.allowSelectionOverride ?? true) && fileSelect.contains(metadata.ocId)
+        cell.selected(isSelected, isEditMode: isEditMode, color: NCBrandColor.shared.getElement(account: session.account))
+        if isSelected { a11yValues.append(NSLocalizedString("_selected_", comment: "")) }
 
         // Accessibility
         cell.setAccessibility(label: metadata.fileNameView + ", " + (cell.labelInfo?.text ?? "") + (cell.labelSubinfo?.text ?? ""), value: a11yValues.joined(separator: ", "))
@@ -588,3 +644,6 @@ extension NCCollectionViewCommon {
     }
 }
 #endif
+
+
+
