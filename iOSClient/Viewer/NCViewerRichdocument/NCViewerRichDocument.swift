@@ -46,15 +46,12 @@ class NCViewerRichDocument: UIViewController, WKNavigationDelegate, WKScriptMess
                 primaryAction: nil,
                 menu: UIMenu(title: "", children: [
                     UIDeferredMenuElement.uncached { [self] completion in
-                        if let menu = NCViewerContextMenu.makeContextMenu(controller: self.tabBarController as? NCMainTabBarController, metadata: self.metadata, webView: true, sender: self) {
+                        if let menu = NCContextMenuViewer(metadata: self.metadata, controller: self.tabBarController as? NCMainTabBarController, webView: true, sender: self).viewMenu() {
                             completion(menu.children)
                         }
                     }
                 ]))
         }
-//        navigationItem.hidesBackButton = true
-        navigationController?.navigationBar.prefersLargeTitles = false
-        navigationItem.title = metadata.fileNameView
 
         let config = WKWebViewConfiguration()
         config.websiteDataStore = WKWebsiteDataStore.nonPersistent()
@@ -129,11 +126,6 @@ class NCViewerRichDocument: UIViewController, WKNavigationDelegate, WKScriptMess
             tabBarController?.tabBar.isHidden = false
         }
 
-        // Prevent back navigation gesture of iOS >= 26 as that can cause unintended swipe backs
-        if #available(iOS 26.0, *) {
-            navigationController?.interactiveContentPopGestureRecognizer?.isEnabled = false
-        }
-
         Task {
             await NCNetworking.shared.transferDispatcher.removeDelegate(self)
         }
@@ -194,7 +186,9 @@ class NCViewerRichDocument: UIViewController, WKNavigationDelegate, WKScriptMess
             }
 
             if message.body as? String == "share" {
-                NCCreate().createShare(viewController: self, metadata: metadata, page: .sharing)
+                NCCreate().createShare(controller: self.controller,
+                                       metadata: metadata,
+                                       page: .sharing)
             }
 
             if let param = message.body as? [AnyHashable: Any] {
@@ -231,10 +225,16 @@ class NCViewerRichDocument: UIViewController, WKNavigationDelegate, WKScriptMess
                                                                                 status: self.global.metadataStatusDownloading)
                                 }
                             }, progressHandler: { _ in
-                            }, completionHandler: { account, etag, _, _, headers, _, error in
+                            }, completionHandler: { account, response, error in
                                 NCActivityIndicator.shared.stop()
+                                let allHeaderFields = response?.response?.allHeaderFields
+
                                 Task {
+                                    let nkComm = NextcloudKit.shared.nkCommonInstance
                                     let ocId = self.metadata.ocId
+                                    let allHeaderFields = response?.response?.allHeaderFields
+                                    let etag = nkComm.normalizedETag(nkComm.findHeader("oc-etag", allHeaderFields: allHeaderFields))
+
                                     await self.database.setMetadataSessionAsync(ocId: ocId,
                                                                                 session: "",
                                                                                 sessionTaskIdentifier: 0,
@@ -244,8 +244,15 @@ class NCViewerRichDocument: UIViewController, WKNavigationDelegate, WKScriptMess
                                 }
                                 if error == .success && account == self.metadata.account {
                                     var item = fileNameLocalPath
+                                    if let disposition = NextcloudKit.shared.nkCommonInstance.findHeader("Content-Disposition", allHeaderFields: allHeaderFields),
+                                        let filenameContentDisposition = self.filenameFromContentDisposition(disposition) {
+                                         fileName = filenameContentDisposition
+                                         item = self.utilityFileSystem.createServerUrl(serverUrl: self.utilityFileSystem.directoryUserData, fileName: fileName)
+                                         _ = self.utilityFileSystem.moveFile(atPath: fileNameLocalPath, toPath: item)
+                                    }
 
-                                    if let headers {
+                                    /*
+                                    if let allHeaderFields {
                                         if let disposition = headers["Content-Disposition"] as? String,
                                            let filenameContentDisposition = self.filenameFromContentDisposition(disposition) {
                                             fileName = filenameContentDisposition
@@ -253,6 +260,7 @@ class NCViewerRichDocument: UIViewController, WKNavigationDelegate, WKScriptMess
                                             _ = self.utilityFileSystem.moveFile(atPath: fileNameLocalPath, toPath: item)
                                         }
                                     }
+                                    */
 
                                     if type == "print" {
                                         let pic = UIPrintInteractionController.shared
@@ -316,7 +324,7 @@ class NCViewerRichDocument: UIViewController, WKNavigationDelegate, WKScriptMess
 
     // MARK: -
 
-    func dismissSelect(serverUrl: String?, metadata: tableMetadata?, type: String, items: [Any], overwrite: Bool, copy: Bool, move: Bool, session: NCSession.Session) {
+    func dismissSelect(serverUrl: String?, metadata: tableMetadata?, type: String, items: [Any], overwrite: Bool, copy: Bool, move: Bool, session: NCSession.Session, controller: NCMainTabBarController?) {
         if let serverUrl, let metadata {
             let path = utilityFileSystem.getRelativeFilePath(metadata.fileName, serverUrl: serverUrl, session: session)
 
@@ -385,10 +393,6 @@ class NCViewerRichDocument: UIViewController, WKNavigationDelegate, WKScriptMess
     }
 
     public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-        if #available(iOS 26.0, *) {
-            navigationController?.interactiveContentPopGestureRecognizer?.isEnabled = false
-        }
-
         NCActivityIndicator.shared.stop()
     }
 

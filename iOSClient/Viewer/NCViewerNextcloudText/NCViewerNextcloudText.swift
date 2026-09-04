@@ -6,7 +6,7 @@ import UIKit
 import NextcloudKit
 @preconcurrency import WebKit
 
-class NCViewerDirectEditing: UIViewController, WKNavigationDelegate, WKScriptMessageHandler, WKUIDelegate {
+class NCViewerNextcloudText: UIViewController, WKNavigationDelegate, WKScriptMessageHandler, WKUIDelegate {
     var webView = WKWebView()
     var bottomConstraint: NSLayoutConstraint?
     var link: String = ""
@@ -16,15 +16,15 @@ class NCViewerDirectEditing: UIViewController, WKNavigationDelegate, WKScriptMes
     let utility = NCUtility()
     var items: [UIBarButtonItem] = []
 
-    @MainActor
-    var controller: NCMainTabBarController? {
-        self.tabBarController as? NCMainTabBarController
-    }
-
     var sceneIdentifier: String {
         (self.tabBarController as? NCMainTabBarController)?.sceneIdentifier ?? ""
     }
 
+    @MainActor
+    var controller: NCMainTabBarController? {
+        self.tabBarController as? NCMainTabBarController
+    }
+    
     // MARK: - View Life Cycle
 
     required init?(coder: NSCoder) {
@@ -49,11 +49,7 @@ class NCViewerDirectEditing: UIViewController, WKNavigationDelegate, WKScriptMes
             items.append(moreButton)
         }
 
-        let group = UIBarButtonItemGroup(
-            barButtonItems: items,
-            representativeItem: nil
-        )
-        navigationItem.trailingItemGroups = [group]
+        navigationItem.rightBarButtonItems = items
         navigationItem.leftBarButtonItems = nil
 //        if editor == "nextcloud text" {
 //            navigationItem.hidesBackButton = true
@@ -61,16 +57,11 @@ class NCViewerDirectEditing: UIViewController, WKNavigationDelegate, WKScriptMes
         navigationController?.navigationBar.prefersLargeTitles = false
         navigationItem.title = metadata.fileNameView
         
-
-        // Prevent back navigation gesture of iOS/iPadOS >= 26 as that will interfere with the possibility to mark text in onlyoffice
-        if #available(iOS 26.0, *) {
-            navigationController?.interactiveContentPopGestureRecognizer?.isEnabled = false
-        }
-
         let config = WKWebViewConfiguration()
         config.websiteDataStore = WKWebsiteDataStore.nonPersistent()
         let contentController = config.userContentController
         contentController.add(self, name: "DirectEditingMobileInterface")
+        // FIXME: ONLYOFFICE Due to the WK Shared Workers issue the editors cannot be opened on the devices with iOS 16.1.
         if editor == "onlyoffice" {
             let dropSharedWorkersScript = WKUserScript(source: "delete window.SharedWorker;", injectionTime: WKUserScriptInjectionTime.atDocumentStart, forMainFrameOnly: false)
             config.userContentController.addUserScript(dropSharedWorkersScript)
@@ -123,6 +114,9 @@ class NCViewerDirectEditing: UIViewController, WKNavigationDelegate, WKScriptMes
 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+
+        // Re-evaluate in-app messages after viewDidAppear
+        MoEngageAnalytics.shared.displayInAppNotificationSafely(reason: "viewDidAppear")
 
         Task {
             await NCNetworking.shared.transferDispatcher.addDelegate(self)
@@ -177,8 +171,7 @@ class NCViewerDirectEditing: UIViewController, WKNavigationDelegate, WKScriptMes
             }
 
             if message.body as? String == "share" {
-                NCCreate().createShare(controller: self.controller,
-                                       metadata: metadata, page: .sharing)
+                NCCreate().createShare(controller: self.controller, metadata: metadata, page: .sharing)
             }
 
             if message.body as? String == "loading" {
@@ -229,7 +222,7 @@ class NCViewerDirectEditing: UIViewController, WKNavigationDelegate, WKScriptMes
     }
 }
 
-extension NCViewerDirectEditing: UINavigationControllerDelegate {
+extension NCViewerNextcloudText: UINavigationControllerDelegate {
     override func didMove(toParent parent: UIViewController?) {
         super.didMove(toParent: parent)
 
@@ -243,7 +236,7 @@ extension NCViewerDirectEditing: UINavigationControllerDelegate {
     }
 }
 
-extension NCViewerDirectEditing: NCTransferDelegate {
+extension NCViewerNextcloudText: NCTransferDelegate {
     func transferReloadData(serverUrl: String?) { }
 
     func transferReloadDataSource(serverUrl: String?, requestData: Bool, status: Int?) { }
