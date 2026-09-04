@@ -227,6 +227,7 @@ extension tableMetadata {
         return session.isEmpty && !isDirectoryE2EE && !e2eEncrypted
     }
 
+    // Return if is sharable
     func isSharable() -> Bool {
         guard let capabilities = NCNetworking.shared.capabilities[account] else {
             return false
@@ -294,6 +295,33 @@ extension tableMetadata {
         } else {
             return NCMetadataPermissions.canCreateFile(self)
         }
+    }
+    
+    var isDOC: Bool {
+        return (contentType == "application/msword" || contentType == "application/vnd.openxmlformats-officedocument.wordprocessingml.document")
+    }
+    
+    var isXLS: Bool {
+        return (contentType == "application/vnd.ms-excel" || contentType == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+    }
+    
+    var isPPT: Bool {
+        return (contentType == "application/vnd.ms-powerpoint" ||
+                contentType == "application/vnd.openxmlformats-officedocument.presentationml.presentation" ||
+                contentType == "application/vnd.ms-powerpoint.presentation.macroEnabled.12")
+    }
+    
+    var isTXT: Bool {
+        return (contentType == "text/plain" ||
+                contentType == "text/markdown")
+    }
+    
+    var isZIP: Bool {
+        return (contentType == "application/zip" ||
+                contentType == "application/x-7z-compressed" ||
+                contentType == "application/x-rar-compressed" ||
+                contentType == "application/x-gzip" ||
+                contentType == "application/x-tar")
     }
 
 #endif
@@ -509,7 +537,7 @@ extension NCManageDatabase {
             }
         }
     }
-    
+
     func deleteMetadataOcIds(_ ocIds: [String]) {
         do {
             let realm = try Realm()
@@ -522,7 +550,7 @@ extension NCManageDatabase {
 
         }
     }
-
+    
     func replaceMetadataAsync(ocId: String, metadata: tableMetadata) async {
         let detached = metadata.detachedCopy()
 
@@ -1390,36 +1418,6 @@ extension NCManageDatabase {
                 .filter(predicate)
                 .first != nil
         } ?? false
-    }
-
-    func countMetadatasFor(serverUrl: String) -> Int {
-        core.performRealmRead { realm in
-            let results = realm.objects(tableMetadata.self)
-                .filter("serverUrl == %@", serverUrl)
-            return results.count
-        } ?? 0
-    }
-
-    /// Filters Auto Upload metadata entries, returning only the items that are not already queued in the local database.
-    /// - Parameter metadatas: The detached Auto Upload metadata entries generated from Photos assets.
-    /// - Returns: Only metadata entries that can be safely added to the upload queue.
-    func filterAutoUploadMetadatasNotAlreadyQueuedAsync(_ metadatas: [tableMetadata]) async -> [tableMetadata] {
-        await core.performRealmReadAsync { realm in
-            metadatas.filter { metadata in
-                guard !metadata.assetLocalIdentifier.isEmpty else {
-                    return false
-                }
-                return realm.objects(tableMetadata.self)
-                    .filter(
-                        "account == %@ AND sessionSelector == %@ AND assetLocalIdentifier == %@ AND session != %@",
-                        metadata.account,
-                        NCGlobal.shared.selectorUploadAutoUpload,
-                        metadata.assetLocalIdentifier,
-                        ""
-                    )
-                    .isEmpty
-            }
-        } ?? []
     }
 
     // MARK: - helpers
