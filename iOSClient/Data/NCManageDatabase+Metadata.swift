@@ -231,6 +231,7 @@ extension tableMetadata {
         return session.isEmpty && !isDirectoryE2EE && !e2eEncrypted
     }
 
+    // Return if is sharable
     func isSharable() -> Bool {
         guard let capabilities = NCNetworking.shared.capabilities[account] else {
             return false
@@ -251,14 +252,15 @@ extension tableMetadata {
               NextcloudKit.shared.isNetworkReachable() else {
             return false
         }
-        let directEditingEditors = NCDocumentEditorSupport.directEditingEditorIdentifiers(account: account, contentType: contentType, fileName: fileNameView)
+        let directEditingEditors = NCDocumentEditorSupport.directEditingEditorIdentifiers(account: account, contentType: contentType)
         let supportsRichdocuments = NCDocumentEditorSupport.isFileSupportedByRichdocuments(self)
 
         return supportsRichdocuments || !directEditingEditors.isEmpty
     }
 
     var isLegacyRichdocumentsEditorAvailable: Bool {
-        guard classFile == NKTypeClassFile.document.rawValue,
+        guard !isPDF,
+              classFile == NKTypeClassFile.document.rawValue,
               NextcloudKit.shared.isNetworkReachable(),
               NCDocumentEditorSupport.isFileSupportedByRichdocuments(self) else {
             return false
@@ -266,8 +268,7 @@ extension tableMetadata {
 
         let directEditingEditors = NCDocumentEditorSupport.directEditingEditorIdentifiers(
             account: account,
-            contentType: contentType,
-            fileName: fileNameView
+            contentType: contentType
         )
         return !directEditingEditors.contains {
             $0.caseInsensitiveCompare(NCGlobal.shared.editorCollabora) == .orderedSame
@@ -278,7 +279,7 @@ extension tableMetadata {
         guard (classFile == NKTypeClassFile.document.rawValue) && NextcloudKit.shared.isNetworkReachable() else {
             return false
         }
-        let editors = NCDocumentEditorSupport.directEditingEditorIdentifiers(account: account, contentType: contentType, fileName: fileNameView)
+        let editors = NCDocumentEditorSupport.directEditingEditorIdentifiers(account: account, contentType: contentType)
         return !editors.isEmpty
     }
 
@@ -292,6 +293,33 @@ extension tableMetadata {
         } else {
             return NCMetadataPermissions.canCreateFile(self)
         }
+    }
+    
+    var isDOC: Bool {
+        return (contentType == "application/msword" || contentType == "application/vnd.openxmlformats-officedocument.wordprocessingml.document")
+    }
+    
+    var isXLS: Bool {
+        return (contentType == "application/vnd.ms-excel" || contentType == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+    }
+    
+    var isPPT: Bool {
+        return (contentType == "application/vnd.ms-powerpoint" ||
+                contentType == "application/vnd.openxmlformats-officedocument.presentationml.presentation" ||
+                contentType == "application/vnd.ms-powerpoint.presentation.macroEnabled.12")
+    }
+    
+    var isTXT: Bool {
+        return (contentType == "text/plain" ||
+                contentType == "text/markdown")
+    }
+    
+    var isZIP: Bool {
+        return (contentType == "application/zip" ||
+                contentType == "application/x-7z-compressed" ||
+                contentType == "application/x-rar-compressed" ||
+                contentType == "application/x-gzip" ||
+                contentType == "application/x-tar")
     }
 
 #endif
@@ -466,20 +494,6 @@ extension NCManageDatabase {
         }
     }
 
-    /// Inserts discovered transfers only if the start/stop session is still current.
-    func addAutoUploadMetadatasAsync(_ metadatas: [tableMetadata], account: String, sessionIdentifier: String, seedOcId: String? = nil) async {
-        let detached = metadatas.map { $0.detachedCopy() }
-        await core.performRealmWriteAsync { realm in
-            guard let current = realm.objects(tableAccount.self).filter("account == %@", account).first,
-                  current.autoUploadStart,
-                  current.autoUploadSessionIdentifier == sessionIdentifier else { return }
-            if let seedOcId {
-                guard realm.objects(tableMetadata.self).filter("account == %@ AND (ocId == %@ OR ocIdTransfer == %@)", account, seedOcId, seedOcId).first != nil else { return }
-            }
-            realm.add(detached, update: .all)
-        }
-    }
-
     func addMetadatas(_ metadatas: [tableMetadata], sync: Bool = true) {
         let detached = metadatas.map { $0.detachedCopy() }
 
@@ -524,7 +538,7 @@ extension NCManageDatabase {
             }
         }
     }
-    
+
     func deleteMetadataOcIds(_ ocIds: [String]) {
         do {
             let realm = try Realm()
@@ -537,29 +551,7 @@ extension NCManageDatabase {
 
         }
     }
-
-    /// Updates an existing job without recreating a deleted transfer or clearing cancellation.
-    /// Requeueing also requires the same active auto-upload session.
-    func updateBackgroundUploadMetadataAsync(_ metadata: tableMetadata, expectedJobIdentifier: String, sessionIdentifier: String? = nil) async {
-        let detached = metadata.detachedCopy()
-        await core.performRealmWriteAsync { realm in
-            guard let current = realm.object(ofType: tableMetadata.self, forPrimaryKey: detached.ocId),
-                  current.backgroundUploadJobIdentifier == expectedJobIdentifier else { return }
-            if let sessionIdentifier {
-                guard !current.backgroundUploadCancellationRequested,
-                      let account = realm.objects(tableAccount.self).filter("account == %@", detached.account).first,
-                      account.autoUploadStart,
-                      account.autoUploadSessionIdentifier == sessionIdentifier else {
-                    // This terminal job has already been acknowledged; do not leave a stale identifier.
-                    if current.status != NCGlobal.shared.metadataStatusNormal { realm.delete(current) }
-                    return
-                }
-            }
-            detached.backgroundUploadCancellationRequested = current.backgroundUploadCancellationRequested || detached.backgroundUploadCancellationRequested
-            realm.add(detached, update: .modified)
-        }
-    }
-
+    
     func replaceMetadataAsync(ocId: String, metadata: tableMetadata) async {
         let detached = metadata.detachedCopy()
 
@@ -834,6 +826,16 @@ extension NCManageDatabase {
         }
     }
 
+    func clearAssetLocalIdentifiersAsync(_ assetLocalIdentifiers: [String]) async {
+        await core.performRealmWriteAsync { realm in
+            let results = realm.objects(tableMetadata.self)
+                .filter("assetLocalIdentifier IN %@", assetLocalIdentifiers)
+            for result in results {
+                result.assetLocalIdentifier = ""
+            }
+        }
+    }
+
     /// Asynchronously sets the favorite status of a `tableMetadata` entry.
     /// Optionally stores the previous favorite flag and updates the sync status.
     func setMetadataFavoriteAsync(ocId: String, favorite: Bool?, saveOldFavorite: String?, status: Int) async {
@@ -1032,20 +1034,6 @@ extension NCManageDatabase {
                 .first?
                 .detachedCopy()
         }
-    }
-
-    /// Returns metadata stored before PhotoKit supplied its persistent job identifier.
-    /// The caller must still match the destination because a Live Photo has two resources per asset.
-    func getPendingBackgroundUploadMetadatasAsync(assetLocalIdentifier: String) async -> [tableMetadata] {
-        await core.performRealmReadAsync { realm in
-            realm.objects(tableMetadata.self)
-                .filter(
-                    "assetLocalIdentifier == %@ AND backgroundUploadJobIdentifier == %@",
-                    assetLocalIdentifier,
-                    "pending"
-                )
-                .map { $0.detachedCopy() }
-        } ?? []
     }
 
     func getResultsMetadatasAsync(predicate: NSPredicate) async -> Results<tableMetadata>? {
@@ -1381,6 +1369,39 @@ extension NCManageDatabase {
                 .filter(predicate)
                 .map { $0.detachedCopy() }
         } ?? []
+    }
+
+    func getAssetLocalIdentifiersUploadedAsync() async -> [String]? {
+        return await core.performRealmReadAsync { realm in
+            let results = realm.objects(tableMetadata.self).filter("assetLocalIdentifier != ''")
+            return Self.uploadedAssetLocalIdentifiers(in: Array(results))
+        }
+    }
+
+    /// A local asset can only be deleted once every tracked transfer for it is complete.
+    /// Live Photo links contain a filename before server pairing and a file ID afterwards.
+    static func uploadedAssetLocalIdentifiers(in metadatas: [tableMetadata]) -> [String] {
+        let grouped = Dictionary(grouping: metadatas.filter { !$0.assetLocalIdentifier.isEmpty }, by: \.assetLocalIdentifier)
+        return grouped.compactMap { identifier, components in
+            guard components.allSatisfy({
+                $0.status == NCGlobal.shared.metadataStatusNormal && !$0.backgroundUploadCancellationRequested
+            }) else {
+                return nil
+            }
+
+            for component in components where component.isLivePhoto {
+                let hasCompletedCompanion = components.contains { companion in
+                    companion.ocId != component.ocId &&
+                    companion.account == component.account &&
+                    companion.serverUrl == component.serverUrl &&
+                    ((component.isLivePhotoImage && companion.isLivePhotoVideo) ||
+                     (component.isLivePhotoVideo && companion.isLivePhotoImage)) &&
+                    (companion.fileName == component.livePhotoFile || companion.fileId == component.livePhotoFile)
+                }
+                guard hasCompletedCompanion else { return nil }
+            }
+            return identifier
+        }.sorted()
     }
 
     func getMetadataFromFileId(_ fileId: String?, account: String?) -> tableMetadata? {
