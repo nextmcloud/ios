@@ -50,14 +50,25 @@ extension NCTrash: UICollectionViewDataSource {
             gridCell.delegate = self
             cell = gridCell
         }
+
         guard let resultTableTrash = datasource?[indexPath.item] else { return cell }
+
+        let contextMenu = NCContextMenuTrash(objectId: resultTableTrash.fileId, trashController: self)
+        if let listCell = cell as? NCTrashListCell {
+            listCell.buttonMore.menu = contextMenu.viewMenu()
+            listCell.buttonMore.showsMenuAsPrimaryAction = true
+        } else if let gridCell = cell as? NCTrashGridCell {
+            gridCell.buttonMore.menu = contextMenu.viewMenu()
+            gridCell.buttonMore.showsMenuAsPrimaryAction = true
+        }
 
         cell.imageItem.contentMode = .scaleAspectFit
 
         if resultTableTrash.iconName.isEmpty {
             image = NCImageCache.shared.getImageFile()
         } else {
-            image = NCUtility().loadImage(named: resultTableTrash.iconName, useTypeIconFile: true, account: resultTableTrash.account)
+//            image = NCUtility().loadImage(named: resultTableTrash.iconName, useTypeIconFile: true, account: resultTableTrash.account)
+            image = NCUtility().previewTrashIcon(for: resultTableTrash)
         }
 
         if let imageIcon = utility.getImage(ocId: resultTableTrash.fileId,
@@ -75,10 +86,9 @@ extension NCTrash: UICollectionViewDataSource {
             }
         }
 
-        cell.account = resultTableTrash.account
         cell.objectId = resultTableTrash.fileId
         cell.setupCellUI(tableTrash: resultTableTrash, image: image)
-        cell.selected(selectOcId.contains(resultTableTrash.fileId), isEditMode: isEditMode, account: resultTableTrash.account)
+        cell.selected(selectOcId.contains(resultTableTrash.fileId), isEditMode: isEditMode, color: NCBrandColor.shared.getElement(account: session.account))
 
         return cell
     }
@@ -120,66 +130,12 @@ extension NCTrash: UICollectionViewDataSource {
 
         return text
     }
-    
-    func setTitleLabel(directories: Int, files: Int, size: Int64) -> String {
-        var foldersText = ""
-        var filesText = ""
-        var text = ""
-
-        if directories > 1 {
-            foldersText = "\(directories) " + NSLocalizedString("_folders_", comment: "")
-        } else if directories == 1 {
-            foldersText = "1 " + NSLocalizedString("_folder_", comment: "")
-        }
-
-        if files > 1 {
-            filesText = "\(files) " + NSLocalizedString("_files_", comment: "") + " • " + utilityFileSystem.transformedSize(size)
-        } else if files == 1 {
-            filesText = "1 " + NSLocalizedString("_file_", comment: "") + " • " + utilityFileSystem.transformedSize(size)
-        }
-
-        if foldersText.isEmpty {
-            text = filesText
-        } else if filesText.isEmpty {
-            text = foldersText
-        } else {
-            text = foldersText + " • " + filesText
-        }
-        return text
-    }
-    
-    func setTitleLabel(directories: Int, files: Int, size: Int64) -> String {
-        var foldersText = ""
-        var filesText = ""
-        var text = ""
-
-        if directories > 1 {
-            foldersText = "\(directories) " + NSLocalizedString("_folders_", comment: "")
-        } else if directories == 1 {
-            foldersText = "1 " + NSLocalizedString("_folder_", comment: "")
-        }
-
-        if files > 1 {
-            filesText = "\(files) " + NSLocalizedString("_files_", comment: "") + " • " + utilityFileSystem.transformedSize(size)
-        } else if files == 1 {
-            filesText = "1 " + NSLocalizedString("_file_", comment: "") + " • " + utilityFileSystem.transformedSize(size)
-        }
-
-        if foldersText.isEmpty {
-            text = filesText
-        } else if filesText.isEmpty {
-            text = foldersText
-        } else {
-            text = foldersText + " • " + filesText
-        }
-        return text
-    }
 
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
         if kind == UICollectionView.elementKindSectionHeader {
             guard let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: "sectionFirstHeaderEmptyData", for: indexPath) as? NCSectionFirstHeaderEmptyData
             else { return NCSectionFirstHeaderEmptyData() }
-            header.emptyImage.image = utility.loadImage(named: "trashIcon", colors: [NCBrandColor.shared.getElement(account: session.account)])
+            header.emptyImage.image = utility.loadImage(named: "trash", colors: [NCBrandColor.shared.getElement(account: session.account)])
             header.emptyTitle.text = NSLocalizedString("_trash_no_trash_", comment: "")
             header.emptyDescription.text = NSLocalizedString("_trash_no_trash_description_", comment: "")
             return header
@@ -188,8 +144,6 @@ extension NCTrash: UICollectionViewDataSource {
             else { return NCSectionFooter() }
             if let datasource {
                 footer.setTitleLabel(setTextFooter(datasource: datasource))
-//                let info = self.getFooterInformation(datasource: datasource)
-//                footer.setTitleLabel(directories: info.directories, files: info.files, size: info.size)
             }
             return footer
         }
