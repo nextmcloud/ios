@@ -6,30 +6,16 @@ import UIKit
 import NextcloudKit
 @preconcurrency import WebKit
 
-final class NCViewerDirectEditing: UIViewController, WKNavigationDelegate, WKScriptMessageHandler, WKUIDelegate {
-    private let directEditingMobileInterface = "DirectEditingMobileInterface"
-    private let richDocumentsMobileInterface = "RichDocumentsMobileInterface"
-
-    var link: String
-    var editor: String
-    var userAgent: String
-    private(set) var metadata: tableMetadata
-    var imageIcon: UIImage?
-
+class NCViewerDirectEditing: UIViewController, WKNavigationDelegate, WKScriptMessageHandler, WKUIDelegate {
     var webView = WKWebView()
     var bottomConstraint: NSLayoutConstraint?
-    var documentController: UIDocumentInteractionController?
+    var link: String = ""
+    var editor: String = ""
+    var metadata: tableMetadata = tableMetadata()
+    var imageIcon: UIImage?
     let utility = NCUtility()
-    let utilityFileSystem = NCUtilityFileSystem()
-    let database = NCManageDatabase.shared
-    let global = NCGlobal.shared
     var items: [UIBarButtonItem] = []
     private var isClosingTextEditor = false
-
-    @MainActor
-    var session: NCSession.Session {
-        NCSession.shared.getSession(account: metadata.account)
-    }
 
     @MainActor
     var controller: NCMainTabBarController? {
@@ -42,47 +28,27 @@ final class NCViewerDirectEditing: UIViewController, WKNavigationDelegate, WKScr
 
     // MARK: - View Life Cycle
 
-    init?(coder: NSCoder, link: String, editor: String, userAgent: String, metadata: tableMetadata, imageIcon: UIImage?) {
-        guard !link.isEmpty,
-              !editor.isEmpty,
-              !userAgent.isEmpty else {
-            return nil
-        }
-
-        self.link = link
-        self.editor = editor
-        self.userAgent = userAgent
-        self.metadata = metadata
-        self.imageIcon = imageIcon
-
-        super.init(coder: coder)
-    }
-
-    @available(*, unavailable, message: "Use the dependency initializer")
     required init?(coder: NSCoder) {
-        fatalError(
-            "Use init(coder:link:editor:userAgent:metadata:imageIcon:)"
-        )
+        super.init(coder: coder)
     }
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        let moreButton = UIBarButtonItem(
-            image: NCImageCache.shared.getImageButtonMore(),
-            primaryAction: nil,
-            menu: UIMenu(title: "", children: [
-                UIDeferredMenuElement.uncached { [self] completion in
-                    if let menu = NCContextMenuViewer(metadata: self.metadata,
-                                                      controller: self.tabBarController as? NCMainTabBarController,
-                                                      viewController: self.tabBarController,
-                                                      webView: true,
-                                                      sender: self).viewMenu() {
-                        completion(menu.children)
+        if !metadata.ocId.hasPrefix("TEMP") {
+            let moreButton = UIBarButtonItem(
+                image: NCImageCache.shared.getImageButtonMore(),
+                primaryAction: nil,
+                menu: UIMenu(title: "", children: [
+                    UIDeferredMenuElement.uncached { [self] completion in
+                        if let menu = NCContextMenuViewer(metadata: self.metadata, controller: self.tabBarController as? NCMainTabBarController, webView: true, sender: self).viewMenu() {
+                            completion(menu.children)
+                        }
                     }
-                }
-            ]))
-        items.append(moreButton)
+                ]))
+
+            items.append(moreButton)
+        }
 
         let group = UIBarButtonItemGroup(
             barButtonItems: items,
@@ -90,6 +56,12 @@ final class NCViewerDirectEditing: UIViewController, WKNavigationDelegate, WKScr
         )
         navigationItem.trailingItemGroups = [group]
         navigationItem.leftBarButtonItems = nil
+//        if editor == "nextcloud text" {
+//            navigationItem.hidesBackButton = true
+//        }
+        navigationController?.navigationBar.prefersLargeTitles = false
+        navigationItem.title = metadata.fileNameView
+        
 
         // Text releases its lock on the file only when its own close runs (the in-page close
         // button). Leaving with the system back button skipped that and left the file locked
@@ -112,11 +84,8 @@ final class NCViewerDirectEditing: UIViewController, WKNavigationDelegate, WKScr
         let config = WKWebViewConfiguration()
         config.websiteDataStore = WKWebsiteDataStore.nonPersistent()
         let contentController = config.userContentController
-        contentController.add(self, name: directEditingMobileInterface)
-        if editor == global.editorCollabora {
-            contentController.add(self, name: richDocumentsMobileInterface)
-        }
-        if editor == global.editorEuroOffice {
+        contentController.add(self, name: "DirectEditingMobileInterface")
+        if editor == "onlyoffice" {
             let dropSharedWorkersScript = WKUserScript(source: "delete window.SharedWorker;", injectionTime: WKUserScriptInjectionTime.atDocumentStart, forMainFrameOnly: false)
             config.userContentController.addUserScript(dropSharedWorkersScript)
         }
@@ -124,15 +93,20 @@ final class NCViewerDirectEditing: UIViewController, WKNavigationDelegate, WKScr
         webView.navigationDelegate = self
         webView.uiDelegate = self
         webView.scrollView.isScrollEnabled = false
-        webView.customUserAgent = userAgent
         view.addSubview(webView)
 
         webView.translatesAutoresizingMaskIntoConstraints = false
         webView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 0).isActive = true
         webView.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor, constant: 0).isActive = true
         webView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 0).isActive = true
-        bottomConstraint = webView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
+        bottomConstraint = webView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: 70)
         bottomConstraint?.isActive = true
+
+        if editor == "onlyoffice" {
+            webView.customUserAgent = utility.getCustomUserAgentOnlyOffice()
+        } else if editor == "nextcloud text" {
+            webView.customUserAgent = utility.getCustomUserAgentNCText()
+        } // else: use default
 
         if let url = URL(string: link) {
             var request = URLRequest(url: url)
@@ -159,14 +133,6 @@ final class NCViewerDirectEditing: UIViewController, WKNavigationDelegate, WKScr
 
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardDidShow), name: UIResponder.keyboardDidShowNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
-        if editor == global.editorCollabora {
-            NotificationCenter.default.addObserver(
-                self,
-                selector: #selector(grabRichDocumentsFocus),
-                name: NSNotification.Name(rawValue: global.notificationCenterRichdocumentGrabFocus),
-                object: nil
-            )
-        }
     }
 
     override func viewDidAppear(_ animated: Bool) {
@@ -175,26 +141,12 @@ final class NCViewerDirectEditing: UIViewController, WKNavigationDelegate, WKScr
         Task {
             await NCNetworking.shared.transferDispatcher.addDelegate(self)
         }
+
+        NCActivityIndicator.shared.start(backgroundView: view)
     }
 
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-
-        let isLeavingViewer = isMovingFromParent || isBeingDismissed || navigationController?.isBeingDismissed == true
-        if isLeavingViewer {
-            if #available(iOS 26.0, *) {
-                navigationController?.interactiveContentPopGestureRecognizer?.isEnabled = true
-            }
-
-            if editor == global.editorCollabora {
-                webView.evaluateJavaScript("OCA.RichDocuments.documentsMain.onClose()")
-            }
-
-            webView.configuration.userContentController.removeScriptMessageHandler(forName: directEditingMobileInterface)
-            if editor == global.editorCollabora {
-                webView.configuration.userContentController.removeScriptMessageHandler(forName: richDocumentsMobileInterface)
-            }
-        }
 
         if #available(iOS 18.0, *) {
             tabBarController?.setTabBarHidden(false, animated: true)
@@ -206,13 +158,10 @@ final class NCViewerDirectEditing: UIViewController, WKNavigationDelegate, WKScr
             await NCNetworking.shared.transferDispatcher.removeDelegate(self)
         }
 
+        webView.configuration.userContentController.removeScriptMessageHandler(forName: "DirectEditingMobileInterface")
+
         NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardDidShowNotification, object: nil)
         NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillHideNotification, object: nil)
-        NotificationCenter.default.removeObserver(
-            self,
-            name: NSNotification.Name(rawValue: global.notificationCenterRichdocumentGrabFocus),
-            object: nil
-        )
     }
 
     @objc func viewUnload() {
@@ -267,14 +216,6 @@ final class NCViewerDirectEditing: UIViewController, WKNavigationDelegate, WKScr
 
     @objc func keyboardWillHide(notification: Notification) {
         bottomConstraint?.constant = 0
-    }
-
-    @objc private func grabRichDocumentsFocus() {
-        guard editor == global.editorCollabora else {
-            return
-        }
-
-        webView.evaluateJavaScript("OCA.RichDocuments.documentsMain.postGrabFocus()")
     }
 
     // MARK: -
@@ -470,7 +411,19 @@ final class NCViewerDirectEditing: UIViewController, WKNavigationDelegate, WKScr
                     self.documentController?.presentOptionsMenu(from: .zero, in: self.view, animated: true)
                 }
             }
-        )
+
+            if message.body as? String == "loading" {
+                print("loading")
+            }
+
+            if message.body as? String == "loaded" {
+                print("loaded")
+            }
+
+            if message.body as? String == "paste" {
+                self.paste(self)
+            }
+        }
     }
 
     // MARK: -
@@ -486,7 +439,7 @@ final class NCViewerDirectEditing: UIViewController, WKNavigationDelegate, WKScr
     }
 
     public func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
-        NCActivityIndicator.shared.start(backgroundView: view)
+        print("didStartProvisionalNavigation")
     }
 
     public func webView(_ webView: WKWebView, didReceiveServerRedirectForProvisionalNavigation navigation: WKNavigation!) {
@@ -494,14 +447,6 @@ final class NCViewerDirectEditing: UIViewController, WKNavigationDelegate, WKScr
     }
 
     public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-        NCActivityIndicator.shared.stop()
-    }
-
-    public func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: any Error) {
-        NCActivityIndicator.shared.stop()
-    }
-
-    public func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: any Error) {
         NCActivityIndicator.shared.stop()
     }
 
@@ -593,7 +538,7 @@ extension NCViewerDirectEditing: NCTransferDelegate {
 
     func transferProgressDidUpdate(progress: Float, totalBytes: Int64, totalBytesExpected: Int64, fileName: String, serverUrl: String) { }
 
-    func transferChange(networkingStatus: String,
+    func transferChange(status: String,
                         account: String,
                         fileName: String,
                         serverUrl: String,
@@ -602,7 +547,7 @@ extension NCViewerDirectEditing: NCTransferDelegate {
                         destination: String?,
                         error: NKError) {
         Task {@MainActor in
-            if networkingStatus == NCGlobal.shared.networkingStatusFavorite,
+            if status == NCGlobal.shared.networkingStatusFavorite,
                self.metadata.ocId == ocId,
                let metadata = await NCManageDatabase.shared.getMetadataFromOcIdAsync(ocId) {
                 self.metadata = metadata
