@@ -231,6 +231,7 @@ extension tableMetadata {
         return session.isEmpty && !isDirectoryE2EE && !e2eEncrypted
     }
 
+    // Return if is sharable
     func isSharable() -> Bool {
         guard let capabilities = NCNetworking.shared.capabilities[account] else {
             return false
@@ -238,7 +239,7 @@ extension tableMetadata {
         if !capabilities.fileSharingApiEnabled || (capabilities.e2EEEnabled && isDirectoryE2EE) {
             return false
         }
-        return true
+        return !e2eEncrypted
     }
 
     var hasPreviewBorder: Bool {
@@ -292,6 +293,33 @@ extension tableMetadata {
         } else {
             return NCMetadataPermissions.canCreateFile(self)
         }
+    }
+    
+    var isDOC: Bool {
+        return (contentType == "application/msword" || contentType == "application/vnd.openxmlformats-officedocument.wordprocessingml.document")
+    }
+    
+    var isXLS: Bool {
+        return (contentType == "application/vnd.ms-excel" || contentType == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+    }
+    
+    var isPPT: Bool {
+        return (contentType == "application/vnd.ms-powerpoint" ||
+                contentType == "application/vnd.openxmlformats-officedocument.presentationml.presentation" ||
+                contentType == "application/vnd.ms-powerpoint.presentation.macroEnabled.12")
+    }
+    
+    var isTXT: Bool {
+        return (contentType == "text/plain" ||
+                contentType == "text/markdown")
+    }
+    
+    var isZIP: Bool {
+        return (contentType == "application/zip" ||
+                contentType == "application/x-7z-compressed" ||
+                contentType == "application/x-rar-compressed" ||
+                contentType == "application/x-gzip" ||
+                contentType == "application/x-tar")
     }
 
 #endif
@@ -511,6 +539,19 @@ extension NCManageDatabase {
         }
     }
 
+    func deleteMetadataOcIds(_ ocIds: [String]) {
+        do {
+            let realm = try Realm()
+            try realm.write {
+                let results = realm.objects(tableMetadata.self).filter("ocId IN %@", ocIds)
+                realm.delete(results)
+            }
+        } catch let error as NSError {
+            nkLog(error: "Could not access database: \(error)")
+
+        }
+    }
+    
     func replaceMetadataAsync(ocId: String, metadata: tableMetadata) async {
         let detached = metadata.detachedCopy()
 

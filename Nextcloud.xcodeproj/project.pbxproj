@@ -110,6 +110,7 @@
 		AFCE353927E5DE0500FEA6C2 /* Shareable.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFCE353827E5DE0400FEA6C2 /* Shareable.swift */; };
 		C0DECA022F65000100C0D001 /* NCCameraRollTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0DECA012F65000100C0D001 /* NCCameraRollTests.swift */; };
 		CA1700013000000000000001 /* NCUploadedAssetsCleanupTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA1700013000000000000002 /* NCUploadedAssetsCleanupTests.swift */; };
+		B5738F9A304AE0B3009D8D2F /* MimeTypeUtil.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5738F99304AE0B3009D8D2F /* MimeTypeUtil.swift */; };
 		CB3666201AF7550816B5CD6A /* NCContextMenuComment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8932E90EC4278026D86CCCC9 /* NCContextMenuComment.swift */; };
 		D5B6AA7827200C7200D49C24 /* NCActivityTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5B6AA7727200C7200D49C24 /* NCActivityTableViewCell.swift */; };
 		F0A1B2C430B5000100D4E5F6 /* NCMediaViewerFloatingTitleViewTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0A1B2C330B5000100D4E5F6 /* NCMediaViewerFloatingTitleViewTests.swift */; };
@@ -1439,6 +1440,8 @@
 		AFCE353427E4ED5900FEA6C2 /* DateFormatter+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DateFormatter+Extension.swift"; sourceTree = "<group>"; };
 		AFCE353627E4ED7B00FEA6C2 /* NCShareCells.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCShareCells.swift; sourceTree = "<group>"; };
 		AFCE353827E5DE0400FEA6C2 /* Shareable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Shareable.swift; sourceTree = "<group>"; };
+		B4C7A5B36D1ED178FB6B76CB /* NCContextMenuPlayerTracks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCContextMenuPlayerTracks.swift; sourceTree = "<group>"; };
+		B5738F99304AE0B3009D8D2F /* MimeTypeUtil.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MimeTypeUtil.swift; sourceTree = "<group>"; };
 		BB7697C94BA14450A0867940 /* NCContextMenuProfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCContextMenuProfile.swift; sourceTree = "<group>"; };
 		C0046CDA2A17B98400D87C9D /* NextcloudUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NextcloudUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		C04E2F202A17BB4D001BAD85 /* NextcloudIntegrationTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NextcloudIntegrationTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -3471,6 +3474,7 @@
 		F7BFFA991A24D7BB0044ED85 /* Utility */ = {
 			isa = PBXGroup;
 			children = (
+				B5738F99304AE0B3009D8D2F /* MimeTypeUtil.swift */,
 				F39170A82CB8201B006127BC /* FileAutoRenamer+Extensions.swift */,
 				F33918C32C7CD8F2002D9AA1 /* FileNameValidator+Extensions.swift */,
 				F752BA042E58C05200616A26 /* Maintenance.swift */,
@@ -4981,6 +4985,7 @@
 				F71FA7992F3508C600E86192 /* NCNetworking+WebDAV.swift in Sources */,
 				F76B3CCF1EAE01BD00921AC9 /* NCBrand.swift in Sources */,
 				F72944F32A84246400246839 /* NCEndToEndMetadataV2.swift in Sources */,
+				B5738F9B304AE0B3009D8D2F /* MimeTypeUtil.swift in Sources */,
 				F7BAADCC1ED5A87C00B7EAD4 /* NCManageDatabase.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -5251,6 +5256,7 @@
 				F7132C722D085AD200B42D6A /* NCTermOfServiceModel.swift in Sources */,
 				F7132C732D085AD200B42D6A /* NCTermOfServiceView.swift in Sources */,
 				F7A08A7C3017441D00470AD3 /* NCMedia+SelectDelegate.swift in Sources */,
+				B5738F9A304AE0B3009D8D2F /* MimeTypeUtil.swift in Sources */,
 				F7D4BF3F2CA2E8D800A5E746 /* TOPasscodeFixedInputView.m in Sources */,
 				F7D4BF402CA2E8D800A5E746 /* TOPasscodeButtonLabel.m in Sources */,
 				F70898692EDDB51700EF85BD /* NCSelectOpen+SelectDelegate.swift in Sources */,
