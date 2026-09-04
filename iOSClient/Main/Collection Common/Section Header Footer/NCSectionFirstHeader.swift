@@ -35,6 +35,13 @@ class NCSectionFirstHeader: UICollectionReusableView, UIGestureRecognizerDelegat
     private var viewController: UIViewController?
     private var sceneIdentifier: String = ""
 
+#if !EXTENSION
+    @MainActor
+    internal var controller: NCMainTabBarController? {
+        viewController?.tabBarController as? NCMainTabBarController
+    }
+#endif
+
     override func awakeFromNib() {
         super.awakeFromNib()
 
@@ -169,7 +176,8 @@ extension NCSectionFirstHeader: UICollectionViewDataSource {
                 cell.image.image = image
                 cell.image.contentMode = .scaleAspectFill
             } else {
-                cell.image.image = self.utility.loadImage(named: metadata.iconName, useTypeIconFile: true, account: metadata.account)
+//                cell.image.image = self.utility.loadImage(named: metadata.iconName, useTypeIconFile: true, account: metadata.account)
+                cell.image.image = self.utility.previewIcon(for: metadata)
                 cell.image.contentMode = .scaleAspectFit
                 if recommendedFiles.hasPreview {
                     Task {
@@ -210,7 +218,7 @@ extension NCSectionFirstHeader: UICollectionViewDataSource {
                 cell.setImageCorner(withBorder: false)
             }
 
-            cell.labelFilename.text = metadata.fileNameView
+            cell.setBidiSafeFilename(metadata.fileNameView, isDirectory: metadata.directory, titleLabel: cell.labelFilename, extensionLabel: cell.labelExtensionFilename)
             cell.labelInfo.text = recommendedFiles.reason
 
             cell.delegate = self
@@ -249,7 +257,7 @@ extension NCSectionFirstHeader: UICollectionViewDelegate {
             return NCViewerProviderContextMenu(metadata: metadata, image: image, sceneIdentifier: self.sceneIdentifier)
         }, actionProvider: { _ in
             let cell = collectionView.cellForItem(at: indexPath)
-            let contextMenu = NCContextMenu(metadata: metadata.detachedCopy(), viewController: viewController, sceneIdentifier: self.sceneIdentifier, sender: cell)
+            let contextMenu = NCContextMenuMain(metadata: metadata.detachedCopy(), viewController: viewController, controller: self.controller, sender: cell)
             return contextMenu.viewMenu()
         })
 #endif
@@ -265,13 +273,13 @@ extension NCSectionFirstHeader: UICollectionViewDelegateFlowLayout {
 }
 
 extension NCSectionFirstHeader: NCRecommendationsCellDelegate {
-    func contextMenu(with metadata: tableMetadata?, button: UIButton, sender: Any) {
+    func openContextMenu(with metadata: tableMetadata?, button: UIButton, sender: Any) {
 #if !EXTENSION
         Task {
             guard let viewController = self.viewController, let metadata else {
                 return
             }
-            button.menu = NCContextMenu(metadata: metadata, viewController: viewController, sceneIdentifier: self.sceneIdentifier, sender: sender).viewMenu()
+            button.menu = NCContextMenuMain(metadata: metadata, viewController: viewController, controller: self.controller, sender: sender).viewMenu()
         }
 #endif
     }
