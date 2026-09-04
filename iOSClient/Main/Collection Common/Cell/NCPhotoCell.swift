@@ -106,7 +106,8 @@ extension NCCollectionViewCommon {
                         if metadata.iconName.isEmpty {
                             cell.previewImg?.image = NCImageCache.shared.getImageFile()
                         } else {
-                            cell.previewImg?.image = self.utility.loadImage(named: metadata.iconName, useTypeIconFile: true, account: metadata.account)
+//                            cell.previewImg?.image = self.utility.loadImage(named: metadata.iconName, useTypeIconFile: true, account: metadata.account)
+                            cell.previewImg?.image = self.utility.previewIcon(for: metadata)
                         }
                     }
                 }

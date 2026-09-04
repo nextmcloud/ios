@@ -147,7 +147,8 @@ extension NCCollectionViewCommon {
                 if metadata.iconName.isEmpty {
                     cell.previewImg?.image = NCImageCache.shared.getImageFile()
                 } else {
-                    cell.previewImg?.image = utility.loadImage(named: metadata.iconName, useTypeIconFile: true, account: metadata.account)
+//                    cell.previewImg?.image = utility.loadImage(named: metadata.iconName, useTypeIconFile: true, account: metadata.account)
+                    cell.previewImg?.image = utility.previewIcon(for: metadata)
                 }
             }
         } else {
@@ -211,3 +212,4 @@ extension NCCollectionViewCommon {
 
 }
 #endif
+

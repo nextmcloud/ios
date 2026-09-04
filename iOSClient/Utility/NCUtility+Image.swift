@@ -12,6 +12,100 @@ import Photos
 
 extension NCUtility {
     
+    // MARK: - MIME-based icon convenience
+    /// Returns an icon image for the provided MIME type or filename, using MimeTypeUtil mappings.
+    /// - Parameters:
+    ///   - mimeType: Optional MIME type string (e.g., "application/pdf"). If nil, the method will infer from the filename.
+    ///   - fileName: Optional filename or path to infer the MIME type when `mimeType` is nil.
+    ///   - account: Optional account to pass through for theming if needed in the future.
+    /// - Returns: A UIImage representing the file type.
+    @discardableResult
+    func loadIcon(mimeType: String?, fileName: String?, account: String? = nil) -> UIImage {
+        let resolvedMime: String
+        if let mime = mimeType, !mime.isEmpty {
+            resolvedMime = mime
+        } else if let name = fileName, !name.isEmpty {
+            resolvedMime = MimeTypeUtil.bestMimeType(forFileName: (name as NSString).lastPathComponent)
+        } else {
+            resolvedMime = "application/octet-stream"
+        }
+
+        if let image = MimeTypeUtil.icon(forMimeType: resolvedMime, fileName: fileName ?? "", account: account, isDarkMode: (UITraitCollection.current.userInterfaceStyle == .dark)) {
+            return image
+        }
+        // Fallback to existing generic file image
+        return UIImage(named: "file")! //?? UIImage(systemName: "doc")!
+    }
+    
+    /// Returns a preview icon for a given metadata using office-first mapping and MIME/filename convention.
+    /// - Parameter metadata: The tableMetadata describing the file.
+    /// - Returns: A UIImage representing the file type icon.
+    func previewIcon(for metadata: tableMetadata) -> UIImage {
+        // Office file extensions first
+        let ext = (metadata.fileNameView as NSString).pathExtension.lowercased()
+        if ["doc", "docx", "dot", "dotx"].contains(ext) || metadata.isDOC {
+            return UIImage(named: "document")!
+        } else if ["xls", "xlsx", "xlt", "xltx"].contains(ext) || metadata.isXLS {
+            return UIImage(named: "file_xls")!
+        } else if ext == "pdf" || metadata.isPDF {
+            return UIImage(named: "file_pdf")!
+        } else if ["ppt", "pptx", "pot", "potx", "pptm"].contains(ext) || metadata.isPPT {
+            return UIImage(named: "file_ppt")!
+        } else if ext == "txt" || ext == "md" || metadata.isTXT {
+            return UIImage(named: "file_txt")!
+        } else if ext == "odg" {
+            return UIImage(named: "file_odg")!
+        } else if ext == "zip" || metadata.isZIP {
+            return UIImage(named: "file_compress")!
+        }
+
+        // Convention: use MIME if available, otherwise iconName inference
+        else if metadata.iconName.isEmpty {
+            let imageName = metadata.fileNameView
+            // If imageName looks like a MIME type (e.g., "application/pdf"), use it directly; otherwise infer from filename
+            let looksLikeMime = imageName.contains("/")
+            let mimeIcon = looksLikeMime
+            ? self.loadIcon(mimeType: imageName, fileName: nil, account: metadata.account)
+            : self.loadIcon(mimeType: nil, fileName: imageName, account: metadata.account)
+            return mimeIcon
+        } else {
+            return loadImage(named: metadata.iconName, useTypeIconFile: true, account: metadata.account)
+        }
+    }
+    
+    func previewTrashIcon(for metadata: tableTrash) -> UIImage {
+        // Office file extensions first
+        let ext = (metadata.fileName as NSString).pathExtension.lowercased()
+        if ["doc", "docx", "dot", "dotx"].contains(ext) || metadata.isDOC {
+            return UIImage(named: "document")!
+        } else if ["xls", "xlsx", "xlt", "xltx", "csv", "xlsm"].contains(ext) || metadata.isXLS {
+            return UIImage(named: "file_xls")!
+        } else if ext == "pdf" || metadata.isPDF {
+            return UIImage(named: "file_pdf")!
+        } else if ["ppt", "pptx", "pot", "potx", "pptm"].contains(ext) || metadata.isPPT {
+            return UIImage(named: "file_ppt")!
+        } else if ext == "txt" || ext == "md" || metadata.isTXT {
+            return UIImage(named: "file_txt")!
+        } else if ext == "odg" {
+            return UIImage(named: "file_odg")!
+        } else if ext == "zip" || metadata.isZIP {
+            return UIImage(named: "file_compress")!
+        }
+
+        // Convention: use MIME if available, otherwise iconName inference
+        else if metadata.iconName.isEmpty {
+            let imageName = metadata.fileName
+            // If imageName looks like a MIME type (e.g., "application/pdf"), use it directly; otherwise infer from filename
+            let looksLikeMime = imageName.contains("/")
+            let mimeIcon = looksLikeMime
+            ? self.loadIcon(mimeType: imageName, fileName: nil, account: metadata.account)
+            : self.loadIcon(mimeType: nil, fileName: imageName, account: metadata.account)
+            return mimeIcon
+        } else {
+            return loadImage(named: metadata.iconName, useTypeIconFile: true, account: metadata.account)
+        }
+    }
+    
     func loadImage(named imageName: String,
                    colors: [UIColor]? = nil,
                    size: CGFloat? = nil,
@@ -500,3 +594,4 @@ extension NCUtility {
         return imageData.count
     }
 }
+

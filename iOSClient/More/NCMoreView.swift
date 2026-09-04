@@ -129,10 +129,10 @@ struct NCMoreView: View {
             .background(Color(.secondarySystemGroupedBackground))
             .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
 
-            Text(NSLocalizedString("_autoupload_description_", comment: ""))
-                .font(.footnote)
-                .foregroundStyle(.secondary)
-                .padding(.horizontal, 16)
+//            Text(NSLocalizedString("_autoupload_description_", comment: ""))
+//                .font(.footnote)
+//                .foregroundStyle(.secondary)
+//                .padding(.horizontal, 16)
         }
     }
 

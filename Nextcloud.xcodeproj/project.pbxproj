@@ -208,6 +208,8 @@
 		B5E2E0982FDAD9CC00FAA4FD /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = B5E2E0972FDAD9CC00FAA4FD /* FirebaseCore */; };
 		B5E2E09A2FDAD9CC00FAA4FD /* FirebaseMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = B5E2E0992FDAD9CC00FAA4FD /* FirebaseMessaging */; };
 		B5E2E09C2FDAD9CC00FAA4FD /* FirebaseRemoteConfig in Frameworks */ = {isa = PBXBuildFile; productRef = B5E2E09B2FDAD9CC00FAA4FD /* FirebaseRemoteConfig */; };
+		B5FB4B453049873D00FFC68A /* MimeTypeUtil.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5FB4B443049873D00FFC68A /* MimeTypeUtil.swift */; };
+		B5FB4B463049873D00FFC68A /* MimeTypeUtil.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5FB4B443049873D00FFC68A /* MimeTypeUtil.swift */; };
 		B5FF03E12FE9083800E21622 /* NCSettings.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B5FF03E02FE9083800E21622 /* NCSettings.storyboard */; };
 		B5FF03E52FE908C600E21622 /* InitialPrivacySettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5FF03E42FE908C600E21622 /* InitialPrivacySettingsViewController.swift */; };
 		B5FF03E62FE908C600E21622 /* ImprintViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5FF03E32FE908C600E21622 /* ImprintViewController.swift */; };
@@ -1238,6 +1240,7 @@
 		B5E2E07F2FDAD38700FAA4FD /* AnalyticsHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsHelper.swift; sourceTree = "<group>"; };
 		B5E2E0802FDAD38700FAA4FD /* AnalyticsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsService.swift; sourceTree = "<group>"; };
 		B5E2E0822FDAD38700FAA4FD /* AppUpdater.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppUpdater.swift; sourceTree = "<group>"; };
+		B5FB4B443049873D00FFC68A /* MimeTypeUtil.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MimeTypeUtil.swift; sourceTree = "<group>"; };
 		B5FF03E02FE9083800E21622 /* NCSettings.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = NCSettings.storyboard; sourceTree = "<group>"; };
 		B5FF03E22FE908C600E21622 /* HelpViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelpViewController.swift; sourceTree = "<group>"; };
 		B5FF03E32FE908C600E21622 /* ImprintViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImprintViewController.swift; sourceTree = "<group>"; };
@@ -3252,6 +3255,7 @@
 				F71F6D062B6A6A5E00F1EB15 /* ThreadSafeArray.swift */,
 				F7245923289BB50B00474787 /* ThreadSafeDictionary.swift */,
 				F7D4BF2B2CA2E8D800A5E746 /* TOPasscodeViewController */,
+				B5FB4B443049873D00FFC68A /* MimeTypeUtil.swift */,
 			);
 			path = Utility;
 			sourceTree = "<group>";
@@ -4427,6 +4431,7 @@
 				F7245925289BB59100474787 /* ThreadSafeDictionary.swift in Sources */,
 				F72EC7292F4617F600A2135C /* NotificationCenter+Extension.swift in Sources */,
 				F7BF9D852934CA21009EE9A6 /* NCManageDatabase+LayoutForView.swift in Sources */,
+				B5FB4B463049873D00FFC68A /* MimeTypeUtil.swift in Sources */,
 				F79EC78926316AC4004E59D6 /* NCPopupViewController.swift in Sources */,
 				F7C30DFB291BCF790017149B /* NCNetworkingE2EECreateFolder.swift in Sources */,
 				F73EF7DA2B0226080087E6E9 /* NCManageDatabase+Tip.swift in Sources */,
@@ -4868,6 +4873,7 @@
 				F7381EE1218218C9000B1560 /* NCOffline.swift in Sources */,
 				F751247C2C42919C00E63DB8 /* NCPhotoCell.swift in Sources */,
 				F7A509252C26BD5D00326106 /* NCCreate.swift in Sources */,
+				B5FB4B453049873D00FFC68A /* MimeTypeUtil.swift in Sources */,
 				F7FA80002C0F4F3B0072FC60 /* NCUploadAssetsModel.swift in Sources */,
 				F719D9E2288D396100762E33 /* NCColorPicker.swift in Sources */,
 				F73EF7DF2B02266D0087E6E9 /* NCManageDatabase+Trash.swift in Sources */,
@@ -5316,7 +5322,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 5;
+				CURRENT_PROJECT_VERSION = 8;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 9FH6TNGWF2;
@@ -5349,7 +5355,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 5;
+				CURRENT_PROJECT_VERSION = 8;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 9FH6TNGWF2;
@@ -5626,7 +5632,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 5;
+				CURRENT_PROJECT_VERSION = 8;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 9FH6TNGWF2;
@@ -5659,7 +5665,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 5;
+				CURRENT_PROJECT_VERSION = 8;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 9FH6TNGWF2;
@@ -5692,7 +5698,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 5;
+				CURRENT_PROJECT_VERSION = 8;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 9FH6TNGWF2;
@@ -5724,7 +5730,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 5;
+				CURRENT_PROJECT_VERSION = 8;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 9FH6TNGWF2;
@@ -5758,7 +5764,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 5;
+				CURRENT_PROJECT_VERSION = 8;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 9FH6TNGWF2;
@@ -5788,7 +5794,7 @@
 				CODE_SIGN_ENTITLEMENTS = "$(SRCROOT)/Brand/iOSClient.entitlements";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 5;
+				CURRENT_PROJECT_VERSION = 8;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 9FH6TNGWF2;
