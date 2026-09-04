@@ -100,10 +100,15 @@ class NCViewerRichDocument: UIViewController, WKNavigationDelegate, WKScriptMess
         NotificationCenter.default.addObserver(self, selector: #selector(self.grabFocus), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterRichdocumentGrabFocus), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardDidShow), name: UIResponder.keyboardDidShowNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
+        
+        AnalyticsHelper.shared.trackEvent(eventName: .EVENT__ONLINE_OFFICE_USED)
     }
 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+
+        // Re-evaluate in-app messages after viewDidAppear
+        MoEngageAnalytics.shared.displayInAppNotificationSafely(reason: "viewDidAppear")
 
         Task {
             await NCNetworking.shared.transferDispatcher.addDelegate(self)
@@ -119,11 +124,6 @@ class NCViewerRichDocument: UIViewController, WKNavigationDelegate, WKScriptMess
             tabBarController?.setTabBarHidden(false, animated: true)
         } else {
             tabBarController?.tabBar.isHidden = false
-        }
-
-        // Prevent back navigation gesture of iOS >= 26 as that can cause unintended swipe backs
-        if #available(iOS 26.0, *) {
-            navigationController?.interactiveContentPopGestureRecognizer?.isEnabled = false
         }
 
         Task {
@@ -393,10 +393,6 @@ class NCViewerRichDocument: UIViewController, WKNavigationDelegate, WKScriptMess
     }
 
     public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-        if #available(iOS 26.0, *) {
-            navigationController?.interactiveContentPopGestureRecognizer?.isEnabled = false
-        }
-
         NCActivityIndicator.shared.stop()
     }
 

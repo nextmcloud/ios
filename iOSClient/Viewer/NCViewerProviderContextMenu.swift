@@ -32,11 +32,13 @@ class NCViewerProviderContextMenu: UIViewController {
         self.sceneIdentifier = sceneIdentifier
 
         if metadata.directory {
-            imageView.image = NCImageCache.shared.getFolder(account: metadata.account)
+            imageView.image = NCImageCache.shared.getFolder()
             imageView.frame = resize(CGSize(width: sizeIcon, height: sizeIcon))
         } else {
             // ICON
-            let image = NCUtility().loadImage(named: metadata.iconName, useTypeIconFile: true, account: metadata.account)
+//            let image = NCUtility().loadImage(named: metadata.iconName, useTypeIconFile: true, account: metadata.account)
+            let image = NCUtility().previewIcon(for: metadata)
+
             imageView.image = image
             imageView.frame = resize(CGSize(width: sizeIcon, height: sizeIcon))
             // PREVIEW
@@ -123,6 +125,9 @@ class NCViewerProviderContextMenu: UIViewController {
 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+
+        // Re-evaluate in-app messages after viewDidAppear
+        MoEngageAnalytics.shared.displayInAppNotificationSafely(reason: "viewDidAppear")
 
         Task {
             await NCNetworking.shared.transferDispatcher.addDelegate(self)

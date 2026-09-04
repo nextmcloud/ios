@@ -25,7 +25,7 @@ import Foundation
 import UIKit
 import Accelerate
 
-extension UIImage {
+extension UIImage: @unchecked Sendable  {
     /// Returns a raster-resized copy of the image at the specified size,
     /// preserving the original scale and renderingMode.
     ///
