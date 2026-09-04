@@ -29,38 +29,6 @@ final class NCImageCache: @unchecked Sendable {
     public var isLoadingCache: Bool = false
     public var controller: UITabBarController?
 
-    let showBothPredicateMediaString = "account == %@ AND serverUrl BEGINSWITH %@ AND (classFile == '\(NKTypeClassFile.image.rawValue)' OR classFile == '\(NKTypeClassFile.video.rawValue)') AND NOT (session CONTAINS[c] 'upload') AND NOT (livePhotoFile != '' AND classFile == '\(NKTypeClassFile.video.rawValue)')"
-
-    struct metadataInfo {
-        var etag: String
-        var date: NSDate
-        var width: Int
-        var height: Int
-    }
-
-    struct imageInfo {
-        var image: UIImage?
-        var size: CGSize?
-        var date: Date
-    }
-
-    private typealias ThumbnailImageLRUCache = LRUCache<String, imageInfo>
-    private typealias ThumbnailSizeLRUCache = LRUCache<String, CGSize?>
-
-    private lazy var cacheImage: ThumbnailImageLRUCache = {
-        return ThumbnailImageLRUCache(countLimit: limit)
-    }()
-    private lazy var cacheSize: ThumbnailSizeLRUCache = {
-        return ThumbnailSizeLRUCache()
-    }()
-    private var metadatasInfo: [String: metadataInfo] = [:]
-    private var metadatas: ThreadSafeArray<tableMetadata>?
-
-    var createMediaCacheInProgress: Bool = false
-    let showAllPredicateMediaString = "account == %@ AND serverUrl BEGINSWITH %@ AND (classFile == '\(NKCommon.TypeClassFile.image.rawValue)' OR classFile == '\(NKCommon.TypeClassFile.video.rawValue)') AND NOT (session CONTAINS[c] 'upload')"
-    let showBothPredicateMediaString = "account == %@ AND serverUrl BEGINSWITH %@ AND (classFile == '\(NKCommon.TypeClassFile.image.rawValue)' OR classFile == '\(NKCommon.TypeClassFile.video.rawValue)') AND NOT (session CONTAINS[c] 'upload') AND NOT (livePhotoFile != '' AND classFile == '\(NKCommon.TypeClassFile.video.rawValue)')"
-    let showOnlyPredicateMediaString = "account == %@ AND serverUrl BEGINSWITH %@ AND classFile == %@ AND NOT (session CONTAINS[c] 'upload') AND NOT (livePhotoFile != '' AND classFile == '\(NKCommon.TypeClassFile.video.rawValue)')"
-
     init() {
         observerToken = NotificationCenter.default.addObserver(forName: UIApplication.didReceiveMemoryWarningNotification, object: nil, queue: nil) { _ in
             self.cache.removeAll()
@@ -170,21 +138,123 @@ final class NCImageCache: @unchecked Sendable {
                            mediaPath: String,
                            showOnlyImages: Bool,
                            showOnlyVideos: Bool) -> NSPredicate {
-        var predicate = NSPredicate()
         let startServerUrl = self.utilityFileSystem.getHomeServer(session: session) + mediaPath
-        let showBothPredicate = "account == %@ AND serverUrl BEGINSWITH %@ AND mediaSearch == true AND hasPreview == true AND (classFile == '\(NKTypeClassFile.image.rawValue)' OR classFile == '\(NKTypeClassFile.video.rawValue)') AND NOT (status IN %@)"
-        let showOnlyPredicateImage = "account == %@ AND serverUrl BEGINSWITH %@ AND mediaSearch == true AND hasPreview == true AND classFile == 'image' AND NOT (status IN %@)"
-        let showOnlyPredicateVideo = "account == %@ AND serverUrl BEGINSWITH %@ AND mediaSearch == true AND hasPreview == true AND classFile == 'video' AND livePhotoFile == '' AND NOT (status IN %@)"
+
+        let showBothPredicate = """
+        account == %@ AND
+        serverUrl BEGINSWITH %@ AND
+        mediaSearch == true AND
+        hasPreview == true AND
+        (
+        classFile == '\(NKTypeClassFile.image.rawValue)' OR classFile == '\(NKTypeClassFile.video.rawValue)'
+        ) AND
+        NOT (status IN %@)
+        """
+
+        let showOnlyPredicateImage = """
+        account == %@ AND
+        serverUrl BEGINSWITH %@ AND
+        mediaSearch == true AND
+        hasPreview == true AND
+        (
+        classFile == '\(NKTypeClassFile.image.rawValue)' OR (classFile == '\(NKTypeClassFile.video.rawValue)' AND livePhotoFile != '')
+        ) AND
+        NOT (status IN %@)
+        """
+
+        let showOnlyPredicateVideo = """
+        account == %@ AND
+        serverUrl BEGINSWITH %@ AND
+        mediaSearch == true AND
+        hasPreview == true AND
+        classFile == 'video' AND
+        NOT (status IN %@)
+        """
 
         if showOnlyImages {
-            predicate = NSPredicate(format: showOnlyPredicateImage, session.account, startServerUrl, global.metadataStatusHideInView)
+            return NSPredicate(format: showOnlyPredicateImage,
+                               session.account,
+                               startServerUrl,
+                               global.metadataStatusHideInView)
         } else if showOnlyVideos {
-            predicate = NSPredicate(format: showOnlyPredicateVideo, session.account, startServerUrl, global.metadataStatusHideInView)
+            return NSPredicate(format: showOnlyPredicateVideo,
+                               session.account,
+                               startServerUrl,
+                               global.metadataStatusHideInView)
         } else {
-            predicate = NSPredicate(format: showBothPredicate, session.account, startServerUrl, global.metadataStatusHideInView)
+            return NSPredicate(format: showBothPredicate,
+                               session.account,
+                               startServerUrl,
+                               global.metadataStatusHideInView)
         }
+    }
 
-        return predicate
+    // MARK: -
+
+    func getImageFile(colors: [UIColor] = [NCBrandColor.shared.iconImageColor2]) -> UIImage {
+        return utility.loadImage(named: "file", colors: colors, size: 24)
+    }
+
+    func getImageShared(colors: [UIColor] = NCBrandColor.shared.iconImageMultiColors) -> UIImage {
+        return utility.loadImage(named: "share", colors: colors, size: 24)
+    }
+
+    func getImageCanShare(colors: [UIColor] = NCBrandColor.shared.iconImageMultiColors) -> UIImage {
+        return utility.loadImage(named: "share", colors: colors, size: 24)
+    }
+
+    func getImageShareByLink(colors: [UIColor] = [NCBrandColor.shared.iconImageColor]) -> UIImage {
+        return utility.loadImage(named: "share", colors: colors, size: 24)
+    }
+
+    func getImageSharedWithMe(colors: [UIColor] = [NCBrandColor.shared.iconSystemGrayColor]) -> UIImage {
+        return utility.loadImage(named: "cloudUpload", colors: [NCBrandColor.shared.nmcIconSharedWithMe], size: 24)
+    }
+    
+    func getImageFavorite(colors: [UIColor] = [NCBrandColor.shared.yellowFavorite]) -> UIImage {
+        return utility.loadImage(named: "star.fill", colors: colors, size: 24)
+    }
+
+    func getImageOfflineFlag(colors: [UIColor] = [.systemGreen]) -> UIImage {
+        return utility.loadImage(named: "arrow.down.circle.fill", colors: colors, size: 24)
+    }
+
+    func getImageLocal(colors: [UIColor] = [.systemGreen]) -> UIImage {
+        return utility.loadImage(named: "checkmark.circle.fill", colors: colors, size: 24)
+    }
+
+    func getImageCheckedYes(color: UIColor) -> UIImage? {
+//        return UIImage(named: "checkedYes")!
+        let config = UIImage.SymbolConfiguration(paletteColors: [.white, color])
+        return UIImage(systemName: "checkmark.circle.fill", withConfiguration: config)
+    }
+
+    func getImageCheckedNo(color: UIColor) -> UIImage? {
+        let weightConfig = UIImage.SymbolConfiguration(weight: .light)
+        let colorConfig = UIImage.SymbolConfiguration(paletteColors: [color])
+        let config = weightConfig.applying(colorConfig)
+        return UIImage(systemName: "circle", withConfiguration: config)
+    }
+
+    func getImageCheckedYes(colors: [UIColor] = [NCBrandColor.shared.iconImageColor]) -> UIImage {
+        return UIImage(named: "checkedYes")!
+    }
+
+    func getImageCheckedNo(colors: [UIColor] = [NCBrandColor.shared.iconImageColor]) -> UIImage {
+        return utility.loadImage(named: "circle", colors: colors, size: 24)
+    }
+    
+    func getImageButtonMore(colors: [UIColor] = [NCBrandColor.shared.iconImageColor]) -> UIImage {
+//        return utility.loadImage(named: "ellipsis", colors: colors)
+        return UIImage(named: "more")!.image(color: .systemGray, size: 24)
+    }
+
+    func getImageButtonStop(colors: [UIColor] = [NCBrandColor.shared.iconImageColor]) -> UIImage {
+        return utility.loadImage(named: "stop.circle", colors: colors)
+    }
+
+    func getImageButtonMoreLock(colors: [UIColor] = [NCBrandColor.shared.iconImageColor]) -> UIImage {
+        return utility.loadImage(named: "lock.fill", colors: colors)
     }
 
     // MARK: -
@@ -266,8 +336,6 @@ final class NCImageCache: @unchecked Sendable {
         self.brandElementColor = brandElement
         
         let folderWidth: CGFloat = UIScreen.main.bounds.width / 3
-        let utility = NCUtility()
-
         images.folderEncrypted = UIImage(named: "folderEncrypted")!
         images.folderSharedWithMe = UIImage(named: "folder-share")!
         images.folderPublic = UIImage(named: "folder-share")!
@@ -288,58 +356,8 @@ final class NCImageCache: @unchecked Sendable {
         NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterChangeTheming)
     }
     
-    func getImageFile(colors: [UIColor] = [NCBrandColor.shared.iconImageColor2]) -> UIImage {
-        return UIImage(named: "file")!.image(color: colors.first!, size: 24)
-    }
 
-    func getImageShared(colors: [UIColor] = [NCBrandColor.shared.iconSystemGrayColor]) -> UIImage {
-        return utility.loadImage(named: "share", colors: colors, size: 24)
-    }
-
-    func getImageCanShare(colors: [UIColor] = [NCBrandColor.shared.iconSystemGrayColor]) -> UIImage {
-        return utility.loadImage(named: "share", colors: colors, size: 24)
-    }
-
-    func getImageShareByLink(colors: [UIColor] = [NCBrandColor.shared.iconSystemGrayColor]) -> UIImage {
-        return utility.loadImage(named: "share", colors: colors, size: 24)
-    }
-
-    func getImageSharedWithMe(colors: [UIColor] = [NCBrandColor.shared.iconSystemGrayColor]) -> UIImage {
-        return utility.loadImage(named: "cloudUpload", colors: [NCBrandColor.shared.nmcIconSharedWithMe], size: 24)
-    }
     
-    func getImageFavorite(colors: [UIColor] = [NCBrandColor.shared.yellowFavorite]) -> UIImage {
-        return utility.loadImage(named: "star.fill", colors: colors, size: 24)
-    }
-
-    func getImageOfflineFlag(colors: [UIColor] = [.systemGreen]) -> UIImage {
-        return utility.loadImage(named: "arrow.down.circle.fill", colors: colors, size: 24)
-    }
-
-    func getImageLocal(colors: [UIColor] = [.systemGreen]) -> UIImage {
-        return utility.loadImage(named: "checkmark.circle.fill", colors: colors, size: 24)
-    }
-
-    func getImageCheckedYes(colors: [UIColor] = [NCBrandColor.shared.iconImageColor]) -> UIImage {
-        return UIImage(named: "checkedYes")!
-    }
-
-    func getImageCheckedNo(colors: [UIColor] = [NCBrandColor.shared.iconImageColor]) -> UIImage {
-        return utility.loadImage(named: "circle", colors: colors, size: 24)
-    }
-
-    func getImageButtonMore(colors: [UIColor] = [NCBrandColor.shared.iconImageColor]) -> UIImage {
-        return UIImage(named: "more")!.image(color: .systemGray, size: 24)
-    }
-
-    func getImageButtonStop(colors: [UIColor] = [NCBrandColor.shared.iconImageColor]) -> UIImage {
-        return utility.loadImage(named: "stop.circle", colors: colors, size: 24)
-    }
-
-    func getImageButtonMoreLock(colors: [UIColor] = [NCBrandColor.shared.iconImageColor]) -> UIImage {
-        return utility.loadImage(named: "lock.fill", colors: colors, size: 24)
-    }
-
     func getFolder() -> UIImage {
         return UIImage(named: "folder")!
     }
