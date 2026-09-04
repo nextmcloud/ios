@@ -49,6 +49,11 @@ class NCShareNewUserAddComment: UIViewController, NCShareNavigationTitleSetting 
     var downloadLimit: DownloadLimitViewModel = .unlimited
     var downloadLimitChanged: Bool = false
 
+    var controller: NCMainTabBarController?
+    var windowScene: UIWindowScene? {
+        SceneManager.shared.getWindowScene(controller: controller)
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         self.setNavigationTitle()
@@ -119,10 +124,18 @@ class NCShareNewUserAddComment: UIViewController, NCShareNavigationTitleSetting 
 
     @IBAction func sendShareClicked(_ sender: Any) {
         share.note = noteTextField.text
-        if isNewShare {
-            networking?.createShare(share, downloadLimit: self.downloadLimit)
+        if !share.note.isEmpty {
+            if isNewShare {
+                networking?.createShare(share, downloadLimit: self.downloadLimit)
+            } else {
+                networking?.updateShare(share, downloadLimit: self.downloadLimit, changeDownloadLimit: downloadLimitChanged)
+            }
         } else {
-            networking?.updateShare(share, downloadLimit: self.downloadLimit, changeDownloadLimit: downloadLimitChanged)
+            Task {
+                await showErrorBanner(windowScene: self.windowScene,
+                                      text: "_share_note_should_not_be_empty_",
+                                      errorCode: 0)
+            }
         }
     
         self.navigationController?.popToRootViewController(animated: true)

@@ -39,32 +39,32 @@ final class NCUtility: NSObject, Sendable {
     }
 
     func editorsDirectEditing(account: String, contentType: String) -> [String] {
-        var names: [String] = []
+        var identifiers: [String] = []
         let capabilities = NCNetworking.shared.capabilities[account]
 
         capabilities?.directEditingEditors.forEach { editor in
             editor.mimetypes.forEach { mimetype in
                 if mimetype == contentType {
-                    names.append(editor.name)
+                    identifiers.append(editor.identifier)
                 }
                 // HARDCODE
                 // https://github.com/nextcloud/text/issues/913
                 if mimetype == "text/markdown" && contentType == "text/x-markdown" {
-                    names.append(editor.name)
+                    identifiers.append(editor.identifier)
                 }
                 if contentType == "text/html" {
-                    names.append(editor.name)
+                    identifiers.append(editor.identifier)
                 }
             }
 
             editor.optionalMimetypes.forEach { mimetype in
                 if mimetype == contentType {
-                    names.append(editor.name)
+                    identifiers.append(editor.identifier)
                 }
             }
         }
 
-        return Array(Set(names))
+        return Array(Set(identifiers))
     }
 
     func getCustomUserAgentNCText() -> String {
@@ -114,13 +114,6 @@ final class NCUtility: NSObject, Sendable {
         if fileId.count >= 8 { return fileId }
         let zeros = String(repeating: "0", count: 8 - fileId.count)
         return zeros + fileId
-    }
-
-    func getLivePhotoOcId(metadata: tableMetadata) -> String? {
-        if let instanceId = splitOcId(metadata.ocId).instanceId {
-            return paddedFileId(metadata.livePhotoFile) + instanceId
-        }
-        return nil
     }
 
     func getVersionBuild() -> String {
@@ -284,14 +277,6 @@ final class NCUtility: NSObject, Sendable {
         }
         return height
     }
-
-    func formatBadgeCount(_ count: Int) -> String {
-        if count <= 9999 {
-            return "\(count)"
-        } else {
-            return count.formatted(.number.notation(.compactName).locale(Locale(identifier: "en_US")))
-        }
-    }
     
     // E-mail validations
     // 1. Basic Email Validator (ASCII only)
@@ -353,17 +338,11 @@ final class NCUtility: NSObject, Sendable {
         return isValidEmail(punycodeEmail)
     }
 
-    // 5. Unified Email Validation - Check for both basic and IDN emails
-    func validateEmail(_ email: String) -> Bool {
-        if isValidEmail(email) {
-            print("Valid ASCII email: \(email)")
-            return true
-        } else if isValidIDNEmail(email) {
-            print("Valid IDN email: \(email)")
-            return true
+    func formatBadgeCount(_ count: Int) -> String {
+        if count <= 9999 {
+            return "\(count)"
         } else {
-            print("Invalid email: \(email)")
-            return false
+            return count.formatted(.number.notation(.compactName).locale(Locale(identifier: "en_US")))
         }
     }
 }

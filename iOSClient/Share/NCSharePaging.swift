@@ -39,6 +39,7 @@ class NCSharePaging: UIViewController {
     private let applicationHandle = NCApplicationHandle()
 
     var metadata = tableMetadata()
+    var controller: NCMainTabBarController?
     var pages: [NCBrandOptions.NCInfoPagingTab] = []
     var page: NCBrandOptions.NCInfoPagingTab = .activity
 
@@ -61,9 +62,9 @@ class NCSharePaging: UIViewController {
         pagingViewController.backgroundColor = .systemBackground
         pagingViewController.menuBackgroundColor = .systemBackground
         pagingViewController.selectedBackgroundColor = .systemBackground
-        pagingViewController.indicatorColor = NCBrandColor.shared.getElement(account: metadata.account)
+        pagingViewController.indicatorColor = NCBrandColor.shared.brand
         pagingViewController.textColor = NCBrandColor.shared.textColor
-        pagingViewController.selectedTextColor = NCBrandColor.shared.getElement(account: metadata.account)
+        pagingViewController.selectedTextColor = NCBrandColor.shared.brand
 
         // Pagination
         addChild(pagingViewController)
@@ -209,6 +210,7 @@ extension NCSharePaging: PagingViewControllerDataSource {
             }
             viewController.metadata = metadata
             viewController.height = height
+            viewController.controller = controller
             return viewController
         } else {
             return applicationHandle.pagingViewController(pagingViewController, viewControllerAt: index, metadata: metadata, topHeight: height)
@@ -323,12 +325,18 @@ class NCShareHeaderView: UIView {
 
     @IBAction func touchUpInsideFavorite(_ sender: UIButton) {
         guard let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId) else { return }
-        NCNetworking.shared.setStatusWaitFavorite(metadata) { error in
+        Task {
+            let error = await NCNetworking.shared.setStatusWaitFavorite(metadata)
             if error == .success {
-                guard let metadata = NCManageDatabase.shared.getMetadataFromOcId(metadata.ocId) else { return }
-                self.favorite.setImage(NCUtility().loadImage(named: metadata.favorite ? "star" : "star.fill", colors: [NCBrandColor.shared.yellowFavorite], size: 20), for: .normal)
+                if let metadata = NCManageDatabase.shared.getMetadataFromOcId(metadata.ocId) {
+                    await MainActor.run {
+                        self.favorite.setImage(NCUtility().loadImage(named: metadata.favorite ? "star" : "star.fill", colors: [NCBrandColor.shared.yellowFavorite], size: 20), for: .normal)
+                    }
+                }
             } else {
-                NCContentPresenter().showError(error: error)
+                await MainActor.run {
+                    NCContentPresenter().showError(error: error)
+                }
             }
         }
     }

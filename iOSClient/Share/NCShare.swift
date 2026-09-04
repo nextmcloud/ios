@@ -47,6 +47,7 @@ class NCShare: UIViewController, NCSharePagingContent {
 //    var textField: UIView? { searchField }
     var textField: UITextField? { self.view.viewWithTag(Tag.searchField) as? UITextField }
 
+    @IBOutlet weak var searchField: UISearchBar!
     @IBOutlet weak var tableView: UITableView!
 //    @IBOutlet weak var btnContact: UIButton!
 
@@ -88,6 +89,8 @@ class NCShare: UIViewController, NCSharePagingContent {
     var shareEmails: [tableShare] = []
     var shareOthers: [tableShare] = []
     private var cachedHeader: NCShareAdvancePermissionHeader?
+    
+//    var sendMail: Bool = false
     
     // MARK: - View Life Cycle
 
@@ -175,9 +178,9 @@ class NCShare: UIViewController, NCSharePagingContent {
 
     // MARK: - Notification Center
 
-    @objc func openShareProfile(_ sender: UITapGestureRecognizer) {
-        self.showProfileMenu(userId: metadata.ownerId, session: session, sender: sender.view)
-    }
+//    @objc func openShareProfile(_ sender: UITapGestureRecognizer) {
+//        self.showProfileMenu(userId: metadata.ownerId, session: session, sender: sender.view)
+//    }
 
     private func scrollToTopIfNeeded() {
         if tableView.numberOfSections > 0 && tableView.numberOfRows(inSection: 0) > 0 {
@@ -351,9 +354,92 @@ class NCShare: UIViewController, NCSharePagingContent {
         } else {
             networking?.createShareLink(password: "")
         }
-        
     }
 
+    func presentQuickStatusActionSheet(for share: tableShare, sender: Any?) {
+        guard let metadata = metadata else { return }
+
+        let alertController = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+        let isDirectory = metadata.directory
+
+        // Read Only
+        let readOnlyAction = UIAlertAction(title: NSLocalizedString("_share_read_only_", comment: ""), style: .default) { [weak self] _ in
+            let permissions = NCSharePermissions.getPermissionValue(canCreate: false, canEdit: false, canDelete: false, canShare: false, isDirectory: isDirectory)
+            self?.updateSharePermissions(share: share, permissions: permissions)
+        }
+        alertController.addAction(readOnlyAction)
+
+        // Editing
+        let editingAction = UIAlertAction(title: NSLocalizedString("_share_editing_", comment: ""), style: .default) { [weak self] _ in
+            let permissions = NCSharePermissions.getPermissionValue(canCreate: true, canEdit: true, canDelete: true, canShare: true, isDirectory: isDirectory)
+            self?.updateSharePermissions(share: share, permissions: permissions)
+        }
+        alertController.addAction(editingAction)
+
+        // File Drop (only for directories with public link or email share)
+        if isDirectory && (share.shareType == NKShare.ShareType.publicLink.rawValue || share.shareType == NKShare.ShareType.email.rawValue) {
+            let fileDropAction = UIAlertAction(title: NSLocalizedString("_share_file_drop_", comment: ""), style: .default) { [weak self] _ in
+                let permissions = NCSharePermissions.getPermissionValue(canRead: false, canCreate: true, canEdit: false, canDelete: false, canShare: false, isDirectory: isDirectory)
+                self?.updateSharePermissions(share: share, permissions: permissions)
+            }
+            alertController.addAction(fileDropAction)
+        }
+
+        // Custom Permissions
+        let customAction = UIAlertAction(title: NSLocalizedString("_custom_permissions_", comment: ""), style: .default) { [weak self] _ in
+            self?.openAdvancePermission(for: share)
+        }
+        alertController.addAction(customAction)
+
+        // Cancel
+        let cancelAction = UIAlertAction(title: NSLocalizedString("_cancel_", comment: ""), style: .cancel)
+        alertController.addAction(cancelAction)
+
+        // iPad popover support
+        if let popover = alertController.popoverPresentationController,
+           let sourceView = sender as? UIView {
+            let barItem = UIBarButtonItem(customView: sourceView)
+            popover.sourceItem = barItem
+        }
+
+        present(alertController, animated: true)
+    }
+    
+    private func openAdvancePermission(for share: tableShare) {
+        guard let advancePermission = UIStoryboard(name: "NCShare", bundle: nil).instantiateViewController(withIdentifier: "NCShareAdvancePermission") as? NCShareAdvancePermission,
+              !share.isInvalidated,
+              let metadata = metadata else { return }
+
+        advancePermission.networking = networking
+        advancePermission.share = tableShare(value: share)
+        advancePermission.oldTableShare = tableShare(value: share)
+        advancePermission.metadata = metadata
+        advancePermission.controller = self.controller
+
+        if let downloadLimit = try? NCManageDatabase.shared.getDownloadLimit(byAccount: metadata.account, shareToken: share.token) {
+            advancePermission.downloadLimit = .limited(limit: downloadLimit.limit, count: downloadLimit.count)
+        }
+
+        navigationController?.pushViewController(advancePermission, animated: true)
+    }
+
+    func updateSharePermissions(share: tableShare, permissions: Int) {
+        let updatedShare = tableShare(value: share)
+        updatedShare.permissions = permissions
+
+        var downloadLimit: DownloadLimitViewModel = .unlimited
+
+        do {
+            if let model = try database.getDownloadLimit(byAccount: metadata.account, shareToken: updatedShare.token) {
+                downloadLimit = .limited(limit: model.limit, count: model.count)
+            }
+        } catch {
+            nkLog(error: "Failed to get download limit from database!")
+            return
+        }
+
+        networking?.updateShare(updatedShare, downloadLimit: downloadLimit)
+    }
 }
 
 // MARK: - NCShareNetworkingDelegate
@@ -534,6 +620,10 @@ extension NCShare: UITableViewDataSource {
                 let linkNumber = " \(indexPath.row + 1)"
                 cell.configure(with: tableShare, at: indexPath, isDirectory: metadata.directory, title: linkNumber)
             }
+//            self.sendMail = (tableShare.shareType != NKShare.ShareType.publicLink.rawValue)
+            cell.buttonDetail.menu = NCContextMenuShare(share: tableShare, isDirectory: metadata.isDirectory, canReshare: canReshare, shareController: self, controller: controller).viewMenu()
+            cell.buttonDetail.showsMenuAsPrimaryAction = true
+
             return cell
 
         case .emails:
@@ -543,6 +633,8 @@ extension NCShare: UITableViewDataSource {
             }
             cell.delegate = self
             cell.configure(with: tableShare, at: indexPath, isDirectory: metadata.directory, userId: session.userId)
+            cell.buttonMenu.menu = NCContextMenuShare(share: tableShare, isDirectory: metadata.isDirectory, canReshare: canReshare, shareController: self, controller: controller).viewMenu()
+            cell.buttonMenu.showsMenuAsPrimaryAction = true
             return cell
         }
     }
@@ -654,24 +746,26 @@ extension NCShare: CNContactPickerDelegate {
     }
 
     func showEmailList(arrEmail: [String], sender: Any?) {
-        var actions = [NCMenuAction]()
+        let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+
         for email in arrEmail {
-            actions.append(
-                NCMenuAction(
-                    title: email,
-                    icon: utility.loadImage(named: "email", colors: [NCBrandColor.shared.iconImageColor]),
-                    selected: false,
-                    on: false,
-                    sender: sender,
-                    action: { _ in
-                        self.textField?.text = email
-                        self.networking?.getSharees(searchString: email)
-                    }
-                )
-            )
+            alert.addAction(UIAlertAction(title: email, style: .default) { _ in
+                self.searchField?.text = email
+                self.networking?.getSharees(searchString: email)
+            })
         }
+
+        alert.addAction(UIAlertAction(title: NSLocalizedString("_cancel_", comment: ""), style: .cancel))
+
+        // iPad popover support
+        if let popover = alert.popoverPresentationController {
+            popover.sourceView = self.view
+            popover.sourceRect = CGRect(x: self.view.bounds.midX, y: self.view.bounds.midY, width: 0, height: 0)
+            popover.permittedArrowDirections = []
+        }
+
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-            self.presentMenu(with: actions, sender: sender)
+            self.present(alert, animated: true)
         }
     }
 }

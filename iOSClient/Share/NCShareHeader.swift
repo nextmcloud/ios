@@ -47,7 +47,8 @@ class NCShareHeader: UIView {
             if metadata.directory {
                 imageView.image = metadata.e2eEncrypted ? NCImageCache.shared.getFolderEncrypted() : NCImageCache.shared.getFolder()
             } else if !metadata.iconName.isEmpty {
-                imageView.image = NCUtility().loadImage(named: metadata.iconName, useTypeIconFile: true, account: metadata.account)
+//                imageView.image = NCUtility().loadImage(named: metadata.iconName, useTypeIconFile: true, account: metadata.account)
+                imageView.image = NCUtility().previewIcon(for: metadata)
             } else {
                 imageView.image = NCImageCache.shared.getImageFile()
             }
@@ -60,7 +61,8 @@ class NCShareHeader: UIView {
         info.textColor = NCBrandColor.shared.textColor2
         info.text = utilityFileSystem.transformedSize(metadata.size) + ", " + NCUtility().getRelativeDateTitle(metadata.date as Date)
 
-        tagListView.addTags(Array(metadata.tags))
+        tagListView.marginY = 8
+        refreshTags(metadata.tagNames, tagModels: metadata.tags.map(\.nkTag))
 
         setNeedsLayout()
         layoutIfNeeded()
@@ -69,6 +71,32 @@ class NCShareHeader: UIView {
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         if fullWidthImageView.image != nil {
             imageView.isHidden = traitCollection.verticalSizeClass != .compact
+        }
+    }
+    
+    private func refreshTags(_ tags: [String], tagModels: [NKTag]? = nil) {
+        let tagModels = tagModels ?? []
+
+        tagListView.removeAllTags()
+
+        for tagName in tags {
+            let matchedTag = tagModels.first { $0.name == tagName }
+            let displayName = matchedTag?.name ?? tagName
+            let tagView = tagListView.addTag(displayName)
+
+            if let colorHex = matchedTag?.color, let color = UIColor(hex: colorHex) {
+                tagView.tagBackgroundColor = .clear
+                tagView.borderColor = color
+                tagView.textColor = color
+                tagView.selectedTextColor = color
+            } else {
+                tagView.tagBackgroundColor = .clear
+                tagView.borderColor = .systemGray
+                tagView.textColor = .systemGray
+                tagView.selectedTextColor = .systemGray
+            }
+
+            tagView.textFont = UIFont.boldSystemFont(ofSize: 12)
         }
     }
 }
@@ -86,44 +114,8 @@ class NCShareAdvancePermissionHeader: UITableViewHeaderFooterView {
     let utility = NCUtility()
     let utilityFileSystem = NCUtilityFileSystem()
     var shares: (firstShareLink: tableShare?, share: [tableShare]?) = (nil, nil)
-
-    func setupUI(with metadata: tableMetadata) {
-        fileName.textColor = NCBrandColor.shared.label
-        info.textColor = NCBrandColor.shared.textInfo
-
-        let isShare = metadata.permissions.contains(NCPermissions().permissionShared)
-
-        if let image = NCUtility().getImage(ocId: metadata.ocId, etag: metadata.etag, ext: NCGlobal.shared.previewExt1024, userId: metadata.userId, urlBase: metadata.urlBase) {
-            fullWidthImageView.image = image
-            fullWidthImageView.contentMode = .scaleAspectFill
-            imageView.isHidden = true
-        } else {
-            imageView.isHidden = false
-            if metadata.e2eEncrypted {
-                imageView.image = NCImageCache.shared.getFolderEncrypted()
-            } else if isShare || !metadata.shareType.isEmpty {
-                imageView.image = NCImageCache.shared.getFolderPublic()
-            } else if !metadata.shareType.isEmpty {
-                imageView.image = metadata.shareType.contains(3)
-                    ? NCImageCache.shared.getFolderPublic()
-                    : NCImageCache.shared.getFolderSharedWithMe()
-            } else if metadata.permissions.contains("S"), (metadata.permissions.range(of: "S") != nil) {
-                imageView.image = NCImageCache.shared.getImageSharedWithMe()
-            } else if metadata.directory {
-                imageView.image = NCImageCache.shared.getFolder()
-            } else if !metadata.iconName.isEmpty {
-                imageView.image = NCUtility().loadImage(named: metadata.iconName, useTypeIconFile: true, account: metadata.account)
-            } else {
-                imageView.image = NCImageCache.shared.getImageFile()
-            }
-        }
-
-        fileName.text = metadata.fileNameView
-        fileName.textColor = NCBrandColor.shared.fileFolderName
-
-        updateFavoriteIcon(isFavorite: metadata.favorite)
-        info.text = utilityFileSystem.transformedSize(metadata.size) + ", " + utility.getRelativeDateTitle(metadata.date as Date)
-    }
+    var shareLinks: [tableShare] = []
+    var shareEmails: [tableShare] = []
     
     func setupUI(with metadata: tableMetadata, linkCount: Int, emailCount: Int) {
         fileName.textColor = NCBrandColor.shared.label
@@ -143,8 +135,8 @@ class NCShareAdvancePermissionHeader: UITableViewHeaderFooterView {
                 
                 if metadata.e2eEncrypted {
                     imageView.image = NCImageCache.shared.getFolderEncrypted()
-                } else if metadata.permissions.contains("S"), (metadata.permissions.range(of: "S") != nil) {
-                    imageView.image = NCImageCache.shared.getFolderSharedWithMe()
+//                } else if metadata.permissions.contains("S"), (metadata.permissions.range(of: "S") != nil) {
+//                    imageView.image = NCImageCache.shared.getFolderSharedWithMe()
                 } else if (!metadata.shareType.isEmpty || !(shares.share?.isEmpty ?? true) || (shares.firstShareLink != nil)) || isShare || hasEmailAndLinkShares {
                     imageView.image = NCImageCache.shared.getFolderPublic()
                 } else if metadata.mountType == "group" {
@@ -158,7 +150,8 @@ class NCShareAdvancePermissionHeader: UITableViewHeaderFooterView {
                 if metadata.iconName.isEmpty {
                     imageView.image = NCImageCache.shared.getImageFile()
                 } else {
-                    imageView.image = NCUtility().loadImage(named: metadata.iconName, useTypeIconFile: true, account: metadata.account)
+//                    imageView.image = NCUtility().loadImage(named: metadata.iconName, useTypeIconFile: true, account: metadata.account)
+                    imageView.image = NCUtility().previewIcon(for: metadata)
                 }
             }
         }
@@ -176,12 +169,20 @@ class NCShareAdvancePermissionHeader: UITableViewHeaderFooterView {
     
     @IBAction func touchUpInsideFavorite(_ sender: UIButton) {
         guard let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId) else { return }
-        NCNetworking.shared.setStatusWaitFavorite(metadata) { error in
+        Task {
+            let error = await NCNetworking.shared.setStatusWaitFavorite(metadata)
             if error == .success {
-                guard let metadata = NCManageDatabase.shared.getMetadataFromOcId(metadata.ocId) else { return }
-                self.updateFavoriteIcon(isFavorite: metadata.favorite)
+                if let updated = NCManageDatabase.shared.getMetadataFromOcId(metadata.ocId) {
+                    await MainActor.run {
+                        self.updateFavoriteIcon(isFavorite: updated.favorite)
+                    }
+                    // Broadcast favorite change so other screens can update their headers
+//                    NotificationCenter.default.post(name: NSNotification.Name("NCMetadataFavoriteDidChange"), object: updated, userInfo: ["ocId": updated.ocId])
+                }
             } else {
-                NCContentPresenter().showError(error: error)
+                await MainActor.run {
+                    NCContentPresenter().showError(error: error)
+                }
             }
         }
     }

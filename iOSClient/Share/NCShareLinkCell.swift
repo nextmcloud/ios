@@ -68,10 +68,6 @@ class NCShareLinkCell: UITableViewCell {
         self.indexPath = indexPath
         self.isDirectory = isDirectory
         setupCellAppearance(titleAppendString: title)
-
-//        let shareLinksCountString = shareLinksCount > 0 ? String(shareLinksCount) : ""
-//        setupCellAppearance(titleAppendString: shareLinksCountString)
-//        setupCellAppearance(titleAppendString: String(shareLinksCount))
     }
 
     private func setupCellAppearance(titleAppendString: String? = nil) {
@@ -132,12 +128,24 @@ class NCShareLinkCell: UITableViewCell {
     }
 
     @IBAction func quickStatusClicked(_ sender: UIButton) {
-        delegate?.quickStatus(with: tableShare, sender: sender)
+        delegate?.tapQuickStatus(with: tableShare, sender: sender)
+    }
+    
+    @IBAction func touchUpCopy(_ sender: Any) {
+        delegate?.tapCopy(with: tableShare, sender: sender)
+    }
+
+    @IBAction func touchUpMenu(_ sender: Any) {
+        delegate?.tapMenu(with: tableShare, sender: sender)
+    }
+
+    @objc func openQuickStatus(_ sender: UITapGestureRecognizer) {
+        delegate?.tapQuickStatus(with: tableShare, sender: sender.view ?? sender)
     }
 }
 
 protocol NCShareLinkCellDelegate: AnyObject {
     func tapCopy(with tableShare: tableShare?, sender: Any)
     func tapMenu(with tableShare: tableShare?, sender: Any)
-    func quickStatus(with tableShare: tableShare?, sender: Any)
+    func tapQuickStatus(with tableShare: tableShare?, sender: Any)
 }

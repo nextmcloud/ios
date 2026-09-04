@@ -50,9 +50,7 @@ class NCShareUserCell: UITableViewCell, NCCellProtocol {
             // Also update title if display name changed.
             if let share = tableShare {
                 labelTitle.text = share.shareWithDisplayname
-                imagePasswordSet.isHidden = share.password.isEmpty
-                imageExpiredDateSet.isHidden = (share.expirationDate == nil)
-                leadingContraintofImageRightArrow.constant = (imagePasswordSet.isHidden && imageExpiredDateSet.isHidden) ? 0 : 5
+                applyIconsIfNeeded()
             }
         }
     }
@@ -91,24 +89,46 @@ class NCShareUserCell: UITableViewCell, NCCellProtocol {
         self.tableShare = share
         self.isDirectory = isDirectory
         setupCellUI(userId: userId)
+        applyIconsIfNeeded()
     }
 
     func refresh(with share: tableShare?, userId: String) {
         self.tableShare = share
         setupCellUI(userId: userId)
+        applyIconsIfNeeded()
     }
 
     // MARK: - UI Setup
+    
+    private func setupCellUI(userId: String) {
+        guard let tableShare = tableShare else { return }
+
+        labelTitle.text = tableShare.shareWithDisplayname
+
+        let isOwner = tableShare.uidOwner == userId || tableShare.uidFileOwner == userId
+        isUserInteractionEnabled = isOwner
+        buttonMenu.isHidden = !isOwner
+        buttonMenu.accessibilityLabel = NSLocalizedString("_more_", comment: "")
+
+        btnQuickStatus.setTitle("", for: .normal)
+        btnQuickStatus.isEnabled = true
+        btnQuickStatus.accessibilityHint = NSLocalizedString("_user_sharee_footer_", comment: "")
+        btnQuickStatus.contentHorizontalAlignment = .left
+
+        imageExpiredDateSet.isHidden = true
+        imagePasswordSet.isHidden = true
+        
+        setupCellUIAppearance()
+        updatePermissionUI()
+    }
+    
     private func setupCellUIAppearance() {
-//        contentView.backgroundColor = NCBrandColor.shared.secondarySystemGroupedBackground
-        buttonMenu.contentMode = .scaleAspectFill
-//        buttonMenu.setImage(NCImageCache.images.buttonMore.image(color: NCBrandColor.shared.brand, size: 24), for: .normal)
-        buttonMenu.setImage(NCImageCache.shared.getImageButtonMore().image(color: NCBrandColor.shared.brand, size: 24), for: .normal)
         labelQuickStatus.textColor = NCBrandColor.shared.shareBlueColor
         labelTitle.textColor = NCBrandColor.shared.label
         imageRightArrow.image = UIImage(named: "rightArrow")?.image(color: NCBrandColor.shared.shareBlueColor)
         imageExpiredDateSet.image = UIImage(named: "calenderNew")?.image(color: NCBrandColor.shared.shareBlueColor)
         imagePasswordSet.image = UIImage(named: "lockNew")?.image(color: NCBrandColor.shared.shareBlueColor)
+        buttonMenu.setImage(NCImageCache.shared.getImageButtonMore().image(color: NCBrandColor.shared.brand, size: 24), for: .normal)
 
         imagePermissionType.image = imagePermissionType.image?.image(color: NCBrandColor.shared.shareBlueColor)
         // Permission UI is updated via tableShare didSet or explicit refresh
@@ -130,29 +150,17 @@ class NCShareUserCell: UITableViewCell, NCCellProtocol {
             imagePermissionType.image = UIImage(named: "showPasswordNew")?.image(color: NCBrandColor.shared.shareBlueColor)
         }
 
-        imagePasswordSet.isHidden = tableShare.password.isEmpty
-        imageExpiredDateSet.isHidden = (tableShare.expirationDate == nil)
-        
-        leadingContraintofImageRightArrow.constant = (imagePasswordSet.isHidden && imageExpiredDateSet.isHidden) ? 0 : 5
+        applyIconsIfNeeded()
     }
-
-    private func setupCellUI(userId: String) {
+    
+    // Ensures calendar icon visibility is correctly applied after configure/refresh
+    func applyIconsIfNeeded() {
         guard let tableShare = tableShare else { return }
-
-        labelTitle.text = tableShare.shareWithDisplayname
-
-        let isOwner = tableShare.uidOwner == userId || tableShare.uidFileOwner == userId
-        isUserInteractionEnabled = isOwner
-        buttonMenu.isHidden = !isOwner
-        buttonMenu.accessibilityLabel = NSLocalizedString("_more_", comment: "")
-
-        btnQuickStatus.setTitle("", for: .normal)
-        btnQuickStatus.isEnabled = true
-        btnQuickStatus.accessibilityHint = NSLocalizedString("_user_sharee_footer_", comment: "")
-        btnQuickStatus.contentHorizontalAlignment = .left
-
-        setupCellUIAppearance()
-        updatePermissionUI()
+        imagePasswordSet.isHidden = tableShare.password.isEmpty
+        // Show calendar icon when an expiration date is set
+        imageExpiredDateSet.isHidden = (tableShare.expirationDate == nil)
+        // Adjust spacing accordingly
+        leadingContraintofImageRightArrow.constant = (imagePasswordSet.isHidden && imageExpiredDateSet.isHidden) ? 0 : 5
     }
 
     private func getTypeString(_ tableShare: tableShareV2) -> String {
@@ -168,23 +176,23 @@ class NCShareUserCell: UITableViewCell, NCCellProtocol {
         }
     }
 
-    @objc func tapAvatarImage(_ sender: UITapGestureRecognizer) {
-        delegate?.showProfile(with: tableShare, sender: sender)
-    }
-
     @IBAction func touchUpInsideMenu(_ sender: Any) {
         delegate?.tapMenu(with: tableShare, sender: sender)
     }
 
     @IBAction func quickStatusClicked(_ sender: Any) {
-        delegate?.quickStatus(with: tableShare, sender: sender)
+        delegate?.tapQuickStatus(with: tableShare, sender: sender)
+    }
+    
+    @objc func openQuickStatus(_ sender: UIGestureRecognizer) {
+        delegate?.tapQuickStatus(with: tableShare, sender: sender.view ?? sender)
     }
 }
 
 protocol NCShareUserCellDelegate: AnyObject {
     func tapMenu(with tableShare: tableShare?, sender: Any)
-    func showProfile(with tableComment: tableShare?, sender: Any)
-    func quickStatus(with tableShare: tableShare?, sender: Any)
+    func tapProfileMenu(with tableShare: tableShare?) -> UIMenu?
+    func tapQuickStatus(with tableShare: tableShare?, sender: Any)
 }
 
 // MARK: - NCSearchUserDropDownCell
