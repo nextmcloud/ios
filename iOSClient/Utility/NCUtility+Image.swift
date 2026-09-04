@@ -11,7 +11,172 @@ import CoreMedia
 import Photos
 
 extension NCUtility {
+    
+    // MARK: - MIME-based icon convenience
+    /// Returns an icon image for the provided MIME type or filename, using MimeTypeUtil mappings.
+    /// - Parameters:
+    ///   - mimeType: Optional MIME type string (e.g., "application/pdf"). If nil, the method will infer from the filename.
+    ///   - fileName: Optional filename or path to infer the MIME type when `mimeType` is nil.
+    ///   - account: Optional account to pass through for theming if needed in the future.
+    /// - Returns: A UIImage representing the file type.
+    @discardableResult
+    func loadIcon(mimeType: String?, fileName: String?, account: String? = nil) -> UIImage {
+        let resolvedMime: String
+        if let mime = mimeType, !mime.isEmpty {
+            resolvedMime = mime
+        } else if let name = fileName, !name.isEmpty {
+            resolvedMime = MimeTypeUtil.bestMimeType(forFileName: (name as NSString).lastPathComponent)
+        } else {
+            resolvedMime = "application/octet-stream"
+        }
+
+        if let image = MimeTypeUtil.icon(forMimeType: resolvedMime, fileName: fileName ?? "", account: account, isDarkMode: (UITraitCollection.current.userInterfaceStyle == .dark)) {
+            return image
+        }
+        // Fallback to existing generic file image
+        return UIImage(named: "file")! //?? UIImage(systemName: "doc")!
+    }
+    
+    /// Returns a preview icon for a given metadata using office-first mapping and MIME/filename convention.
+    /// - Parameter metadata: The tableMetadata describing the file.
+    /// - Returns: A UIImage representing the file type icon.
+    func previewIcon(for metadata: tableMetadata) -> UIImage {
+        // Office file extensions first
+        let ext = (metadata.fileNameView as NSString).pathExtension.lowercased()
+        if ["doc", "docx", "dot", "dotx"].contains(ext) || metadata.isDOC {
+            return UIImage(named: "document")!
+        } else if ["xls", "xlsx", "xlt", "xltx"].contains(ext) || metadata.isXLS {
+            return UIImage(named: "file_xls")!
+        } else if ext == "pdf" || metadata.isPDF {
+            return UIImage(named: "file_pdf")!
+        } else if ["ppt", "pptx", "pot", "potx", "pptm"].contains(ext) || metadata.isPPT {
+            return UIImage(named: "file_ppt")!
+        } else if ext == "txt" || ext == "md" || metadata.isTXT {
+            return UIImage(named: "file_txt")!
+        } else if ext == "odg" {
+            return UIImage(named: "file_odg")!
+        } else if ext == "zip" || metadata.isZIP {
+            return UIImage(named: "file_compress")!
+        }
+
+        // Convention: use MIME if available, otherwise iconName inference
+        else if metadata.iconName.isEmpty {
+            let imageName = metadata.fileNameView
+            // If imageName looks like a MIME type (e.g., "application/pdf"), use it directly; otherwise infer from filename
+            let looksLikeMime = imageName.contains("/")
+            let mimeIcon = looksLikeMime
+            ? self.loadIcon(mimeType: imageName, fileName: nil, account: metadata.account)
+            : self.loadIcon(mimeType: nil, fileName: imageName, account: metadata.account)
+            return mimeIcon
+        } else {
+            return loadImage(named: metadata.iconName, useTypeIconFile: true, account: metadata.account)
+        }
+    }
+    
+    func previewTrashIcon(for metadata: tableTrash) -> UIImage {
+        // Office file extensions first
+        let ext = (metadata.fileName as NSString).pathExtension.lowercased()
+        if ["doc", "docx", "dot", "dotx"].contains(ext) || metadata.isDOC {
+            return UIImage(named: "document")!
+        } else if ["xls", "xlsx", "xlt", "xltx", "csv", "xlsm"].contains(ext) || metadata.isXLS {
+            return UIImage(named: "file_xls")!
+        } else if ext == "pdf" || metadata.isPDF {
+            return UIImage(named: "file_pdf")!
+        } else if ["ppt", "pptx", "pot", "potx", "pptm"].contains(ext) || metadata.isPPT {
+            return UIImage(named: "file_ppt")!
+        } else if ext == "txt" || ext == "md" || metadata.isTXT {
+            return UIImage(named: "file_txt")!
+        } else if ext == "odg" {
+            return UIImage(named: "file_odg")!
+        } else if ext == "zip" || metadata.isZIP {
+            return UIImage(named: "file_compress")!
+        }
+
+        // Convention: use MIME if available, otherwise iconName inference
+        else if metadata.iconName.isEmpty {
+            let imageName = metadata.fileName
+            // If imageName looks like a MIME type (e.g., "application/pdf"), use it directly; otherwise infer from filename
+            let looksLikeMime = imageName.contains("/")
+            let mimeIcon = looksLikeMime
+            ? self.loadIcon(mimeType: imageName, fileName: nil, account: metadata.account)
+            : self.loadIcon(mimeType: nil, fileName: imageName, account: metadata.account)
+            return mimeIcon
+        } else {
+            return loadImage(named: metadata.iconName, useTypeIconFile: true, account: metadata.account)
+        }
+    }
+    
     func loadImage(named imageName: String,
+                   colors: [UIColor]? = nil,
+                   size: CGFloat? = nil,
+                   useTypeIconFile: Bool = false,
+                   systemNameWeight: UIImage.SymbolWeight = .regular,
+                   account: String? = nil) -> UIImage {
+        var image: UIImage?
+
+        if useTypeIconFile {
+            switch imageName {
+            case NKTypeIconFile.audio.rawValue: image = UIImage(named: "file_audio")
+            case NKTypeIconFile.code.rawValue: image = UIImage(named: "file_code")
+            case NKTypeIconFile.compress.rawValue: image = UIImage(named: "file_compress")
+            case NKTypeIconFile.directory.rawValue: image = UIImage(named: "folder")
+            case NKTypeIconFile.document.rawValue: image = UIImage(named: "document")
+            case NKTypeIconFile.image.rawValue: image = UIImage(named: "file_photo")
+            case NKTypeIconFile.video.rawValue: image = UIImage(named: "file_movie")
+            case NKTypeIconFile.xls.rawValue: image = UIImage(named: "file_xls")
+            case NKTypeIconFile.pdf.rawValue: image = UIImage(named: "file_pdf")
+            case NKTypeIconFile.ppt.rawValue: image = UIImage(named: "file_ppt")
+            case NKTypeIconFile.txt.rawValue: image = UIImage(named: "file_txt")
+            default: image = (imageName as NSString).pathExtension == "odg" ? UIImage(named: "file_odg") : UIImage(named: "file")
+            }
+        }
+
+        if let image { return image }//.withTintColor(NCBrandColor.shared.iconImageColor) }
+        // see https://stackoverflow.com/questions/71764255
+//        let sfSymbolName = imageName.replacingOccurrences(of: "_", with: ".")
+//        let color = colors?.first ?? UIColor.systemGray
+        let symbolPointSize = size ?? 24
+
+        // SF IMAGE
+        if let colors {
+            if imageName == "star" || imageName == "star.fill" || imageName == "info.circle" {
+                image = UIImage(systemName: imageName, withConfiguration: UIImage.SymbolConfiguration(weight: systemNameWeight))?.applyingSymbolConfiguration(UIImage.SymbolConfiguration(paletteColors: colors))
+            } else {
+                image = UIImage(systemName: imageName, withConfiguration: UIImage.SymbolConfiguration(pointSize: symbolPointSize, weight: systemNameWeight))?.applyingSymbolConfiguration(UIImage.SymbolConfiguration(paletteColors: colors))
+            }
+
+        } else {
+            if imageName == "star" || imageName == "star.fill" || imageName == "info.circle" {
+                image = UIImage(systemName: imageName, withConfiguration: UIImage.SymbolConfiguration(weight: systemNameWeight))
+            } else {
+                image = UIImage(systemName: imageName, withConfiguration: UIImage.SymbolConfiguration(pointSize: symbolPointSize, weight: systemNameWeight))
+            }
+        }
+        
+        if let image { return image }//.withTintColor(NCBrandColor.shared.iconImageColor) }
+
+        // IMAGES
+        if let color = colors?.first, let size {
+            image = UIImage(named: imageName)?.image(color: color, size: size)
+        } else if let color = colors?.first, size == nil {
+            image = UIImage(named: imageName)?.image(color: color, size: 24)
+        } else if colors == nil, size == nil {
+            image = UIImage(named: imageName)?.resizeImage(size: CGSize(width: 24, height: 24))
+        } else if colors == nil, let size {
+            image = UIImage(named: imageName)?.resizeImage(size: CGSize(width: size, height: size))
+        }
+        
+        if let image { return image }//.withTintColor(NCBrandColor.shared.iconImageColor) }
+
+        // NO IMAGES FOUND
+        if let color = colors?.first, let size {
+            return UIImage(named: "file")!.image(color: color, size: size)
+        } else {
+            return UIImage(named: "file")!
+        }
+    }
+    
+    func loadImage1(named imageName: String,
                    colors: [UIColor]? = nil,
                    size: CGFloat? = nil,
                    useTypeIconFile: Bool = false,
@@ -38,16 +203,16 @@ extension NCUtility {
             }
         }
 
-        if let image { return image }
+        if let image { return image.withTintColor(NCBrandColor.shared.iconImageColor) }
 
         // SF IMAGE
         if let colors {
-            image = UIImage(systemName: imageName, withConfiguration: UIImage.SymbolConfiguration(weight: systemNameWeight))?.applyingSymbolConfiguration(UIImage.SymbolConfiguration(paletteColors: colors))
+            image = UIImage(systemName: imageName, withConfiguration: UIImage.SymbolConfiguration(weight: .light))?.applyingSymbolConfiguration(UIImage.SymbolConfiguration(paletteColors: colors))
         } else {
-            image = UIImage(systemName: imageName, withConfiguration: UIImage.SymbolConfiguration(weight: systemNameWeight))
+            image = UIImage(systemName: imageName, withConfiguration: UIImage.SymbolConfiguration(weight: .light))
         }
 
-        if let image { return image }
+        if let image { return image.withTintColor(NCBrandColor.shared.iconImageColor) }
 
         // IMAGES
         if let color = colors?.first, let size {
@@ -59,13 +224,13 @@ extension NCUtility {
         } else if colors == nil, let size {
             image = UIImage(named: imageName)?.resizeImage(size: CGSize(width: size, height: size))
         }
-        if let image { return image }
+        if let image { return image.withTintColor(NCBrandColor.shared.iconImageColor) }
 
         // NO IMAGES FOUND
         if let color = colors?.first, let size {
-            return UIImage(systemName: "doc")!.image(color: color, size: size)
+            return UIImage(named: "file")!.image(color: color, size: size).withTintColor(NCBrandColor.shared.iconImageColor)
         } else {
-            return UIImage(systemName: "doc")!
+            return UIImage(named: "file")!.withTintColor(NCBrandColor.shared.iconImageColor)
         }
     }
 
@@ -153,6 +318,34 @@ extension NCUtility {
         createImageStandard(ocId: ocId, etag: etag, image: image, userId: userId, urlBase: urlBase)
     }
 
+    func createImageFileFrom(data: Data, ocId: String, etag: String) {
+        guard let image = UIImage(data: data) else { return }
+        let fileNamePath1024 = self.utilityFileSystem.getDirectoryProviderStorageImageOcId(ocId, etag: etag, ext: global.previewExt1024)
+
+        do {
+            try data.write(to: URL(fileURLWithPath: fileNamePath1024), options: .atomic)
+        } catch { }
+
+        createImageStandard(ocId: ocId, etag: etag, image: image)
+    }
+    
+    private func createImageStandard(ocId: String, etag: String, image: UIImage) {
+        let ext = [global.previewExt1024, global.previewExt512, global.previewExt256]
+        let size = [global.size1024, global.size512, global.size256]
+        let compressionQuality = [0.5, 0.6, 0.7]
+
+        for i in 0..<ext.count {
+            if !utilityFileSystem.fileProviderStorageImageExists(ocId, etag: etag, ext: ext[i]),
+               let image = image.resizeImage(size: size[i]),
+               let data = image.jpegData(compressionQuality: compressionQuality[i]) {
+                do {
+                    let fileNamePath = utilityFileSystem.getDirectoryProviderStorageImageOcId(ocId, etag: etag, ext: ext[i])
+                    try data.write(to: URL(fileURLWithPath: fileNamePath))
+                } catch { }
+            }
+        }
+    }
+    
     private func createImageStandard(ocId: String, etag: String, image: UIImage, userId: String, urlBase: String) {
         let ext = [global.previewExt1024, global.previewExt512, global.previewExt256]
         let size = [global.size1024, global.size512, global.size256]
@@ -168,6 +361,10 @@ extension NCUtility {
                 } catch { }
             }
         }
+    }
+    
+    func getImage(ocId: String, etag: String, ext: String) -> UIImage? {
+        return UIImage(contentsOfFile: self.utilityFileSystem.getDirectoryProviderStorageImageOcId(ocId, etag: etag, ext: ext))
     }
 
     func getImage(ocId: String, etag: String, ext: String, userId: String, urlBase: String) -> UIImage? {
@@ -397,3 +594,4 @@ extension NCUtility {
         return imageData.count
     }
 }
+
