@@ -42,7 +42,9 @@ class InitialPrivacySettingsViewController: UIViewController {
         acceptButton.layer.borderColor = NCBrandColor.shared.brand.cgColor
         acceptButton.setTitle(NSLocalizedString("_accept_button_title_", comment: ""), for: .normal)
         privacySettingsHelpText.centerText()
-        privacySettingsHelpText.font = UIFont(name: privacySettingsHelpText.font!.fontName, size: 16)
+//        privacySettingsHelpText.font = UIFont(name: privacySettingsHelpText.font!.fontName, size: 16)
+        privacySettingsHelpText.font = UIFont(name: UIFont.preferredFont(forTextStyle: .body).fontName, size: 16)
+        privacySettingsHelpText.adjustsFontForContentSizeCategory = true
         self.navigationItem.leftBarButtonItem?.tintColor = NCBrandColor.shared.brand
     }
     
@@ -137,6 +139,7 @@ public extension UITextView {
         style.alignment = .left
         
         let attributedOriginalText = NSMutableAttributedString(string: originalText)
+        let baseFont = UIFont.preferredFont(forTextStyle: .body)
         
         let fullRange = NSRange(location: 0, length: attributedOriginalText.length)
         attributedOriginalText.addAttribute(NSAttributedString.Key.foregroundColor, value: UIColor.label, range: fullRange)
@@ -145,11 +148,12 @@ public extension UITextView {
             attributedOriginalText.addAttribute(NSAttributedString.Key.link, value: linkTextAndType.value, range: linkRange)
             attributedOriginalText.addAttribute(NSAttributedString.Key.paragraphStyle, value: style, range: fullRange)
             attributedOriginalText.addAttribute(NSAttributedString.Key.foregroundColor, value: NCBrandColor.shared.brand, range: linkRange)
-            attributedOriginalText.addAttribute(NSAttributedString.Key.font, value: UIFont.systemFont(ofSize: 10), range: fullRange)
+            attributedOriginalText.addAttribute(NSAttributedString.Key.font, value: baseFont, range: fullRange)
         }
         
         self.linkTextAttributes = [NSAttributedString.Key.foregroundColor: NCBrandColor.shared.brand]
         self.attributedText = attributedOriginalText
+        self.adjustsFontForContentSizeCategory = true
     }
     
     func centerText() {
@@ -167,5 +171,4 @@ enum LinkType: String {
     case privacyPolicy
     case settings
 }
-
 
