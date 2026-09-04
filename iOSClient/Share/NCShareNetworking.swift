@@ -114,10 +114,19 @@ class NCShareNetworking: NSObject {
     func createShareLink(password: String?) {
         NCActivityIndicator.shared.start(backgroundView: view)
         let filenamePath = utilityFileSystem.getRelativeFilePath(metadata.fileName, serverUrl: metadata.serverUrl, session: session)
+        
+        let readOnlyPermissions = NCSharePermissions.getPermissionValue(
+            canCreate: false,
+            canEdit: false,
+            canDelete: false,
+            canShare: false,
+            isDirectory: self.metadata.contentType.contains("directory")
+        )
 
         NextcloudKit.shared.createShare(path: filenamePath,
                                         shareType: NCShareCommon.shareTypeLink,
                                         shareWith: "",
+                                        permissions: readOnlyPermissions,
                                         account: metadata.account) { [weak self] account, share, _, error in
             guard let self = self else { return }
             NCActivityIndicator.shared.stop()
@@ -354,3 +363,4 @@ class NCShareNetworking: NSObject {
         }
     }
 }
+
