@@ -54,7 +54,7 @@ extension NCUtility {
         } else if ext == "txt" || ext == "md" || metadata.isTXT {
             return UIImage(named: "file_txt")!
         } else if ext == "odg" {
-            return UIImage(named: "file_odg")!
+            return UIImage(named: "file_odg") ?? UIImage(named: "file")!
         } else if ext == "zip" || metadata.isZIP {
             return UIImage(named: "file_compress")!
         }
@@ -87,7 +87,7 @@ extension NCUtility {
         } else if ext == "txt" || ext == "md" || metadata.isTXT {
             return UIImage(named: "file_txt")!
         } else if ext == "odg" {
-            return UIImage(named: "file_odg")!
+            return UIImage(named: "file_odg") ?? UIImage(named: "file")!
         } else if ext == "zip" || metadata.isZIP {
             return UIImage(named: "file_compress")!
         }
