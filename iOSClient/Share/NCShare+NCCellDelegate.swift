@@ -22,6 +22,7 @@
 //
 
 import UIKit
+import NextcloudKit
 
 // MARK: - NCCell Delegates
 extension NCShare: NCShareLinkCellDelegate, NCShareUserCellDelegate {
@@ -48,13 +49,20 @@ extension NCShare: NCShareLinkCellDelegate, NCShareUserCellDelegate {
         }
         NCShareCommon.copyLink(link: tableShare.url, viewController: self, sender: sender)
     }
-
+    
     func tapMenu(with tableShare: tableShare?, sender: Any) {
         // Menu is now shown via native context menu on the button
         // Only handle the case where there's no tableShare (add new link)
         if tableShare == nil {
             self.makeNewLinkShare()
         }
+//        if let tableShare = tableShare {
+//            
+//            self.toggleShareMenu(for: tableShare, sendMail: (tableShare.shareType != NKShare.ShareType.publicLink.rawValue), folder: metadata?.directory ?? false, sender: sender)
+//            
+//        } else {
+//            self.makeNewLinkShare()
+//        }
     }
 
     func tapProfileMenu(with tableShare: tableShare?) -> UIMenu? {

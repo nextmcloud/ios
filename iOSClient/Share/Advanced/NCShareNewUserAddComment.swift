@@ -27,6 +27,9 @@ class NCShareNewUserAddComment: UIViewController, NCShareNavigationTitleSetting 
     @IBOutlet weak var headerContainerView: UIView!
     @IBOutlet weak var sharingLabel: UILabel!
     @IBOutlet weak var noteTextField: UITextView!
+    @IBOutlet weak var btnCancel: UIButton!
+    @IBOutlet weak var btnSendShare: UIButton!
+    @IBOutlet weak var buttonContainerView: UIView!
 
     let contentInsets: CGFloat = 16
     var onDismiss: (() -> Void)?
@@ -34,13 +37,51 @@ class NCShareNewUserAddComment: UIViewController, NCShareNavigationTitleSetting 
     public var share: Shareable!
     public var metadata: tableMetadata!
 
+    var isNewShare: Bool { share is NCTableShareOptions }
+    var networking: NCShareNetworking?
+
+    var isFromMenu: Bool = false
+    ///
+    /// The possible download limit associated with this share.
+    ///
+    /// This can only be created after the share has been actually created due to its requirement of the share token provided by the server.
+    ///
+    var downloadLimit: DownloadLimitViewModel = .unlimited
+    var downloadLimitChanged: Bool = false
+
+    var controller: NCMainTabBarController?
+    var windowScene: UIWindowScene? {
+        SceneManager.shared.getWindowScene(controller: controller)
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         self.setNavigationTitle()
 
-        NotificationCenter.default.addObserver(self, selector: #selector(adjustForKeyboard), name: UIResponder.keyboardWillHideNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: UIResponder.keyboardWillShowNotification, object: nil)
+//        NotificationCenter.default.addObserver(self, selector: #selector(adjustForKeyboard), name: UIResponder.keyboardWillHideNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(adjustForKeyboard), name: UIResponder.keyboardWillChangeFrameNotification, object: nil)
 
+        btnCancel.setTitleColor(NCBrandColor.shared.label, for: .normal)
+        btnCancel.layer.borderColor = NCBrandColor.shared.label.cgColor
+        btnCancel.backgroundColor = .clear
+        buttonContainerView.backgroundColor = NCBrandColor.shared.secondarySystemGroupedBackground
+        btnSendShare.backgroundColor = NCBrandColor.shared.customer //setBackgroundColor(NCBrandColor.shared.customer, for: .normal)
+        btnSendShare.setTitleColor(.white, for: .normal)
+
+        btnCancel.setTitle(NSLocalizedString("_cancel_", comment: ""), for: .normal)
+        btnCancel.layer.cornerRadius = 10
+        btnCancel.layer.masksToBounds = true
+        btnCancel.layer.borderWidth = 1
+        btnSendShare.setTitle(NSLocalizedString("_send_share_", comment: ""), for: .normal)
+        btnSendShare.layer.cornerRadius = 10
+        btnSendShare.layer.masksToBounds = true
+
+        if !self.isFromMenu {
+            buttonContainerView.isHidden = true
+        }
+        
         sharingLabel.text = NSLocalizedString("_share_note_recipient_", comment: "")
 
         noteTextField.textContainerInset = UIEdgeInsets(top: contentInsets, left: contentInsets, bottom: contentInsets, right: contentInsets)
@@ -52,7 +93,9 @@ class NCShareNewUserAddComment: UIViewController, NCShareNavigationTitleSetting 
         } onDone: {
             self.noteTextField.resignFirstResponder()
             self.share.note = self.noteTextField.text
-            self.navigationController?.popViewController(animated: true)
+            if !self.isFromMenu {
+                self.navigationController?.popViewController(animated: true)
+            }
         }
 
         noteTextField.inputAccessoryView = toolbar.wrappedSafeAreaContainer
@@ -75,6 +118,29 @@ class NCShareNewUserAddComment: UIViewController, NCShareNavigationTitleSetting 
         onDismiss?()
     }
 
+    @IBAction func cancelClicked(_ sender: Any) {
+        self.navigationController?.popToRootViewController(animated: true)
+    }
+
+    @IBAction func sendShareClicked(_ sender: Any) {
+        share.note = noteTextField.text
+        if !share.note.isEmpty {
+            if isNewShare {
+                networking?.createShare(share, downloadLimit: self.downloadLimit)
+            } else {
+                networking?.updateShare(share, downloadLimit: self.downloadLimit, changeDownloadLimit: downloadLimitChanged)
+            }
+        } else {
+            Task {
+                await showErrorBanner(windowScene: self.windowScene,
+                                      text: "_share_note_should_not_be_empty_",
+                                      errorCode: 0)
+            }
+        }
+    
+        self.navigationController?.popToRootViewController(animated: true)
+    }
+    
     @objc func adjustForKeyboard(notification: Notification) {
         guard let keyboardValue = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue,
               let globalTextViewFrame = noteTextField.superview?.convert(noteTextField.frame, to: nil) else { return }
@@ -89,5 +155,19 @@ class NCShareNewUserAddComment: UIViewController, NCShareNavigationTitleSetting 
         }
 
         noteTextField.scrollIndicatorInsets = noteTextField.contentInset
+    }
+    
+    @objc func keyboardWillShow(notification: Notification) {
+        if UIScreen.main.bounds.width <= 375 {
+            if view.frame.origin.y == 0 {
+                self.view.frame.origin.y -= 200
+            }
+        }
+    }
+    
+    @objc func keyboardWillHide(notification: Notification) {
+        if view.frame.origin.y != 0 {
+            self.view.frame.origin.y = 0
+        }
     }
 }

@@ -23,25 +23,20 @@
 
 import UIKit
 import TagListView
-import SwiftUI
 import NextcloudKit
 
 class NCShareHeader: UIView {
     @IBOutlet weak var imageView: UIImageView!
     @IBOutlet weak var fileName: UILabel!
-    @IBOutlet weak var fileNameExtension: UILabel!
     @IBOutlet weak var info: UILabel!
     @IBOutlet weak var fullWidthImageView: UIImageView!
     @IBOutlet weak var fileNameTopConstraint: NSLayoutConstraint!
     @IBOutlet weak var tagListView: TagListView!
 
-    private var metadata = tableMetadata()
-
     private var heightConstraintWithImage: NSLayoutConstraint?
     private var heightConstraintWithoutImage: NSLayoutConstraint?
 
     func setupUI(with metadata: tableMetadata) {
-        self.metadata = metadata.detachedCopy()
         let utilityFileSystem = NCUtilityFileSystem()
         if let image = NCUtility().getImage(ocId: metadata.ocId, etag: metadata.etag, ext: NCGlobal.shared.previewExt1024, userId: metadata.userId, urlBase: metadata.urlBase) {
             fullWidthImageView.image = image
@@ -50,9 +45,10 @@ class NCShareHeader: UIView {
             imageView.isHidden = true
         } else {
             if metadata.directory {
-                imageView.image = metadata.e2eEncrypted ? NCImageCache.shared.getFolderEncrypted(account: metadata.account) : NCImageCache.shared.getFolder(account: metadata.account)
+                imageView.image = metadata.e2eEncrypted ? NCImageCache.shared.getFolderEncrypted() : NCImageCache.shared.getFolder()
             } else if !metadata.iconName.isEmpty {
-                imageView.image = NCUtility().loadImage(named: metadata.iconName, useTypeIconFile: true, account: metadata.account)
+//                imageView.image = NCUtility().loadImage(named: metadata.iconName, useTypeIconFile: true, account: metadata.account)
+                imageView.image = NCUtility().previewIcon(for: metadata)
             } else {
                 imageView.image = NCImageCache.shared.getImageFile()
             }
@@ -60,12 +56,8 @@ class NCShareHeader: UIView {
             fileNameTopConstraint.constant -= 45
         }
 
-        fileName?.numberOfLines = 1
-        fileNameExtension?.numberOfLines = 1
-        setBidiSafeFilename(metadata.fileNameView, isDirectory: metadata.directory, titleLabel: fileName, extensionLabel: fileNameExtension)
-
+        fileName.text = metadata.fileNameView
         fileName.textColor = NCBrandColor.shared.textColor
-        fileNameExtension?.textColor = NCBrandColor.shared.textColor
         info.textColor = NCBrandColor.shared.textColor2
         info.text = utilityFileSystem.transformedSize(metadata.size) + ", " + NCUtility().getRelativeDateTitle(metadata.date as Date)
 
@@ -81,33 +73,7 @@ class NCShareHeader: UIView {
             imageView.isHidden = traitCollection.verticalSizeClass != .compact
         }
     }
-
-    func presentTagEditor(from sourceViewController: UIViewController, onApplied: (([NKTag]) -> Void)? = nil) {
-        let editor = NCTagEditorView(
-            metadata: metadata.detachedCopy(),
-            windowScene: sourceViewController.view.window?.windowScene,
-            onApplied: { [weak self] tags in
-                guard let self else { return }
-                self.metadata.tags.removeAll()
-                self.metadata.tags.append(objectsIn: tags, account: self.metadata.account)
-                self.refreshTags(tags.map(\.name), tagModels: tags)
-                onApplied?(tags)
-            }
-        )
-
-        let hosting = UIHostingController(rootView: editor)
-        hosting.title = NSLocalizedString("_tags_", comment: "")
-        hosting.isModalInPresentation = true
-
-        if let sheet = hosting.sheetPresentationController {
-            sheet.detents = [.medium(), .large()]
-            sheet.selectedDetentIdentifier = .medium
-            sheet.prefersGrabberVisible = true
-        }
-
-        sourceViewController.present(hosting, animated: true)
-    }
-
+    
     private func refreshTags(_ tags: [String], tagModels: [NKTag]? = nil) {
         let tagModels = tagModels ?? []
 
@@ -133,5 +99,91 @@ class NCShareHeader: UIView {
             tagView.textFont = UIFont.boldSystemFont(ofSize: 12)
         }
     }
+}
 
+class NCShareAdvancePermissionHeader: UITableViewHeaderFooterView {
+    @IBOutlet weak var imageView: UIImageView!
+    @IBOutlet weak var fileName: UILabel!
+    @IBOutlet weak var info: UILabel!
+    @IBOutlet weak var favorite: UIButton!
+    @IBOutlet weak var fullWidthImageView: UIImageView!
+
+    static let reuseIdentifier = "NCShareAdvancePermissionHeader"
+
+    var ocId = ""
+    let utility = NCUtility()
+    let utilityFileSystem = NCUtilityFileSystem()
+    var shares: (firstShareLink: tableShare?, share: [tableShare]?) = (nil, nil)
+    var shareLinks: [tableShare] = []
+    var shareEmails: [tableShare] = []
+    
+    func setupUI(with metadata: tableMetadata, linkCount: Int, emailCount: Int) {
+        fileName.textColor = NCBrandColor.shared.label
+        info.textColor = NCBrandColor.shared.textInfo
+        
+        let isShare = metadata.permissions.contains(NCPermissions().permissionShared)
+        let isMounted = metadata.permissions.contains(NCPermissions().permissionMounted)
+        let hasEmailAndLinkShares = (linkCount > 0 && emailCount > 0)
+        
+        if let image = NCUtility().getImage(ocId: metadata.ocId, etag: metadata.etag, ext: NCGlobal.shared.previewExt1024, userId: metadata.userId, urlBase: metadata.urlBase) {
+            fullWidthImageView.image = image
+            fullWidthImageView.contentMode = .scaleAspectFill
+            imageView.isHidden = true
+        } else {
+            imageView.isHidden = false
+            if metadata.directory {
+                
+                if metadata.e2eEncrypted {
+                    imageView.image = NCImageCache.shared.getFolderEncrypted()
+//                } else if metadata.permissions.contains("S"), (metadata.permissions.range(of: "S") != nil) {
+//                    imageView.image = NCImageCache.shared.getFolderSharedWithMe()
+                } else if (!metadata.shareType.isEmpty || !(shares.share?.isEmpty ?? true) || (shares.firstShareLink != nil)) || isShare || hasEmailAndLinkShares {
+                    imageView.image = NCImageCache.shared.getFolderPublic()
+                } else if metadata.mountType == "group" {
+                    imageView.image = NCImageCache.shared.getFolderGroup()
+                } else if isMounted {
+                    imageView.image = NCImageCache.shared.getFolderExternal()
+                } else {
+                    imageView.image = NCImageCache.shared.getFolder()
+                }
+            } else {
+                if metadata.iconName.isEmpty {
+                    imageView.image = NCImageCache.shared.getImageFile()
+                } else {
+//                    imageView.image = NCUtility().loadImage(named: metadata.iconName, useTypeIconFile: true, account: metadata.account)
+                    imageView.image = NCUtility().previewIcon(for: metadata)
+                }
+            }
+        }
+
+        fileName.text = metadata.fileNameView
+        fileName.textColor = NCBrandColor.shared.fileFolderName
+
+        updateFavoriteIcon(isFavorite: metadata.favorite)
+        info.text = utilityFileSystem.transformedSize(metadata.size) + ", " + utility.getRelativeDateTitle(metadata.date as Date)
+    }
+    
+    private func updateFavoriteIcon(isFavorite: Bool) {
+        favorite.setImage(NCUtility().loadImage(named: !isFavorite ? "star" : "star.fill", colors: [NCBrandColor.shared.yellowFavorite], size: 24), for: .normal)
+    }
+    
+    @IBAction func touchUpInsideFavorite(_ sender: UIButton) {
+        guard let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId) else { return }
+        Task {
+            let error = await NCNetworking.shared.setStatusWaitFavorite(metadata)
+            if error == .success {
+                if let updated = NCManageDatabase.shared.getMetadataFromOcId(metadata.ocId) {
+                    await MainActor.run {
+                        self.updateFavoriteIcon(isFavorite: updated.favorite)
+                    }
+                    // Broadcast favorite change so other screens can update their headers
+//                    NotificationCenter.default.post(name: NSNotification.Name("NCMetadataFavoriteDidChange"), object: updated, userInfo: ["ocId": updated.ocId])
+                }
+            } else {
+                await MainActor.run {
+                    NCContentPresenter().showError(error: error)
+                }
+            }
+        }
+    }
 }
