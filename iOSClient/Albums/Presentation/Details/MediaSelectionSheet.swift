@@ -42,11 +42,11 @@ struct MediaSelectionSheet: View {
     }
 }
 
-#if DEBUG
-#Preview {
-    MediaSelectionSheet(
-        onCancel: {},
-        onDone: { _ in }
-    )
-}
-#endif
+//#if DEBUG
+//#Preview {
+//    MediaSelectionSheet(
+//        onCancel: {},
+//        onDone: { _ in }
+//    )
+//}
+//#endif
