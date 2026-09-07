@@ -48,6 +48,29 @@ final class NCGlobal: Sendable {
     let editorOnlyOffice: String                    = "onlyoffice"
     let editorWhiteboard: String                    = "whiteboard"
 
+    // Nextcloud version
+    //
+    let nextcloudVersion18: Int                     = 18
+    let nextcloudVersion20: Int                     = 20
+    let nextcloudVersion23: Int                     = 23
+    let nextcloudVersion24: Int                     = 24
+    let nextcloudVersion25: Int                     = 25
+    let nextcloudVersion26: Int                     = 26
+    let nextcloudVersion27: Int                     = 27
+    let nextcloudVersion28: Int                     = 28
+    let nextcloudVersion30: Int                     = 30
+    let nextcloudVersion31: Int                     = 31
+    let nextcloudVersion32: Int                     = 32
+    let nextcloudVersion33: Int                     = 33
+    let nextcloudVersionFuture: Int                 = 99999
+
+
+    // Nextcloud unsupported
+    //
+    let nextcloud_unsupported_version: Int          = 20
+
+//    let nextcloud_unsupported_version: Int = 17
+    
     // Intro selector
     //
     let introLogin: Int                             = 0
@@ -131,6 +154,7 @@ final class NCGlobal: Sendable {
 
     // Error
     //
+    let errorRequestExplicityCancelled: Int     = 15
     let errorNotModified: Int                   = 304
     let errorBadRequest: Int                    = 400
     let errorUnauthorized: Int                  = 401
@@ -260,6 +284,38 @@ final class NCGlobal: Sendable {
     let notificationCenterCheckUserDelaultErrorDone             = "checkUserDelaultErrorDone"       // userInfo: account, controller
     let notificationCenterServerDidUpdate                       = "serverDidUpdate"                 // userInfo: account
     let notificationCenterNetworkReachability                   = "networkReachability"
+
+    let notificationCenterClearCache                            = "clearCache"
+    let notificationCenterCreateMediaCacheEnded                 = "createMediaCacheEnded"
+    let notificationCenterUpdateNotification                    = "updateNotification"
+
+    let notificationCenterDeleteFile                            = "deleteFile"                      // userInfo: [ocId], error
+    let notificationCenterCopyMoveFile                          = "copyMoveFile"                    // userInfo: [ocId] serverUrl, account, dragdrop, type (copy, move)
+    let notificationCenterMoveFile                              = "moveFile"                        // userInfo: [ocId], [indexPath], error
+    let notificationCenterCopyFile                              = "copyFile"                        // userInfo: [ocId], [indexPath], error
+    let notificationCenterRenameFile                            = "renameFile"                      // userInfo: serverUrl, account, error
+    let notificationCenterFavoriteFile                          = "favoriteFile"                    // userInfo: ocId, serverUrl
+    let notificationCenterFileExists                            = "fileExists"                      // userInfo: ocId, fileExists
+    let notificationCenterReloadDataSource                      = "reloadDataSource"                // userInfo: serverUrl?, clearDataSource
+
+    let notificationCenterGetServerData                         = "getServerData"                   // userInfo: serverUrl?
+    
+    let notificationCenterChangeStatusFolderE2EE                = "changeStatusFolderE2EE"          // userInfo: serverUrl
+    
+    let notificationCenterDownloadStartFile                     = "downloadStartFile"               // userInfo: ocId, ocIdTransfer, session, serverUrl, account
+    let notificationCenterDownloadedFile                        = "downloadedFile"                  // userInfo: ocId, ocIdTransfer, session, session, serverUrl, account, selector, error
+    let notificationCenterDownloadCancelFile                    = "downloadCancelFile"              // userInfo: ocId, ocIdTransfer, session, serverUrl, account
+    
+    let notificationCenterUploadStartFile                       = "uploadStartFile"                 // userInfo: ocId, ocIdTransfer, session, serverUrl, account, fileName, sessionSelector
+    let notificationCenterUploadedFile                          = "uploadedFile"                    // userInfo: ocId, ocIdTransfer, session, serverUrl, account, fileName, ocIdTransfer, error
+    let notificationCenterUploadedLivePhoto                     = "uploadedLivePhoto"               // userInfo: ocId, ocIdTransfer, session, serverUrl, account, fileName, ocIdTransfer, error
+    let notificationCenterUploadCancelFile                      = "uploadCancelFile"                // userInfo: ocId, ocIdTransfer, session, serverUrl, account
+    
+    let notificationCenterProgressTask                          = "progressTask"                    // userInfo: account, ocId, ocIdTransfer, session, serverUrl, status, chunk, e2eEncrypted, progress, totalBytes, totalBytesExpected
+    
+    let notificationCenterUpdateBadgeNumber                     = "updateBadgeNumber"               // userInfo: counterDownload, counterUpload
+    
+    let notificationCenterCreateFolder                          = "createFolder"                    // userInfo: ocId, serverUrl, account, withPush, sceneIdentifier
 
     let notificationCenterMenuSearchTextPDF                     = "menuSearchTextPDF"
     let notificationCenterMenuGotToPageInPDF                    = "menuGotToPageInPDF"
@@ -400,6 +456,10 @@ final class NCGlobal: Sendable {
     //
     let udMigrationMultiDomains             = "migrationMultiDomains"
     let udLastVersion                       = "lastVersion"
+    
+    // Album
+    //
+    let selectedTabIndexAlbum: Int                             = 3
 }
 
 /**

@@ -1,5 +1,5 @@
 {
-  "originHash" : "b092e04dd25276db24ca02e5c41e732c10cb4045264d961e3b6b734943656553",
+  "originHash" : "e17d49ec88ee53b0fdb113e0051b7e0397e08b69a7467353ebb39df35f8836e3",
   "pins" : [
     {
       "identity" : "abseil-cpp-binary",
@@ -236,6 +236,15 @@
       }
     },
     {
+      "identity" : "queuer",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/FabrizioBrancati/Queuer",
+      "state" : {
+        "revision" : "9ae00b0da125f127f1bbf2e92d8e1fbb0994427e",
+        "version" : "4.0.0"
+      }
+    },
+    {
       "identity" : "realm-core",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/realm/realm-core.git",
@@ -296,6 +305,15 @@
       "state" : {
         "revision" : "869129b7bf4ecc57b97d0193ad29690ca2134750",
         "version" : "1.8.1"
+      }
+    },
+    {
+      "identity" : "swiftentrykit",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/huri000/SwiftEntryKit",
+      "state" : {
+        "revision" : "5ad36cccf0c4b9fea32f4e9b17a8e38f07563ef0",
+        "version" : "2.0.0"
       }
     },
     {
