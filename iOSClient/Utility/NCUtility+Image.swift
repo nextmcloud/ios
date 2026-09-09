@@ -54,7 +54,7 @@ extension NCUtility {
         } else if ext == "txt" || ext == "md" || metadata.isTXT {
             return UIImage(named: "file_txt")!
         } else if ext == "odg" {
-            return UIImage(named: "file_odg") ?? UIImage(named: "file")!
+            return UIImage(named: "diagram") ?? UIImage(named: "file")!
         } else if ext == "zip" || metadata.isZIP {
             return UIImage(named: "file_compress")!
         }
@@ -87,7 +87,7 @@ extension NCUtility {
         } else if ext == "txt" || ext == "md" || metadata.isTXT {
             return UIImage(named: "file_txt")!
         } else if ext == "odg" {
-            return UIImage(named: "file_odg") ?? UIImage(named: "file")!
+            return UIImage(named: "diagram") ?? UIImage(named: "file")!
         } else if ext == "zip" || metadata.isZIP {
             return UIImage(named: "file_compress")!
         }
@@ -127,7 +127,7 @@ extension NCUtility {
             case NKTypeIconFile.pdf.rawValue: image = UIImage(named: "file_pdf")
             case NKTypeIconFile.ppt.rawValue: image = UIImage(named: "file_ppt")
             case NKTypeIconFile.txt.rawValue: image = UIImage(named: "file_txt")
-            default: image = (imageName as NSString).pathExtension == "odg" ? UIImage(named: "file_odg") : UIImage(named: "file")
+            default: image = (imageName as NSString).pathExtension == "odg" ? UIImage(named: "diagram") : UIImage(named: "file")
             }
         }
 
