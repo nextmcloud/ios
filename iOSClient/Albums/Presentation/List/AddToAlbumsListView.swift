@@ -17,6 +17,13 @@ struct AddToAlbumsListView: View {
     var onFinish: (Album) -> Void
     var onDismiss: () -> Void
     var onCreateAlbum: () -> Void
+
+    // Sorted view of albums by localized, case-insensitive name
+    private var sortedAlbums: [Album] {
+        viewModel.albums.sorted { lhs, rhs in
+            lhs.name.localizedCaseInsensitiveCompare(rhs.name) == .orderedAscending
+        }
+    }
     
     init(viewModel: AlbumsListViewModel, localAccount: String, onFinish: @escaping (Album) -> Void, onDismiss: @escaping () -> Void, onCreateAlbum: @escaping () -> Void) {
         self._viewModel = StateObject(wrappedValue: viewModel)
@@ -43,7 +50,7 @@ struct AddToAlbumsListView: View {
                             }
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .padding(.vertical, 10)
-                            .padding(.horizontal, 16)
+//                            .padding(.horizontal, 16)
                             .background(
                                 RoundedRectangle(cornerRadius: 10)
                                     .fill(Color(.secondarySystemGroupedBackground).opacity(0.08))
@@ -60,7 +67,7 @@ struct AddToAlbumsListView: View {
                         .foregroundColor(.primary)
                         .padding(.horizontal, 16)
                         .frame(maxWidth: .infinity, alignment: .leading)) {
-                            ForEach(viewModel.albums) { album in
+                            ForEach(sortedAlbums) { album in
                                 AlbumRow(album: album, localAccount: localAccount)
                                     .padding(.vertical, 8)
                                     .onTapGesture {
