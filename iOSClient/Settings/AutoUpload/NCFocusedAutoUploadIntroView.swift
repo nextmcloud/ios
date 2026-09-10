@@ -67,6 +67,7 @@ struct NCFocusedAutoUploadIntroView: View {
             } label: {
                 Text(NSLocalizedString("_enable_focused_auto_upload_", comment: ""))
                     .font(.title3)
+                    .multilineTextAlignment(.center)
                     .foregroundStyle(.white)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 18)

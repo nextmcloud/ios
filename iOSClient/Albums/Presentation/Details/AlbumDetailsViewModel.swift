@@ -70,9 +70,9 @@ class AlbumDetailsViewModel: ObservableObject {
         
         if trimmed.isEmpty {
             return [NSLocalizedString("_albums_list_album_name_validation_nonempty_", comment: "")]
-        } else if trimmed.count < 3 {
+        } else if trimmed.count < 1 {
             return [NSLocalizedString("_albums_list_album_name_validation_min_length_", comment: "")]
-        } else if trimmed.count > 30 {
+        } else if trimmed.count > 120 {
             return [NSLocalizedString("_albums_list_album_name_validation_max_length_", comment: "")]
         } else if trimmed.contains("/") || trimmed.contains("\\") {
             return [NSLocalizedString("_albums_list_album_name_validation_specials_", comment: "")]

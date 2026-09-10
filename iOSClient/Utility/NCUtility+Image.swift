@@ -139,14 +139,14 @@ extension NCUtility {
 
         // SF IMAGE
         if let colors {
-            if imageName == "star" || imageName == "star.fill" || imageName == "info.circle" {
+            if imageName == "star" || imageName == "star.fill" || imageName == "info.circle" || imageName == "xmark" {
                 image = UIImage(systemName: imageName, withConfiguration: UIImage.SymbolConfiguration(weight: systemNameWeight))?.applyingSymbolConfiguration(UIImage.SymbolConfiguration(paletteColors: colors))
             } else {
                 image = UIImage(systemName: imageName, withConfiguration: UIImage.SymbolConfiguration(pointSize: symbolPointSize, weight: systemNameWeight))?.applyingSymbolConfiguration(UIImage.SymbolConfiguration(paletteColors: colors))
             }
 
         } else {
-            if imageName == "star" || imageName == "star.fill" || imageName == "info.circle" {
+            if imageName == "star" || imageName == "star.fill" || imageName == "info.circle" || imageName == "xmark" {
                 image = UIImage(systemName: imageName, withConfiguration: UIImage.SymbolConfiguration(weight: systemNameWeight))
             } else {
                 image = UIImage(systemName: imageName, withConfiguration: UIImage.SymbolConfiguration(pointSize: symbolPointSize, weight: systemNameWeight))
