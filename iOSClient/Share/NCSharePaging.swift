@@ -24,16 +24,19 @@
 
 import UIKit
 import NextcloudKit
+import MarqueeLabel
 import NextcloudKitUI
 import TagListView
 import SwiftUI
 
 protocol NCSharePagingContent {
-    var textField: UIView? { get }
+    var textField: UITextField? { get }
 }
 
 class NCSharePaging: UIViewController {
     private weak var appDelegate = UIApplication.shared.delegate as? AppDelegate
+    private var currentVC: NCSharePagingContent?
+    private let applicationHandle = NCApplicationHandle()
     private let tabModel = NCSharePagingTabModel()
     private weak var headerView: NCShareHeader?
     private var pageVCs: [UIViewController] = []
@@ -85,62 +88,30 @@ class NCSharePaging: UIViewController {
         )
         navigationItem.leftBarButtonItem?.accessibilityLabel = NSLocalizedString("_close_", comment: "")
 
-        let manageTagsAction = UIAction(title: NSLocalizedString("_edit_tags_", comment: ""), image: UIImage(systemName: "tag")) { [weak self] _ in
-            self?.editTagsTapped(nil)
-        }
-
-        let moreButton = UIBarButtonItem(image: UIImage(systemName: "ellipsis"), style: .plain, target: nil, action: nil)
-        moreButton.menu = UIMenu(children: [manageTagsAction])
-
-        var rightBarButtonItems = [moreButton]
-
-        // The unified share (+) button only applies to servers with the new sharing API.
-        let capabilities = NCNetworking.shared.capabilities[metadata.account] ?? NKCapabilities.Capabilities()
-
-        if capabilities.unifiedSharingEnabled {
-            let addShareButton = UIBarButtonItem(image: UIImage(systemName: "person.badge.plus"), style: .plain, target: self, action: #selector(addShareTapped(_:)))
-            addShareButton.accessibilityLabel = NSLocalizedString("_share_", comment: "")
-            rightBarButtonItems.insert(addShareButton, at: 0)
-        }
-
-        navigationItem.rightBarButtonItems = rightBarButtonItems
-
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow(notification:)), name: UIResponder.keyboardWillShowNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide(notification:)), name: UIResponder.keyboardWillHideNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(applicationDidEnterBackground(notification:)), name: UIApplication.didEnterBackgroundNotification, object: nil)
 
-        setupHeader()
+        // *** MUST BE THE FIRST ONE ***
+        pagingViewController.metadata = metadata
+        pagingViewController.backgroundColor = .systemBackground
+        pagingViewController.menuBackgroundColor = .systemBackground
+        pagingViewController.selectedBackgroundColor = .systemBackground
+        pagingViewController.indicatorColor = NCBrandColor.shared.brand
+        pagingViewController.textColor = NCBrandColor.shared.textColor
+        pagingViewController.selectedTextColor = NCBrandColor.shared.brand
 
-        pageVCs = pages.map { makeViewController(for: $0) }
-        tabModel.selection = pages.firstIndex(of: initialPage) ?? 0
+        // Pagination
+        addChild(pagingViewController)
+        view.addSubview(pagingViewController.view)
+        pagingViewController.didMove(toParent: self)
 
-        setupContent()
-    }
-
-    private func setupHeader() {
-        guard let headerView = Bundle.main.loadNibNamed("NCShareHeader", owner: self, options: nil)?.first as? NCShareHeader else { return }
-        self.headerView = headerView
-        headerView.backgroundColor = .systemGroupedBackground
-        headerView.setupUI(with: metadata)
-
-        view.addSubview(headerView)
-        headerView.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            headerView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-            headerView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
-            headerView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor)
-        ])
-    }
-
-    private func setupContent() {
-        let content = NCSharePagingContentView(
-            model: tabModel,
-            tint: Color(NCBrandColor.shared.getElement(account: metadata.account)),
-            titles: pages.map(titleForTab(_:)),
-            pageVCs: pageVCs,
-            onSelectionChange: { [weak self] _ in
-                self?.view.endEditing(true)
-            }
+        // Customization
+        pagingViewController.indicatorOptions = .visible(
+            height: 1,
+            zIndex: Int.max,
+            spacing: .zero,
+            insets: .zero
         )
         let host = UIHostingController(rootView: content)
         host.view.backgroundColor = .systemGroupedBackground
@@ -209,12 +180,13 @@ class NCSharePaging: UIViewController {
         }
     }
 
-    private func titleForTab(_ tab: NCBrandOptions.NCInfoPagingTab) -> String {
-        switch tab {
-        case .activity: return NSLocalizedString("_activity_", comment: "")
-        case .sharing: return NSLocalizedString("_sharing_", comment: "")
-        case .details: return NSLocalizedString("_details_", comment: "")
-        }
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        
+        // Re-evaluate in-app messages after viewDidAppear
+        MoEngageAnalytics.shared.displayInAppNotificationSafely(reason: "viewDidAppear")
+
+        currentVC = pagingViewController.pageViewController.selectedViewController as? NCSharePagingContent
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -227,6 +199,10 @@ class NCSharePaging: UIViewController {
         if !capabilities.fileSharingApiEnabled && !capabilities.filesComments && capabilities.activity.isEmpty {
             self.dismiss(animated: false, completion: nil)
         }
+
+//        pagingViewController.menuItemSize = .fixed(
+//            width: self.view.bounds.width / CGFloat(self.pages.count),
+//            height: 40)
     }
 
     override func viewWillDisappear(_ animated: Bool) {
@@ -274,21 +250,6 @@ class NCSharePaging: UIViewController {
         self.dismiss(animated: true, completion: nil)
     }
 
-    @objc private func addShareTapped(_ sender: UIBarButtonItem) {
-        page = .sharing
-        shareCreateTrigger.isPresenting = true
-    }
-
-    @objc func editTagsTapped(_ sender: Any?) {
-        guard let header = headerView else { return }
-
-        header.presentTagEditor(from: self) { [weak self] tags in
-            guard let self else { return }
-            self.metadata.tags.removeAll()
-            self.metadata.tags.append(objectsIn: tags, account: self.metadata.account)
-        }
-    }
-
     @objc func applicationDidEnterBackground(notification: Notification) {
         self.dismiss(animated: false, completion: nil)
     }
@@ -327,10 +288,23 @@ struct NCSharePagingContentView: View {
                         .tag(index)
                 }
             }
-            .tabViewStyle(.page(indexDisplayMode: .never))
+            viewController.metadata = metadata
+            viewController.height = height
+            viewController.controller = controller
+            return viewController
+        } else {
+            return applicationHandle.pagingViewController(pagingViewController, viewControllerAt: index, metadata: metadata, topHeight: height)
         }
-        .onChange(of: model.selection) { _, newValue in
-            onSelectionChange(newValue)
+    }
+
+    func pagingViewController(_: PagingViewController, pagingItemAt index: Int) -> PagingItem {
+
+        if pages[index] == .activity {
+            return PagingIndexItem(index: index, title: NSLocalizedString("_activity_", comment: ""))
+        } else if pages[index] == .sharing {
+            return PagingIndexItem(index: index, title: NSLocalizedString("_sharing_", comment: ""))
+        } else {
+            return applicationHandle.pagingViewController(pagingViewController, pagingItemAt: index)
         }
     }
 }
@@ -344,5 +318,54 @@ private struct NCViewControllerRepresentable: UIViewControllerRepresentable {
 
         // TabView(.page) does not propagate appearance trait changes to represented VCs (as of iOS 18.4), seems a SwiftUI bug...
         uiViewController.view.overrideUserInterfaceStyle = context.environment.colorScheme == .dark ? .dark : .light
+    }
+}
+
+class NCShareHeaderView: UIView {
+
+    @IBOutlet weak var imageView: UIImageView!
+    @IBOutlet weak var path: MarqueeLabel!
+    @IBOutlet weak var info: UILabel!
+    @IBOutlet weak var creation: UILabel!
+    @IBOutlet weak var upload: UILabel!
+    @IBOutlet weak var favorite: UIButton!
+    @IBOutlet weak var details: UIButton!
+    @IBOutlet weak var tagListView: TagListView!
+
+    var ocId = ""
+
+    override func awakeFromNib() {
+        super.awakeFromNib()
+        let longGesture = UILongPressGestureRecognizer(target: self, action: #selector(longTap(_:)))
+        path.addGestureRecognizer(longGesture)
+    }
+
+    @IBAction func touchUpInsideFavorite(_ sender: UIButton) {
+        guard let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId) else { return }
+        Task {
+            let error = await NCNetworking.shared.setStatusWaitFavorite(metadata)
+            if error == .success {
+                if let metadata = NCManageDatabase.shared.getMetadataFromOcId(metadata.ocId) {
+                    await MainActor.run {
+                        self.favorite.setImage(NCUtility().loadImage(named: metadata.favorite ? "star" : "star.fill", colors: [NCBrandColor.shared.yellowFavorite], size: 20), for: .normal)
+                    }
+                }
+            } else {
+                await MainActor.run {
+                    NCContentPresenter().showError(error: error)
+                }
+            }
+        }
+    }
+
+    @IBAction func touchUpInsideDetails(_ sender: UIButton) {
+        creation.isHidden = !creation.isHidden
+        upload.isHidden = !upload.isHidden
+    }
+
+    @objc func longTap(_ sender: UIGestureRecognizer) {
+        UIPasteboard.general.string = path.text
+        let error = NKError(errorCode: NCGlobal.shared.errorInternalError, errorDescription: "_copied_path_")
+        NCContentPresenter().showInfo(error: error)
     }
 }

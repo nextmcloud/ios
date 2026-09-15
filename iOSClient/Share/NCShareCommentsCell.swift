@@ -26,7 +26,7 @@ import NextcloudKit
 
 // MARK: - NCShareCommentsCell
 
-class NCShareCommentsCell: UITableViewCell {
+class NCShareCommentsCell: UITableViewCell, NCCellProtocol {
 
     @IBOutlet weak var imageItem: UIImageView!
     @IBOutlet weak var labelUser: UILabel!
@@ -55,6 +55,9 @@ class NCShareCommentsCell: UITableViewCell {
     override func awakeFromNib() {
         super.awakeFromNib()
 
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(tapAvatarImage(_:)))
+        imageItem?.addGestureRecognizer(tapGesture)
+        
         avatarButton = UIButton(type: .system)
         avatarButton.translatesAutoresizingMaskIntoConstraints = false
         avatarButton.backgroundColor = .clear
@@ -70,15 +73,11 @@ class NCShareCommentsCell: UITableViewCell {
         buttonMenu.showsMenuAsPrimaryAction = true
     }
 
-    func configureAvatarMenu() {
-        guard let tableComments = tableComments else {
-            avatarButton.menu = nil
-            return
-        }
+    @objc func tapAvatarImage(_ sender: UITapGestureRecognizer) {
         avatarButton.menu = delegate?.openProfileMenu(with: tableComments)
     }
 
-    func configureCommentMenu() {
+    @IBAction func touchUpInsideMenu(_ sender: Any) {
         buttonMenu.menu = delegate?.openCommentMenu(with: tableComments)
     }
 }

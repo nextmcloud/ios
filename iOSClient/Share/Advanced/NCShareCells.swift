@@ -68,8 +68,7 @@ enum NCUserPermission: CaseIterable, NCPermission {
         case .read: NKShare.Permission.read.rawValue
         case .reshare: NKShare.Permission.share.rawValue
         case .edit: NKShare.Permission.update.rawValue
-        case .create: NKShare.Permission.create.rawValue
-        case .delete: NKShare.Permission.delete.rawValue
+//        case .create: NKShare.Permission.create.rawValue
         }
     }
 
@@ -89,7 +88,7 @@ enum NCUserPermission: CaseIterable, NCPermission {
         return []
     }
 
-    case read, reshare, edit, create, delete
+    case read, reshare, edit//, create
     static let forDirectory: [NCUserPermission] = NCUserPermission.allCases
     static let forFile: [NCUserPermission] = [.read, .reshare, .edit]
 
@@ -98,8 +97,7 @@ enum NCUserPermission: CaseIterable, NCPermission {
         case .read: return NSLocalizedString("_share_can_read_", comment: "")
         case .reshare: return NSLocalizedString("_share_can_reshare_", comment: "")
         case .edit: return NSLocalizedString("_share_can_change_", comment: "")
-        case .create: return NSLocalizedString("_share_can_create_", comment: "")
-        case .delete: return NSLocalizedString("_share_can_delete_", comment: "")
+//        case .create: return NSLocalizedString("_share_can_create_", comment: "")
         }
     }
 }
@@ -125,8 +123,9 @@ enum NCLinkEmailPermission: CaseIterable, NCPermission {
         return switch self {
         case .read: NKShare.Permission.read.rawValue
         case .edit: NKShare.Permission.update.rawValue
-        case .create: NKShare.Permission.create.rawValue
-        case .delete: NKShare.Permission.delete.rawValue
+        case .uploadEdit: NKShare.Permission.create.rawValue
+        case .fileDrop: NKShare.Permission.create.rawValue
+        case .secureFileDrop: NKShare.Permission.create.rawValue
         }
     }
 
@@ -137,18 +136,31 @@ enum NCLinkEmailPermission: CaseIterable, NCPermission {
     func isOn(for share: Shareable) -> Bool {
         return (share.permissions & permissionBitFlag) != 0
     }
+    
+//    func didChange(_ share: Shareable, to newValue: Bool) {
+//        guard self != .edit || newValue else {
+//            share.permissions = NKShare.Permission.read.rawValue
+//            return
+//        }
+//        share.permissions = permissionBitFlag
+//    }
+
+    func hasResharePermission(for parentPermission: Int) -> Bool {
+        permissionBitFlag & parentPermission == permissionBitFlag
+    }
 
     var title: String {
         switch self {
         case .read: return NSLocalizedString("_share_can_read_", comment: "")
         case .edit: return NSLocalizedString("_share_can_change_", comment: "")
-        case .create: return NSLocalizedString("_share_can_create_", comment: "")
-        case .delete: return NSLocalizedString("_share_can_delete_", comment: "")
+        case .uploadEdit: return NSLocalizedString("_share_allow_upload_", comment: "")
+        case .fileDrop: return NSLocalizedString("_share_file_drop_", comment: "")
+        case .secureFileDrop: return NSLocalizedString("_share_secure_file_drop_", comment: "")
         }
     }
 
-    case edit, read, create, delete
-    static let forDirectory: [NCLinkEmailPermission] = NCLinkEmailPermission.allCases
+    case edit, read, uploadEdit, fileDrop, secureFileDrop
+    static let forDirectory: [NCLinkEmailPermission] = [.read, .edit, .fileDrop]
     static let forFile: [NCLinkEmailPermission] = [.read, .edit]
 }
 
@@ -207,7 +219,6 @@ enum NCAdvancedPermission: CaseIterable, NCShareCellConfig {
     }
 
     case label, hideDownload, limitDownload, expirationDate, password, note, downloadAndSync
-
     static let forLink: [NCAdvancedPermission] = [.expirationDate, .hideDownload, .label, .limitDownload, .note, .password]
     static let forEmail: [NCAdvancedPermission] = [.expirationDate, .note, .downloadAndSync, .password]
     static let forUser: [NCAdvancedPermission] = [.expirationDate, .note, .downloadAndSync]
@@ -226,23 +237,24 @@ struct NCShareConfig {
         self.sharePermission = parentMetadata.sharePermissionsCollaborationServices
         self.isDirectory = parentMetadata.directory
         let type: NCPermission.Type = (share.shareType == NKShare.ShareType.publicLink.rawValue || share.shareType == NKShare.ShareType.email.rawValue) ? NCLinkEmailPermission.self : NCUserPermission.self
+//        let type: NCPermission.Type = share.shareType == NKShare.ShareType.publicLink.rawValue ? NCLinkEmailPermission.self : NCUserPermission.self
         self.permissions = parentMetadata.directory ? (parentMetadata.e2eEncrypted ? type.forDirectoryE2EE(account: parentMetadata.account) : type.forDirectory) : type.forFile
 
         switch share.shareType {
-        case NKShare.ShareType.publicLink.rawValue:
-            let capabilities = NCNetworking.shared.capabilities[parentMetadata.account] ?? NKCapabilities.Capabilities()
-            let hasDownloadLimitCapability = capabilities.fileSharingDownloadLimit
+           case NKShare.ShareType.publicLink.rawValue:
+               let capabilities = NCNetworking.shared.capabilities[parentMetadata.account] ?? NKCapabilities.Capabilities()
+               let hasDownloadLimitCapability = capabilities.fileSharingDownloadLimit
 
-            if parentMetadata.isDirectory || hasDownloadLimitCapability == false {
-                self.advanced = NCAdvancedPermission.forLink.filter { $0 != .limitDownload }
-            } else {
-                self.advanced = NCAdvancedPermission.forLink
-            }
-        case NKShare.ShareType.email.rawValue:
-            self.advanced = NCAdvancedPermission.forEmail
-        default:
-            self.advanced = NCAdvancedPermission.forUser
-        }
+               if parentMetadata.isDirectory || hasDownloadLimitCapability == false {
+                   self.advanced = NCAdvancedPermission.forLink.filter { $0 != .limitDownload }
+               } else {
+                   self.advanced = NCAdvancedPermission.forLink
+               }
+           case NKShare.ShareType.email.rawValue:
+               self.advanced = NCAdvancedPermission.forEmail
+           default:
+               self.advanced = NCAdvancedPermission.forUser
+       }
     }
 
     func cellFor(indexPath: IndexPath) -> UITableViewCell? {
