@@ -403,3 +403,169 @@ class NCListLayout: UICollectionViewFlowLayout {
 //        return result
 //    }
 //}
+#if !EXTENSION
+extension NCCollectionViewCommon {
+    func listCell(cell: NCListCell, indexPath: IndexPath, metadata: tableMetadata, existsImagePreview: Bool) -> NCListCell {
+        defer {
+            let capabilities = NCNetworking.shared.capabilities[session.account] ?? NKCapabilities.Capabilities()
+            if !metadata.isSharable() || (!capabilities.fileSharingApiEnabled && !capabilities.filesComments && capabilities.activity.isEmpty) {
+                cell.hideButtonShare(true)
+            }
+        }
+        var isShare = false
+        var isMounted = false
+        var a11yValues: [String] = []
+
+        // CONTENT MODE
+        cell.previewImg?.layer.borderWidth = 0
+
+        if existsImagePreview && layoutForView?.layout != global.layoutPhotoRatio {
+            cell.previewImg?.contentMode = .scaleAspectFill
+        } else {
+            cell.previewImg?.contentMode = .scaleAspectFit
+        }
+
+        if let metadataFolder {
+            isShare = metadata.permissions.contains(NCMetadataPermissions.permissionShared) && !metadataFolder.permissions.contains(NCMetadataPermissions.permissionShared)
+            isMounted = metadata.permissions.contains(NCMetadataPermissions.permissionMounted) && !metadataFolder.permissions.contains(NCMetadataPermissions.permissionMounted)
+        }
+
+        if isSearchingMode {
+            if metadata.name == global.appName {
+                cell.labelInfo?.text = NSLocalizedString("_in_", comment: "") + " " + utilityFileSystem.getPath(path: metadata.path, user: metadata.user)
+            } else {
+                cell.labelInfo?.text = metadata.subline
+            }
+            cell.labelSubinfo?.isHidden = true
+        } else if !metadata.sessionError.isEmpty, metadata.status != global.metadataStatusNormal {
+            cell.labelSubinfo?.isHidden = false
+            cell.labelInfo?.text = metadata.sessionError
+        } else {
+            cell.labelSubinfo?.isHidden = false
+            cell.writeInfoDateSize(date: metadata.date, size: metadata.size)
+        }
+
+        cell.setBidiSafeFilename(metadata.fileNameView, isDirectory: metadata.directory, titleLabel: cell.labelTitle, extensionLabel: cell.labelExtension)
+
+        // Accessibility [shared] if metadata.ownerId != appDelegate.userId, appDelegate.account == metadata.account {
+        if metadata.ownerId != metadata.userId {
+            a11yValues.append(NSLocalizedString("_shared_with_you_by_", comment: "") + " " + metadata.ownerDisplayName)
+        }
+
+        if metadata.directory {
+            cellMainDirectory(cell: cell, metadata: metadata, isShare: isShare, isMounted: isMounted)
+        } else {
+            cellMainFile(cell: cell, metadata: metadata, a11yValues: &a11yValues)
+        }
+
+        // image Favorite
+        if metadata.favorite {
+            cell.imageFavorite?.image = imageCache.getImageFavorite()
+            a11yValues.append(NSLocalizedString("_favorite_short_", comment: ""))
+        }
+
+        // Share button image (SF Symbol)
+        if isShare {
+            cell.buttonShared.setImage(imageCache.getImageShared(), for: .normal)
+        } else if !metadata.shareType.isEmpty {
+            metadata.shareType.contains(NKShare.ShareType.publicLink.rawValue) ?
+            (cell.buttonShared.setImage(imageCache.getImageShareByLink(), for: .normal)) :
+            (cell.buttonShared.setImage(imageCache.getImageShared(), for: .normal))
+        } else {
+            cell.buttonShared.setImage(imageCache.getImageCanShare(), for: .normal)
+        }
+
+        // Button More
+        if metadata.lock == true {
+            cell.setButtonMore(image: imageCache.getImageButtonMoreLock())
+            a11yValues.append(String(format: NSLocalizedString("_locked_by_", comment: ""), metadata.lockOwnerDisplayName))
+        } else {
+            cell.setButtonMore(image: imageCache.getImageButtonMore())
+        }
+
+        // Status
+        cellMainStatus(cell: cell, metadata: metadata, a11yValues: &a11yValues)
+
+        // AVATAR
+        if !metadata.ownerId.isEmpty, metadata.ownerId != metadata.userId {
+            let fileName = NCSession.shared.getFileName(urlBase: metadata.urlBase, user: metadata.ownerId)
+
+            if let image = NCImageCache.shared.getImageCache(key: fileName) {
+                cell.setSharedAvatarImage(image)
+            } else {
+                let fileNameLocalPath = self.utilityFileSystem.createServerUrl(serverUrl: utilityFileSystem.directoryUserData, fileName: fileName)
+
+                if let image = UIImage(contentsOfFile: fileNameLocalPath) {
+                    cell.setSharedAvatarImage(image)
+                    imageCache.addImageCache(image: image, key: fileName)
+                }
+            }
+        }
+
+        // URL
+        if metadata.classFile == NKTypeClassFile.url.rawValue {
+            cell.imageLocal.image = nil
+            cell.setButtonsHidden(true)
+        }
+
+        // Separator
+        if collectionView.numberOfItems(inSection: indexPath.section) == indexPath.row + 1 || isSearchingMode {
+            cell.separator?.isHidden = true
+        } else {
+            cell.separator?.isHidden = false
+        }
+
+        // Edit mode
+        if fileSelect.contains(metadata.ocId) {
+            cell.selected(true, isEditMode: isEditMode, color: NCBrandColor.shared.getElement(account: session.account))
+            a11yValues.append(NSLocalizedString("_selected_", comment: ""))
+        } else {
+            cell.selected(false, isEditMode: isEditMode, color: NCBrandColor.shared.getElement(account: session.account))
+        }
+
+        // Accessibility
+        cell.setAccessibility(label: metadata.fileNameView + ", " + (cell.labelInfo?.text ?? "") + (cell.labelSubinfo?.text ?? ""), value: a11yValues.joined(separator: ", "))
+
+        // Color string find in search
+        cell.labelTitle?.textColor = NCBrandColor.shared.textColor
+        cell.labelExtension?.textColor = NCBrandColor.shared.textColor
+
+        if isSearchingMode,
+           let searchResultStore,
+           !searchResultStore.isEmpty,
+           let title = cell.labelTitle?.text {
+            let attributedString = NSMutableAttributedString(string: title)
+            let nsTitle = title as NSString
+            let range = nsTitle.range(of: searchResultStore, options: [.caseInsensitive])
+            let color = NCBrandColor.shared.getElement(account: session.account)
+
+            if range.location != NSNotFound,
+               NSMaxRange(range) <= nsTitle.length {
+                attributedString.addAttribute(.foregroundColor, value: color, range: range)
+            }
+
+            cell.labelTitle?.attributedText = attributedString
+        }
+
+        // TAGS
+        cell.setTags(tags: Array(metadata.tags))
+
+        // SearchingMode - TAG Separator Hidden
+        if isSearchingMode {
+            cell.labelInfoSeparator.isHidden = true
+        }
+
+        // Hide buttons
+        if metadata.name != global.appName {
+            cell.setButtonsHidden(true)
+        }
+
+        cell.setIconOutlines()
+
+        // Obligatory here, at the end !!
+        cell.metadata = metadata
+
+        return cell
+    }
+}
+#endif
