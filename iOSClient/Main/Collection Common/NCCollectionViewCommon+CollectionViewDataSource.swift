@@ -238,7 +238,7 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
                         if let emptyImageName {
                             emptyImage = utility.loadImage(named: emptyImageName, colors: emptyImageColors != nil ? emptyImageColors : [NCBrandColor.shared.getElement(account: session.account)])
                         } else {
-                            emptyImage = imageCache.getFolder(account: session.account)
+                            emptyImage = imageCache.getFolder()
                         }
                         emptyTitle = NSLocalizedString(self.emptyTitle, comment: "")
                         emptyDescription = NSLocalizedString(emptyDescription, comment: "")
@@ -247,11 +247,11 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
                         emptyTitle = NSLocalizedString("_files_no_files_", comment: "")
                         emptyDescription = NSLocalizedString("_folder_offline_desc_", comment: "")
                     } else if let metadataFolder, !metadataFolder.isCreatable {
-                        emptyImage = imageCache.getFolder(account: session.account)
+                        emptyImage = imageCache.getFolder()
                         emptyTitle = NSLocalizedString("_files_no_files_", comment: "")
                         emptyDescription = NSLocalizedString("_no_file_no_permission_to_create_", comment: "")
                     } else {
-                        emptyImage = imageCache.getFolder(account: session.account)
+                        emptyImage = imageCache.getFolder()
                         emptyTitle = NSLocalizedString("_files_no_files_", comment: "")
                         emptyDescription = NSLocalizedString("_no_file_pull_down_", comment: "")
                     }

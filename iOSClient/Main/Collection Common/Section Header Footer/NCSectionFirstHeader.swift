@@ -248,40 +248,44 @@ extension NCSectionFirstHeader: UICollectionViewDataSource {
             }
 
             if metadata.directory {
-                let icon = self.utility.loadImage(
-                    named: metadata.iconName,
-                    useTypeIconFile: true,
-                    account: metadata.account
-                )
-
-                await MainActor.run {
-                    guard let cell,
-                          cell.representedFileId == fileId,
-                          cell.representedAccount == account,
-                          cell.imageRequestID == imageRequestID else {
-                        return
-                    }
-
-                    cell.image.image = icon
-                    cell.image.contentMode = .scaleAspectFit
-                }
-
-                return
-            }
-
-            if let image = self.utility.getImage(
-                ocId: metadata.ocId,
-                etag: metadata.etag,
-                ext: self.global.previewExt512,
-                userId: metadata.userId,
-                urlBase: metadata.urlBase
-            ) {
-                await MainActor.run {
-                    guard let cell,
-                          cell.representedFileId == fileId,
-                          cell.representedAccount == account,
-                          cell.imageRequestID == imageRequestID else {
-                        return
+                cell.image.image = self.utility.loadImage(named: metadata.iconName, useTypeIconFile: true, account: metadata.account)
+                cell.image.contentMode = .scaleAspectFit
+            } else if let image = imagePreview {
+                cell.image.image = image
+                cell.image.contentMode = .scaleAspectFill
+            } else {
+//                cell.image.image = self.utility.loadImage(named: metadata.iconName, useTypeIconFile: true, account: metadata.account)
+                cell.image.image = self.utility.previewIcon(for: metadata)
+                cell.image.contentMode = .scaleAspectFit
+                if recommendedFiles.hasPreview {
+                    Task {
+                        let resultsPreview = await NextcloudKit.shared.downloadPreviewAsync(fileId: metadata.fileId, etag: metadata.etag, account: metadata.account) { task in
+                            Task {
+                                let identifier = await NCNetworking.shared.networkingTasks.createIdentifier(account: metadata.account,
+                                                                                                            path: metadata.fileId,
+                                                                                                            name: "DownloadPreview")
+                                await NCNetworking.shared.networkingTasks.track(identifier: identifier, task: task)
+                            }
+                        }
+                        if resultsPreview.error == .success, let data = resultsPreview.responseData?.data {
+                            self.utility.createImageFileFrom(data: data, ocId: metadata.ocId, etag: metadata.etag, userId: metadata.userId, urlBase: metadata.urlBase)
+                            if let image = self.utility.getImage(ocId: metadata.ocId, etag: metadata.etag, ext: self.global.previewExt512, userId: metadata.userId, urlBase: metadata.urlBase) {
+                                Task { @MainActor in
+                                    for case let cell as NCRecommendationsCell in self.collectionViewRecommendations.visibleCells {
+                                        if cell.metadata?.fileId == recommendedFiles.id {
+                                            cell.image.contentMode = .scaleAspectFill
+                                            if metadata.classFile == NKTypeClassFile.document.rawValue {
+                                                cell.setImageCorner(withBorder: true)
+                                            }
+                                            UIView.transition(with: cell.image, duration: 0.75, options: .transitionCrossDissolve, animations: {
+                                                cell.image.image = image
+                                            }, completion: nil)
+                                            break
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
 
                     cell.image.image = image
