@@ -296,6 +296,45 @@ final class NCUtilityFileSystem: NSObject, @unchecked Sendable {
         return false
     }
 
+    @objc var directoryProviderStorage: String {
+        guard let directoryGroup = fileManager.containerURL(forSecurityApplicationGroupIdentifier: NCBrandOptions.shared.capabilitiesGroup) else { return "" }
+        let path = directoryGroup.appendingPathComponent(NCGlobal.shared.directoryProviderStorage).path
+        if !fileManager.fileExists(atPath: path) {
+            do {
+                try fileManager.createDirectory(atPath: path, withIntermediateDirectories: true)
+            } catch { print("Error: \(error)") }
+        }
+        return path
+    }
+    
+    @objc func getDirectoryProviderStorageOcId(_ ocId: String) -> String {
+        let path = directoryProviderStorage + "/" + ocId
+        if !fileManager.fileExists(atPath: path) {
+            do {
+                try fileManager.createDirectory(atPath: path, withIntermediateDirectories: true)
+            } catch { print("Error: \(error)") }
+        }
+        return path
+    }
+    
+    func getDirectoryProviderStorageImageOcId(_ ocId: String, etag: String, ext: String) -> String {
+        return getDirectoryProviderStorageOcId(ocId) + "/" + etag + ext
+    }
+    
+    func fileProviderStorageImageExists(_ ocId: String, etag: String, ext: String) -> Bool {
+        let fileNamePath = getDirectoryProviderStorageImageOcId(ocId, etag: etag, ext: ext)
+        do {
+            let fileNamePathAttribute = try fileManager.attributesOfItem(atPath: fileNamePath)
+            let fileSize: UInt64 = fileNamePathAttribute[FileAttributeKey.size] as? UInt64 ?? 0
+            if fileSize > 0 {
+                return true
+            } else {
+                return false
+            }
+        } catch { }
+        return false
+    }
+
     // MARK: -
 
     @discardableResult
@@ -942,7 +981,15 @@ final class NCUtilityFileSystem: NSObject, @unchecked Sendable {
         let parent = url.deletingLastPathComponent().lastPathComponent
         return parent == "f" ? id : nil
     }
-
+    
+    func getTextServerUrl(session: NCSession.Session, serverUrl: String) -> String {
+        if let directory = NCManageDatabase.shared.getTableDirectory(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@", session.account, serverUrl)), let metadata = NCManageDatabase.shared.getMetadataFromOcId(directory.ocId) {
+            return (metadata.fileNameView)
+        } else {
+            return (serverUrl as NSString).lastPathComponent
+        }
+    }
+  
     /// Extracts the numeric fileId prefix from a Nextcloud ocId.
     ///
     /// - Parameter ocId: Nextcloud ocId, usually composed by a numeric fileId prefix and an instance suffix.
