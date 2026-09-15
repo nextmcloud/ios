@@ -13,47 +13,66 @@ class NCCollectionViewCommon: UIViewController, NCAccountSettingsModelDelegate, 
 
     @IBOutlet weak var collectionView: UICollectionView!
 
-    let database = NCManageDatabase.shared
-    let global = NCGlobal.shared
-    let utility = NCUtility()
-    let utilityFileSystem = NCUtilityFileSystem()
-    let imageCache = NCImageCache.shared
-    var dataSource = NCCollectionViewDataSource()
-    let networking = NCNetworking.shared
-    let appDelegate = (UIApplication.shared.delegate as? AppDelegate)!
-    var pinchGesture: UIPinchGestureRecognizer = UIPinchGestureRecognizer()
+    internal let database = NCManageDatabase.shared
+    internal let global = NCGlobal.shared
+    internal let utility = NCUtility()
+    internal let utilityFileSystem = NCUtilityFileSystem()
+    internal let imageCache = NCImageCache.shared
+    internal var dataSource = NCCollectionViewDataSource()
+    internal let networking = NCNetworking.shared
+    internal let appDelegate = (UIApplication.shared.delegate as? AppDelegate)!
+    internal var pinchGesture: UIPinchGestureRecognizer = UIPinchGestureRecognizer()
+    private var isNavigatingMetadata = false
 
-    var autoUploadFileName = ""
-    var autoUploadDirectory = ""
-    let refreshControl = UIRefreshControl()
-    var searchController: UISearchController?
-    var backgroundImageView = UIImageView()
-    var serverUrl: String = ""
-    var isEditMode = false
-    var isDirectoryE2EE = false
-    var isDirectoryEncrypted = false
-    var fileSelect: [String] = []
-    var metadataFolder: tableMetadata?
-    var richWorkspaceText: String?
-    var sectionFirstHeader: NCSectionFirstHeader?
-    var sectionFirstHeaderEmptyData: NCSectionFirstHeaderEmptyData?
-    var isSearchingMode: Bool = false
-    var networkSearchInProgress: Bool = false
-    var layoutForView: NCDBLayoutForView?
-    var searchDataSourceTask: URLSessionTask?
-    var dataSourceTask: URLSessionTask?
-    var providers: [NKSearchProvider]?
-    var searchResults: [NKSearchResult]?
-    var listLayout = NCListLayout()
-    var gridLayout = NCGridLayout()
-    var mediaLayout = NCMediaLayout()
-    var layoutType = NCGlobal.shared.layoutList
-    var literalSearch: String?
-    var tabBarSelect: NCCollectionViewCommonSelectTabBar?
-    var attributesZoomIn: UIMenuElement.Attributes = []
-    var attributesZoomOut: UIMenuElement.Attributes = []
-    var tipViewAccounts: EasyTipView?
-    var syncMetadatasTask: Task<Void, Never>?
+    internal var autoUploadFileName = ""
+    internal var autoUploadDirectory = ""
+    internal let refreshControl = UIRefreshControl()
+    internal var searchController: UISearchController?
+    internal var backgroundImageView = UIImageView()
+    internal var serverUrl: String = ""
+    internal var isEditMode = false
+    // whether the displayed folder is E2EE; refreshed on each collection view data-source pass
+    internal var isCurrentDirectoryE2EE = false
+    // whether the displayed E2EE folder was decoded with active or archived keys
+    internal var endToEndKeySetAccess: NCEndToEndKeySetAccess = .unavailable
+    internal var fileSelect: [String] = []
+    internal var metadataFolder: tableMetadata?
+    internal var richWorkspaceText: String?
+    internal var sectionFirstHeader: NCSectionFirstHeader?
+    internal var sectionFirstHeaderEmptyData: NCSectionFirstHeaderEmptyData?
+
+    // Layout
+    //
+    internal var layoutForView: NCDBLayoutForView?
+    internal var layoutForViewLayoutStore: String?
+    internal var listLayout = NCListLayout()
+    internal var gridLayout = NCGridLayout()
+    internal var mediaLayout = NCMediaLayout()
+    internal var layoutType = NCGlobal.shared.layoutList
+
+    internal var tabBarSelect: NCCollectionViewCommonSelectTabBar?
+
+    internal var attributesZoomIn: UIMenuElement.Attributes = []
+    internal var attributesZoomOut: UIMenuElement.Attributes = []
+
+    internal var tipViewAccounts: EasyTipView?
+    internal var syncMetadatasTask: Task<Void, Never>?
+
+    // Edit Menu
+    //
+    internal let dragDropMenuIdentifier = "dragdrop"
+    internal var editMenuInteraction: UIEditMenuInteraction?
+    internal var currentMenuObjectId: String?
+    internal var currentMenuPoint: CGPoint = .zero
+
+    // Search
+    //
+    internal var isSearchingMode: Bool = false
+    internal var networkSearchInProgress: Bool = false
+    internal var searchOperationHandle = NKOperationHandle()
+    internal var searchTask: URLSessionTask?
+    internal var searchResultText: String?
+    internal var searchResultStore: String?
 
     // DECLARE
     var layoutKey = ""
@@ -82,7 +101,7 @@ class NCCollectionViewCommon: UIViewController, NCAccountSettingsModelDelegate, 
     var currentScale: CGFloat = 1.0
     var maxColumns: Int {
         let screenWidth = min(UIScreen.main.bounds.width, UIScreen.main.bounds.height)
-        let column = Int(screenWidth / 44)
+        let column = Int(screenWidth / 55)
 
         return column
     }
@@ -218,8 +237,9 @@ class NCCollectionViewCommon: UIViewController, NCAccountSettingsModelDelegate, 
                 self.refreshControl.endRefreshing()
 
                 // Wait 1.5 seconds before resetting the button alpha
-                try? await Task.sleep(nanoseconds: 1_500_000_000)
-                self.mainNavigationController?.resetPlusButtonAlpha()
+                try? await Task.sleep(for: .seconds(1.5))
+                // (+)
+                self.mainNavigationController?.menuPlus?.resetPlusButtonAlpha()
             }
         }
 
@@ -342,6 +362,10 @@ class NCCollectionViewCommon: UIViewController, NCAccountSettingsModelDelegate, 
         self.networking.downloadThumbnailQueue.cancelAll()
         self.networking.unifiedSearchQueue.cancelAll()
         searchDataSourceTask?.cancel()
+        // Cancel Properties
+        Task {
+            await searchOperationHandle.cancel()
+        }
     }
 
     override func viewDidDisappear(_ animated: Bool) {
@@ -353,8 +377,6 @@ class NCCollectionViewCommon: UIViewController, NCAccountSettingsModelDelegate, 
 
         NotificationCenter.default.removeObserver(self, name: UIApplication.willResignActiveNotification, object: nil)
         NotificationCenter.default.removeObserver(self, name: NSNotification.Name(rawValue: global.notificationCenterCloseRichWorkspaceWebView), object: nil)
-
-        removeImageCache(metadatas: self.dataSource.getMetadatas())
     }
 
     func presentationControllerDidDismiss( _ presentationController: UIPresentationController) {
@@ -490,6 +512,7 @@ class NCCollectionViewCommon: UIViewController, NCAccountSettingsModelDelegate, 
     // MARK: - NotificationCenter
 
     @objc func applicationWillResignActive(_ notification: NSNotification) {
+        // (+)
         self.mainNavigationController?.menuPlus?.resetPlusButtonAlpha()
 //        self.resetPlusButtonAlpha()
 //        self.refreshControl.endRefreshing()
@@ -741,6 +764,15 @@ class NCCollectionViewCommon: UIViewController, NCAccountSettingsModelDelegate, 
         default:
             break
         }
+        if !isSearchingMode {
+            self.isSearchingMode = true
+            self.dataSource.removeAll()
+            self.collectionView.reloadData()
+        }
+
+        // (+)
+        self.mainNavigationController?.menuPlus?.hiddenPlusButton(isEditMode: self.isEditMode, isSearchingMode: self.isSearchingMode)
+    }
 
         collectionView.collectionViewLayout.invalidateLayout()
     }
@@ -759,6 +791,36 @@ class NCCollectionViewCommon: UIViewController, NCAccountSettingsModelDelegate, 
         }
 
         reloadDataSource()
+    }
+      
+    @MainActor
+    func setSearchBarLoading(_ loading: Bool) {
+        guard let textField = searchController?.searchBar.searchTextField else {
+            return
+        }
+        if loading {
+            let spinner = UIActivityIndicatorView(style: .medium)
+            spinner.startAnimating()
+            textField.rightView = spinner
+            textField.rightViewMode = .always
+        } else {
+            textField.rightView = nil
+        }
+    }
+
+    func willDismissSearchController(_ searchController: UISearchController) {
+        self.isSearchingMode = false
+        self.networkSearchInProgress = false
+        self.searchResultText = nil
+        self.searchResultStore = nil
+
+        // (+)
+        self.mainNavigationController?.menuPlus?.hiddenPlusButton(isEditMode: self.isEditMode, isSearchingMode: self.isSearchingMode)
+
+        Task {
+            await searchOperationHandle.cancel()
+            await reloadDataSource()
+        }
     }
 
     @objc func getServerData(_ notification: NSNotification) {
@@ -1224,6 +1286,11 @@ class NCCollectionViewCommon: UIViewController, NCAccountSettingsModelDelegate, 
 
     func unifiedSearchMore(metadataForSection: NCMetadataForSection?) {
         guard let metadataForSection = metadataForSection, let lastSearchResult = metadataForSection.lastSearchResult, let cursor = lastSearchResult.cursor, let term = literalSearch else { return }
+//         if let existingEntry = navigationCollectionViewCommon.first(where: {
+//             $0.navigationController === navigationController && $0.serverUrl == serverUrlPush
+//         }) {
+//             let viewController = existingEntry.viewController
+//             viewController.endToEndKeySetAccess = endToEndKeySetAccess
 
         metadataForSection.unifiedSearchInProgress = true
         Task {
@@ -1276,6 +1343,10 @@ class NCCollectionViewCommon: UIViewController, NCAccountSettingsModelDelegate, 
                 viewController.serverUrl = serverUrlPush
                 viewController.titlePreviusFolder = navigationItem.title
                 viewController.titleCurrentFolder = metadata.fileNameView
+//         viewController.serverUrl = serverUrlPush
+//         viewController.titlePreviusFolder = navigationItem.title
+//         viewController.titleCurrentFolder = metadata.fileNameView
+//         viewController.endToEndKeySetAccess = endToEndKeySetAccess
 
                 navigationCollectionViewCommon.append(NavigationCollectionViewCommon(serverUrl: serverUrlPush, navigationController: self.navigationController, viewController: viewController))
 
@@ -1489,9 +1560,9 @@ extension NCCollectionViewCommon: NCSectionFirstHeaderDelegate {
         }
     }
 
-    func tapRecommendations(with metadata: tableMetadata) {
+    func tapRecommendations(with metadata: tableMetadata, viewerTransitionSource: NCMediaViewerTransitionSource?) {
         Task {
-            await didSelectMetadata(metadata, withOcIds: false)
+            await didSelectMetadata(metadata, withOcIds: false, viewerTransitionSource: viewerTransitionSource)
         }
     }
 }
@@ -1517,7 +1588,7 @@ extension NCCollectionViewCommon: NCTransferDelegate {
         }
     }
 
-    func transferChange(status: String,
+    func transferChange(networkingStatus: String,
                         account: String,
                         fileName: String,
                         serverUrl: String,
@@ -1542,7 +1613,7 @@ extension NCCollectionViewCommon: NCTransferDelegate {
                 return
             }
 
-            switch status {
+            switch networkingStatus {
             case self.global.networkingStatusCreateFolder:
                 if error == .success,
                    serverUrl == self.serverUrl,
