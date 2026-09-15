@@ -24,7 +24,6 @@
 //
 
 import UIKit
-import Parchment
 import DropDown
 import NextcloudKit
 import MarqueeLabel
@@ -100,11 +99,18 @@ class NCShare: UIViewController, NCSharePagingContent {
         navigationController?.setNavigationBarAppearance()
         view.backgroundColor = .systemBackground
         title = NSLocalizedString("_details_", comment: "")
+        view.backgroundColor = .systemGroupedBackground
+
+        viewContainerConstraint.constant = height
+        searchFieldTopConstraint.constant = 0
+
+        searchField.placeholder = NSLocalizedString("_shareLinksearch_placeholder_", comment: "")
+        searchField.autocorrectionType = .no
 
         tableView.dataSource = self
         tableView.delegate = self
         tableView.allowsSelection = false
-        tableView.backgroundColor = .systemBackground
+        tableView.backgroundColor = .systemGroupedBackground
         tableView.contentInset = UIEdgeInsets(top: 8, left: 0, bottom: 10, right: 0)
 
         tableView.register(UINib(nibName: "NCShareLinkCell", bundle: nil), forCellReuseIdentifier: "cellLink")
@@ -144,6 +150,9 @@ class NCShare: UIViewController, NCSharePagingContent {
             }
 
 //            reloadData()
+            self.metadata = await NCNetworking.shared.updateMetadataPlaceholder(metadata)
+
+            reloadData()
 
             networking = NCShareNetworking(metadata: metadata, view: self.view, delegate: self, session: session, controller: controller)
             let isVisible = (self.navigationController?.topViewController as? NCSharePaging)?.page == .sharing

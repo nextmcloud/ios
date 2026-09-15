@@ -23,35 +23,70 @@
 //
 
 import UIKit
-import Parchment
 import NextcloudKit
 import MarqueeLabel
+import NextcloudKitUI
 import TagListView
+import SwiftUI
 
 protocol NCSharePagingContent {
     var textField: UITextField? { get }
 }
 
 class NCSharePaging: UIViewController {
-    private let pagingViewController = NCShareHeaderViewController()
     private weak var appDelegate = UIApplication.shared.delegate as? AppDelegate
     private var currentVC: NCSharePagingContent?
     private let applicationHandle = NCApplicationHandle()
+    private let tabModel = NCSharePagingTabModel()
+    private weak var headerView: NCShareHeader?
+    private var pageVCs: [UIViewController] = []
+    private var contentHost: UIHostingController<NCSharePagingContentView>?
 
     var metadata = tableMetadata()
     var controller: NCMainTabBarController?
+    private let shareCreateTrigger = CreateUnifiedShareTrigger()
+
+    private var internalLink: String {
+        metadata.urlBase + "/index.php/f/" + metadata.fileId
+    }
     var pages: [NCBrandOptions.NCInfoPagingTab] = []
-    var page: NCBrandOptions.NCInfoPagingTab = .activity
+
+    private var initialPage: NCBrandOptions.NCInfoPagingTab = .activity
+    var page: NCBrandOptions.NCInfoPagingTab {
+        get {
+            guard isViewLoaded else { return initialPage }
+            let index = tabModel.selection
+            return (index < pages.count) ? pages[index] : initialPage
+        }
+        set {
+            initialPage = newValue
+            if isViewLoaded, let index = pages.firstIndex(of: newValue) {
+                tabModel.selection = index
+            }
+        }
+    }
+
+    private var currentVC: NCSharePagingContent? {
+        let index = tabModel.selection
+        guard index < pageVCs.count else { return nil }
+        return pageVCs[index] as? NCSharePagingContent
+    }
 
     // MARK: - View Life Cycle
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        view.backgroundColor = .systemBackground
+        view.backgroundColor = .systemGroupedBackground
         title = NSLocalizedString("_details_", comment: "")
 
-        navigationItem.leftBarButtonItem = UIBarButtonItem(title: NSLocalizedString("_close_", comment: ""), style: .plain, target: self, action: #selector(exitTapped(_:)))
+        navigationItem.leftBarButtonItem = UIBarButtonItem(
+            image: UIImage(systemName: "xmark"),
+            style: .plain,
+            target: self,
+            action: #selector(exitTapped(_:))
+        )
+        navigationItem.leftBarButtonItem?.accessibilityLabel = NSLocalizedString("_close_", comment: "")
 
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow(notification:)), name: UIResponder.keyboardWillShowNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide(notification:)), name: UIResponder.keyboardWillHideNotification, object: nil)
@@ -78,28 +113,71 @@ class NCSharePaging: UIViewController {
             spacing: .zero,
             insets: .zero
         )
+        let host = UIHostingController(rootView: content)
+        host.view.backgroundColor = .systemGroupedBackground
 
-        pagingViewController.borderOptions = .visible(height: 1, zIndex: Int.max, insets: .zero)
+        addChild(host)
+        view.addSubview(host.view)
+        host.didMove(toParent: self)
+        host.view.translatesAutoresizingMaskIntoConstraints = false
 
-        // Contrain the paging view to all edges.
-        pagingViewController.view.translatesAutoresizingMaskIntoConstraints = false
+        let topAnchor = headerView?.bottomAnchor ?? view.safeAreaLayoutGuide.topAnchor
         NSLayoutConstraint.activate([
-            pagingViewController.view.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-            pagingViewController.view.bottomAnchor.constraint(equalTo: view.bottomAnchor),
-            pagingViewController.view.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
-            pagingViewController.view.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor)
+            host.view.topAnchor.constraint(equalTo: topAnchor),
+            host.view.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            host.view.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
+            host.view.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor)
         ])
 
-        pagingViewController.dataSource = self
-        pagingViewController.delegate = self
+        self.contentHost = host
+    }
 
-        if page.rawValue < pages.count {
-            pagingViewController.select(index: page.rawValue)
-        } else {
-            pagingViewController.select(index: 0)
+    private func makeViewController(for tab: NCBrandOptions.NCInfoPagingTab) -> UIViewController {
+        // The old Parchment menu floated over the child view, so children inset by menuHeight (50).
+        // The new SwiftUI layout places the picker above the content, so no inset is needed.
+        let height: CGFloat = 0
+
+        switch tab {
+        case .activity:
+            guard let viewController = UIStoryboard(name: "NCActivity", bundle: nil).instantiateInitialViewController() as? NCActivity else {
+                return UIViewController()
+            }
+            viewController.height = height
+            viewController.showComments = true
+            viewController.didSelectItemEnable = false
+            viewController.metadata = metadata
+            viewController.objectType = "files"
+            viewController.account = metadata.account
+            viewController.usesGroupedBackground = true
+            return viewController
+        case .sharing:
+            let capabilities = NCNetworking.shared.capabilities[metadata.account] ?? NKCapabilities.Capabilities()
+
+            // Newer servers get the unified share list; older ones keep the legacy NCShare UI.
+            if capabilities.unifiedSharingEnabled {
+                let brandColor = Color(NCBrandColor.shared.getElement(account: metadata.account))
+                let listView = UnifiedShareListView(account: metadata.account, sourceId: metadata.fileId, internalLink: internalLink, isDirectory: metadata.directory, tint: brandColor, createTrigger: shareCreateTrigger) { [weak self] error in
+                    guard let self else { return }
+
+                    Task {
+                        let windowScene = SceneManager.shared.getWindowScene(controller: self.controller)
+                        await showErrorBanner(windowScene: windowScene, error: error)
+                    }
+                }
+
+                return UIHostingController(rootView: listView.tint(brandColor))
+            }
+
+            guard let viewController = UIStoryboard(name: "NCShare", bundle: nil).instantiateViewController(withIdentifier: "sharing") as? NCShare else {
+                return UIViewController()
+            }
+            viewController.metadata = metadata
+            viewController.height = height
+            viewController.controller = controller
+            return viewController
+        case .details:
+            return NCShareDetailsViewController(metadata: metadata)
         }
-
-        pagingViewController.reloadMenu()
     }
 
     override func viewDidAppear(_ animated: Bool) {
@@ -177,36 +255,38 @@ class NCSharePaging: UIViewController {
     }
 }
 
-// MARK: - PagingViewController Delegate
+// MARK: - SwiftUI tab content
 
-extension NCSharePaging: PagingViewControllerDelegate {
-    func pagingViewController(_ pagingViewController: PagingViewController, willScrollToItem pagingItem: PagingItem, startingViewController: UIViewController, destinationViewController: UIViewController) {
-
-        currentVC?.textField?.resignFirstResponder()
-        self.currentVC = destinationViewController as? NCSharePagingContent
-    }
+@Observable
+final class NCSharePagingTabModel {
+    var selection: Int = 0
 }
 
-// MARK: - PagingViewController DataSource
+struct NCSharePagingContentView: View {
+    @Bindable var model: NCSharePagingTabModel
+    let tint: Color
+    let titles: [String]
+    let pageVCs: [UIViewController]
+    var onSelectionChange: (Int) -> Void
 
-extension NCSharePaging: PagingViewControllerDataSource {
-    func pagingViewController(_: PagingViewController, viewControllerAt index: Int) -> UIViewController {
-        let height: CGFloat = 50
-
-        if pages[index] == .activity {
-            guard let viewController = UIStoryboard(name: "NCActivity", bundle: nil).instantiateInitialViewController() as? NCActivity else {
-                return UIViewController()
+    var body: some View {
+        VStack(spacing: 0) {
+            Picker("", selection: $model.selection) {
+                ForEach(Array(titles.enumerated()), id: \.offset) { index, title in
+                    Text(title).tag(index)
+                }
             }
-            viewController.height = height
-            viewController.showComments = true
-            viewController.didSelectItemEnable = false
-            viewController.metadata = metadata
-            viewController.objectType = "files"
-            viewController.account = metadata.account
-            return viewController
-        } else if pages[index] == .sharing {
-            guard let viewController = UIStoryboard(name: "NCShare", bundle: nil).instantiateViewController(withIdentifier: "sharing") as? NCShare else {
-                return UIViewController()
+            .pickerStyle(.segmented)
+            .accessibilityLabel(NSLocalizedString("_sections_", comment: ""))
+            .padding(.horizontal, 16)
+            .padding(.vertical, 8)
+            .tint(tint)
+
+            TabView(selection: $model.selection) {
+                ForEach(Array(pageVCs.enumerated()), id: \.offset) { index, viewController in
+                    NCViewControllerRepresentable(viewController: viewController)
+                        .tag(index)
+                }
             }
             viewController.metadata = metadata
             viewController.height = height
@@ -227,80 +307,17 @@ extension NCSharePaging: PagingViewControllerDataSource {
             return applicationHandle.pagingViewController(pagingViewController, pagingItemAt: index)
         }
     }
-
-    func numberOfViewControllers(in pagingViewController: PagingViewController) -> Int {
-        return self.pages.count
-    }
 }
 
-// MARK: - Header
+private struct NCViewControllerRepresentable: UIViewControllerRepresentable {
+    let viewController: UIViewController
 
-class NCShareHeaderViewController: PagingViewController {
-    public var image: UIImage?
-    public var metadata = tableMetadata()
+    func makeUIViewController(context: Context) -> UIViewController { viewController }
 
-    override func loadView() {
-        view = NCSharePagingView(
-            options: options,
-            collectionView: collectionView,
-            pageView: pageViewController.view,
-            metadata: metadata
-        )
-    }
-}
+    func updateUIViewController(_ uiViewController: UIViewController, context: Context) {
 
-class NCSharePagingView: PagingView {
-    var metadata = tableMetadata()
-    let utilityFileSystem = NCUtilityFileSystem()
-    let utility = NCUtility()
-    public var headerHeightConstraint: NSLayoutConstraint?
-    var header: NCShareHeader?
-
-    // MARK: - View Life Cycle
-
-    public init(options: Parchment.PagingOptions, collectionView: UICollectionView, pageView: UIView, metadata: tableMetadata) {
-        super.init(options: options, collectionView: collectionView, pageView: pageView)
-
-        self.metadata = metadata
-    }
-
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-
-    override func setupConstraints() {
-        guard let headerView = Bundle.main.loadNibNamed("NCShareHeader", owner: self, options: nil)?.first as? NCShareHeader else { return }
-        header = headerView
-        headerView.backgroundColor = .systemBackground
-
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateStyle = .short
-        dateFormatter.timeStyle = .short
-        dateFormatter.locale = Locale.current
-
-        headerView.setupUI(with: metadata)
-
-        addSubview(headerView)
-
-        collectionView.translatesAutoresizingMaskIntoConstraints = false
-        headerView.translatesAutoresizingMaskIntoConstraints = false
-        pageView.translatesAutoresizingMaskIntoConstraints = false
-
-        NSLayoutConstraint.activate([
-            collectionView.leadingAnchor.constraint(equalTo: leadingAnchor),
-            collectionView.trailingAnchor.constraint(equalTo: trailingAnchor),
-            collectionView.heightAnchor.constraint(equalToConstant: options.menuHeight),
-            collectionView.topAnchor.constraint(equalTo: headerView.bottomAnchor),
-
-            headerView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor),
-            headerView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor),
-            headerView.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor),
-
-            pageView.leadingAnchor.constraint(equalTo: leadingAnchor),
-            pageView.trailingAnchor.constraint(equalTo: trailingAnchor),
-            pageView.bottomAnchor.constraint(equalTo: bottomAnchor),
-            pageView.topAnchor.constraint(equalTo: headerView.bottomAnchor)
-        ])
+        // TabView(.page) does not propagate appearance trait changes to represented VCs (as of iOS 18.4), seems a SwiftUI bug...
+        uiViewController.view.overrideUserInterfaceStyle = context.environment.colorScheme == .dark ? .dark : .light
     }
 }
 

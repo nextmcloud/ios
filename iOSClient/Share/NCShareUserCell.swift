@@ -238,6 +238,7 @@ class NCSearchUserDropDownCell: DropDownCell, NCCellProtocol {
         } else {
             centerTitleConstraint.constant = 0
         }
+
     }
 }
 
