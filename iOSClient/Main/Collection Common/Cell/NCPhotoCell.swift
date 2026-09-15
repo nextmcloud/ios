@@ -82,11 +82,12 @@ extension NCCollectionViewCommon {
 
         cell.metadata = metadata
 
-        // Image
-        //
-        if let image = NCImageCache.shared.getImageCache(ocId: metadata.ocId, etag: metadata.etag, ext: ext) {
+        if let image = imageCache.getImageCache(ocId: metadata.ocId, etag: metadata.etag, ext: ext) {
             cell.previewImg?.image = image
             cell.previewImg?.contentMode = .scaleAspectFill
+        } else if let image = utility.getImage(ocId: metadata.ocId, etag: metadata.etag, ext: ext, userId: metadata.userId, urlBase: metadata.urlBase) {
+            imageCache.addImageCache(ocId: metadata.ocId, etag: metadata.etag, image: image, ext: ext)
+            cell.previewImg?.image = image
         } else {
             if isPinchGestureActive || ext == global.previewExt512 || ext == global.previewExt1024 {
                 cell.previewImg?.image = self.utility.getImage(ocId: metadata.ocId, etag: metadata.etag, ext: ext, userId: metadata.userId, urlBase: metadata.urlBase)
@@ -111,6 +112,11 @@ extension NCCollectionViewCommon {
                         }
                     }
                 }
+//             cell.previewImg?.contentMode = .scaleAspectFit
+//             if metadata.iconName.isEmpty {
+//                 cell.previewImg?.image = imageCache.getImageFile()
+//             } else {
+//                 cell.previewImg?.image = utility.loadImage(named: metadata.iconName, useTypeIconFile: true, account: metadata.account)
             }
         }
 

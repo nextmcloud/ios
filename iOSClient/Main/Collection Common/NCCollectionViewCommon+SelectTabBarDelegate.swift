@@ -145,6 +145,7 @@ extension NCCollectionViewCommon: NCCollectionViewCommonSelectTabBarDelegate {
             await NCCreate().createActivityViewController(
                 selectedMetadata: metadatas,
                 controller: self.controller,
+                presentViewController: self,
                 sender: nil)
         }
     }
@@ -209,7 +210,7 @@ extension NCCollectionViewCommon: NCCollectionViewCommonSelectTabBarDelegate {
         searchController(enabled: !editMode)
 
         // (+)
-        mainNavigationController?.menuPlus?.hiddenPlusButton(editMode)
+        mainNavigationController?.menuPlus?.hiddenPlusButton(isEditMode: self.isEditMode, isSearchingMode: self.isSearchingMode)
 
         if editMode {
             navigationItem.leftBarButtonItems = nil
