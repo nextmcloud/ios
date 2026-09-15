@@ -9,8 +9,10 @@ import Alamofire
 import LucidBanner
 
 extension NCCollectionViewCommon: UICollectionViewDelegate {
-    func didSelectMetadata(_ metadata: tableMetadata, withOcIds: Bool) {
-        let capabilities = NCNetworking.shared.capabilities[session.account] ?? NKCapabilities.Capabilities()
+    @MainActor
+    func didSelectMetadata(_ metadata: tableMetadata, withOcIds: Bool, viewerTransitionSource: NCMediaViewerTransitionSource?) async {
+        let capabilities = await NKCapabilities.shared.getCapabilities(for: session.account)
+
         if metadata.e2eEncrypted {
             if capabilities.e2EEEnabled {
                 if !NCPreferences().isEndToEndEnabled(account: metadata.account) {
@@ -71,18 +73,14 @@ extension NCCollectionViewCommon: UICollectionViewDelegate {
         if metadata.directory {
             pushMetadata(metadata)
         } else {
-            Task { @MainActor in
-                let image = utility.getImage(ocId: metadata.ocId, etag: metadata.etag, ext: self.global.previewExt1024, userId: metadata.userId, urlBase: metadata.urlBase)
-                let fileExists = utilityFileSystem.fileProviderStorageExists(metadata)
+            let image = utility.getImage(ocId: metadata.ocId, etag: metadata.etag, ext: self.global.previewExt1024, userId: metadata.userId, urlBase: metadata.urlBase)
+            let fileExists = utilityFileSystem.fileProviderStorageExists(metadata)
 
-                // --- E2EE -------
-                if metadata.isDirectoryE2EE {
-                    if fileExists {
-                        if let vc = await NCViewer().getViewerController(metadata: metadata, delegate: self) {
-                            self.navigationController?.pushViewController(vc, animated: true)
-                        }
-                    } else {
-                        await downloadFile()
+            // --- E2EE -------
+            if metadata.isDirectoryE2EE {
+                if fileExists {
+                    if let vc = await NCViewer().getViewerController(metadata: metadata, delegate: self, viewerTransitionSource: viewerTransitionSource) {
+                        self.navigationController?.pushViewController(vc, animated: true)
                     }
                     return
                 }
@@ -94,31 +92,26 @@ extension NCCollectionViewCommon: UICollectionViewDelegate {
                         $0.classFile == NKTypeClassFile.video.rawValue ||
                         $0.classFile == NKTypeClassFile.audio.rawValue }.map(\.ocId)
 
-                    if let vc = await NCViewer().getViewerController(metadata: metadata, ocIds: withOcIds ? ocIds : nil, image: image, delegate: self) {
-                        self.navigationController?.pushViewController(vc, animated: true)
-                    }
-                } else if !metadata.isDirectoryE2EE, metadata.isAvailableEditorView || utilityFileSystem.fileProviderStorageExists(metadata) || metadata.name == self.global.talkName {
-                    if let vc = await NCViewer().getViewerController(metadata: metadata, image: image, delegate: self) {
-                        self.navigationController?.pushViewController(vc, animated: true)
-                    }
-                } else if NextcloudKit.shared.isNetworkReachable() {
-                    guard let  metadata = await database.setMetadataSessionInWaitDownloadAsync(ocId: metadata.ocId,
-                                                                                               session: self.networking.sessionDownload,
-                                                                                               selector: global.selectorLoadFileView,
-                                                                                               sceneIdentifier: self.controller?.sceneIdentifier) else {
-                        return
-                    }
+                if let vc = await NCViewer().getViewerController(metadata: metadata, ocIds: withOcIds ? ocIds : nil, image: image, delegate: self, viewerTransitionSource: viewerTransitionSource) {
+                    self.navigationController?.pushViewController(vc, animated: true)
+                }
+            } else if !metadata.isDirectoryE2EE, metadata.isDocumentEditorAvailable || utilityFileSystem.fileProviderStorageExists(metadata) || metadata.name == self.global.talkName {
+                if let vc = await NCViewer().getViewerController(metadata: metadata, image: image, delegate: self, viewerTransitionSource: viewerTransitionSource) {
+                    self.navigationController?.pushViewController(vc, animated: true)
+                }
+            } else if NextcloudKit.shared.isNetworkReachable() {
+                guard let  metadata = await database.setMetadataSessionInWaitDownloadAsync(ocId: metadata.ocId,
+                                                                                           session: self.networking.sessionDownload,
+                                                                                           selector: global.selectorLoadFileView,
+                                                                                           sceneIdentifier: self.controller?.sceneIdentifier) else {
+                    return
+                }
 
-                    if metadata.name == "files" {
-                        await downloadFile()
-                    } else if !metadata.url.isEmpty,
-                              let vc = await NCViewer().getViewerController(metadata: metadata, delegate: self) {
-                        self.navigationController?.pushViewController(vc, animated: true)
-                    }
-                } else {
-                    Task {
-                        await showErrorBanner(windowScene: windowScene, text: "_go_online_", errorCode: NCGlobal.shared.errorOfflineNotAllowed)
-                    }
+                if metadata.name == "files" {
+                    await downloadFile()
+                } else if !metadata.url.isEmpty,
+                          let vc = await NCViewer().getViewerController(metadata: metadata, delegate: self, viewerTransitionSource: viewerTransitionSource) {
+                    self.navigationController?.pushViewController(vc, animated: true)
                 }
             }
         }
@@ -128,6 +121,7 @@ extension NCCollectionViewCommon: UICollectionViewDelegate {
         guard let metadata = self.dataSource.getMetadata(indexPath: indexPath) else {
             return
         }
+        var viewerTransitionSource: NCMediaViewerTransitionSource?
 
         if self.isEditMode {
             if !metadata.e2eEncrypted {
@@ -144,7 +138,13 @@ extension NCCollectionViewCommon: UICollectionViewDelegate {
             return
         }
 
-        self.didSelectMetadata(metadata, withOcIds: true)
+        if let cell = collectionView.cellForItem(at: indexPath) as? NCCellMainProtocol {
+            viewerTransitionSource = cell.viewerTransitionSource()
+        }
+
+        Task {
+            await didSelectMetadata(metadata, withOcIds: true, viewerTransitionSource: viewerTransitionSource)
+        }
     }
 
     func collectionView(_ collectionView: UICollectionView, contextMenuConfigurationForItemAt indexPath: IndexPath, point: CGPoint) -> UIContextMenuConfiguration? {
