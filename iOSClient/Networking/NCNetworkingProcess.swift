@@ -323,7 +323,6 @@ actor NCNetworkingProcess {
 
                 await updateTimerIntervalIfNeeded(hasPendingTransfers: true)
             } else {
-                // Remove upload asset
                 await removeUploadedAssetsIfNeeded()
 
                 // Set Live Photo
