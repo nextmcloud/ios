@@ -345,7 +345,11 @@ extension NCNetworking {
 #if !EXTENSION
             await NCNetworking.shared.setLivePhoto(account: metadata.account)
 #endif
-        }
+        } else {
+#if !EXTENSION
+                AnalyticsHelper.shared.trackEventWithMetadata(eventName: .EVENT__UPLOAD_FILE ,metadata: metadata)
+#endif
+            }
 
         await self.transferDispatcher.notifyAllDelegates { delegate in
             delegate.transferChange(networkingStatus: self.global.networkingStatusUploaded,
