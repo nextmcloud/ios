@@ -33,7 +33,10 @@ class NCCollectionViewCommon: UIViewController, NCAccountSettingsModelDelegate, 
     internal var backgroundImageView = UIImageView()
     internal var serverUrl: String = ""
     internal var isEditMode = false
-    internal var isDirectoryE2EE = false
+    // whether the displayed folder is E2EE; refreshed on each collection view data-source pass
+    internal var isCurrentDirectoryE2EE = false
+    // whether the displayed E2EE folder was decoded with active or archived keys
+    internal var endToEndKeySetAccess: NCEndToEndKeySetAccess = .unavailable
     internal var fileSelect: [String] = []
     internal var metadataFolder: tableMetadata?
     internal var richWorkspaceText: String?
@@ -93,7 +96,7 @@ class NCCollectionViewCommon: UIViewController, NCAccountSettingsModelDelegate, 
     internal var currentScale: CGFloat = 1.0
     internal var maxColumns: Int {
         let screenWidth = min(UIScreen.main.bounds.width, UIScreen.main.bounds.height)
-        let column = Int(screenWidth / 44)
+        let column = Int(screenWidth / 55)
 
         return column
     }
@@ -261,6 +264,7 @@ class NCCollectionViewCommon: UIViewController, NCAccountSettingsModelDelegate, 
 
                 // Wait 1.5 seconds before resetting the button alpha
                 try? await Task.sleep(for: .seconds(1.5))
+                // (+)
                 self.mainNavigationController?.menuPlus?.resetPlusButtonAlpha()
             }
         }
@@ -389,8 +393,7 @@ class NCCollectionViewCommon: UIViewController, NCAccountSettingsModelDelegate, 
         super.viewWillDisappear(animated)
         dismissTip()
 
-        // Cancel Queue & Retrieves Properties
-        self.networking.downloadThumbnailQueue.cancelAll()
+        // Cancel Properties
         Task {
             await searchOperationHandle.cancel()
         }
@@ -405,8 +408,6 @@ class NCCollectionViewCommon: UIViewController, NCAccountSettingsModelDelegate, 
 
         NotificationCenter.default.removeObserver(self, name: UIApplication.willResignActiveNotification, object: nil)
         NotificationCenter.default.removeObserver(self, name: NSNotification.Name(rawValue: global.notificationCenterCloseRichWorkspaceWebView), object: nil)
-
-        removeImageCache(metadatas: self.dataSource.getMetadatas())
     }
 
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
@@ -451,6 +452,7 @@ class NCCollectionViewCommon: UIViewController, NCAccountSettingsModelDelegate, 
     // MARK: - NotificationCenter
 
     @objc func applicationWillResignActive(_ notification: NSNotification) {
+        // (+)
         self.mainNavigationController?.menuPlus?.resetPlusButtonAlpha()
     }
 
@@ -577,14 +579,14 @@ class NCCollectionViewCommon: UIViewController, NCAccountSettingsModelDelegate, 
         // TIP
         dismissTip()
 
-        // (+)
-        self.mainNavigationController?.menuPlus?.hiddenPlusButton(true)
-
         if !isSearchingMode {
             self.isSearchingMode = true
             self.dataSource.removeAll()
             self.collectionView.reloadData()
         }
+
+        // (+)
+        self.mainNavigationController?.menuPlus?.hiddenPlusButton(isEditMode: self.isEditMode, isSearchingMode: self.isSearchingMode)
     }
 
     func searchBarTextDidEndEditing(_ searchBar: UISearchBar) {
@@ -596,14 +598,29 @@ class NCCollectionViewCommon: UIViewController, NCAccountSettingsModelDelegate, 
         }
     }
 
-    func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
-        // (+)
-        self.mainNavigationController?.menuPlus?.hiddenPlusButton(false)
+    @MainActor
+    func setSearchBarLoading(_ loading: Bool) {
+        guard let textField = searchController?.searchBar.searchTextField else {
+            return
+        }
+        if loading {
+            let spinner = UIActivityIndicatorView(style: .medium)
+            spinner.startAnimating()
+            textField.rightView = spinner
+            textField.rightViewMode = .always
+        } else {
+            textField.rightView = nil
+        }
+    }
 
+    func willDismissSearchController(_ searchController: UISearchController) {
         self.isSearchingMode = false
         self.networkSearchInProgress = false
         self.searchResultText = nil
         self.searchResultStore = nil
+
+        // (+)
+        self.mainNavigationController?.menuPlus?.hiddenPlusButton(isEditMode: self.isEditMode, isSearchingMode: self.isSearchingMode)
 
         Task {
             await searchOperationHandle.cancel()
@@ -830,6 +847,7 @@ class NCCollectionViewCommon: UIViewController, NCAccountSettingsModelDelegate, 
             $0.navigationController === navigationController && $0.serverUrl == serverUrlPush
         }) {
             let viewController = existingEntry.viewController
+            viewController.endToEndKeySetAccess = endToEndKeySetAccess
 
             if navigationController.topViewController === viewController {
                 return
@@ -851,6 +869,7 @@ class NCCollectionViewCommon: UIViewController, NCAccountSettingsModelDelegate, 
         viewController.serverUrl = serverUrlPush
         viewController.titlePreviusFolder = navigationItem.title
         viewController.titleCurrentFolder = metadata.fileNameView
+        viewController.endToEndKeySetAccess = endToEndKeySetAccess
 
         navigationCollectionViewCommon.append(
             NavigationCollectionViewCommon(
@@ -957,9 +976,9 @@ extension NCCollectionViewCommon: NCSectionFirstHeaderDelegate {
         }
     }
 
-    func tapRecommendations(with metadata: tableMetadata) {
+    func tapRecommendations(with metadata: tableMetadata, viewerTransitionSource: NCMediaViewerTransitionSource?) {
         Task {
-            await didSelectMetadata(metadata, withOcIds: false)
+            await didSelectMetadata(metadata, withOcIds: false, viewerTransitionSource: viewerTransitionSource)
         }
     }
 }
@@ -985,7 +1004,7 @@ extension NCCollectionViewCommon: NCTransferDelegate {
         }
     }
 
-    func transferChange(status: String,
+    func transferChange(networkingStatus: String,
                         account: String,
                         fileName: String,
                         serverUrl: String,
@@ -1010,7 +1029,7 @@ extension NCCollectionViewCommon: NCTransferDelegate {
                 return
             }
 
-            switch status {
+            switch networkingStatus {
             case self.global.networkingStatusCreateFolder:
                 if error == .success,
                    serverUrl == self.serverUrl,
