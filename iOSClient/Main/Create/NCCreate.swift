@@ -9,155 +9,236 @@ import LucidBanner
 import Alamofire
 
 class NCCreate: NSObject {
-    let utility = NCUtility()
-    let utilityFileSystem = NCUtilityFileSystem()
-    let database = NCManageDatabase.shared
-    let global = NCGlobal.shared
+    private let utilityFileSystem = NCUtilityFileSystem()
+
+    /// Compatibility entry point used by already-stabilized Direct Editing callers.
+    /// `creatorId` is intentionally required, so this method cannot select legacy Richdocuments.
+    @MainActor
+    func createDocument(controller: NCMainTabBarController,
+                        serverUrl: String,
+                        fileName: String,
+                        editorId: String,
+                        creatorId: String,
+                        templateId: String,
+                        session: NCSession.Session) async {
+        await createFileForDirectEditing(
+            controller: controller,
+            serverUrl: serverUrl,
+            fileName: fileName,
+            editorId: editorId,
+            creatorId: creatorId,
+            templateId: templateId,
+            session: session
+        )
+    }
 
     @MainActor
-    func createDocument(controller: NCMainTabBarController, fileNamePath: String, fileName: String, editorId: String, creatorId: String? = nil, templateId: String, account: String) async {
-        let session = NCSession.shared.getSession(account: account)
+    func createFileForDirectEditing(controller: NCMainTabBarController,
+                                    serverUrl: String,
+                                    fileName: String,
+                                    editorId: String,
+                                    creatorId: String,
+                                    templateId: String,
+                                    session: NCSession.Session) async {
+        let windowScene = SceneManager.shared.getWindowScene(controller: controller)
+        guard let viewController = controller.currentViewController(),
+              let adapter = NCDirectEditorAdapter.resolve(from: [editorId]) else {
+            return
+        }
+        let fileNamePath = utilityFileSystem.getRelativeFilePath(fileName, serverUrl: serverUrl, session: session)
+        let serverUrlFileName = serverUrl + "/" + fileName
+        let options = NKRequestOptions(customUserAgent: adapter.userAgent())
+
+        let results = await NextcloudKit.shared.createFileForDirectEditingAsync(
+            fileNamePath: fileNamePath,
+            editorId: editorId,
+            creatorId: creatorId,
+            templateId: templateId,
+            account: session.account,
+            options: options
+        ) { task in
+            Task {
+                let identifier = await NCNetworking.shared.networkingTasks.createIdentifier(
+                    account: session.account,
+                    path: fileNamePath,
+                    name: "createFileForDirectEditing"
+                )
+                await NCNetworking.shared.networkingTasks.track(identifier: identifier, task: task)
+            }
+        }
+
+        guard results.error == .success,
+              let editorURL = results.url,
+              !editorURL.isEmpty else {
+            let error: NKError = results.error == .success ? .invalidData : results.error
+            await showErrorBanner(windowScene: windowScene, text: error.errorDescription, errorCode: error.errorCode)
+            return
+        }
+
+        await openCreatedFile(
+            serverUrlFileName: serverUrlFileName,
+            editorId: editorId,
+            editorURL: editorURL,
+            session: session,
+            controller: controller,
+            viewController: viewController
+        )
+    }
+
+    @MainActor
+    func createLegacyRichdocumentsFile(controller: NCMainTabBarController,
+                                       serverUrl: String,
+                                       fileName: String,
+                                       templateId: String,
+                                       session: NCSession.Session) async {
+        let windowScene = SceneManager.shared.getWindowScene(controller: controller)
         guard let viewController = controller.currentViewController() else {
             return
         }
-        var UUID = NSUUID().uuidString
-        UUID = "TEMP" + UUID.replacingOccurrences(of: "-", with: "")
-        var options = NKRequestOptions()
-        let serverUrl = controller.currentServerUrl()
+        let fileNamePath = utilityFileSystem.getRelativeFilePath(fileName, serverUrl: serverUrl, session: session)
+        let serverUrlFileName = serverUrl + "/" + fileName
 
-        if let creatorId, let adapter = NCDirectEditorAdapter.resolve(from: [editorId]) {
-            options = NKRequestOptions(customUserAgent: adapter.userAgent(utility))
-            let results = await NextcloudKit.shared.textCreateFileAsync(fileNamePath: fileNamePath, editorId: editorId, creatorId: creatorId, templateId: templateId, account: account, options: options) { task in
-                Task {
-                    let identifier = await NCNetworking.shared.networkingTasks.createIdentifier(account: account,
-                                                                                                path: fileNamePath,
-                                                                                                name: "textCreateFile")
-                    await NCNetworking.shared.networkingTasks.track(identifier: identifier, task: task)
-                }
+        let results = await NextcloudKit.shared.createRichdocumentsFileFromTemplateAsync(
+            filePath: fileNamePath,
+            templateId: templateId,
+            account: session.account
+        ) { task in
+            Task {
+                let identifier = await NCNetworking.shared.networkingTasks.createIdentifier(
+                    account: session.account,
+                    path: fileNamePath,
+                    name: "createRichdocumentsFileFromTemplate"
+                )
+                await NCNetworking.shared.networkingTasks.track(identifier: identifier, task: task)
             }
-            guard results.error == .success, let url = results.url else {
-                Task {
-                    let windowScene = SceneManager.shared.getWindowScene(controller: controller)
-                    await showErrorBanner(windowScene: windowScene, text: results.error.errorDescription, errorCode: results.error.errorCode)
-                }
-                return
-            }
-            let metadata = await NCManageDatabaseCreateMetadata().createMetadataAsync(
-                fileName: fileName,
-                ocId: UUID,
-                serverUrl: serverUrl,
-                url: url,
-                session: session,
-                sceneIdentifier: controller.sceneIdentifier)
-            if let vc = await NCViewer().getViewerController(metadata: metadata, delegate: viewController) {
-                viewController.navigationController?.pushViewController(vc, animated: true)
-            }
+        }
 
-        } else if editorId == "collabora" {
+        guard results.error == .success,
+              let editorURL = results.url,
+              !editorURL.isEmpty else {
+            let error: NKError = results.error == .success ? .invalidData : results.error
+            await showErrorBanner(windowScene: windowScene, text: error.errorDescription, errorCode: error.errorCode)
+            return
+        }
 
-            let results = await NextcloudKit.shared.createRichdocumentsAsync(path: fileNamePath, templateId: templateId, account: account) { task in
-                Task {
-                    let identifier = await NCNetworking.shared.networkingTasks.createIdentifier(account: account,
-                                                                                                path: fileNamePath,
-                                                                                                name: "CreateRichdocuments")
-                    await NCNetworking.shared.networkingTasks.track(identifier: identifier, task: task)
-                }
-            }
-            guard results.error == .success, let url = results.url else {
-                Task {
-                    let windowScene = SceneManager.shared.getWindowScene(controller: controller)
-                    await showErrorBanner(windowScene: windowScene, text: results.error.errorDescription, errorCode: results.error.errorCode)
-                }
-                return
-            }
+        await openCreatedFile(
+            serverUrlFileName: serverUrlFileName,
+            editorId: NCGlobal.shared.editorCollabora,
+            editorURL: editorURL,
+            session: session,
+            controller: controller,
+            viewController: viewController
+        )
+    }
 
-            let metadata = await NCManageDatabaseCreateMetadata().createMetadataAsync(
-                fileName: fileName,
-                ocId: UUID,
-                serverUrl: serverUrl,
-                url: url,
-                session: session,
-                sceneIdentifier: controller.sceneIdentifier)
+    func getDirectEditingTemplates(editorId: String,
+                                   creatorId: String,
+                                   fallbackExtension: String,
+                                   account: String) async -> (templates: [NKDirectEditingTemplate], selectedTemplate: NKDirectEditingTemplate, ext: String) {
+        guard let adapter = NCDirectEditorAdapter.resolve(from: [editorId]) else {
+            let fallbackTemplate = NKDirectEditingTemplate(ext: fallbackExtension, name: "Empty", preview: "")
+            return ([fallbackTemplate], fallbackTemplate, fallbackExtension)
+        }
 
-            if let vc = await NCViewer().getViewerController(metadata: metadata, delegate: viewController) {
-                viewController.navigationController?.pushViewController(vc, animated: true)
+        let options = NKRequestOptions(customUserAgent: adapter.userAgent())
+        let results = await NextcloudKit.shared.getDirectEditingTemplatesAsync(
+            account: account,
+            editorId: editorId,
+            creatorId: creatorId,
+            options: options
+        ) { task in
+            Task {
+                let identifier = await NCNetworking.shared.networkingTasks.createIdentifier(
+                    account: account,
+                    name: "getDirectEditingTemplates"
+                )
+                await NCNetworking.shared.networkingTasks.track(identifier: identifier, task: task)
             }
+        }
+
+        let templates = results.error == .success ? results.templates ?? [] : []
+        if let selectedTemplate = templates.first(where: { $0.preview?.isEmpty ?? true }) ?? templates.first {
+            return (templates, selectedTemplate, selectedTemplate.ext)
+        }
+
+        let fallbackTemplate = NKDirectEditingTemplate(
+            ext: fallbackExtension,
+            name: "Empty",
+            preview: ""
+        )
+        return ([fallbackTemplate], fallbackTemplate, fallbackExtension)
+    }
+
+    func getLegacyRichdocumentsTemplates(templateType: String,
+                                         account: String) async -> (templates: [NKRichdocumentsTemplate], selectedTemplate: NKRichdocumentsTemplate?, ext: String, error: NKError) {
+        let results = await NextcloudKit.shared.getRichdocumentsTemplatesAsync(
+            templateType: templateType,
+            account: account
+        ) { task in
+            Task {
+                let identifier = await NCNetworking.shared.networkingTasks.createIdentifier(
+                    account: account,
+                    path: templateType,
+                    name: "getRichdocumentsTemplates"
+                )
+                await NCNetworking.shared.networkingTasks.track(identifier: identifier, task: task)
+            }
+        }
+
+        let templates = results.error == .success ? results.templates ?? [] : []
+        let selectedTemplate = templates.first(where: { $0.preview.isEmpty }) ?? templates.first
+        let ext = selectedTemplate?.ext ?? legacyRichdocumentsDefaultExtension(for: templateType)
+        let error: NKError = results.error == .success && selectedTemplate == nil ? .invalidData : results.error
+        return (templates, selectedTemplate, ext, error)
+    }
+
+    @MainActor
+    private func openCreatedFile(serverUrlFileName: String,
+                                 editorId: String,
+                                 editorURL: String,
+                                 session: NCSession.Session,
+                                 controller: NCMainTabBarController,
+                                 viewController: UIViewController) async {
+        let results = await NCNetworking.shared.readFileAsync(
+            serverUrlFileName: serverUrlFileName,
+            account: session.account
+        )
+        guard results.error == .success, let metadata = results.metadata else {
+            let windowScene = SceneManager.shared.getWindowScene(controller: controller)
+            await showErrorBanner(
+                windowScene: windowScene,
+                text: results.error.errorDescription,
+                errorCode: results.error.errorCode
+            )
+            return
+        }
+
+        metadata.url = editorURL
+
+        if let viewer = await NCViewer().getViewerController(
+            metadata: metadata,
+            delegate: viewController,
+            viewerTransitionSource: nil,
+            selectedEditor: editorId
+        ) {
+            viewController.navigationController?.pushViewController(viewer, animated: true)
         }
     }
 
-    func getTemplate(editorId: String, templateId: String, account: String) async -> (templates: [NKEditorTemplate], selectedTemplate: NKEditorTemplate, ext: String) {
-        var templates: [NKEditorTemplate] = []
-        var selectedTemplate = NKEditorTemplate()
-        var ext: String = ""
-
-        if let adapter = NCDirectEditorAdapter.resolve(from: [editorId]) {
-            let options = NKRequestOptions(customUserAgent: adapter.userAgent(NCUtility()))
-
-            let results = await NextcloudKit.shared.textGetListOfTemplatesAsync(account: account, options: options) { task in
-                Task {
-                    let identifier = await NCNetworking.shared.networkingTasks.createIdentifier(account: account,
-                                                                                                name: "textGetListOfTemplates")
-                    await NCNetworking.shared.networkingTasks.track(identifier: identifier, task: task)
-                }
-            }
-            if results.error == .success, let resultTemplates = results.templates {
-                for template in resultTemplates {
-                    var temp = NKEditorTemplate()
-                    temp.identifier = template.identifier
-                    temp.ext = template.ext
-                    temp.name = template.name
-                    temp.preview = template.preview
-                    templates.append(temp)
-                    // default: template empty
-                    if temp.preview.isEmpty {
-                        selectedTemplate = temp
-                        ext = template.ext
-                    }
-                }
-            }
-
-            if templates.isEmpty {
-                var temp = NKEditorTemplate()
-                temp.identifier = ""
-                temp.ext = adapter.defaultExt(templateId)
-                temp.name = "Empty"
-                temp.preview = ""
-                templates.append(temp)
-                selectedTemplate = temp
-                ext = temp.ext
-            }
+    private func legacyRichdocumentsDefaultExtension(for templateType: String) -> String {
+        switch templateType {
+        case "spreadsheet":
+            return "ods"
+        case "presentation":
+            return "odp"
+        case "drawing":
+            return "odg"
+        default:
+            return "odt"
         }
-
-        if editorId == "collabora" {
-            let results = await NextcloudKit.shared.getTemplatesRichdocumentsAsync(typeTemplate: templateId, account: account) { task in
-                Task {
-                    let identifier = await NCNetworking.shared.networkingTasks.createIdentifier(account: account,
-                                                                                                path: templateId,
-                                                                                                name: "getTemplatesRichdocuments")
-                    await NCNetworking.shared.networkingTasks.track(identifier: identifier, task: task)
-                }
-            }
-            if results.error == .success {
-                for template in results.templates! {
-                    var temp = NKEditorTemplate()
-                    temp.identifier = "\(template.templateId)"
-                    temp.ext = template.ext
-                    temp.name = template.name
-                    temp.preview = template.preview
-                    templates.append(temp)
-                    // default: template empty
-                    if temp.preview.isEmpty {
-                        selectedTemplate = temp
-                        ext = temp.ext
-                    }
-                }
-            }
-        }
-
-        return (templates, selectedTemplate, ext)
     }
 
-    func createShare(controller: NCMainTabBarController?, metadata: tableMetadata, page: NCBrandOptions.NCInfoPagingTab) {
+    func createShare(controller: NCMainTabBarController?, presentViewController: UIViewController?, metadata: tableMetadata, page: NCBrandOptions.NCInfoPagingTab) {
         guard let controller else {
             return
         }
@@ -165,24 +246,7 @@ class NCCreate: NSObject {
 
         NCNetworking.shared.readFile(serverUrlFileName: metadata.serverUrlFileName, account: metadata.account) { _, metadata, file, error in
             Task { @MainActor in
-                if let metadata = metadata, let file = file, error == .success {
-                    // Remove all known download limits from shares related to the given file.
-                    // This avoids obsolete download limit objects to stay around.
-                    // Afterwards create new download limits, should any such be returned for the known shares.
-                    let shares = await NCManageDatabase.shared.getTableSharesAsync(account: metadata.account,
-                                                                                   serverUrl: metadata.serverUrl,
-                                                                                   fileName: metadata.fileName)
-                    for share in shares {
-                        await NCManageDatabase.shared.deleteDownloadLimitAsync(byAccount: metadata.account, shareToken: share.token)
-
-                        if let receivedDownloadLimit = file.downloadLimits.first(where: { $0.token == share.token }) {
-                            await NCManageDatabase.shared.createDownloadLimitAsync(account: metadata.account,
-                                                                                   count: receivedDownloadLimit.count,
-                                                                                   limit: receivedDownloadLimit.limit,
-                                                                                   token: receivedDownloadLimit.token)
-                        }
-                    }
-
+                if let metadata, let file, error == .success {
                     var pages: [NCBrandOptions.NCInfoPagingTab] = []
                     let shareNavigationController = UIStoryboard(name: "NCShare", bundle: nil).instantiateInitialViewController() as? UINavigationController
                     let shareViewController = shareNavigationController?.topViewController as? NCSharePaging
@@ -195,6 +259,30 @@ class NCCreate: NSObject {
                     }
                     if !metadata.isSharable(), let idx = pages.firstIndex(of: .sharing) {
                         pages.remove(at: idx)
+                    }
+                    if !capabilities.governanceEnabled, let idx = pages.firstIndex(of: .details) {
+                        pages.remove(at: idx)
+                    }
+
+                    if capabilities.unifiedSharingEnabled {
+                        // Unified Sharing NC 35
+                    } else {
+                        // Remove all known download limits from shares related to the given file.
+                        // This avoids obsolete download limit objects to stay around.
+                        // Afterwards create new download limits, should any such be returned for the known shares.
+                        let shares = await NCManageDatabase.shared.getTableSharesAsync(account: metadata.account,
+                                                                                       serverUrl: metadata.serverUrl,
+                                                                                       fileName: metadata.fileName)
+                        for share in shares {
+                            await NCManageDatabase.shared.deleteDownloadLimitAsync(byAccount: metadata.account, shareToken: share.token)
+
+                            if let receivedDownloadLimit = file.downloadLimits.first(where: { $0.token == share.token }) {
+                                await NCManageDatabase.shared.createDownloadLimitAsync(account: metadata.account,
+                                                                                       count: receivedDownloadLimit.count,
+                                                                                       limit: receivedDownloadLimit.limit,
+                                                                                       token: receivedDownloadLimit.token)
+                            }
+                        }
                     }
 
                     shareViewController?.pages = pages
@@ -211,7 +299,7 @@ class NCCreate: NSObject {
 
                     shareNavigationController?.modalPresentationStyle = .formSheet
                     if let shareNavigationController = shareNavigationController {
-                        controller.present(shareNavigationController, animated: true, completion: nil)
+                        presentViewController?.present(shareNavigationController, animated: true, completion: nil)
                     }
                 }
             }
@@ -224,8 +312,8 @@ class NCCreate: NSObject {
     ///   - controller: Main tab bar controller used to present the activity view.
     ///   - sender: The UI element that triggered the action (for iPad popover anchoring).
     @MainActor
-    func createActivityViewController(selectedMetadata: [tableMetadata], controller: NCMainTabBarController?, sender: Any?) async {
-        guard let controller else {
+    func createActivityViewController(selectedMetadata: [tableMetadata], controller: NCMainTabBarController?, presentViewController: UIViewController?, sender: Any?) async {
+        guard let controller, let presentViewController else {
             return
         }
 
@@ -303,14 +391,21 @@ class NCCreate: NSObject {
 
         // iPad popover configuration
         if let popover = activityViewController.popoverPresentationController {
-            if let view = sender as? UIView {
-                popover.sourceView = view
-                popover.sourceRect = view.bounds
+            if let barButtonItem = sender as? UIBarButtonItem {
+                // Anchor the popover to the bar button item.
+                popover.barButtonItem = barButtonItem
+
+            } else if let sourceView = sender as? UIView {
+                // Anchor the popover to the sender view.
+                popover.sourceView = sourceView
+                popover.sourceRect = sourceView.bounds
+
             } else {
-                popover.sourceView = controller.view
+                // Fallback: anchor the popover to the center of the presenting view.
+                popover.sourceView = presentViewController.view
                 popover.sourceRect = CGRect(
-                    x: controller.view.bounds.midX,
-                    y: controller.view.bounds.midY,
+                    x: presentViewController.view.bounds.midX,
+                    y: presentViewController.view.bounds.midY,
                     width: 0,
                     height: 0
                 )
@@ -318,7 +413,7 @@ class NCCreate: NSObject {
             }
         }
 
-        controller.present(activityViewController, animated: true)
+        presentViewController.present(activityViewController, animated: true)
     }
 
     // MARK: - Private helper

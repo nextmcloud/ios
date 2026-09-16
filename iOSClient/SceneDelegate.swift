@@ -299,10 +299,11 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             // Timeout auto
             let didFinish = await withTaskGroup(of: Bool.self) { group -> Bool in
                 group.addTask {
-                    // QUEUE
-                    NCNetworking.shared.cancelAllQueue()
+                    // TransferCoordinator
+                    await NCTransferCoordinator.shared.cancelAll()
                     // FLUSH TRANSFERS SUCCESS
-                    await NCNetworking.shared.metadataTranfersSuccess.flush()
+                    await NCNetworking.shared.metadataDownloadTranfersSuccess.flush()
+                    await NCNetworking.shared.metadataUploadTranfersSuccess.flush()
                     // BACKUP
                     await NCManageDatabase.shared.backupTableAccountToFileAsync()
                     // LOG
@@ -397,14 +398,19 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
                     case self.global.actionTextDocument:
                         let session = SceneManager.shared.getSession(scene: scene)
                         let capabilities = await NKCapabilities.shared.getCapabilities(for: session.account)
-                        guard let creator = capabilities.directEditingCreators.first(where: { $0.editor == "text" }) else {
+                        guard let creator = capabilities.directEditingCreators.first(where: { $0.editor == global.editorText }) else {
                             return
                         }
                         let serverUrl = controller.currentServerUrl()
                         let fileName = await NCNetworking.shared.createFileName(fileNameBase: NSLocalizedString("_untitled_", comment: "") + "." + creator.ext, account: session.account, serverUrl: serverUrl)
-                        let fileNamePath = NCUtilityFileSystem().getRelativeFilePath(String(describing: fileName), serverUrl: serverUrl, session: session)
 
-                        await NCCreate().createDocument(controller: controller, fileNamePath: fileNamePath, fileName: String(describing: fileName), editorId: "text", creatorId: creator.identifier, templateId: "document", account: session.account)
+                        await NCCreate().createDocument(controller: controller,
+                                                        serverUrl: serverUrl,
+                                                        fileName: fileName,
+                                                        editorId: global.editorText,
+                                                        creatorId: creator.identifier,
+                                                        templateId: "document",
+                                                        session: session)
                     case self.global.actionVoiceMemo:
                         NCAskAuthorization().askAuthorizationAudioRecord(controller: controller) { hasPermission in
                             if hasPermission {
@@ -625,6 +631,17 @@ final class SceneManager: @unchecked Sendable {
         return nil
     }
 
+    func getController(account: String?) -> NCMainTabBarController? {
+        if let account {
+            for controller in sceneController.keys {
+                if account == controller.account {
+                    return controller
+                }
+            }
+        }
+        return nil
+    }
+
     func getControllers() -> [NCMainTabBarController] {
         return Array(sceneController.keys)
     }
@@ -664,18 +681,52 @@ final class SceneManager: @unchecked Sendable {
     }
     
     func getWindow(sceneIdentifier: String?) -> UIWindow? {
-        var mainTabBarController: NCMainTabBarController?
+//         var mainTabBarController: NCMainTabBarController?
 
-        if let sceneIdentifier {
-            for controller in sceneController.keys {
-                if sceneIdentifier == controller.sceneIdentifier {
-                    mainTabBarController = controller
-                }
-            }
+//         if let sceneIdentifier {
+//             for controller in sceneController.keys {
+//                 if sceneIdentifier == controller.sceneIdentifier {
+//                     mainTabBarController = controller
+//                 }
+//             }
+//         }
+//         guard let mainTabBarController,
+//               let scene = sceneController[mainTabBarController] else { return UIApplication.shared.mainAppWindow }
+//         return getWindow(scene: scene)
+        // Try exact match via your registry
+        if let sceneIdentifier,
+           let controller = sceneController.keys.first(where: { $0.sceneIdentifier == sceneIdentifier }),
+           let scene = sceneController[controller],
+           let window = getWindow(scene: scene)?.windowScene?.resolvedWindow {
+            return window
         }
-        guard let mainTabBarController,
-              let scene = sceneController[mainTabBarController] else { return UIApplication.shared.mainAppWindow }
-        return getWindow(scene: scene)
+
+        let windowScenes = UIApplication.shared.connectedScenes
+            .compactMap { $0 as? UIWindowScene }
+
+        // Fallback: prefer a foregroundActive window scene
+        if let window = windowScenes
+            .first(where: { $0.activationState == .foregroundActive })?
+            .resolvedWindow {
+            return window
+        }
+
+        // Fallback: foregroundInactive window scene
+        if let window = windowScenes
+            .first(where: { $0.activationState == .foregroundInactive })?
+            .resolvedWindow {
+            return window
+        }
+
+        // Last resort: first connected window scene with a resolved window
+        if let window = windowScenes
+            .compactMap({ $0.resolvedWindow })
+            .first {
+            return window
+        }
+
+        // Absolute last resort
+        return UIApplication.shared.mainAppWindow
     }
 
     func getSceneIdentifier() -> [String] {
