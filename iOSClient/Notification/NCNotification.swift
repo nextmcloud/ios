@@ -77,9 +77,17 @@ class NCNotification: UITableViewController, NCNotificationCellDelegate {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
 
+        // Re-evaluate in-app messages after viewDidAppear
+        MoEngageAnalytics.shared.displayInAppNotificationSafely(reason: "viewDidAppear")
+
         Task {
             await getNetwokingNotification()
         }
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        AnalyticsHelper.shared.trackEvent(eventName: .SCREEN_EVENT__NOTIFICATIONS)
     }
 
     override func viewWillDisappear(_ animated: Bool) {
@@ -101,7 +109,7 @@ class NCNotification: UITableViewController, NCNotificationCellDelegate {
     }
 
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let notification = notifications[indexPath.row]
+        guard let notification = NCApplicationHandle().didSelectNotification(notifications[indexPath.row], viewController: self) else { return }
 
         do {
             if let subjectRichParameters = notification.subjectRichParameters,
@@ -125,6 +133,7 @@ class NCNotification: UITableViewController, NCNotificationCellDelegate {
         let notification = notifications[indexPath.row]
         cell.delegate = self
         cell.selectionStyle = .none
+        cell.indexPath = indexPath
         cell.identifier = notification.idNotification
 
         let urlIcon = URL(string: notification.icon)
@@ -150,6 +159,13 @@ class NCNotification: UITableViewController, NCNotificationCellDelegate {
             cell.avatarLeadingMargin.constant = 50
 
             let fileName = NCSession.shared.getFileName(urlBase: session.urlBase, user: user)
+            let results = NCManageDatabase.shared.getImageAvatarLoaded(fileName: fileName)
+
+            if results.image == nil {
+                cell.avatarImageView?.image = utility.loadUserImage(for: user, displayName: json["user"]?["name"].string, urlBase: session.urlBase)
+            } else {
+                cell.avatarImageView?.image = results.image
+            }
             let fileNameLocalPath = self.utilityFileSystem.createServerUrl(serverUrl: utilityFileSystem.directoryUserData, fileName: fileName)
             if let image = UIImage(contentsOfFile: fileNameLocalPath) {
                 cell.avatar?.image = image
@@ -258,13 +274,6 @@ class NCNotification: UITableViewController, NCNotificationCellDelegate {
                 cell.more.isEnabled = true
                 cell.more.isHidden = false
                 cell.more.setTitle("…", for: .normal)
-
-                let contextMenu = NCContextMenuNotification(
-                    notification: notification,
-                    delegate: self
-                )
-                cell.more.menu = contextMenu.viewMenu()
-                cell.more.showsMenuAsPrimaryAction = true
             }
 
             var buttonWidth = max(cell.primary.intrinsicContentSize.width, cell.secondary.intrinsicContentSize.width)
@@ -350,6 +359,10 @@ class NCNotification: UITableViewController, NCNotificationCellDelegate {
         }
     }
 
+    func tapMore(with notification: NKNotifications, sender: Any?) {
+       toggleMenu(notification: notification, sender: sender)
+    }
+
     // MARK: - Load notification networking
 
     @MainActor
@@ -374,7 +387,7 @@ class NCNotification: UITableViewController, NCNotificationCellDelegate {
         let sortedNotifications = notifications.sorted { $0.date > $1.date }
         for notification in sortedNotifications {
             if let icon = notification.icon {
-                if await self.utility.convertSVGtoPNGWriteToUserData(serverUrl: icon, rewrite: false, account: session.account).image != nil {
+                self.utility.convertSVGtoPNGWriteToUserData(svgUrlString: icon, width: 25, rewrite: false, account: session.account) { _, _ in
                     self.tableView.reloadData()
                 }
             }
@@ -387,7 +400,7 @@ class NCNotification: UITableViewController, NCNotificationCellDelegate {
 
 // MARK: -
 
-class NCNotificationCell: UITableViewCell {
+class NCNotificationCell: UITableViewCell, NCCellProtocol {
 
     @IBOutlet weak var icon: UIImageView!
     @IBOutlet weak var avatar: UIImageView!
@@ -402,11 +415,23 @@ class NCNotificationCell: UITableViewCell {
     @IBOutlet weak var primaryWidth: NSLayoutConstraint!
     @IBOutlet weak var secondaryWidth: NSLayoutConstraint!
 
-    var user = ""
-    var identifier: Int = 0
+    private var user = ""
+    private var index = IndexPath()
 
     weak var delegate: NCNotificationCellDelegate?
     var notification: NKNotifications?
+
+    var indexPath: IndexPath {
+        get { return index }
+        set { index = newValue }
+    }
+    var avatarImageView: UIImageView? {
+        return avatar
+    }
+    var fileUser: String? {
+        get { return user }
+        set { user = newValue ?? "" }
+    }
 
     @IBAction func touchUpInsideRemove(_ sender: Any) {
         guard let notification = notification else { return }
@@ -428,9 +453,15 @@ class NCNotificationCell: UITableViewCell {
         else { return }
         delegate?.tapAction(with: notification, label: label, sender: sender)
     }
+
+    @IBAction func touchUpInsideMore(_ sender: Any) {
+        guard let notification = notification else { return }
+        delegate?.tapMore(with: notification, sender: sender)
+    }
 }
 
 protocol NCNotificationCellDelegate: AnyObject {
     func tapRemove(with notification: NKNotifications, sender: Any?)
     func tapAction(with notification: NKNotifications, label: String, sender: Any?)
+    func tapMore(with notification: NKNotifications, sender: Any?)
 }
