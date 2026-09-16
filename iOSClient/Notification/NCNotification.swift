@@ -63,11 +63,15 @@ class NCNotification: UITableViewController, NCNotificationCellDelegate {
             }
         }
 
-        let close = UIBarButtonItem(title: NSLocalizedString("_close_", comment: ""), style: .plain) {
-            self.dismiss(animated: true)
-        }
+        let close = UIBarButtonItem(
+            image: UIImage(systemName: "xmark"),
+            style: .plain,
+            target: self,
+            action: #selector(viewClose)
+        )
+        close.accessibilityLabel = NSLocalizedString("_close_", comment: "")
 
-        self.navigationItem.leftBarButtonItems = [close]
+        navigationItem.rightBarButtonItem = close
     }
 
     override func viewDidAppear(_ animated: Bool) {
@@ -124,13 +128,14 @@ class NCNotification: UITableViewController, NCNotificationCellDelegate {
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-
         guard let cell = self.tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath) as? NCNotificationCell else { return UITableViewCell() }
+
+        let notification = notifications[indexPath.row]
         cell.delegate = self
         cell.selectionStyle = .none
         cell.indexPath = indexPath
+        cell.identifier = notification.idNotification
 
-        let notification = notifications[indexPath.row]
         let urlIcon = URL(string: notification.icon)
         var image: UIImage?
 
@@ -140,6 +145,7 @@ class NCNotification: UITableViewController, NCNotificationCellDelegate {
         }
 
         if let image = image {
+            cell.icon.contentMode = .scaleAspectFit
             cell.icon.image = image.withTintColor(NCBrandColor.shared.getElement(account: session.account), renderingMode: .alwaysOriginal)
         }
 
@@ -160,10 +166,40 @@ class NCNotification: UITableViewController, NCNotificationCellDelegate {
             } else {
                 cell.avatarImageView?.image = results.image
             }
+            let fileNameLocalPath = self.utilityFileSystem.createServerUrl(serverUrl: utilityFileSystem.directoryUserData, fileName: fileName)
+            if let image = UIImage(contentsOfFile: fileNameLocalPath) {
+                cell.avatar?.image = image
+            }
+            let account = session.account
+            let identifier = notification.idNotification
 
-            if !(results.tblAvatar?.loaded ?? false),
-               NCNetworking.shared.downloadAvatarQueue.operations.filter({ ($0 as? NCOperationDownloadAvatar)?.fileName == fileName }).isEmpty {
-                NCNetworking.shared.downloadAvatarQueue.addOperation(NCOperationDownloadAvatar(user: user, fileName: fileName, account: session.account, view: tableView))
+            Task {
+                let etagResource = await NCManageDatabase.shared.getTableAvatarAsync(fileName: fileName)?.etag
+                await NCTransferCoordinator.shared.start(identifier: fileName,
+                                                         priority: .userInitiated) {
+                    let results = await NextcloudKit.shared.downloadAvatarAsync(
+                        user: user,
+                        fileNameLocalPath: fileNameLocalPath,
+                        sizeImage: NCGlobal.shared.avatarSize,
+                        avatarSizeRounded: NCGlobal.shared.avatarSizeRounded,
+                        etagResource: etagResource,
+                        account: account)
+
+                    if results.error == .success,
+                       let image = results.imageAvatar,
+                       let etag = results.etag,
+                       etag != etagResource {
+                        await NCManageDatabase.shared.addAvatarAsync(fileName: fileName, etag: etag)
+                        await MainActor.run {
+                            guard
+                                let cell = self.tableView.cellForRow(at: indexPath) as? NCNotificationCell,
+                                cell.identifier == identifier else {
+                                return
+                            }
+                            cell.avatar?.image = image
+                        }
+                    }
+                }
             }
         }
 
