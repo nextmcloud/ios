@@ -54,7 +54,7 @@ extension NCUtility {
         } else if ext == "txt" || ext == "md" || metadata.isTXT {
             return UIImage(named: "file_txt")!
         } else if ext == "odg" {
-            return UIImage(named: "file_odg")!
+            return UIImage(named: "diagram") ?? UIImage(named: "file")!
         } else if ext == "zip" || metadata.isZIP {
             return UIImage(named: "file_compress")!
         }
@@ -87,7 +87,7 @@ extension NCUtility {
         } else if ext == "txt" || ext == "md" || metadata.isTXT {
             return UIImage(named: "file_txt")!
         } else if ext == "odg" {
-            return UIImage(named: "file_odg")!
+            return UIImage(named: "diagram") ?? UIImage(named: "file")!
         } else if ext == "zip" || metadata.isZIP {
             return UIImage(named: "file_compress")!
         }
@@ -127,7 +127,7 @@ extension NCUtility {
             case NKTypeIconFile.pdf.rawValue: image = UIImage(named: "file_pdf")
             case NKTypeIconFile.ppt.rawValue: image = UIImage(named: "file_ppt")
             case NKTypeIconFile.txt.rawValue: image = UIImage(named: "file_txt")
-            default: image = (imageName as NSString).pathExtension == "odg" ? UIImage(named: "file_odg") : UIImage(named: "file")
+            default: image = (imageName as NSString).pathExtension == "odg" ? UIImage(named: "diagram") : UIImage(named: "file")
             }
         }
 
@@ -139,14 +139,14 @@ extension NCUtility {
 
         // SF IMAGE
         if let colors {
-            if imageName == "star" || imageName == "star.fill" || imageName == "info.circle" {
+            if imageName == "star" || imageName == "star.fill" || imageName == "info.circle" || imageName == "xmark" {
                 image = UIImage(systemName: imageName, withConfiguration: UIImage.SymbolConfiguration(weight: systemNameWeight))?.applyingSymbolConfiguration(UIImage.SymbolConfiguration(paletteColors: colors))
             } else {
                 image = UIImage(systemName: imageName, withConfiguration: UIImage.SymbolConfiguration(pointSize: symbolPointSize, weight: systemNameWeight))?.applyingSymbolConfiguration(UIImage.SymbolConfiguration(paletteColors: colors))
             }
 
         } else {
-            if imageName == "star" || imageName == "star.fill" || imageName == "info.circle" {
+            if imageName == "star" || imageName == "star.fill" || imageName == "info.circle" || imageName == "xmark" {
                 image = UIImage(systemName: imageName, withConfiguration: UIImage.SymbolConfiguration(weight: systemNameWeight))
             } else {
                 image = UIImage(systemName: imageName, withConfiguration: UIImage.SymbolConfiguration(pointSize: symbolPointSize, weight: systemNameWeight))
