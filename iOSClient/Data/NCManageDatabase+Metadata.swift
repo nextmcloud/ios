@@ -86,6 +86,7 @@ class tableMetadata: Object {
     @objc public var lockOwnerDisplayName = ""
     @objc public var lockTime: Date?
     @objc public var lockTimeOut: Date?
+    @objc dynamic var mediaSearch: Bool = false
     @objc dynamic var placeholder: Bool = false
     @objc dynamic var path = ""
     @objc dynamic var permissions = ""
@@ -563,6 +564,19 @@ extension NCManageDatabase {
             realm.delete(results)
         }
     }
+    
+    func deleteMetadataOcIds(_ ocIds: [String]) {
+        do {
+            let realm = try Realm()
+            try realm.write {
+                let results = realm.objects(tableMetadata.self).filter("ocId IN %@", ocIds)
+                realm.delete(results)
+            }
+        } catch let error as NSError {
+            nkLog(error: "Could not access database: \(error)")
+
+        }
+    }
 
     func renameMetadata(fileNameNew: String, ocId: String, status: Int = NCGlobal.shared.metadataStatusNormal) async {
         await core.performRealmWriteAsync { realm in
@@ -938,6 +952,36 @@ extension NCManageDatabase {
             updated: toUpdateOcIds.count,
             deleted: deletedMetadatas
         )
+    }
+
+    /// Syncs the remote and local metadata.
+    /// Returns true if there were changes (additions or deletions), false if everything was already up-to-date.
+    func mergeRemoteMetadatasAsync(remoteMetadatas: [tableMetadata], localMetadatas: [tableMetadata]) async -> Bool {
+        // Set of ocId
+        let remoteOcIds = Set(remoteMetadatas.map { $0.ocId })
+        let localOcIds = Set(localMetadatas.map { $0.ocId })
+
+        // Calculate diffs
+        let toDeleteOcIds = localOcIds.subtracting(remoteOcIds)
+        let toAddOcIds = remoteOcIds.subtracting(localOcIds)
+
+        guard !toDeleteOcIds.isEmpty || !toAddOcIds.isEmpty else {
+            return false // No changes needed
+        }
+
+        let toDeleteKeys = Array(toDeleteOcIds)
+
+        await core.performRealmWriteAsync { realm in
+            let toAdd = remoteMetadatas.filter { toAddOcIds.contains($0.ocId) }
+            let toDelete = toDeleteKeys.compactMap {
+                realm.object(ofType: tableMetadata.self, forPrimaryKey: $0)
+            }
+
+            realm.delete(toDelete)
+            realm.add(toAdd, update: .modified)
+        }
+
+        return true
     }
 
     // MARK: - Realm Read
