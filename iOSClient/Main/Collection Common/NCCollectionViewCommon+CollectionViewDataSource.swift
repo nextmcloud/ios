@@ -20,22 +20,21 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
         self.layoutForView = self.database.getLayoutForView(account: session.account, key: layoutKey, serverUrl: serverUrl)
         // is a Directory E2EE
         if isSearchingMode {
-            self.isCurrentDirectoryE2EE = false
+            self.isDirectoryE2EE = false
         } else {
-            self.isCurrentDirectoryE2EE = NCUtilityFileSystem().isDirectoryE2EE(serverUrl: serverUrl, urlBase: session.urlBase, userId: session.userId, account: session.account)
+            self.isDirectoryE2EE = NCUtilityFileSystem().isDirectoryE2EE(serverUrl: serverUrl, urlBase: session.urlBase, userId: session.userId, account: session.account)
         }
         return self.dataSource.numberOfItemsInSection(section)
     }
 
     func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
         if !collectionView.indexPathsForVisibleItems.contains(indexPath) {
-            guard let cell = cell as? NCCellMainProtocol,
-                  let identifier = cell.metadata?.ocId else {
+            guard let metadata = self.dataSource.getMetadata(indexPath: indexPath) else {
                 return
             }
 
-            Task {
-                await NCTransferCoordinator.shared.cancel(identifier: identifier)
+            for case let operation as NCCollectionViewDownloadThumbnail in self.networking.downloadThumbnailQueue.operations where operation.metadata.ocId == metadata.ocId {
+                operation.cancel()
             }
         }
     }
@@ -44,127 +43,23 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
         guard let metadata = self.dataSource.getMetadata(indexPath: indexPath) else {
             return
         }
-
-        let ocId = metadata.ocId
-        let etag = metadata.etag
-        let fileId = metadata.fileId
-        let iconName = metadata.iconName
-        let account = metadata.account
-
-        // AVATAR
-        //
-        if !metadata.ownerId.isEmpty, metadata.ownerId != metadata.userId {
-            let fileName = NCSession.shared.getFileName(urlBase: metadata.urlBase, user: metadata.ownerId)
-            let fileNameLocalPath = self.utilityFileSystem.createServerUrl(serverUrl: utilityFileSystem.directoryUserData, fileName: fileName)
-
-            if UIImage(contentsOfFile: fileNameLocalPath) == nil,
-               let user = getAvatarFromIconUrl(metadata: metadata) {
-                Task {
-                    let etagResource = await database.getTableAvatarAsync(fileName: fileName)?.etag
-                    await NCTransferCoordinator.shared.start(identifier: fileName,
-                                                             priority: .userInitiated) {
-                        let results = await NextcloudKit.shared.downloadAvatarAsync(
-                            user: user,
-                            fileNameLocalPath: fileNameLocalPath,
-                            sizeImage: NCGlobal.shared.avatarSize,
-                            avatarSizeRounded: NCGlobal.shared.avatarSizeRounded,
-                            etagResource: etagResource,
-                            account: account)
-
-                        if results.error == .success,
-                           let image = results.imageAvatar,
-                           let etag = results.etag,
-                           etag != etagResource {
-                            self.imageCache.addImageCache(image: image, key: fileName)
-                            await self.database.addAvatarAsync(fileName: fileName, etag: etag)
-                            await MainActor.run {
-                                guard
-                                    let cell = self.collectionView.cellForItem(at: indexPath) as? NCListCell,
-                                    cell.metadata?.ocId == ocId else {
-                                    return
-                                }
-                                cell.setSharedAvatarImage(image)
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        // PREVIEW IMAGE
-        //
+        let existsImagePreview = self.utilityFileSystem.fileProviderStorageImageExists(metadata.ocId, etag: metadata.etag, userId: metadata.userId, urlBase: metadata.urlBase)
         let ext = self.global.getSizeExtension(column: self.numberOfColumns)
-        let imageExists = self.utilityFileSystem.fileProviderStorageImageExists(ocId, etag: metadata.etag, userId: metadata.userId, urlBase: metadata.urlBase)
 
-        guard metadata.hasPreview,
-              !imageExists else {
-            return
-        }
-
-        Task {
-            await NCTransferCoordinator.shared.start(
-                identifier: ocId,
-                priority: .visible
-            ) {
-                let result = await NextcloudKit.shared.downloadPreviewAsync(
-                    fileId: fileId,
-                    etag: etag,
-                    account: account)
-
-                guard !Task.isCancelled,
-                      result.error == .success,
-                      let data = result.responseData?.data else {
-                    return
-                }
-
-                let image = await self.utility.createImageFileFrom(
-                    data: data,
-                    ocId: ocId,
-                    etag: etag,
-                    ext: ext,
-                    userId: self.session.userId,
-                    urlBase: self.session.urlBase)
-
-                await MainActor.run {
-                    guard let visibleIndexPath = self.collectionView.indexPathsForVisibleItems.first(where: {
-                        self.dataSource.getMetadata(indexPath: $0)?.ocId == ocId
-                    }),
-                          let cell = self.collectionView.cellForItem(at: visibleIndexPath) as? NCCellMainProtocol,
-                          cell.metadata?.ocId == ocId else {
-                        return
-                    }
-
-                    if let image, let imageItem = cell.previewImg {
-                        imageItem.contentMode = .scaleAspectFill
-
-                        UIView.transition(
-                            with: imageItem,
-                            duration: 0.75,
-                            options: .transitionCrossDissolve
-                        ) {
-                            imageItem.image = image
-                        }
-                    } else {
-                        cell.previewImg?.contentMode = .scaleAspectFit
-                        cell.previewImg?.image = self.utility.loadImage(
-                            named: iconName,
-                            useTypeIconFile: true,
-                            account: account
-                        )
-                    }
-                }
-            }
+        if metadata.hasPreview,
+           !existsImagePreview,
+           self.networking.downloadThumbnailQueue.operations.filter({ ($0 as? NCMediaDownloadThumbnail)?.metadata.ocId == metadata.ocId }).isEmpty {
+            self.networking.downloadThumbnailQueue.addOperation(NCCollectionViewDownloadThumbnail(metadata: metadata, collectionView: collectionView, ext: ext))
         }
     }
 
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let metadata = self.dataSource.getMetadata(indexPath: indexPath) ?? tableMetadata()
-        let existsImagePreview = utilityFileSystem.fileProviderStorageImageExists(metadata.ocId, etag: metadata.etag, userId: metadata.userId, urlBase: metadata.urlBase)
 
         // E2EE create preview
-        if self.isCurrentDirectoryE2EE,
+        if self.isDirectoryE2EE,
            metadata.isImageOrVideo,
-           !existsImagePreview {
+           !utilityFileSystem.fileProviderStorageImageExists(metadata.ocId, etag: metadata.etag, userId: metadata.userId, urlBase: metadata.urlBase) {
             utility.createImageFileFrom(metadata: metadata)
         }
 
@@ -176,18 +71,18 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
             } else {
                 let gridCell = (collectionView.dequeueReusableCell(withReuseIdentifier: "gridCell", for: indexPath) as? NCGridCell)!
                 gridCell.delegate = self
-                return self.gridCell(cell: gridCell, indexPath: indexPath, metadata: metadata, existsImagePreview: existsImagePreview)
+                return self.gridCell(cell: gridCell, indexPath: indexPath, metadata: metadata)
             }
         } else if isLayoutGrid {
             // LAYOUT GRID
             let gridCell = (collectionView.dequeueReusableCell(withReuseIdentifier: "gridCell", for: indexPath) as? NCGridCell)!
             gridCell.delegate = self
-            return self.gridCell(cell: gridCell, indexPath: indexPath, metadata: metadata, existsImagePreview: existsImagePreview)
+            return self.gridCell(cell: gridCell, indexPath: indexPath, metadata: metadata)
         } else {
             // LAYOUT LIST
             let listCell = (collectionView.dequeueReusableCell(withReuseIdentifier: "listCell", for: indexPath) as? NCListCell)!
             listCell.delegate = self
-            return self.listCell(cell: listCell, indexPath: indexPath, metadata: metadata, existsImagePreview: existsImagePreview)
+            return self.listCell(cell: listCell, indexPath: indexPath, metadata: metadata)
         }
     }
 
@@ -214,7 +109,6 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
                                   heightHeaderSection: heightHeaderSection,
                                   sectionText: sectionText,
                                   viewController: self,
-                                  parentCollectionView: self.collectionView,
                                   sceneItentifier: self.sceneIdentifier,
                                   delegate: self)
 
@@ -239,7 +133,7 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
                         if let emptyImageName {
                             emptyImage = utility.loadImage(named: emptyImageName, colors: emptyImageColors != nil ? emptyImageColors : [NCBrandColor.shared.getElement(account: session.account)])
                         } else {
-                            emptyImage = imageCache.getFolder(account: session.account)
+                            emptyImage = imageCache.getFolder()
                         }
                         emptyTitle = NSLocalizedString(self.emptyTitle, comment: "")
                         emptyDescription = NSLocalizedString(emptyDescription, comment: "")
@@ -248,11 +142,11 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
                         emptyTitle = NSLocalizedString("_files_no_files_", comment: "")
                         emptyDescription = NSLocalizedString("_folder_offline_desc_", comment: "")
                     } else if let metadataFolder, !metadataFolder.isCreatable {
-                        emptyImage = imageCache.getFolder(account: session.account)
+                        emptyImage = imageCache.getFolder()
                         emptyTitle = NSLocalizedString("_files_no_files_", comment: "")
                         emptyDescription = NSLocalizedString("_no_file_no_permission_to_create_", comment: "")
                     } else {
-                        emptyImage = imageCache.getFolder(account: session.account)
+                        emptyImage = imageCache.getFolder()
                         emptyTitle = NSLocalizedString("_files_no_files_", comment: "")
                         emptyDescription = NSLocalizedString("_no_file_pull_down_", comment: "")
                     }
@@ -347,5 +241,39 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
             }
         }
         return ownerId
+    }
+
+    /// Caches preview images asynchronously for the provided metadata entries.
+    /// - Parameters:
+    ///   - metadatas: The list of metadata entries to cache.
+    ///   - priority: The task priority to use (default is `.utility`).
+    func cachingAsync(metadatas: [tableMetadata], priority: TaskPriority = .utility) {
+        Task.detached(priority: priority) {
+            for (cost, metadata) in metadatas.enumerated() {
+                // Skip if not an image or video
+                guard metadata.isImageOrVideo else { continue }
+                // Check if image is already cached
+                let alreadyCached = NCImageCache.shared.getImageCache(ocId: metadata.ocId,
+                                                                      etag: metadata.etag,
+                                                                      ext: self.global.previewExt256) != nil
+                guard !alreadyCached else {
+                    continue
+                }
+
+                // caching preview
+                //
+                if let image = self.utility.getImage(ocId: metadata.ocId, etag: metadata.etag, ext: self.global.previewExt256, userId: metadata.userId, urlBase: metadata.urlBase) {
+                    NCImageCache.shared.addImageCache(ocId: metadata.ocId, etag: metadata.etag, image: image, ext: self.global.previewExt256, cost: cost)
+                }
+            }
+        }
+    }
+
+    func removeImageCache(metadatas: [tableMetadata]) {
+        DispatchQueue.global().async {
+            for metadata in metadatas {
+                NCImageCache.shared.removeImageCache(ocIdPlusEtag: metadata.ocId + metadata.etag)
+            }
+        }
     }
 }

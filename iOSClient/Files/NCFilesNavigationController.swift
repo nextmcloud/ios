@@ -22,7 +22,7 @@ class NCFilesNavigationController: NCMainNavigationController {
             }
 
             Task {
-                await self.setNavigationLeftItems()
+//                await self.setNavigationLeftItems()
             }
         }
     }
