@@ -277,7 +277,7 @@ final class NCUtility: NSObject, Sendable {
         }
         return height
     }
-    
+
     // E-mail validations
     // 1. Basic Email Validator (ASCII only)
     func isValidEmail(_ email: String) -> Bool {
@@ -289,18 +289,18 @@ final class NCUtility: NSObject, Sendable {
     // 2. Manually Convert Unicode Domain to Punycode with German Char Support
     func convertToPunycode(email: String) -> String? {
         guard let atIndex = email.firstIndex(of: "@") else { return nil }
-        
+
         let localPart = String(email[..<atIndex])
         var domainPart = String(email[email.index(after: atIndex)...])
-        
+
         // Normalize the domain part before converting to Punycode
         let normalizedDomainPart = domainPart.precomposedStringWithCanonicalMapping
-        
+
         // Attempt to convert Unicode to Punycode using a custom conversion function
         if let punycodeDomain = punycodeEncode(normalizedDomainPart) {
             return "\(localPart)@\(punycodeDomain)"
         }
-        
+
         return nil
     }
 
@@ -308,7 +308,7 @@ final class NCUtility: NSObject, Sendable {
     func punycodeEncode(_ domain: String) -> String? {
         // Mapping of common German characters to their corresponding Punycode equivalents
         var punycodeDomain = domain.lowercased()
-        
+
         let germanCharToPunycode: [String: String] = [
             "ü": "xn--u-1fa",  // ü → xn--u-1fa
             "ä": "xn--a-1fa",  // ä → xn--a-1fa
@@ -318,12 +318,12 @@ final class NCUtility: NSObject, Sendable {
             "è": "xn--e-1f",   // è → xn--e-1f
             "à": "xn--a-1f",   // à → xn--a-1f
         ]
-        
+
         // Replace each German character with the corresponding Punycode equivalent
         for (char, punycode) in germanCharToPunycode {
             punycodeDomain = punycodeDomain.replacingOccurrences(of: char, with: punycode)
         }
-        
+
         // If no change occurred, return the domain as it is (i.e., no Punycode needed)
         return punycodeDomain
     }
@@ -334,7 +334,7 @@ final class NCUtility: NSObject, Sendable {
         guard let punycodeEmail = convertToPunycode(email: email) else {
             return false
         }
-        
+
         return isValidEmail(punycodeEmail)
     }
 
