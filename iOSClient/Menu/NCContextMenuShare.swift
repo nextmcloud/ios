@@ -54,7 +54,7 @@ class NCContextMenuShare: NSObject {
         }
         actions.append(advancePermissionAction)
 //        }
-        
+
         // Send email
         if (share.shareType != NKShare.ShareType.publicLink.rawValue) {
 //        if shareController.sendMail {
@@ -66,7 +66,7 @@ class NCContextMenuShare: NSObject {
             }
             actions.append(sendNewEmailAction)
         }
-        
+
 //        // Details action
 //        let detailsAction = UIAction(
 //            title: NSLocalizedString("_details_", comment: ""),
@@ -204,7 +204,7 @@ class NCContextMenuShare: NSObject {
         }
         shareController.networking?.unShare(idShare: share.idShare)
     }
-    
+
     private func openShareEmail(shareController: NCShare) {
         let storyboard = UIStoryboard(name: "NCShare", bundle: nil)
         guard let viewNewUserComment = storyboard.instantiateViewController(withIdentifier: "NCShareNewUserAddComment") as? NCShareNewUserAddComment else { return }

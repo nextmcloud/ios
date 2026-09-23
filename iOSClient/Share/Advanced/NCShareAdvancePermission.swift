@@ -340,7 +340,6 @@ class NCShareAdvancePermission: UITableViewController, NCShareAdvanceFotterDeleg
 
                     if error != .success {
                         await showErrorBanner(windowScene: windowScene, error: error)
-                        return
                     }
                 }
 
