@@ -118,6 +118,7 @@ final class NCPreferences: NSObject {
     }
 
     var requestPasscodeAtStart: Bool {
+//    @objc var requestPasscodeAtStart: Bool {
         get {
             let keychainOLD = Keychain(service: "Crypto Cloud")
             if let value = keychainOLD["notPasscodeAtStart"], !value.isEmpty {
@@ -233,15 +234,6 @@ final class NCPreferences: NSObject {
         }
     }
 
-    var saveCameraMediaToCameraRoll: Bool {
-        get {
-            return getBoolPreference(key: "saveCameraMediaToCameraRoll", defaultValue: true)
-        }
-        set {
-            setUserDefaults(newValue, forKey: "saveCameraMediaToCameraRoll")
-        }
-    }
-
     var privacyScreenEnabled: Bool {
         get {
             if NCBrandOptions.shared.enforce_privacyScreenEnabled {
@@ -264,6 +256,36 @@ final class NCPreferences: NSObject {
         }
     }
 
+    var mediaColumnCount: Int {
+        get {
+            let value = getIntPreference(key: "mediaColumnCount", defaultValue: 3)
+            return value
+        }
+        set {
+            setUserDefaults(newValue, forKey: "mediaColumnCount")
+        }
+    }
+
+    var mediaTypeLayout: String {
+        get {
+            let value = getStringPreference(key: "mediaTypeLayout", defaultValue: NCGlobal.shared.mediaLayoutRatio)
+            return value
+        }
+        set {
+            setUserDefaults(newValue, forKey: "mediaTypeLayout")
+        }
+    }
+    
+    var mediaSortDate: String {
+        get {
+            let value = getStringPreference(key: "mediaSortDate", defaultValue: "date")
+            return value
+        }
+        set {
+            setUserDefaults(newValue, forKey: "mediaSortDate")
+        }
+    }
+    
     var textRecognitionStatus: Bool {
         get {
             return getBoolPreference(key: "textRecognitionStatus", defaultValue: false)
@@ -484,10 +506,12 @@ final class NCPreferences: NSObject {
     }
 
     func isEndToEndEnabled(account: String) -> Bool {
-        guard let certificate = getEndToEndCertificate(account: account), !certificate.isEmpty,
+        guard let capabilities = NCNetworking.shared.capabilities[account],
+              let certificate = getEndToEndCertificate(account: account), !certificate.isEmpty,
               let publicKey = getEndToEndPublicKey(account: account), !publicKey.isEmpty,
               let privateKey = getEndToEndPrivateKey(account: account), !privateKey.isEmpty,
-              let passphrase = getEndToEndPassphrase(account: account), !passphrase.isEmpty else {
+              let passphrase = getEndToEndPassphrase(account: account), !passphrase.isEmpty,
+              NCGlobal.shared.e2eeVersions.contains(capabilities.e2EEApiVersion) else {
             return false
         }
         return true
@@ -890,6 +914,72 @@ final class NCPreferences: NSObject {
             return intValue
         }
 
+        return defaultValue
+    }
+
+    func removeAll() {
+        try? keychain.removeAll()
+    }
+
+    private func setUserDefaults(_ value: Any?, forKey key: String) {
+        let keyPreferences = "Preferences_\(key)"
+        UserDefaults.standard.set(value, forKey: keyPreferences)
+    }
+
+    private func getBoolPreference(key: String, account: String? = nil, defaultValue: Bool) -> Bool {
+        let suffix = account ?? ""
+        let userDefaultsKey = account != nil ? "Preferences_\(key)_\(suffix)" : "Preferences_\(key)"
+        let keychainKey = account != nil ? "\(key)\(suffix)" : key
+
+        if let value = UserDefaults.standard.object(forKey: userDefaultsKey) as? Bool {
+            return value
+        }
+
+        if let value = try? keychain.get(keychainKey), let boolValue = Bool(value) {
+            UserDefaults.standard.set(boolValue, forKey: userDefaultsKey)
+            try? keychain.remove(keychainKey)
+            return boolValue
+        }
+
+        UserDefaults.standard.set(defaultValue, forKey: userDefaultsKey)
+        return defaultValue
+    }
+
+    private func getStringPreference(key: String, account: String? = nil, defaultValue: String) -> String {
+        let suffix = account ?? ""
+        let userDefaultsKey = account != nil ? "Preferences_\(key)_\(suffix)" : "Preferences_\(key)"
+        let keychainKey = account != nil ? "\(key)\(suffix)" : key
+
+        if let value = UserDefaults.standard.object(forKey: userDefaultsKey) as? String {
+            return value
+        }
+
+        if let value = try? keychain.get(keychainKey) {
+            UserDefaults.standard.set(value, forKey: userDefaultsKey)
+            try? keychain.remove(keychainKey)
+            return value
+        }
+
+        UserDefaults.standard.set(defaultValue, forKey: userDefaultsKey)
+        return defaultValue
+    }
+
+    private func getIntPreference(key: String, account: String? = nil, defaultValue: Int) -> Int {
+        let suffix = account ?? ""
+        let userDefaultsKey = account != nil ? "Preferences_\(key)_\(suffix)" : "Preferences_\(key)"
+        let keychainKey = account != nil ? "\(key)\(suffix)" : key
+
+        if let value = UserDefaults.standard.object(forKey: userDefaultsKey) as? Int {
+            return value
+        }
+
+        if let value = try? keychain.get(keychainKey), let intValue = Int(value) {
+            UserDefaults.standard.set(intValue, forKey: userDefaultsKey)
+            try? keychain.remove(keychainKey)
+            return intValue
+        }
+
+        UserDefaults.standard.set(defaultValue, forKey: userDefaultsKey)
         return defaultValue
     }
 }
