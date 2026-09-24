@@ -5,12 +5,13 @@
 import UIKit
 
 class NCMediaCell: UICollectionViewCell {
+
     @IBOutlet weak var imageItem: UIImageView!
     @IBOutlet weak var imageVisualEffect: UIVisualEffectView!
     @IBOutlet weak var imageSelect: UIImageView!
     @IBOutlet weak var imageStatus: UIImageView!
 
-    var identifier: String = ""
+    var ocId: String = ""
     var date: Date?
 
     override func awakeFromNib() {
@@ -27,20 +28,20 @@ class NCMediaCell: UICollectionViewCell {
         imageStatus.image = nil
         imageItem.image = nil
         imageVisualEffect.alpha = 0.4
-        imageSelect.image = NCImageCache.shared.getImageCheckedYes()
+//        imageSelect.image = NCImageCache.shared.getImageCheckedYes(color: color)
         imageVisualEffect.isHidden = true
         imageSelect.isHidden = true
     }
 
-    func selected(_ status: Bool) {
+    func selected(_ status: Bool, color: UIColor) {
         if status {
 //            imageSelect.isHidden = false
             imageVisualEffect.isHidden = false
-            imageSelect.image = NCImageCache.shared.getImageCheckedYes()
+            imageSelect.image = NCImageCache.shared.getImageCheckedYes(color: color)
         } else {
 //            imageSelect.isHidden = true
             imageVisualEffect.isHidden = true
-            imageSelect.image = NCImageCache.shared.getImageCheckedNo()
+            imageSelect.image = NCImageCache.shared.getImageCheckedNo(color: color)
         }
     }
 }
