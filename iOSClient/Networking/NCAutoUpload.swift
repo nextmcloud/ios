@@ -26,6 +26,26 @@ class NCAutoUpload: NSObject {
         guard networking.isOnline else {
             return 0
         }
+        let tblAccounts = await NCManageDatabase.shared.getTableAccountsAsync(predicate: NSPredicate(format: "autoUploadStart == true"))
+        for tblAccount in tblAccounts {
+
+            let accountAutoUploadFileName = NCManageDatabase.shared.getAccountAutoUploadFileName(account: tblAccount.account)
+            if(accountAutoUploadFileName == "Kamera-Medien" || accountAutoUploadFileName == "Camera-Media"){
+                //set autoupload folder as per locale
+                if(accountAutoUploadFileName != NCBrandOptions.shared.folderDefaultAutoUpload){
+                    //set auto upload as per locale
+                    print("auto upload folder set here....")
+                    await NCManageDatabase.shared.setAccountAutoUploadFileNameAsync(NCBrandOptions.shared.folderDefaultAutoUpload)
+                }
+            }
+            let albumIds = NCPreferences().getAutoUploadAlbumIds(account: tblAccount.account)
+            let assetCollections = PHAssetCollection.allAlbums.filter({albumIds.contains($0.localIdentifier)})
+            let result = await getCameraRollAssets(controller: nil, assetCollections: assetCollections, tblAccount: tableAccount(value: tblAccount))
+            if let assets = result.assets, !assets.isEmpty, let fileNames = result.fileNames {
+                let item = await uploadAssets(controller: nil, tblAccount: tblAccount, assets: assets, fileNames: fileNames)
+                counter += item
+            }
+        }
 
         guard let account = await database.getTableAccountAsync(predicate: NSPredicate(format: "autoUploadStart == true")) else {
             return 0
@@ -81,7 +101,7 @@ class NCAutoUpload: NSObject {
                                        subtitle: "_creating_db_photo_progress_",
                                        systemImage: "photo.on.rectangle.angled",
                                        imageAnimation: .bounce,
-                                       imageColor: .systemBlue,
+                                       imageColor: NCBrandColor.shared.customer,
                                        autoDismissAfter: 0,
                                        swipeToDismiss: false
         )
@@ -100,15 +120,14 @@ class NCAutoUpload: NSObject {
             return
         }
 
-        let num = await uploadAssets(controller: controller, tblAccount: tblAccount, assets: assets, fileNames: fileNames, filterExistingQueue: false)
+        let num = await uploadAssets(controller: controller, tblAccount: tblAccount, assets: assets, fileNames: fileNames)
         nkLog(debug: "Automatic upload \(num) upload")
     }
 
     private func uploadAssets(controller: NCMainTabBarController?,
                               tblAccount: tableAccount,
                               assets: [PHAsset],
-                              fileNames: [String],
-                              filterExistingQueue: Bool) async -> Int {
+                              fileNames: [String]) async -> Int {
         let capabilities = await NKCapabilities.shared.getCapabilities(for: tblAccount.account)
         let autoMkcol = NCBrandOptions.shared.isServerVersion(capabilities, greaterOrEqualTo: .v33)
         let session = NCSession.shared.getSession(account: tblAccount.account)
@@ -125,12 +144,8 @@ class NCAutoUpload: NSObject {
         for (index, asset) in assets.enumerated() {
             let fileName = fileNames[index]
 
-            let sourceFileExtension = (fileName as NSString).pathExtension.lowercased()
-            let fileNameCompatible = NCCameraRoll.outputFileName(
-                for: fileName,
-                sourceFileExtension: sourceFileExtension,
-                nativeFormat: !formatCompatibility
-            )
+            // Convert HEIC if compatibility mode is on
+            let fileNameCompatible = formatCompatibility && (fileName as NSString).pathExtension.lowercased() == "heic" ? (fileName as NSString).deletingPathExtension + ".jpg" : fileName
 
             if skipFileNames.contains(fileNameCompatible) || skipFileNames.contains(fileName) {
                 continue
@@ -145,7 +160,7 @@ class NCAutoUpload: NSObject {
             let uploadSession = onWWAN ? self.networking.sessionUploadBackgroundWWan : self.networking.sessionUploadBackground
 
             let metadata = await NCManageDatabaseCreateMetadata().createMetadataAsync(
-                fileName: fileNameCompatible,
+                fileName: fileName,
                 ocId: UUID().uuidString,
                 serverUrl: serverUrl,
                 session: session,
@@ -195,33 +210,19 @@ class NCAutoUpload: NSObject {
             await self.database.updateAccountPropertyAsync(\.autoUploadSinceDate, value: date, account: session.account)
         }
 
-        guard !metadatas.isEmpty else {
-            return 0
+        if !metadatas.isEmpty {
+            if autoMkcol {
+                await self.database.addMetadatasAsync(metadatas)
+            } else {
+                let metadatasFolder = await NCManageDatabaseCreateMetadata().createMetadatasFolderAsync(
+                    assets: assets,
+                    useSubFolder: tblAccount.autoUploadCreateSubfolder,
+                    session: session)
+                await self.database.addMetadatasAsync(metadatasFolder + metadatas)
+            }
         }
 
-        let metadatasToAdd: [tableMetadata]
-
-        if filterExistingQueue {
-            metadatasToAdd = await self.database.filterAutoUploadMetadatasNotAlreadyQueuedAsync(metadatas)
-        } else {
-            metadatasToAdd = metadatas
-        }
-
-        guard !metadatasToAdd.isEmpty else {
-            return 0
-        }
-
-        if autoMkcol {
-            await self.database.addMetadatasAsync(metadatasToAdd)
-        } else {
-            let metadatasFolder = await NCManageDatabaseCreateMetadata().createMetadatasFolderAsync(
-                assets: assets,
-                useSubFolder: tblAccount.autoUploadCreateSubfolder,
-                session: session)
-            await self.database.addMetadatasAsync(metadatasFolder + metadatasToAdd)
-        }
-
-        return metadatasToAdd.count
+        return metadatas.count
     }
 
     // MARK: -
