@@ -70,12 +70,8 @@ class NCScan: UIViewController, NCScanCellCellDelegate {
         collectionViewDestination.reorderingCadence = .fast // default value - .immediate
         collectionViewDestination.backgroundColor = .secondarySystemGroupedBackground
 
-        cancel.title = nil
-        cancel.image = UIImage(systemName: "xmark")
-        cancel.accessibilityLabel = NSLocalizedString("_cancel_", comment: "")
-        save.title = nil
-        save.image = UIImage(systemName: "checkmark")
-        save.accessibilityLabel = NSLocalizedString("_save_", comment: "")
+        cancel.title = NSLocalizedString("_cancel_", comment: "")
+        save.title = NSLocalizedString("_save_", comment: "")
 
         labelTitlePDFzone.text = NSLocalizedString("_scan_label_document_zone_", comment: "")
         labelTitlePDFzone.backgroundColor = .systemGray6
@@ -107,6 +103,10 @@ class NCScan: UIViewController, NCScanCellCellDelegate {
 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+        
+        // Re-evaluate in-app messages after viewDidAppear
+        MoEngageAnalytics.shared.displayInAppNotificationSafely(reason: "viewDidAppear")
+
         showTip()
     }
 
@@ -128,6 +128,13 @@ class NCScan: UIViewController, NCScanCellCellDelegate {
     }
 
     override var canBecomeFirstResponder: Bool { return true }
+
+//    override func canPerformAction(_ action: Selector, withSender sender: Any?) -> Bool {
+//        if action == #selector(pasteImage()) {
+//            return true
+//        }
+//        return false
+//    }
 
     @objc func dismiss(_ notification: NSNotification) {
         self.dismiss(animated: true, completion: nil)
