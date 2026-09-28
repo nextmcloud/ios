@@ -109,7 +109,13 @@ class NCManageE2EE: NSObject, ObservableObject, ViewOnAppearHandling, NCEndToEnd
         self.passcodeType = passcodeType
         correctPasscode()
         return
-        #endif
+        #else
+        // If no app lock/passcode is configured, bypass the passcode screen
+        if (NCPreferences().passcode ?? "").isEmpty {
+            self.passcodeType = passcodeType
+            self.correctPasscode()
+            return
+        }
 
         let laContext = LAContext()
         var error: NSError?
@@ -132,6 +138,7 @@ class NCManageE2EE: NSObject, ObservableObject, ViewOnAppearHandling, NCEndToEnd
 
         self.passcodeType = passcodeType
         controller?.present(passcodeViewController, animated: true)
+        #endif
     }
 
     @objc func correctPasscode() {
