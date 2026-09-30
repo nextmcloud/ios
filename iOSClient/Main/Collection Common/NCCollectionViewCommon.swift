@@ -455,7 +455,15 @@ class NCCollectionViewCommon: UIViewController, NCAccountSettingsModelDelegate, 
     override var canBecomeFirstResponder: Bool {
         return true
     }
-    
+
+    func presentationControllerDidDismiss( _ presentationController: UIPresentationController) {
+        let viewController = presentationController.presentedViewController
+
+        if viewController is NCViewerRichWorkspaceWebView {
+            closeRichWorkspaceWebView()
+        }
+    }
+
     @objc func updateIcons() {
         collectionView.reloadData()
     }
