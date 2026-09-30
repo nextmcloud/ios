@@ -82,7 +82,7 @@ class NCShareExtension: UIViewController {
         uploadView.layer.cornerRadius = 10
 
         uploadLabel.text = NSLocalizedString("_upload_", comment: "")
-        uploadLabel.textColor = NCBrandColor.shared.label
+        uploadLabel.textColor = NCBrandColor.shared.customer
         let uploadGesture = UITapGestureRecognizer(target: self, action: #selector(actionUpload(_:)))
         uploadView.addGestureRecognizer(uploadGesture)
 
@@ -95,6 +95,13 @@ class NCShareExtension: UIViewController {
         nkLog(start: "Start Share session " + versionNextcloudiOS)
 
         NCBrandColor.shared.createUserColors()
+
+        registerForTraitChanges([UITraitUserInterfaceStyle.self]) { (self: Self, _) in
+            guard !self.maintenanceMode else {
+                return
+            }
+            self.updateAppearance()
+        }
 
         NotificationCenter.default.addObserver(forName: UIApplication.willEnterForegroundNotification, object: nil, queue: nil) { _ in
             guard !self.maintenanceMode,
@@ -149,7 +156,18 @@ class NCShareExtension: UIViewController {
             return
         }
 
+        // Keep the Share extension visually hidden until we know whether this is
+        // an Assistant text handoff or a normal file upload flow. This avoids the
+        // visible open-and-close flash when the extension only needs to redirect text.
+        view.alpha = 0
+
         Task { @MainActor in
+            if await handleAssistantSharedTextIfNeeded(inputItems: inputItems) {
+                return
+            }
+
+            self.view.alpha = 1
+
             NCFilesExtensionHandler(items: inputItems) { fileNames in
                 self.filesName = fileNames
                 DispatchQueue.main.async {
@@ -165,14 +183,6 @@ class NCShareExtension: UIViewController {
 
             self.collectionView.reloadData()
         }
-
-        if NCPreferences().presentPasscode {
-            NCPasscode.shared.presentPasscode(viewController: self, delegate: self) {
-                NCPasscode.shared.enableTouchFaceID()
-            }
-        }
-
-        self.collectionView.reloadData()
     }
 
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
@@ -259,6 +269,11 @@ class NCShareExtension: UIViewController {
         }
     }
 
+    private func updateAppearance() {
+        collectionView.visibleCells.forEach { $0.setNeedsLayout() }
+        tableView.visibleCells.forEach { $0.setNeedsLayout() }
+    }
+
     // MARK: -
 
     func cancel(with error: NCShareExtensionError? = nil) {
@@ -286,6 +301,7 @@ class NCShareExtension: UIViewController {
 
         navigationItem.title = navigationTitle
         cancelButton.title = NSLocalizedString("_cancel_", comment: "")
+        cancelButton.tintColor = NCBrandColor.shared.customer
 
         // BACK BUTTON
         let backButton = UIButton(type: .custom)
@@ -293,7 +309,7 @@ class NCShareExtension: UIViewController {
         backButton.tintColor = NCBrandColor.shared.label
         backButton.semanticContentAttribute = .forceLeftToRight
         backButton.setTitle(" " + NSLocalizedString("_back_", comment: ""), for: .normal)
-        backButton.setTitleColor(NCBrandColor.shared.label, for: .normal)
+        backButton.setTitleColor(NCBrandColor.shared.customer, for: .normal)
         backButton.action(for: .touchUpInside) { _ in
             while self.serverUrl.last != "/" { self.serverUrl.removeLast() }
             self.serverUrl.removeLast()
