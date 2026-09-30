@@ -129,10 +129,10 @@ struct NCMoreView: View {
             .background(Color(.secondarySystemGroupedBackground))
             .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
 
-            Text(NSLocalizedString("_autoupload_description_", comment: ""))
-                .font(.footnote)
-                .foregroundStyle(.secondary)
-                .padding(.horizontal, 16)
+//            Text(NSLocalizedString("_autoupload_description_", comment: ""))
+//                .font(.footnote)
+//                .foregroundStyle(.secondary)
+//                .padding(.horizontal, 16)
         }
     }
 
@@ -203,9 +203,13 @@ struct NCMoreView: View {
 
                 Spacer()
 
-                Image(systemName: "chevron.right")
-                    .font(.caption)
-                    .foregroundColor(Color(.tertiaryLabel))
+                if case .none = item.destination {
+                    // No accessory for items without a destination
+                } else {
+                    Image(systemName: "chevron.right")
+                        .font(.caption)
+                        .foregroundColor(Color(.tertiaryLabel))
+                }
             }
             .padding(.horizontal, 16)
             .frame(height: 54)
@@ -328,27 +332,27 @@ extension NCMoreModel {
                 items: [
                     Item(
                         titleKey: "_recent_",
-                        image: "clock.arrow.circlepath",
+                        image: "History",
                         destination: .none
                     ),
                     Item(
                         titleKey: "_list_shares_",
-                        image: "person.badge.plus",
+                        image: "share",
                         destination: .none
                     ),
                     Item(
                         titleKey: "_manage_file_offline_",
-                        image: "icloud.and.arrow.down",
+                        image: "cloudDownload",
                         destination: .none
                     ),
                     Item(
                         titleKey: "_scanned_images_",
-                        image: "doc.text.viewfinder",
+                        image: "scan",
                         destination: .none
                     ),
                     Item(
                         titleKey: "_trash_view_",
-                        image: "trash",
+                        image: "trashIcon",
                         destination: .none
                     )
                 ]
@@ -358,7 +362,7 @@ extension NCMoreModel {
                 items: [
                     Item(
                         titleKey: "_settings_",
-                        image: "gear",
+                        image: "settings",
                         destination: .none
                     )
                 ]
