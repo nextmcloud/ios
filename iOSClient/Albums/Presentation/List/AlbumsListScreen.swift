@@ -5,19 +5,12 @@
 
 import SwiftUI
 
-extension Notification.Name {
-    static let albumsPopToRootRequested = Notification.Name("NCAlbumsPopToRootRequested")
-}
-
 struct AlbumsListScreen: View {
-    @Environment(\.localAccount) var localAccount: String
-    enum NavigationDestination: Hashable {
-        case albumDetails(album: Album)
-    }
+    private unowned let controller: NCMainTabBarController
     @StateObject private var viewModel: AlbumsListViewModel
-    @State private var popToRootTrigger: Int = 0
 
-    init(viewModel: AlbumsListViewModel) {
+    init(controller: NCMainTabBarController, viewModel: AlbumsListViewModel) {
+        self.controller = controller
         self._viewModel = StateObject(wrappedValue: viewModel)
     }
 
@@ -34,17 +27,14 @@ struct AlbumsListScreen: View {
         .toolbar {
             ToolbarItemGroup(placement: .topBarTrailing) {
                 Button(action: { viewModel.onNewAlbumClick() }) {
-                    Text(NSLocalizedString("_albums_list_new_album_btn_", comment: ""))
-                        .font(.body)
-                        .padding(.vertical, 6)
-                        .padding(.horizontal, 10)
-                        .contentShape(Rectangle())
+                    HStack(spacing: 6) {
+                        Image(systemName: "plus")
+                        Text(NSLocalizedString("_albums_list_new_album_btn_", comment: ""))
+                    }
+                    .fixedSize()
                 }
-                .buttonStyle(.plain)
-                .tint(Color(NCBrandColor.shared.iconImageColor))
             }
         }
-        .overlay(setupNavigation.hidden())
         .sheet(
             isPresented: $viewModel.isPhotoSelectionSheetVisible,
             onDismiss: {
@@ -52,6 +42,7 @@ struct AlbumsListScreen: View {
             }
         ) {
             PhotoSelectionSheet(
+                controller: controller,
                 onPhotosSelected: viewModel.onPhotosSelected
             )
         }
@@ -66,11 +57,6 @@ struct AlbumsListScreen: View {
                 viewModel.onNewAlbumPopupCancel()
             }
         )
-        .onReceive(NotificationCenter.default.publisher(for: .albumsPopToRootRequested)) { _ in
-            // Clear any programmatic navigation and force root content
-            viewModel.navigationDestination = nil
-            popToRootTrigger += 1
-        }
     }
 
     @ViewBuilder
@@ -107,46 +93,4 @@ struct AlbumsListScreen: View {
             }
         }
     }
-
-    private var setupNavigation: some View {
-        let binding = Binding<Bool> { [weak viewModel] in
-            viewModel?.navigationDestination != nil
-        } set: { [weak viewModel] value in
-            guard !value else { return }
-            viewModel?.navigationDestination = nil
-        }
-
-        return NavigationLink(isActive: binding) {
-            switch viewModel.navigationDestination {
-            case .some(let value):
-                navigationDestination(value)
-
-            case .none:
-                EmptyView()
-            }
-        } label: {
-            EmptyView()
-        }
-    }
-
-    @ViewBuilder
-    private func navigationDestination(_ destination: NavigationDestination) -> some View {
-        switch destination {
-        case .albumDetails(let album):
-            AlbumDetailsScreen(account: localAccount, album: album)
-        }
-    }
 }
-
-// #if DEBUG
-// #Preview {
-//    NavigationView {
-//        AlbumsListScreen(viewModel: .init(account: "123"))
-//    }.onAppear {
-//        UIView
-//            .appearance(
-//                whenContainedInInstancesOf: [UIAlertController.self]
-//            ).tintColor = NCBrandColor.shared.customer
-//    }
-// }
-// #endif

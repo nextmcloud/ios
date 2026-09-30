@@ -8,6 +8,7 @@ import RealmSwift
 import SwiftUI
 
 class NCFiles: NCCollectionViewCommon {
+    private var dataSourceTask: URLSessionTask?
     internal var lastOffsetY: CGFloat = 0
     internal var lastScrollTime: TimeInterval = 0
     internal var accumulatedScrollDown: CGFloat = 0
@@ -53,26 +54,28 @@ class NCFiles: NCCollectionViewCommon {
             self.serverUrl = utilityFileSystem.getHomeServer(session: session)
             self.titleCurrentFolder = getNavigationTitle()
 
-            NotificationCenter.default.addObserver(forName: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterChangeUser), object: nil, queue: nil) { notification in
-                Task { @MainActor in
-                    if let userInfo = notification.userInfo,
-                       let controller = userInfo["controller"] as? NCMainTabBarController {
+            NotificationCenter.default.addObserver(forName: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterChangeUser), object: nil, queue: .main) { notification in
+                MainActor.assumeIsolated {
+                    guard let userInfo = notification.userInfo,
+                          let account = userInfo["account"] as? String,
+                          self.controller?.account == account else {
+                        return
+                    }
+                    if let controller = userInfo["controller"] as? NCMainTabBarController {
                         guard controller == self.controller else {
                             return
                         }
                     }
-                    if let userInfo = notification.userInfo,
-                       let account = userInfo["account"] as? String {
-                        // re-tint the + button for the new account
-                        self.mainNavigationController?.menuPlus?.updatePlusButtonEnabled(session: NCSession.shared.getSession(account: account))
-                    }
+                    let session = NCSession.shared.getSession(account: account)
+                    self.mainNavigationController?.menuPlusButton.menu = nil
+                    self.mainNavigationController?.menuPlusButton.isEnabled = false
 
+                    self.serverUrl = self.utilityFileSystem.getHomeServer(session: session)
                     self.navigationController?.popToRootViewController(animated: false)
-                    self.serverUrl = self.utilityFileSystem.getHomeServer(session: self.session)
                     self.isSearchingMode = false
                     self.isEditMode = false
                     self.fileSelect.removeAll()
-                    self.layoutForView = self.database.getLayoutForView(account: self.session.account, key: self.layoutKey, serverUrl: self.serverUrl)
+                    self.layoutForView = self.database.getLayoutForView(account: session.account, key: self.layoutKey, serverUrl: self.serverUrl)
 
                     if self.isLayoutList {
                         self.collectionView?.collectionViewLayout = self.listLayout
@@ -85,9 +88,12 @@ class NCFiles: NCCollectionViewCommon {
                     self.titleCurrentFolder = self.getNavigationTitle()
                     self.navigationItem.title = self.titleCurrentFolder
 
-                    await (self.navigationController as? NCMainNavigationController)?.setNavigationLeftItems()
-                    await self.reloadDataSource()
-                    await self.getServerData()
+                    Task { @MainActor in
+                        await self.mainNavigationController?.menuPlus?.create(session: session)
+                        await (self.navigationController as? NCMainNavigationController)?.setNavigationLeftItems()
+                        await self.reloadDataSource()
+                        await self.getServerData()
+                    }
                 }
             }
         }
@@ -118,9 +124,11 @@ class NCFiles: NCCollectionViewCommon {
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
 
+        dataSourceTask?.cancel()
+        dataSourceTask = nil
+
         Task {
             await stopSyncMetadata()
-            await NCNetworking.shared.networkingTasks.cancel(identifier: "\(self.serverUrl)_NCFiles")
         }
     }
 
@@ -160,7 +168,8 @@ class NCFiles: NCCollectionViewCommon {
             startSyncMetadata(metadatas: self.dataSource.getMetadatas())
         }
 
-        await networking.networkingTasks.cancel(identifier: "\(self.serverUrl)_NCFiles")
+        dataSourceTask?.cancel()
+        dataSourceTask = nil
 
         guard !isSearchingMode else {
             await self.search()
@@ -215,11 +224,12 @@ class NCFiles: NCCollectionViewCommon {
         var reloadRequired: Bool = false
         let account = session.account
         let resultsReadFile = await NCNetworking.shared.readFileAsync(serverUrlFileName: serverUrl, account: account) { task in
-            Task {
-                await NCNetworking.shared.networkingTasks.track(identifier: "\(self.serverUrl)_NCFiles", task: task)
-            }
-            if self.dataSource.isEmpty() {
-                self.collectionView.reloadData()
+            Task { @MainActor in
+                self.dataSourceTask = task
+
+                if self.dataSource.isEmpty() {
+                    self.collectionView.reloadData()
+                }
             }
         }
         guard resultsReadFile.error == .success,
@@ -256,11 +266,12 @@ class NCFiles: NCCollectionViewCommon {
             account: account,
             options: options
         ) { task in
-            Task {
-                await NCNetworking.shared.networkingTasks.track(identifier: "\(self.serverUrl)_NCFiles", task: task)
-            }
-            if self.dataSource.isEmpty() {
-                self.collectionView.reloadData()
+            Task { @MainActor in
+                self.dataSourceTask = task
+
+                if self.dataSource.isEmpty() {
+                    self.collectionView.reloadData()
+                }
             }
         }
 

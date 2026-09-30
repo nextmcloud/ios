@@ -128,6 +128,10 @@ class tableMetadata: Object {
     @objc dynamic var nativeFormat: Bool = false
     @objc dynamic var autoUploadServerUrlBase: String?
     @objc dynamic var typeIdentifier: String = ""
+    @objc dynamic var backgroundUploadJobIdentifier = ""
+    @objc dynamic var backgroundUploadRetryCount: Int = 0
+    @objc dynamic var backgroundUploadNextRetryDate: Date?
+    @objc dynamic var backgroundUploadCancellationRequested = false
 
     // =========================
     // UI / transient properties
@@ -183,7 +187,7 @@ extension tableMetadata {
         !directory
     }
 
-#if !EXTENSION_FILE_PROVIDER_EXTENSION
+#if !EXTENSION_FILE_PROVIDER_EXTENSION && !EXTENSION_BACKGROUNDUPLOAD
     @objc var isDirectoryE2EE: Bool {
         return NCUtilityFileSystem().isDirectoryE2EE(serverUrl: serverUrl, urlBase: urlBase, userId: userId, account: account)
     }
@@ -827,11 +831,27 @@ extension NCManageDatabase {
         }
     }
 
-    func clearMetadatasUploadAsync(account: String) async {
+    func requestBackgroundAutoUploadCancellationAsync(account: String) async {
         await core.performRealmWriteAsync { realm in
-            let results = realm.objects(tableMetadata.self)
-                .filter("account == %@ AND (status == %d OR status == %d)", account, NCGlobal.shared.metadataStatusWaitUpload, NCGlobal.shared.metadataStatusUploadError)
-            realm.delete(results)
+            let pendingMetadatas = realm.objects(tableMetadata.self).filter(
+                "account == %@ AND sessionSelector == %@ AND backgroundUploadJobIdentifier == %@",
+                account,
+                NCGlobal.shared.selectorUploadAutoUpload,
+                "pending"
+            )
+
+            realm.delete(pendingMetadatas)
+
+            let jobMetadatas = realm.objects(tableMetadata.self).filter(
+                "account == %@ AND sessionSelector == %@ AND backgroundUploadJobIdentifier != %@ AND backgroundUploadJobIdentifier != ''",
+                account,
+                NCGlobal.shared.selectorUploadAutoUpload,
+                "pending"
+            )
+
+            for metadata in jobMetadatas {
+                metadata.backgroundUploadCancellationRequested = true
+            }
         }
     }
 
@@ -964,6 +984,29 @@ extension NCManageDatabase {
                 .first
                 .map { $0.detachedCopy() }
         }
+    }
+
+    func getMetadataAsync(backgroundUploadJobIdentifier: String) async -> tableMetadata? {
+        await core.performRealmReadAsync { realm in
+            realm.objects(tableMetadata.self)
+                .filter("backgroundUploadJobIdentifier == %@", backgroundUploadJobIdentifier)
+                .first?
+                .detachedCopy()
+        }
+    }
+
+    /// Returns metadata stored before PhotoKit supplied its persistent job identifier.
+    /// The caller must still match the destination because a Live Photo has two resources per asset.
+    func getPendingBackgroundUploadMetadatasAsync(assetLocalIdentifier: String) async -> [tableMetadata] {
+        await core.performRealmReadAsync { realm in
+            realm.objects(tableMetadata.self)
+                .filter(
+                    "assetLocalIdentifier == %@ AND backgroundUploadJobIdentifier == %@",
+                    assetLocalIdentifier,
+                    "pending"
+                )
+                .map { $0.detachedCopy() }
+        } ?? []
     }
 
     func getResultsMetadatasAsync(predicate: NSPredicate) async -> Results<tableMetadata>? {
@@ -1304,11 +1347,37 @@ extension NCManageDatabase {
     func getAssetLocalIdentifiersUploadedAsync() async -> [String]? {
         return await core.performRealmReadAsync { realm in
             let results = realm.objects(tableMetadata.self).filter("assetLocalIdentifier != ''")
-            return results.map { $0.assetLocalIdentifier }
+            return Self.uploadedAssetLocalIdentifiers(in: Array(results))
         }
     }
 
-    func getMetadataFromFileId(_ fileId: String?, account: String? = nil) -> tableMetadata? {
+    /// A local asset can only be deleted once every tracked transfer for it is complete.
+    /// Live Photo links contain a filename before server pairing and a file ID afterwards.
+    static func uploadedAssetLocalIdentifiers(in metadatas: [tableMetadata]) -> [String] {
+        let grouped = Dictionary(grouping: metadatas.filter { !$0.assetLocalIdentifier.isEmpty }, by: \.assetLocalIdentifier)
+        return grouped.compactMap { identifier, components in
+            guard components.allSatisfy({
+                $0.status == NCGlobal.shared.metadataStatusNormal && !$0.backgroundUploadCancellationRequested
+            }) else {
+                return nil
+            }
+
+            for component in components where component.isLivePhoto {
+                let hasCompletedCompanion = components.contains { companion in
+                    companion.ocId != component.ocId &&
+                    companion.account == component.account &&
+                    companion.serverUrl == component.serverUrl &&
+                    ((component.isLivePhotoImage && companion.isLivePhotoVideo) ||
+                     (component.isLivePhotoVideo && companion.isLivePhotoImage)) &&
+                    (companion.fileName == component.livePhotoFile || companion.fileId == component.livePhotoFile)
+                }
+                guard hasCompletedCompanion else { return nil }
+            }
+            return identifier
+        }.sorted()
+    }
+
+    func getMetadataFromFileId(_ fileId: String?, account: String?) -> tableMetadata? {
         guard let fileId else {
             return nil
         }
@@ -1325,7 +1394,7 @@ extension NCManageDatabase {
     /// Asynchronously retrieves a `tableMetadata` object matching the given `fileId`, if available.
     /// - Parameter fileId: The file identifier used to query the Realm database.
     /// - Returns: A detached copy of the `tableMetadata` object, or `nil` if not found.
-    func getMetadataFromFileIdAsync(_ fileId: String?, account: String? = nil) async -> tableMetadata? {
+    func getMetadataFromFileIdAsync(_ fileId: String?, account: String?) async -> tableMetadata? {
         guard let fileId else {
             return nil
         }
@@ -1356,7 +1425,7 @@ extension NCManageDatabase {
         } ?? []
     }
 
-#if !EXTENSION_FILE_PROVIDER_EXTENSION
+#if !EXTENSION_FILE_PROVIDER_EXTENSION && !EXTENSION_BACKGROUNDUPLOAD
     /// Asynchronously retrieves and sorts `tableMetadata` objects matching a given predicate and layout.
     func getMetadatasAsync(predicate: NSPredicate,
                            withLayout layoutForView: NCDBLayoutForView?,

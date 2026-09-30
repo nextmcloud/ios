@@ -6,33 +6,46 @@
 import SwiftUI
 
 struct PhotoSelectionSheet: View {
-    @Environment(\.localAccount) var localAccount: String
+    private unowned let controller: NCMainTabBarController
     let onPhotosSelected: ([String]) -> Void
+
     @State private var mediaVC: NCMedia?
+
+    init(controller: NCMainTabBarController, onPhotosSelected: @escaping ([String]) -> Void) {
+        self.controller = controller
+        self.onPhotosSelected = onPhotosSelected
+    }
 
     var body: some View {
         NavigationView {
             VStack {
-                NCMediaViewRepresentable(ncMedia: $mediaVC)
+                NCMediaViewRepresentable(controller: controller, ncMedia: $mediaVC)
                     .frame(maxHeight: .infinity)
             }
             .navigationTitle(NSLocalizedString("_albums_photo_selection_sheet_title_", comment: ""))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button(NSLocalizedString("_albums_photo_selection_sheet_back_btn_", comment: "")) {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button {
                         onPhotosSelected([])
+                    } label: {
+                        Image(systemName: "xmark")
                     }
-                    .foregroundColor(Color(NCBrandColor.shared.getElement(account: localAccount)))
+                    .accessibilityLabel(
+                        NSLocalizedString("_cancel_", comment: "")
+                    )
                 }
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(NSLocalizedString("_albums_photo_selection_sheet_done_btn_", comment: "")) {
+                ToolbarItem(placement: .confirmationAction) {
+                    Button {
                         onPhotosSelected(mediaVC?.fileSelect ?? [])
+                    } label: {
+                        Image(systemName: "checkmark")
                     }
-                    .foregroundColor(Color(NCBrandColor.shared.getElement(account: localAccount)))
+                    .accessibilityLabel(
+                        NSLocalizedString("_done_", comment: "")
+                    )
                     .disabled(mediaVC == nil)
                 }
-
             }
         }
     }

@@ -388,13 +388,13 @@ final class NCGlobal: Sendable {
     let logTagServiceProficer               = "SERVICE PROVIDER"
     let logTagDatabase                      = "DB"
     let logTagSpeedUpSyncMetadata           = "SYNC METADATA"
-    let logTagNetworkingTasks               = "NETWORKING TASKS"
     let logTagMetadataUploadTransfers       = "METADATA UPLOAD TRANSFERS"
     let logTagMetadataDownloadTransfers     = "METADATA DOWNLOAD TRANSFERS"
     let logTagViewer                        = "VIEWERS"
     let logTagMediaBackfill                 = "MEDIA BACKFILL"
     let logTagMediaPlaceholder              = "MEDIA PLACEHOLDER"
     let logTagMediaPreview                  = "MEDIA PREVIEW"
+    let logTagBackgroundUpload              = "BACKGROUND UPLOAD"
 
     // USER DEFAULTS
     //

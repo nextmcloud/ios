@@ -8,42 +8,40 @@ import Combine
 import NextcloudKit
 import UIKit
 
-// Place this at the top level of a file (outside any class)
 protocol AlbumActionHandler: AnyObject {
     func deleteMetadataFromAlbum(_ selectedMetadatas: [tableMetadata])
 }
 
 class AlbumDetailsViewModel: ObservableObject {
+    private weak var controller: NCMainTabBarController?
+    private var album: Album
+    private let navigator: AlbumsNavigator
 
     @Published var account: String
-    private var album: Album
-
     @Published private(set) var screenTitle: String
-
-    @Published private(set) var photos: [AlbumPhoto: tableMetadata?] = [:]
+    @Published private(set) var photos: [AlbumPhoto] = []
     @Published private(set) var isLoading: Bool = false
+    @Published private(set) var hasCachedPhotos: Bool = false
     @Published private(set) var errorMessage: String?
-
     @Published var isLoadingPopupVisible: Bool = false
-
     @Published var isDeleteAlbumPopupVisible: Bool = false
-
     @Published var isRenameAlbumPopupVisible: Bool = false
     @Published var newAlbumName: String = ""
     @Published private(set) var newAlbumNameError: String?
-
     @Published var isPhotoSelectionSheetVisible: Bool = false
 
     @MainActor
     private var windowScene: UIWindowScene? {
-        SceneManager.shared.getWindowScene(controller: SceneManager.shared.getController(account: account))
+        SceneManager.shared.getWindowScene(controller: controller)
     }
 
     private var cancellables: Set<AnyCancellable> = []
 
-    init(account: String, album: Album) {
-        self.account = account
+    init(controller: NCMainTabBarController, album: Album, navigator: AlbumsNavigator) {
+        self.account = controller.account
+        self.controller = controller
         self.album = album
+        self.navigator = navigator
         self.screenTitle = album.name
         registerPublishers()
         loadAlbumPhotos()
@@ -109,6 +107,13 @@ class AlbumDetailsViewModel: ObservableObject {
     }
 
     func onRenameAlbumPopupConfirm() {
+        let trimmedName = newAlbumName.trimmingCharacters(in: .whitespacesAndNewlines)
+        let errors = validateAlbumName(trimmedName)
+        if let firstError = errors.first {
+            newAlbumNameError = firstError
+            return
+        }
+
         isRenameAlbumPopupVisible = false
         renameAlbum()
     }
@@ -118,57 +123,55 @@ class AlbumDetailsViewModel: ObservableObject {
         loadAlbumPhotos()
     }
 
-    private func loadAlbumPhotos(
-        doOnSuccess: (() -> Void)? = nil
-    ) {
+    private func loadAlbumPhotos() {
 
         guard !isLoading else { return }
 
+        let requestedAlbum = album
+        let cached = NCManageDatabase.shared.getAlbumPhotos(album: requestedAlbum)
+        if let cached {
+            photos = cached.map { AlbumPhoto(metadata: $0) }
+        }
+        hasCachedPhotos = cached != nil
         isLoading = true
         errorMessage = nil
 
-        NextcloudKit.shared.fetchAlbumPhotos(for: album.name, account: account) { [weak self] result in
-
-            self?.isLoading = false
-
-            switch result {
-            case .success(let photos):
-                self?.photos = Dictionary(uniqueKeysWithValues: photos.map { photo in
-                    let meta = NCManageDatabase.shared.getMetadataFromFileId(photo.fileId)
-                    return (photo.toAlbumPhoto(), meta)
-                })
-                doOnSuccess?()
-
-            case .failure:
-             // Task { @MainActor in
-             //     await showErrorBanner(windowScene: self?.windowScene, error: NKError(error: error))
-             // }
-                self?.errorMessage = NSLocalizedString("_albums_photos_error_msg_", comment: "")
+        Task { @MainActor [weak self] in
+            guard let self else { return }
+            defer { self.isLoading = false }
+            do {
+                let photos = try await AlbumsManager.shared.refreshAlbumPhotos(requestedAlbum)
+                guard self.account == requestedAlbum.account, self.album.id == requestedAlbum.id else { return }
+                self.photos = photos
+                self.hasCachedPhotos = true
+            } catch is CancellationError {
+                // A newer refresh or a successful edit superseded this response.
+            } catch {
+                guard self.account == requestedAlbum.account, self.album.id == requestedAlbum.id else { return }
+                if !self.hasCachedPhotos {
+                    self.errorMessage = NSLocalizedString("_albums_photos_error_msg_", comment: "")
+                }
             }
         }
     }
 
     func deleteAlbum() {
-
         guard !isLoadingPopupVisible else { return }
-
         isLoadingPopupVisible = true
 
-        NextcloudKit.shared.deleteAlbum(
-            albumName: album.name,
-            account: account
-        ) { [weak self] result in
-
-            self?.isLoadingPopupVisible = false
-
-            switch result {
-            case .success:
-                AlbumsManager.shared.syncAlbums()
-                AlbumsNavigator.shared.pop()
-
-            case .failure(let error):
-                Task { @MainActor in
-                    await showErrorBanner(windowScene: self?.windowScene, error: NKError(error: error))
+        let deletedAlbum = album
+        NextcloudKit.shared.deleteAlbum(albumName: deletedAlbum.name, account: account) { [weak self] result in
+            Task { @MainActor [weak self] in
+                self?.isLoadingPopupVisible = false
+                switch result {
+                case .success(let account):
+                    AlbumsManager.shared.invalidatePhotoRequest(for: deletedAlbum)
+                    NCManageDatabase.shared.deleteAlbum(deletedAlbum)
+                    AlbumsManager.shared.syncAlbums(for: account)
+                    self?.navigator.pop()
+                case .failure(let error):
+                    // User-initiated failures must not be hidden by the network-error cooldown.
+                    await showErrorBanner(windowScene: self?.windowScene, text: error.errorDescription)
                 }
             }
         }
@@ -176,137 +179,101 @@ class AlbumDetailsViewModel: ObservableObject {
 
     @MainActor
     func removePhoto(_ photo: AlbumPhoto) async {
-        guard !isLoadingPopupVisible, photos.keys.contains(photo) else { return }
-
+        guard !isLoadingPopupVisible, photos.contains(where: { $0.id == photo.id }) else { return }
         isLoadingPopupVisible = true
         defer { isLoadingPopupVisible = false }
 
-        // Remove the album entry, including when the original file has no local metadata.
-        let result = await NextcloudKit.shared.deletePhotoFromAlbumAsync(
-            albumName: album.name,
-            fileName: photo.fileName,
-            account: account
-        )
-
-        guard result.error == .success else {
-            await showErrorBanner(windowScene: windowScene, error: result.error)
+        let error = await deletePhotoFromAlbum(photo, metadata: photo.metadata)
+        guard error == .success else {
+            await showErrorBanner(windowScene: windowScene, text: error.errorDescription)
             return
         }
 
-        photos.removeValue(forKey: photo)
-        AlbumsManager.shared.syncAlbums()
+        photos.removeAll { $0.id == photo.id }
+        persistPhotosAfterRemoval()
+        AlbumsManager.shared.syncAlbums(for: account)
     }
 
-    @MainActor func deletePhotos(with metadatas: [tableMetadata]) async {
-        for metadata in metadatas {
-            if let photo = photos.first(where: { $0.value?.ocId == metadata.ocId })?.key {
-
-                guard !isLoadingPopupVisible else { return }
-                await MainActor.run {
-                    isLoadingPopupVisible = true
-                }
-                // Perform the deletion off the main actor but marshal UI updates back to main
-                let error = await self.deletePhotoFromAlbum(photo, metadata: metadata)
-
-                await MainActor.run {
-                    self.isLoadingPopupVisible = false
-                }
-
-                guard error == .success else {
-                    await showErrorBanner(windowScene: windowScene, error: NKError(error: error))
-                    return
-                }
-
-                // Refresh album contents and sync albums list on main thread
-                await MainActor.run {
-                    self.loadAlbumPhotos()
-                    AlbumsManager.shared.syncAlbums()
-                }
-            }
+    @MainActor
+    func deletePhotos(with metadatas: [tableMetadata]) async {
+        guard !isLoadingPopupVisible else { return }
+        isLoadingPopupVisible = true
+        defer {
+            isLoadingPopupVisible = false
+            AlbumsManager.shared.syncAlbums(for: account)
         }
+
+        for metadata in metadatas where metadata.account == account {
+            guard let photo = photos.first(where: { $0.metadata.fileId == metadata.fileId }) else { continue }
+            let error = await deletePhotoFromAlbum(photo, metadata: metadata)
+            guard error == .success else {
+                await showErrorBanner(windowScene: windowScene, text: error.errorDescription)
+                return
+            }
+            photos.removeAll { $0.id == photo.id }
+            persistPhotosAfterRemoval()
+        }
+    }
+
+    @MainActor
+    private func persistPhotosAfterRemoval() {
+        AlbumsManager.shared.invalidatePhotoRequest(for: album)
+        NCManageDatabase.shared.replaceAlbumPhotos(photos.map(\.metadata), album: album)
     }
 
     func deletePhotoFromAlbum(_ photo: AlbumPhoto, metadata: tableMetadata) async -> NKError {
-
-        // Use the album entry's lastPathComponent (includes fileId prefix), do not decode
-        let fileName: String = photo.fileName
-        print("DEBUG: Attempting to remove: \(fileName)")
-
-        let results = await NextcloudKit.shared.deletePhotoFromAlbumAsync(albumName: album.name, fileName: fileName, account: metadata.account) { task in
-            Task {
-                let identifier = await NCNetworking.shared.networkingTasks.createIdentifier(account: metadata.account,
-                                                                                            path: metadata.serverUrlFileName,
-                                                                                            name: "deletePhotoFromAlbum")
-                await NCNetworking.shared.networkingTasks.track(identifier: identifier, task: task)
+        do {
+            // The album's DAV filename can differ from the original metadata filename.
+            // Resolve it when deleting instead of persisting a second photo representation.
+            let files: [NKFile] = try await withCheckedThrowingContinuation { continuation in
+                NextcloudKit.shared.fetchAlbumPhotos(for: album.name, account: account) { result in
+                    continuation.resume(with: result)
+                }
             }
-        }
+            guard let membership = files.first(where: {
+                !$0.directory && $0.account == account && $0.fileId == photo.id
+            }) else {
+                return .success // Already removed from this album on the server.
+            }
+            try await NextcloudKit.shared.deletePhotoFromAlbumAsync(albumName: album.name, fileName: membership.fileName, account: account)
+            return .success
 
-        if results.error == .success {
-            // Successfully unlinked from album. Do not delete local file or metadata.
-            return .success
-        } else if results.error.errorCode == NCGlobal.shared.errorResourceNotFound {
-            // Treat missing resource as already unlinked; do not delete local entities.
-            return .success
-        } else if results.error.errorCode == NCGlobal.shared.errorForbidden && metadata.isLivePhotoVideo {
-            // Some servers may forbid removing the video part of a Live Photo; ignore and treat as success.
-            return .success
-        } else {
-            await NCManageDatabase.shared.setMetadataSessionAsync(ocId: metadata.ocId,
-                                                                  status: NCGlobal.shared.metadataStatusNormal)
-            return results.error
+        } catch let nkError as NKError {
+            if nkError.errorCode == NCGlobal.shared.errorResourceNotFound {
+                return .success
+            }
+
+            if nkError.errorCode == NCGlobal.shared.errorForbidden && metadata.isLivePhotoVideo {
+                return .success
+            }
+
+            return nkError
+
+        } catch {
+            return NKError(error: error)
         }
     }
 
     func renameAlbum() {
-
         guard !isLoadingPopupVisible else { return }
-
         isLoadingPopupVisible = true
 
-        NextcloudKit.shared.renameAlbum(account: account, from: album.name, to: newAlbumName) { [weak self] result in
-
-            switch result {
-            case .success:
-                self?.reloadAlbumAfterRenaming(albumName: self?.newAlbumName ?? "")
-
-            case .failure(let error):
-                self?.isLoadingPopupVisible = false
-                let nkError = NKError(error: error)
-
-                if nkError.errorCode == NCGlobal.shared.errorConflict {
-                    let conflictError = NKError(errorCode: NCGlobal.shared.errorConflict,
-                                                errorDescription: "_album_already_exists_")
-                    Task { @MainActor in
-                        await showInfoBanner(windowScene: self?.windowScene, text: conflictError.errorDescription, errorCode: conflictError.errorCode)
-                    }
-                } else if let innerError = nkError.error as? NKError,
-                          innerError.errorCode == NCGlobal.shared.errorConflict {
-                    let conflictError = NKError(errorCode: NCGlobal.shared.errorConflict,
-                                                errorDescription: "_album_already_exists_")
-                    Task { @MainActor in
-                        await showInfoBanner(windowScene: self?.windowScene, text: conflictError.errorDescription, errorCode: conflictError.errorCode)
-                    }
-                } else {
-                    Task { @MainActor in
-                        await showErrorBanner(windowScene: self?.windowScene, error: nkError)
-                    }
-                }
-            }
-        }
-    }
-
-    private func reloadAlbumAfterRenaming(albumName: String) {
-
-        AlbumsManager.shared.syncAlbums { [weak self] resultAlbums in
-
-            self?.isLoadingPopupVisible = false
-
-            if let newAlbum = resultAlbums.first(where: { $0.name == albumName }) {
-                self?.album = newAlbum
-                self?.loadAlbumPhotos {
-                    self?.screenTitle = self?.album.name ?? ""
-                    self?.newAlbumName = ""
-                }
+        let name = newAlbumName.trimmingCharacters(in: .whitespacesAndNewlines)
+        let originalAlbum = album
+        Task { @MainActor [weak self] in
+            guard let self else { return }
+            defer { self.isLoadingPopupVisible = false }
+            do {
+                let renamed = try await AlbumsManager.shared.renameAlbum(originalAlbum, to: name)
+                self.album = renamed
+                self.screenTitle = renamed.name
+                self.newAlbumName = ""
+                self.loadAlbumPhotos()
+            } catch {
+                self.isLoadingPopupVisible = false
+                let error = (error as? NKError) ?? NKError(error: error)
+                // Report every failed rename, even after another offline operation.
+                await showErrorBanner(windowScene: self.windowScene, text: error.errorDescription)
             }
         }
     }
@@ -316,7 +283,6 @@ class AlbumDetailsViewModel: ObservableObject {
     }
 
     func onPhotosSelected(selectedPhotos: [String]) {
-
         isPhotoSelectionSheetVisible = false
 
         if selectedPhotos.isEmpty {
@@ -324,57 +290,47 @@ class AlbumDetailsViewModel: ObservableObject {
         }
 
         self.isLoadingPopupVisible = true
+        let group = DispatchGroup()
+        var hadAnySuccess = false
 
         for photo in selectedPhotos {
-
-            let metadata: tableMetadata? = NCManageDatabase.shared.getMetadataFromOcId(photo)
+            guard let metadata = NCManageDatabase.shared.getMetadataFromOcId(photo) else {
+                Task {
+                    await showErrorBanner(
+                        windowScene: self.windowScene,
+                        text: NKError.invalidData.errorDescription
+                    )
+                }
+                continue
+            }
+            group.enter()
 
             NextcloudKit.shared.copyPhotoToAlbum(
                 account: account,
-                sourcePath: metadata?.serverUrlFileName ?? photo,
+                sourcePath: metadata.serverUrlFileName,
                 albumName: album.name,
-                fileName: metadata?.fileName ?? photo
+                fileName: metadata.fileName
             ) { [weak self] result in
-
-                DispatchQueue.main.async {
-                    self?.isLoadingPopupVisible = false
-                }
-
-                switch result {
-                case .success:
-                    DispatchQueue.main.async {
-                        self?.loadAlbumPhotos()
-                        AlbumsManager.shared.syncAlbums()
-                    }
-                case .failure(let error):
-                    let nkError = NKError(error: error)
-
-                    // 1. Log the high-level error (usually 1)
-                    debugPrint("Top-level errorCode:", nkError.errorCode)
-
-                    // 2. Check the nested error for the 409 Conflict
-                    if let innerError = nkError.error as? NKError,
-                       innerError.errorCode == NCGlobal.shared.errorConflict {
-
-                        // This is the "File already exists" case (409)
-                        let conflictError = NKError(errorCode: NCGlobal.shared.errorConflict,
-                                                    errorDescription: "_file_already_exists_")
-                        Task { @MainActor in
-                            await showInfoBanner(windowScene: self?.windowScene, text: conflictError.errorDescription, errorCode: conflictError.errorCode)
-                        }
-
-                    } else if nkError.errorCode == NCGlobal.shared.errorConflict {
-                        // Fallback check if the top-level error itself is 409
-                        Task { @MainActor in
-                            await showInfoBanner(windowScene: self?.windowScene, text: nkError.errorDescription, errorCode: nkError.errorCode)
-                        }
-                    } else {
-                        // Handle all other errors (Network, 404, 500, etc.)
-                        Task { @MainActor in
-                            await showErrorBanner(windowScene: self?.windowScene, error: nkError)
-                        }
+                Task { @MainActor [weak self] in
+                    defer { group.leave() }
+                    switch result {
+                    case .success:
+                        hadAnySuccess = true
+                    case .failure(let error):
+                        await showErrorBanner(windowScene: self?.windowScene, text: error.errorDescription)
                     }
                 }
+            }
+        }
+
+        group.notify(queue: .main) { [weak self] in
+            Task { @MainActor [weak self] in
+                guard let self else { return }
+                self.isLoadingPopupVisible = false
+                guard hadAnySuccess else { return }
+                AlbumsManager.shared.invalidatePhotoRequest(for: self.album)
+                self.loadAlbumPhotos()
+                AlbumsManager.shared.syncAlbums(for: self.account)
             }
         }
     }
@@ -384,7 +340,6 @@ extension AlbumDetailsViewModel: AlbumActionHandler {
     func deleteMetadataFromAlbum(_ selectedMetadatas: [tableMetadata]) {
         Task {
             await self.deletePhotos(with: selectedMetadatas)
-
         }
     }
 }

@@ -91,6 +91,71 @@ extension NCManageDatabase {
         return result ?? []
     }
 
+    func fetchSkipAssetLocalIdentifiersAsync(account: String, autoUploadServerUrlBase: String, createdOnOrAfter startDate: Date? = nil) async -> Set<String> {
+        let result: Set<String>? = await core.performRealmReadAsync { realm in
+            var metadatas = realm.objects(tableMetadata.self)
+                .filter("account == %@ AND autoUploadServerUrlBase == %@ AND assetLocalIdentifier != ''",
+                        account, autoUploadServerUrlBase)
+            var transfers = realm.objects(tableAutoUploadTransfer.self)
+                .filter("account == %@ AND serverUrlBase == %@ AND assetLocalIdentifier != ''",
+                        account, autoUploadServerUrlBase)
+
+            if let startDate {
+                metadatas = metadatas.filter("creationDate >= %@", startDate as NSDate)
+                transfers = transfers.filter("date >= %@", startDate as NSDate)
+            }
+
+            let metadataIdentifiers = metadatas.map(\.assetLocalIdentifier)
+            let transferIdentifiers = transfers.map(\.assetLocalIdentifier)
+
+            return Set(metadataIdentifiers).union(transferIdentifiers)
+        }
+
+        return result ?? []
+    }
+
+    /// Returns active auto-upload file names that must not be queued a second time.
+    /// This bounded set is fetched once per discovery pass instead of once for every candidate.
+    func fetchActiveAutoUploadFileNamesAsync(account: String, autoUploadServerUrlBase: String) async -> Set<String> {
+        let result: Set<String>? = await core.performRealmReadAsync { realm in
+            let metadatas = realm.objects(tableMetadata.self)
+                .filter("account == %@ AND autoUploadServerUrlBase == %@ AND status IN %@", account, autoUploadServerUrlBase, NCGlobal.shared.metadataStatusUploadingAllMode)
+            var fileNames = Set(metadatas.map(\.fileNameView))
+
+            // A deferred Live Photo uses one seed metadata; reserve its paired filename until
+            // NCCameraRoll extracts both resources in the host app.
+            for metadata in metadatas where metadata.chunk > 0 &&
+                !metadata.isExtractFile &&
+                metadata.backgroundUploadJobIdentifier.isEmpty &&
+                !metadata.livePhotoFile.isEmpty {
+                fileNames.insert(metadata.livePhotoFile)
+            }
+
+            return fileNames
+        }
+
+        return result ?? []
+    }
+
+    /// Returns candidate file names found in completed auto-upload history.
+    /// Primary-key lookups keep the check proportional to the current asset's one or two resources.
+    func fetchTransferredAutoUploadFileNamesAsync(account: String, autoUploadServerUrlBase: String, fileNames: [String]) async -> Set<String> {
+        guard !fileNames.isEmpty else {
+            return []
+        }
+
+        let result: Set<String>? = await core.performRealmReadAsync { realm in
+            let transferredFileNames = fileNames.compactMap { fileName in
+                let primaryKey = account + autoUploadServerUrlBase + fileName
+                return realm.object(ofType: tableAutoUploadTransfer.self, forPrimaryKey: primaryKey)?.fileName
+            }
+
+            return Set(transferredFileNames)
+        }
+
+        return result ?? []
+    }
+
     /// Asynchronously fetches the most recent auto-uploaded date for the given account and server base URL.
     /// - Parameters:
     ///   - account: The account identifier.

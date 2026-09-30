@@ -8,43 +8,40 @@ import Combine
 import NextcloudKit
 
 class AlbumsListViewModel: ObservableObject {
-    private var account: String
+    private let account: String
+    private(set) weak var controller: NCMainTabBarController?
+    let navigator: AlbumsNavigator
 
     @Published private(set) var albums: [Album] = []
     @Published private(set) var isLoading: Bool = false
     @Published private(set) var errorMessage: String?
-
-    private var thumbnailsTask: Task<Void, Never>?
-    @Published private(set) var albumThumbnails: [String: UIImage] = [:]
-
     @Published var isLoadingPopupVisible: Bool = false
-
     @Published var isNewAlbumCreationPopupVisible: Bool = false
     @Published var newAlbumName: String = ""
     @Published private(set) var newAlbumNameError: String?
-
     @Published var isPhotoSelectionSheetVisible: Bool = false
     @Published var newlyCreatedAlbum: Album?
 
-    @Published var navigationDestination: AlbumsListScreen.NavigationDestination?
-
     @MainActor
     private var windowScene: UIWindowScene? {
-        SceneManager.shared.getWindowScene(controller: SceneManager.shared.getController(account: account))
+        SceneManager.shared.getWindowScene(controller: controller)
     }
 
     private var cancellables: Set<AnyCancellable> = []
     private var isNavigatingToDetails: Bool = false
+    private var didHandlePhotoSelectionResult: Bool = false
 
-    init(account: String) {
-        self.account = account
+    init(controller: NCMainTabBarController, navigator: AlbumsNavigator = AlbumsNavigator()) {
+        self.account = controller.account
+        self.controller = controller
+        self.navigator = navigator
         observeAlbums()
         registerPublishers()
     }
 
     // MARK: - Subscriptions
     private func observeAlbums() {
-        AlbumsManager.shared.albumsPublisher
+        AlbumsManager.shared.albumsPublisher(for: account)
             .receive(on: DispatchQueue.main)
             .sink { [weak self] state in
                 switch state {
@@ -54,6 +51,7 @@ class AlbumsListViewModel: ObservableObject {
                     self?.isLoading = true
                     self?.errorMessage = nil
                 case .success(let albums):
+                    self?.errorMessage = nil
                     self?.isLoading = false
                     self?.albums = albums
                 case .failure:
@@ -97,7 +95,7 @@ class AlbumsListViewModel: ObservableObject {
         guard !isNavigatingToDetails else { return }
         isNavigatingToDetails = true
         DispatchQueue.main.async { [weak self] in
-            AlbumsNavigator.shared.push(.albumDetails(album: album))
+            self?.navigator.push(.albumDetails(album: album))
             self?.isNavigatingToDetails = false
         }
     }
@@ -142,66 +140,43 @@ class AlbumsListViewModel: ObservableObject {
 
     // MARK: - APIs
     func onPulledToRefresh() {
-        AlbumsManager.shared.syncAlbums()
+        AlbumsManager.shared.syncAlbums(for: self.account)
     }
 
     private func createNewAlbum(for name: String) {
-
         guard !isLoadingPopupVisible else { return }
-
         isLoadingPopupVisible = true
 
         NextcloudKit.shared.createNewAlbum(for: account, albumName: name) { [weak self] result in
-
             self?.isLoadingPopupVisible = false
-
             switch result {
-            case .success:
-                AlbumsManager.shared.syncAlbums { [weak self] resultAlbums in
+            case .success(let account):
+                AlbumsManager.shared.syncAlbums(for: account) { [weak self] resultAlbums in
                     if let newAlbum = resultAlbums.first(where: { $0.name == name }) {
                         self?.newlyCreatedAlbum = newAlbum
+                        self?.didHandlePhotoSelectionResult = false
                         self?.isPhotoSelectionSheetVisible = true
                     }
                 }
-
             case .failure(let error):
-                let nkError = NKError(error: error)
-                // Prefer friendly info alert for duplicate album names (409)
-                if let inner = nkError.error as? NKError, inner.errorCode == NCGlobal.shared.errorConflict {
-                    let message = NSLocalizedString("_album_already_exists_", comment: "Album already exists")
-                    let conflict = NKError(errorCode: NCGlobal.shared.errorConflict, errorDescription: message)
-                    Task { @MainActor in
-                        await showInfoBanner(windowScene: self?.windowScene, text: conflict.errorDescription, errorCode: conflict.errorCode)
-                    }
-                } else if nkError.errorCode == NCGlobal.shared.errorConflict {
-                    // Top-level conflict
-                    let message = NSLocalizedString("_album_already_exists_", comment: "Album already exists")
-                    let conflict = NKError(errorCode: NCGlobal.shared.errorConflict, errorDescription: message)
-                    Task { @MainActor in
-                        await showInfoBanner(windowScene: self?.windowScene, text: conflict.errorDescription, errorCode: conflict.errorCode)
-                    }
-                } else {
-                    // Other errors
-                    Task { @MainActor in
-                        await showErrorBanner(windowScene: self?.windowScene, error: nkError)
-                    }
+                Task {
+                    await showErrorBanner(windowScene: self?.windowScene, text: error.errorDescription)
                 }
             }
         }
     }
 
     func onPhotosSelected(selectedPhotos: [String]) {
+        // Closing the sheet also invokes this method through `onDismiss`.
+        // Handle either the toolbar action or the dismissal, never both.
+        guard !didHandlePhotoSelectionResult else { return }
+        didHandlePhotoSelectionResult = true
         isPhotoSelectionSheetVisible = false
 
         guard let album = newlyCreatedAlbum else { return }
 
         if selectedPhotos.isEmpty {
-            guard !isNavigatingToDetails else { return }
-            isNavigatingToDetails = true
-            DispatchQueue.main.async { [weak self] in
-                AlbumsNavigator.shared.push(.albumDetails(album: album))
-                self?.isNavigatingToDetails = false
-            }
+            onAlbumClicked(album)
             return
         }
 
@@ -210,37 +185,24 @@ class AlbumsListViewModel: ObservableObject {
         var hadAnySuccess = false
 
         for photo in selectedPhotos {
+            guard let metadata = NCManageDatabase.shared.getMetadataFromOcId(photo) else {
+                Task {
+                    await showErrorBanner(
+                        windowScene: self.windowScene,
+                        text: NKError.invalidData.errorDescription
+                    )
+                }
+                continue
+            }
             group.enter()
-            let metadata: tableMetadata? = NCManageDatabase.shared.getMetadataFromOcId(photo)
 
-            NextcloudKit.shared.copyPhotoToAlbum(
-                account: account,
-                sourcePath: metadata?.serverUrlFileName ?? photo,
-                albumName: album.name,
-                fileName: metadata?.fileName ?? photo
-            ) { result in
+            NextcloudKit.shared.copyPhotoToAlbum(account: account, sourcePath: metadata.serverUrlFileName, albumName: album.name, fileName: metadata.fileName) { result in
                 switch result {
                 case .success:
                     hadAnySuccess = true
                 case .failure(let error):
-                    let nkError = NKError(error: error)
-
-                    // Check nested conflict first (409), then top-level, otherwise show error
-                    if let innerError = nkError.error as? NKError,
-                       innerError.errorCode == NCGlobal.shared.errorConflict {
-                        let conflictError = NKError(errorCode: NCGlobal.shared.errorConflict,
-                                                    errorDescription: "_file_already_exists_")
-                        Task { @MainActor in
-                            await showInfoBanner(windowScene: self.windowScene, text: conflictError.errorDescription, errorCode: conflictError.errorCode)
-                        }
-                    } else if nkError.errorCode == NCGlobal.shared.errorConflict {
-                        Task { @MainActor in
-                            await showInfoBanner(windowScene: self.windowScene, text: nkError.errorDescription, errorCode: nkError.errorCode)
-                        }
-                    } else {
-                        Task { @MainActor in
-                            await showErrorBanner(windowScene: self.windowScene, error: nkError)
-                        }
+                    Task {
+                        await showErrorBanner(windowScene: self.windowScene, text: error.errorDescription)
                     }
                 }
                 group.leave()
@@ -250,23 +212,14 @@ class AlbumsListViewModel: ObservableObject {
         group.notify(queue: .main) { [weak self] in
             guard let self = self else { return }
             if hadAnySuccess {
-                AlbumsManager.shared.syncAlbums { _ in
-                    guard !self.isNavigatingToDetails else { return }
-                    self.isNavigatingToDetails = true
-                    DispatchQueue.main.async { [weak self] in
-                        guard let self = self else { return }
-                        AlbumsNavigator.shared.push(.albumDetails(album: album))
-                        self.isNavigatingToDetails = false
+                Task { @MainActor in
+                    AlbumsManager.shared.invalidatePhotoRequest(for: album)
+                    AlbumsManager.shared.syncAlbums(for: self.account) { _ in
+                        self.onAlbumClicked(album)
                     }
                 }
             } else {
-                guard !self.isNavigatingToDetails else { return }
-                self.isNavigatingToDetails = true
-                DispatchQueue.main.async { [weak self] in
-                    guard let self = self else { return }
-                    AlbumsNavigator.shared.push(.albumDetails(album: album))
-                    self.isNavigatingToDetails = false
-                }
+                onAlbumClicked(album)
             }
         }
     }

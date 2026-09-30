@@ -23,6 +23,7 @@ class NCCollectionViewCommon: UIViewController, NCAccountSettingsModelDelegate, 
     internal let appDelegate = (UIApplication.shared.delegate as? AppDelegate)!
     internal var pinchGesture: UIPinchGestureRecognizer = UIPinchGestureRecognizer()
     private var isNavigatingMetadata = false
+    private var collectionViewLayoutSize: CGSize = .zero
 
     internal var autoUploadFileName = ""
     internal var autoUploadDirectory = ""
@@ -57,6 +58,7 @@ class NCCollectionViewCommon: UIViewController, NCAccountSettingsModelDelegate, 
 
     internal var tipViewAccounts: EasyTipView?
     internal var syncMetadatasTask: Task<Void, Never>?
+    internal var syncMetadataNetworkTask: URLSessionTask?
 
     // Edit Menu
     //
@@ -193,6 +195,7 @@ class NCCollectionViewCommon: UIViewController, NCAccountSettingsModelDelegate, 
         self.navigationController?.presentationController?.delegate = self
         collectionView.alwaysBounceVertical = true
         collectionView.accessibilityIdentifier = "NCCollectionViewCommon"
+        collectionView.hideTopScrollEdgeEffect()
 
         view.backgroundColor = .systemBackground
         collectionView.backgroundColor = .systemBackground
@@ -358,6 +361,16 @@ class NCCollectionViewCommon: UIViewController, NCAccountSettingsModelDelegate, 
         NotificationCenter.default.addObserver(self, selector: #selector(closeRichWorkspaceWebView), name: NSNotification.Name(rawValue: global.notificationCenterCloseRichWorkspaceWebView), object: nil)
     }
 
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+
+        let layoutSize = collectionView.bounds.size
+        guard layoutSize != collectionViewLayoutSize else { return }
+
+        collectionViewLayoutSize = layoutSize
+        collectionView.collectionViewLayout.invalidateLayout()
+    }
+
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         dismissTip()
@@ -384,6 +397,9 @@ class NCCollectionViewCommon: UIViewController, NCAccountSettingsModelDelegate, 
 
         coordinator.animate(alongsideTransition: { _ in
             self.collectionView?.collectionViewLayout.invalidateLayout()
+        }, completion: { _ in
+            self.collectionView?.collectionViewLayout.invalidateLayout()
+            self.collectionView?.layoutIfNeeded()
         })
 
         self.dismissTip()
@@ -736,10 +752,11 @@ class NCCollectionViewCommon: UIViewController, NCAccountSettingsModelDelegate, 
         var height: CGFloat = 0
         let isLandscape = view.bounds.width > view.bounds.height
         let isIphone = UIDevice.current.userInterfaceIdiom == .phone
+        let hasCompactWidth = traitCollection.horizontalSizeClass == .compact
 
         if self.dataSource.isEmpty() {
             height = utility.getHeightHeaderEmptyData(view: view, portraitOffset: emptyDataPortaitOffset, landscapeOffset: emptyDataLandscapeOffset)
-        } else if isEditMode || (isLandscape && isIphone) {
+        } else if isEditMode || (isLandscape && isIphone && hasCompactWidth) {
             return CGSize.zero
         } else {
             let (heightHeaderRichWorkspace, heightHeaderRecommendations, heightHeaderSection) = getHeaderHeight(section: section)
@@ -752,12 +769,11 @@ class NCCollectionViewCommon: UIViewController, NCAccountSettingsModelDelegate, 
     // MARK: - Footer size
 
     func sizeForFooterInSection(section: Int) -> CGSize {
-        guard let controller else {
+        guard controller != nil else {
             return CGSize.zero
         }
         let sections = dataSource.numberOfSections()
-        let bottomAreaInsets: CGFloat = controller.tabBar.safeAreaInsets.bottom == 0 ? 34 : 0
-        let height = controller.tabBar.frame.height + bottomAreaInsets
+        let height = NCCollectionViewCommonSelectTabBar.height
 
         if isEditMode {
             return CGSize(width: collectionView.frame.width, height: 90 + height)

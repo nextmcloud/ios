@@ -9,14 +9,32 @@ import NextcloudKit
 struct PhotoGridItemView: View {
     @Environment(\.localAccount) var localAccount: String
 
-    let album: Album
     let photo: AlbumPhoto
-    let isVideo: Bool
-    let metadata: tableMetadata?
-    let iconSize: CGFloat
+    let aspectRatio: CGFloat
+    let showsMediaTypeIcon: Bool
+    private var metadata: tableMetadata { photo.metadata }
+
+    private var mediaTypeIconName: String? {
+        if metadata.isVideo {
+            return "play.fill"
+        } else if metadata.isLivePhoto {
+            return "livephoto"
+        }
+        return nil
+    }
 
     @State private var thumbnail: UIImage?
     @State private var isLoading = false
+
+    init(
+        photo: AlbumPhoto,
+        aspectRatio: CGFloat = 1,
+        showsMediaTypeIcon: Bool = true
+    ) {
+        self.photo = photo
+        self.aspectRatio = aspectRatio
+        self.showsMediaTypeIcon = showsMediaTypeIcon
+    }
 
     var body: some View {
         ZStack {
@@ -28,23 +46,23 @@ struct PhotoGridItemView: View {
                 Rectangle().fill(Color.gray.opacity(0.15))
                 if isLoading {
                     ProgressView().controlSize(.small)
-                } else if !photo.hasPreview {
+                } else if !metadata.hasPreview {
                     // Show a generic icon if the API says there is no preview
                     Image(systemName: "doc").foregroundColor(.gray)
                 }
             }
         }
         .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
-        .aspectRatio(1, contentMode: .fill)
+        .aspectRatio(aspectRatio, contentMode: .fill)
         .clipped()
         .overlay(
             Group {
-                if isVideo {
-                    Image(systemName: "play.fill")
+                if showsMediaTypeIcon, let mediaTypeIconName {
+                    Image(systemName: mediaTypeIconName)
                         .resizable()
                         .frame(width: 10, height: 10)
                         .foregroundColor(.white)
-                        .padding(8)
+                        .padding(5)
                 }
             },
             alignment: .bottomLeading
@@ -55,60 +73,55 @@ struct PhotoGridItemView: View {
         }
     }
 
+    @MainActor
     private func loadThumbnailFromPhoto() async {
-        // 1. Validate: Only load if it has a preview and a valid ID
-        guard photo.hasPreview, !photo.id.isEmpty else {
+        // Clear the previous image before validating the new photo. Otherwise a
+        // reused cover view could keep showing a removed photo with no replacement.
+        thumbnail = nil
+        isLoading = !photo.id.isEmpty
+        defer { isLoading = false }
+
+        guard !photo.id.isEmpty else {
             return
         }
 
-        // 2. Clear previous state for reused cells
-        await MainActor.run {
-            self.thumbnail = nil
-            self.isLoading = true
-        }
+        let image = await Self.loadPreview(for: photo, account: localAccount)
+        guard !Task.isCancelled else { return }
+        thumbnail = image
+    }
 
-        // 3. Setup parameters from Photo object and Metadata fallback
+    @MainActor
+    static func loadPreview(for photo: AlbumPhoto, account: String) async -> UIImage? {
+        guard !Task.isCancelled, !photo.id.isEmpty else { return nil }
+
+        let metadata = photo.metadata
         let fileId = photo.id
-        let userId = metadata?.userId ?? ""
-        let urlBase = metadata?.urlBase ?? ""
-        let etag = metadata?.etag ?? ""
+        let ocId = metadata.ocId
+        let userId = metadata.userId
+        let urlBase = metadata.urlBase
+        let etag = metadata.etag
+        let previewExt = NCGlobal.shared.previewExt512
+        let utility = NCUtility()
 
-        // 4. Try Disk Cache First
-        if let cachedImage = NCUtility().getImage(
-            ocId: fileId,
-            etag: etag,
-            ext: NCGlobal.shared.previewExt512,
-            userId: userId,
-            urlBase: urlBase
-        ) {
-            await MainActor.run {
-                self.thumbnail = cachedImage
-                self.isLoading = false
-            }
-            return
+        if let cachedImage = utility.getImage(ocId: ocId, etag: etag, ext: previewExt, userId: userId, urlBase: urlBase) {
+            return cachedImage
         }
 
-        // 5. Download Preview
-        let results = await NextcloudKit.shared.downloadPreviewAsync(
-            fileId: fileId,
-            etag: etag,
-            account: localAccount
-        ) { _ in }
+        guard metadata.hasPreview else { return nil }
 
-        await MainActor.run {
-            if results.error == .success,
-               let data = results.responseData?.data,
-               let image = UIImage(data: data) {
-                self.thumbnail = image
+        let results = await NextcloudKit.shared.downloadPreviewAsync(fileId: fileId, etag: etag, account: account)
+        guard !Task.isCancelled else { return nil }
 
-                // 6. Save to cache (optional but recommended)
-                Task.detached(priority: .background) {
-                    NCUtility().createImageFileFrom(
-                        data: data, ocId: fileId, etag: etag, userId: userId, urlBase: urlBase
-                    )
-                }
-            }
-            self.isLoading = false
+        guard results.error == .success,
+              let data = results.responseData?.data,
+              let image = UIImage(data: data) else {
+            return nil
         }
+
+        Task.detached(priority: .background) {
+            NCUtility().createImageFileFrom(data: data, ocId: ocId, etag: etag, ext: previewExt, userId: userId, urlBase: urlBase)
+        }
+
+        return image
     }
 }

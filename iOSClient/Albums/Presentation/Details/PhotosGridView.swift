@@ -7,52 +7,107 @@ import SwiftUI
 import NextcloudKit
 
 struct PhotosGridView: View {
-    let localAccount: String
-    let photos: [AlbumPhoto: tableMetadata?]
-    let onAddPhotosIntent: () -> Void
-    let album: Album
+    private unowned let controller: NCMainTabBarController
+
+    let photos: [AlbumPhoto]
+    let albumTitle: String
     let onRemovePhoto: (AlbumPhoto) -> Void
 
     @State private var photoToRemove: AlbumPhoto?
     @State private var openingPhoto: AlbumPhoto?
 
-    private var columns: [GridItem] {
-        if UIDevice.current.userInterfaceIdiom == .pad {
-            return Array(repeating: GridItem(.flexible(), spacing: 1), count: 3)
-        } else {
-            return [GridItem(.adaptive(minimum: 100, maximum: 300), spacing: 1)]
+    init(
+        controller: NCMainTabBarController,
+        photos: [AlbumPhoto],
+        albumTitle: String,
+        onRemovePhoto: @escaping (AlbumPhoto) -> Void
+    ) {
+        self.controller = controller
+        self.photos = photos
+        self.albumTitle = albumTitle
+        self.onRemovePhoto = onRemovePhoto
+    }
+
+    private func columns(for width: CGFloat) -> [GridItem] {
+        let count = width >= 600 ? 4 : 3
+        return Array(repeating: GridItem(.flexible(), spacing: 1), count: count)
+    }
+
+    private var sortedPhotos: [AlbumPhoto] {
+        photos.sorted { lhs, rhs in
+            lhs.metadata.fileNameView.localizedCaseInsensitiveCompare(rhs.metadata.fileNameView) == .orderedAscending
         }
     }
 
-    private let calculatedIconSize: CGFloat = 30
+    private var coverPhoto: AlbumPhoto? {
+        photos.filter(\.metadata.hasPreview).max {
+            if $0.metadata.date != $1.metadata.date {
+                return $0.metadata.date.compare($1.metadata.date as Date) == .orderedAscending
+            }
+            return $0.id < $1.id
+        }
+    }
 
     var body: some View {
-        // Sort by filename or date to ensure stability
-        let sortedPhotos = photos.keys.sorted { lhs, rhs in
-            lhs.fileName.localizedCaseInsensitiveCompare(rhs.fileName) == .orderedAscending
-        }
-
-        ScrollView {
-            LazyVGrid(columns: columns, spacing: 1) {
-                ForEach(sortedPhotos, id: \.self) { photo in
-                    let metadata = photos[photo] ?? nil
-                    Button {
-                        openingPhoto = photo
-                    } label: {
-                        PhotoGridItemView(
-                            album: album,
-                            photo: photo,
-                            isVideo: (metadata?.isVideo ?? false),
-                            metadata: metadata,
-                            iconSize: calculatedIconSize
-                        )
-                    }
-                    .disabled(openingPhoto != nil)
-                    .contextMenu {
-                        Button(role: .destructive) {
-                            photoToRemove = photo
+        GeometryReader { geometry in
+            ScrollView {
+                VStack(spacing: 16) {
+                    if let coverPhoto {
+                        Button {
+                            openingPhoto = coverPhoto
                         } label: {
-                            Label(NSLocalizedString("_remove_from_album_", comment: ""), systemImage: "minus.circle")
+                            ZStack(alignment: .bottomLeading) {
+                                PhotoGridItemView(
+                                    photo: coverPhoto,
+                                    aspectRatio: 16.0 / 7.0,
+                                    showsMediaTypeIcon: false
+                                )
+                                .id(coverPhoto.id)
+
+                                LinearGradient(
+                                    colors: [.clear, .black.opacity(0.7)],
+                                    startPoint: .center,
+                                    endPoint: .bottom
+                                )
+
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text(albumTitle)
+                                        .font(.title2.bold())
+
+                                    Text(
+                                        String.localizedStringWithFormat(
+                                            NSLocalizedString("_albums_photos_count_", comment: ""),
+                                            photos.count
+                                        )
+                                    )
+                                        .font(.subheadline)
+                                }
+                                .foregroundStyle(.white)
+                                .padding()
+                            }
+                        }
+                        .disabled(openingPhoto != nil)
+                        .buttonStyle(.plain)
+                    }
+
+                    LazyVGrid(columns: columns(for: geometry.size.width), spacing: 1) {
+                        ForEach(sortedPhotos) { photo in
+                            Button {
+                                openingPhoto = photo
+                            } label: {
+                                PhotoGridItemView(photo: photo)
+                            }
+                            .disabled(openingPhoto != nil)
+                            .contextMenu {
+                                Button(role: .destructive) {
+                                    photoToRemove = photo
+                                } label: {
+                                    Label(
+                                        NSLocalizedString("_remove_from_album_", comment: ""),
+                                        systemImage: "minus.circle"
+                                    )
+                                }
+                            }
                         }
                     }
                 }
@@ -89,19 +144,19 @@ struct PhotosGridView: View {
     @MainActor
     private func openPhotoViewer(photo: AlbumPhoto) async {
         defer { openingPhoto = nil }
-        let controller = SceneManager.shared.getController(account: localAccount)
+        let account = controller.account
         let database = NCManageDatabase.shared
         var selected = await database.getMetadataAsync(
-            predicate: NSPredicate(format: "account == %@ AND fileId == %@", localAccount, photo.id)
+            predicate: NSPredicate(format: "account == %@ AND fileId == %@", account, photo.id)
         )
         guard !Task.isCancelled else { return }
 
         if selected == nil {
-            let result = await NextcloudKit.shared.getFileFromFileIdAsync(fileId: photo.id, account: localAccount)
+            let result = await NextcloudKit.shared.getFileFromFileIdAsync(fileId: photo.id, account: account)
             guard !Task.isCancelled else { return }
             if result.error == .success, let file = result.file {
                 let metadata = await NCManageDatabaseCreateMetadata().convertFileToMetadataAsync(file)
-                if metadata.account == localAccount {
+                if metadata.account == account {
                     await database.addMetadataAsync(metadata)
                     selected = metadata
                 }
@@ -121,9 +176,7 @@ struct PhotosGridView: View {
         // Album entries provide numeric file IDs. The selected file supplies the server's
         // instance suffix so the viewer can resolve every other file lazily by its ocId.
         let utility = NCUtility()
-        let ocIds = photos.keys.sorted {
-            $0.fileName.localizedCaseInsensitiveCompare($1.fileName) == .orderedAscending
-        }.map { albumPhoto in
+        let ocIds = sortedPhotos.map { albumPhoto in
             albumPhoto.id == photo.id
                 ? selected.ocId
                 : utility.paddedFileId(albumPhoto.id) + instanceId
@@ -131,13 +184,13 @@ struct PhotosGridView: View {
         let model = NCMediaViewerModel(
             currentMetadata: selected,
             ocIds: ocIds,
-            session: NCSession.shared.getSession(account: localAccount),
+            session: NCSession.shared.getSession(account: account),
             loader: NCMediaViewerLoader()
         )
         NCMediaViewerPresenter.shared.show(
             model: model,
             viewerTransitionSource: nil,
-            from: controller?.view,
+            from: controller.view,
             contextMenuController: nil
         )
     }

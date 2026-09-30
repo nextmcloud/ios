@@ -12,6 +12,7 @@ import WidgetKit
 import EasyTipView
 import SwiftUI
 import RealmSwift
+import Photos
 
 class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterDelegate {
     var backgroundSessionCompletionHandler: (() -> Void)?
@@ -62,7 +63,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
                                   delegate: NCNetworking.shared)
         NCNetworking.shared.setupTransferDelegate()
 
-        NextcloudKit.configureLogger(logLevel: (NCBrandOptions.shared.disable_log ? .disabled : NCPreferences().log))
+        NextcloudKit.configureLogger(
+            logLevel: NCBrandOptions.shared.disable_log ? .disabled : NCPreferences().log,
+            logDirectory: NCPreferences.sharedLogDirectory
+        )
 
         #if DEBUG
 //      For the tags look NCGlobal LOG TAG

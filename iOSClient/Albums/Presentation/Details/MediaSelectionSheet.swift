@@ -8,7 +8,7 @@ import SwiftUI
 /// A reusable SwiftUI sheet that presents the NCMedia selection UI
 /// and returns the selected file identifiers.
 struct MediaSelectionSheet: View {
-    @Environment(\.localAccount) var localAccount: String
+    private unowned let controller: NCMainTabBarController
 
     // MARK: - Callbacks
     let onCancel: () -> Void
@@ -17,36 +17,40 @@ struct MediaSelectionSheet: View {
     // MARK: - State
     @State private var mediaVC: NCMedia?
 
+    init(controller: NCMainTabBarController, onCancel: @escaping () -> Void, onDone: @escaping (_ selectedFiles: [String]) -> Void) {
+        self.controller = controller
+        self.onCancel = onCancel
+        self.onDone = onDone
+    }
+
     var body: some View {
         NavigationView {
-            NCMediaViewRepresentable(ncMedia: $mediaVC)
+            NCMediaViewRepresentable(controller: controller, ncMedia: $mediaVC)
             .navigationTitle(NSLocalizedString("_albums_photo_selection_sheet_title_", comment: ""))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button(NSLocalizedString("_albums_photo_selection_sheet_back_btn_", comment: "")) {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button {
                         onCancel()
+                    } label: {
+                        Image(systemName: "xmark")
                     }
-                    .foregroundColor(Color(NCBrandColor.shared.getElement(account: localAccount)))
+                    .accessibilityLabel(
+                        NSLocalizedString("_cancel_", comment: "")
+                    )
                 }
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(NSLocalizedString("_albums_photo_selection_sheet_done_btn_", comment: "")) {
+                ToolbarItem(placement: .confirmationAction) {
+                    Button {
                         onDone(mediaVC?.fileSelect ?? [])
+                    } label: {
+                        Image(systemName: "checkmark")
                     }
-                    .foregroundColor(Color(NCBrandColor.shared.getElement(account: localAccount)))
+                    .accessibilityLabel(
+                        NSLocalizedString("_done_", comment: "")
+                    )
                     .disabled(mediaVC == nil)
-                    .opacity(mediaVC == nil ? 0.5 : 1.0)
                 }
             }
         }
     }
 }
-
-#if DEBUG
-#Preview {
-    MediaSelectionSheet(
-        onCancel: {},
-        onDone: { _ in }
-    )
-}
-#endif

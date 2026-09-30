@@ -6,14 +6,13 @@
 import SwiftUI
 
 struct AlbumDetailsScreen: View {
-    private let album: Album
+    private unowned let controller: NCMainTabBarController
     @StateObject private var viewModel: AlbumDetailsViewModel
-    @State private var showMedia = false
 
-    init(account: String, album: Album) {
-        self.album = album
+    init(controller: NCMainTabBarController, album: Album, navigator: AlbumsNavigator = AlbumsNavigator()) {
+        self.controller = controller
         _viewModel = StateObject(
-            wrappedValue: AlbumDetailsViewModel(account: account, album: album)
+            wrappedValue: AlbumDetailsViewModel(controller: controller, album: album, navigator: navigator)
         )
     }
 
@@ -31,11 +30,12 @@ struct AlbumDetailsScreen: View {
             ToolbarItemGroup(placement: .topBarTrailing) {
                 if !viewModel.isLoading {
                     Button(action: handleAddPhotosIntent) {
-                        Image(systemName: "plus")
-                            .imageScale(.large)
+                        HStack(spacing: 6) {
+                            Image(systemName: "plus")
+                            Text(NSLocalizedString("_albums_photos_add_photos_btn_", comment: ""))
+                        }
+                        .fixedSize()
                     }
-                    .buttonStyle(.plain)
-                    .tint(Color(NCBrandColor.shared.iconImageColor))
 
                     Menu {
                         Button {
@@ -68,9 +68,7 @@ struct AlbumDetailsScreen: View {
         .sheet(
             isPresented: $viewModel.isPhotoSelectionSheetVisible
         ) {
-            PhotoSelectionSheet(
-                onPhotosSelected: viewModel.onPhotosSelected
-            )
+            PhotoSelectionSheet(controller: controller, onPhotosSelected: viewModel.onPhotosSelected)
         }
         .inputAlbumNameAlert(
             isPresented: $viewModel.isRenameAlbumPopupVisible,
@@ -110,7 +108,7 @@ struct AlbumDetailsScreen: View {
         .onDisappear {
             NotificationCenter.default.post(name: Notification.Name("NCSelectionModeDidEnd"), object: nil)
         }
-        .onChange(of: viewModel.isPhotoSelectionSheetVisible) { isPresented in
+        .onChange(of: viewModel.isPhotoSelectionSheetVisible) { _, isPresented in
             if isPresented == false {
                 NotificationCenter.default.post(name: Notification.Name("NCSelectionModeDidEnd"), object: nil)
             }
@@ -119,7 +117,7 @@ struct AlbumDetailsScreen: View {
 
     @ViewBuilder
     private func content() -> some View {
-        if viewModel.isLoading {
+        if viewModel.isLoading && !viewModel.hasCachedPhotos {
             ProgressView(NSLocalizedString("_albums_photos_loading_msg_", comment: ""))
         } else if let error = viewModel.errorMessage {
             Text(error)
@@ -135,10 +133,9 @@ struct AlbumDetailsScreen: View {
             }
         } else {
             PhotosGridView(
-                localAccount: viewModel.account,
+                controller: controller,
                 photos: viewModel.photos,
-                onAddPhotosIntent: handleAddPhotosIntent,
-                album: album,
+                albumTitle: viewModel.screenTitle,
                 onRemovePhoto: { photo in
                     Task { @MainActor in
                         await viewModel.removePhoto(photo)
@@ -153,6 +150,5 @@ struct AlbumDetailsScreen: View {
 
     private func handleAddPhotosIntent() {
         viewModel.onAddPhotosIntent()
-        showMedia = true
     }
 }

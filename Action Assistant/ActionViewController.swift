@@ -1,10 +1,6 @@
-//
-//  ActionViewController.swift
-//  Action Assistant
-//
-//  Created by Marino Faggiana on 14/05/2026.
-//  Copyright © 2026 Marino Faggiana. All rights reserved.
-//
+// SPDX-FileCopyrightText: Nextcloud GmbH
+// SPDX-FileCopyrightText: 2026 Marino Faggiana
+// SPDX-License-Identifier: GPL-3.0-or-later
 
 import UIKit
 import NextcloudKit
@@ -13,6 +9,19 @@ import UniformTypeIdentifiers
 final class ActionViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
+
+        let groupIdentifier = NCBrandOptions.shared.capabilitiesGroup
+        let storedLogLevel = UserDefaults(suiteName: groupIdentifier)?
+            .object(forKey: "Preferences_logLevel") as? Int
+        let logLevel = storedLogLevel.flatMap(NKLogLevel.init(rawValue:)) ?? .normal
+        let logDirectory = FileManager.default
+            .containerURL(forSecurityApplicationGroupIdentifier: groupIdentifier)?
+            .appendingPathComponent("Logs", isDirectory: true)
+
+        NextcloudKit.configureLogger(
+            logLevel: NCBrandOptions.shared.disable_log ? .disabled : logLevel,
+            logDirectory: logDirectory
+        )
 
         view.isHidden = true
         view.alpha = 0
@@ -137,6 +146,7 @@ final class ActionViewController: UIViewController {
                 } else {
                     nkLog(error: "Assistant shared text deep link modern responder chain returned false")
                 }
+                NextcloudKit.flushLogger()
             }
 
             openURL(currentResponder, selector, url as NSURL, NSDictionary(), completion)
@@ -144,5 +154,6 @@ final class ActionViewController: UIViewController {
         }
 
         nkLog(error: "Assistant shared text deep link failed because no UIApplication responder can open URL")
+        NextcloudKit.flushLogger()
     }
 }

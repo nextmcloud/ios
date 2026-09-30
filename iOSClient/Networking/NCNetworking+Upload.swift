@@ -7,6 +7,15 @@ import NextcloudKit
 import Alamofire
 
 extension NCNetworking {
+    /// Per-transfer state: background suspension must not discard a resumable upload.
+    @MainActor
+    final class ChunkUploadBackgroundContext {
+        private(set) var interruptedByBackground = false
+
+        func interruptForBackground() {
+            interruptedByBackground = true
+        }
+    }
 
     // MARK: - Upload file in foreground
 
@@ -37,12 +46,6 @@ extension NCNetworking {
                                                             options: options) { request in
             requestHandler(request)
         } taskHandler: { task in
-            Task {
-                let identifier = await NCNetworking.shared.networkingTasks.createIdentifier(account: account,
-                                                                                            path: serverUrlFileName,
-                                                                                            name: "upload")
-                await NCNetworking.shared.networkingTasks.track(identifier: identifier, task: task)
-            }
             taskHandler(task)
         } progressHandler: { progress in
             progressHandler(progress.completedUnitCount, progress.totalUnitCount, progress.fractionCompleted)
@@ -71,6 +74,7 @@ extension NCNetworking {
     func uploadChunkFile(metadata: tableMetadata,
                          performPostProcessing: Bool = true,
                          customHeaders: [String: String]? = nil,
+                         backgroundContext: ChunkUploadBackgroundContext? = nil,
                          chunkProgressHandler: @escaping (_ total: Int, _ counter: Int) -> Void = { _, _ in },
                          uploadStart: @escaping (_ filesChunk: [(fileName: String, size: Int64)]) -> Void = { _ in },
                          uploadProgressHandler: @escaping (_ totalBytesExpected: Int64, _ totalBytes: Int64, _ fractionCompleted: Double) -> Void = { _, _, _ in },
@@ -123,11 +127,6 @@ extension NCNetworking {
                     uploadStart(filesChunk)
                 } uploadTaskHandler: { task in
                     Task {
-                        let url = task.originalRequest?.url?.absoluteString ?? ""
-                        let identifier = await NCNetworking.shared.networkingTasks.createIdentifier(account: metadata.account,
-                                                                                                    path: url,
-                                                                                                    name: "upload")
-                        await NCNetworking.shared.networkingTasks.track(identifier: identifier, task: task)
                         await NCManageDatabase.shared.setMetadataSessionAsync(ocId: metadata.ocId,
                                                                               sessionTaskIdentifier: task.taskIdentifier,
                                                                               status: self.global.metadataStatusUploading)
@@ -171,22 +170,37 @@ extension NCNetworking {
             }
 
             backupFile = file
-        } catch is CancellationError {
-            backupError = NKError(errorCode: -5, errorDescription: "Transfers was cancelled.")
-            await uploadCancelFile(metadata: metadata, directoryChunks: directory)
-        } catch let error as NKError {
-            backupError = error
-            if error.errorCode == -5 {
-                await uploadCancelFile(metadata: metadata, directoryChunks: directory)
-            } else {
-                if performPostProcessing {
-                    await uploadError(withMetadata: metadata, error: error)
+        } catch {
+            let uploadError = (error as? NKError) ?? NKError(error: error)
+            let wasCancelled = error is CancellationError ||
+                uploadError.errorCode == -5 || uploadError.errorCode == NSURLErrorCancelled
+
+            if wasCancelled {
+                backupError = NKError(errorCode: NSURLErrorCancelled, errorDescription: "Transfer was cancelled.")
+                if await backgroundContext?.interruptedByBackground == true {
+                    // Keep the file and chunk state, ready for the next foreground pass.
+                    // E2EE requeues after its outer workflow has unlocked the server folder.
+                    if performPostProcessing {
+                        await NCManageDatabase.shared.setMetadataSessionAsync(
+                            ocId: metadata.ocId,
+                            sessionTaskIdentifier: 0,
+                            sessionError: "",
+                            status: global.metadataStatusWaitUpload,
+                            errorCode: 0
+                        )
+                    }
+                    nkLog(info: "Chunked upload paused by background transition: \(metadata.fileName)")
+                } else if backgroundContext != nil || error is CancellationError || uploadError.errorCode == -5 {
+                    await uploadCancelFile(metadata: metadata, directoryChunks: directory)
+                } else if performPostProcessing {
+                    // Callers without a context retain their previous URL cancellation policy.
+                    await self.uploadError(withMetadata: metadata, error: uploadError)
                 }
-            }
-        } catch let error {
-            backupError = NKError(error: error)
-            if performPostProcessing {
-                await uploadError(withMetadata: metadata, error: backupError)
+            } else {
+                backupError = uploadError
+                if performPostProcessing {
+                    await self.uploadError(withMetadata: metadata, error: uploadError)
+                }
             }
         }
 
@@ -331,9 +345,6 @@ extension NCNetworking {
         let results = await helperMetadataSuccess(metadata: metadata)
 
         await NCManageDatabase.shared.replaceMetadataAsync(ocId: metadata.ocIdTransfer, metadata: metadata)
-        if let localFile = results.localFile {
-            await NCManageDatabase.shared.addLocalFilesAsync(metadatas: [localFile])
-        }
         if let tblAutoUpload = results.autoUpload {
             await NCManageDatabase.shared.addAutoUploadTransferAsync([tblAutoUpload])
         }
@@ -487,13 +498,7 @@ extension NCNetworking {
     @MainActor
     func termsOfService(metadata: tableMetadata) async {
         let options = NKRequestOptions(checkInterceptor: false, queue: .main)
-        let results = await NextcloudKit.shared.getTermsOfServiceAsync(account: metadata.account, options: options, taskHandler: { task in
-            Task {
-                let identifier = await NCNetworking.shared.networkingTasks.createIdentifier(account: metadata.account,
-                                                                                            name: "getTermsOfService")
-                await NCNetworking.shared.networkingTasks.track(identifier: identifier, task: task)
-            }
-        })
+        let results = await NextcloudKit.shared.getTermsOfServiceAsync(account: metadata.account, options: options)
 
         if results.error == .success, let tos = results.tos, !tos.hasUserSigned() {
             await self.uploadCancelFile(metadata: metadata)
@@ -552,10 +557,7 @@ extension NCNetworking {
 
     // MARK: - Helper
 
-    func helperMetadataSuccess(metadata: tableMetadata) async -> (localFile: tableMetadata?,
-                                                                  livePhoto: tableMetadata?,
-                                                                  autoUpload: tableAutoUploadTransfer?) {
-        var localFile: tableMetadata?
+    func helperMetadataSuccess(metadata: tableMetadata) async -> (livePhoto: tableMetadata?, autoUpload: tableAutoUploadTransfer?) {
         var livePhoto: tableMetadata?
         var autoUpload: tableAutoUploadTransfer?
 
@@ -582,6 +584,6 @@ extension NCNetworking {
                                                  date: metadata.creationDate as Date)
         }
 
-        return (localFile: localFile, livePhoto: livePhoto, autoUpload: autoUpload)
+        return (livePhoto: livePhoto, autoUpload: autoUpload)
     }
 }

@@ -54,7 +54,7 @@ SPDX-FileCopyrightText: <YEAR> <Author Name>
 SPDX-License-Identifier: GPL-3.0-or-later
 ```
 
-Some older files still carry legacy “Created by … All rights reserved” Xcode headers — do not copy that style into new files. There is no automated SPDX check in CI, so header correctness is on you.
+Some older files still carry legacy “Created by … All rights reserved” Xcode headers — do not copy that style into new files. The `REUSE Compliance Check` workflow enforces this on every pull request; files that cannot carry a comment (assets, translations, project files) are covered by `REUSE.toml` instead.
 
 Avoid creating source files that implement multiple types; instead, place each type in its own dedicated source file.
 
@@ -82,6 +82,8 @@ The following details are important when working on the iOS client.
 
 ### Tests
 
+- Do not run builds or tests locally. The user performs all Xcode build and test verification manually.
+
 - When implementing new test suites, prefer Swift Testing over XCTest for implementation. UI tests are the exception — XCUITest requires XCTest, so new UI tests are XCTest classes subclassing `BaseUIXCTestCase` in `Tests/NextcloudUITests`.
 - New unit tests go in `Tests/NextcloudUnitTests` as Swift Testing `@Suite` structs with `@testable import Nextcloud`; they need no server.
 - When implementing test cases using Swift Testing, do not prefix test method names with "test".
@@ -90,4 +92,4 @@ The following details are important when working on the iOS client.
 - UI tests require a Nextcloud server at `http://localhost:8080` (credentials `admin`/`admin`, see `Tests/TestConstants.swift`); start one with `Tests/Server.sh` (requires Docker). CI provisions the same server.
 - `NextcloudIntegrationTests` is currently an empty target: `LoginIntegrationTests.swift` is on disk but excluded from the build and references a nonexistent `EnvVars` type — do not model new tests on it.
 - Verify that all tests are passing and correct them if necessary.
-- Run tests the way CI does (see `.github/workflows/xcode.yml`): `xcodebuild test -scheme Nextcloud -destination "platform=iOS Simulator,name=iPhone 16,OS=18.5"` (adjust the simulator to what is installed locally). Without a local test server, restrict to `-only-testing:NextcloudUnitTests`.
+- Run tests the way CI does (see `.github/workflows/xcode.yml`): `xcodebuild test -scheme Nextcloud -destination "platform=iOS Simulator,name=iPhone 17,OS=27.0"` (adjust the simulator to what is installed locally). Without a local test server, restrict to `-only-testing:NextcloudUnitTests`.
