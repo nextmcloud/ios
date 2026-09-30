@@ -254,6 +254,17 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 //        }
 
         hidePrivacyProtectionWindow()
+
+        if !NextcloudKit.shared.isNetworkReachable(),
+           let windowScenee = SceneManager.shared.getWindow(scene: scene)?.windowScene {
+            Task {
+                await showWarningBanner(windowScene: windowScenee,
+                                        subtitle: "_network_not_available_",
+                                        systemImage: "wifi.exclamationmark.circle",
+                                        imageAnimation: .bounce,
+                                        errorCode: NSURLErrorNotConnectedToInternet)
+            }
+        }
     }
 
     func sceneWillResignActive(_ scene: UIScene) {
@@ -361,6 +372,37 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
                 }
             }
             return nil
+        }
+
+        /*
+         Example: nextcloud://assistant/shared-text
+         */
+
+        if scheme == global.appScheme, action == "assistant", url.path == "/shared-text" {
+            guard let text = NCAssistantSharedTextStore.loadAndClear() else {
+                return
+            }
+
+            Task { @MainActor in
+                let capabilities = await NKCapabilities.shared.getCapabilities(for: controller.account)
+                if capabilities.assistantEnabled {
+                    let inputModel = NCAssistantInputModel(initialText: text)
+                    let assistant = NCAssistant(assistantModel: NCAssistantModel(controller: controller, inputModel: inputModel), chatModel: NCAssistantChatModel(controller: controller, inputModel: inputModel), conversationsModel: NCAssistantChatConversationsModel(controller: controller))
+                    let hostingController = UIHostingController(rootView: assistant)
+                    controller.present(hostingController, animated: true, completion: nil)
+                } else {
+                    try? await Task.sleep(for: .seconds(1))
+                    await showBanner(windowScene: scene as? UIWindowScene,
+                                     title: "_info_",
+                                     subtitle: "_no_assistant_installed_",
+                                     systemImage: "sparkles",
+                                     imageAnimation: .none,
+                                     imageColor: NCBrandColor.shared.customer
+                    )
+                }
+            }
+
+            return
         }
 
         /*
