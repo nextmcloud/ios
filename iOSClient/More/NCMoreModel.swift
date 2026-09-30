@@ -173,6 +173,7 @@ final class NCMoreModel: ObservableObject {
 
         autoUploadStart = tableAccount.autoUploadStart
 
+        var userItems: [Item] = []
         var functionItems: [Item] = []
         var externalSiteItems: [Item] = []
         var settingsItems: [Item] = []
@@ -181,16 +182,24 @@ final class NCMoreModel: ObservableObject {
         quotaExternalSiteTitle = ""
         quotaExternalSiteUrl = nil
 
-        functionItems.append(
+        userItems.append(
             Item(
-                titleKey: "_activity_",
-                image: "bolt.fill",
-                destination: .storyboard(
-                    name: "NCActivity",
-                    presentation: .push
-                )
+                titleKey: getUserName(tableAccount),
+                image: "person",
+                destination: .none
             )
         )
+
+//        functionItems.append(
+//            Item(
+//                titleKey: "_activity_",
+//                image: "bolt.fill",
+//                destination: .storyboard(
+//                    name: "NCActivity",
+//                    presentation: .push
+//                )
+//            )
+//        )
 
         functionItems.append(
             Item(
@@ -308,7 +317,18 @@ final class NCMoreModel: ObservableObject {
 
         configureQuota(tableAccount: tableAccount)
 
+        Task { await self.refreshQuotaFromServer() }
+
         loadExternalSites(sessionAccount: tableAccount.account, externalSiteItems: &externalSiteItems)
+
+        if !userItems.isEmpty {
+            sections.append(
+                Section(
+                    type: .regular,
+                    items: userItems
+                )
+            )
+        }
 
         if !functionItems.isEmpty {
             sections.append(
@@ -406,6 +426,37 @@ final class NCMoreModel: ObservableObject {
             quotaUsed,
             quota
         )
+    }
+
+    /// Refreshes quota information from the database asynchronously with a short retry.
+    ///
+    /// This method re-reads the account quota values from the local database with a bounded retry loop,
+    /// allowing UI to catch backend quota updates performed asynchronously elsewhere.
+    ///
+    /// NOTE: No direct network call is made here because there is no `getUserQuota` API in `NCNetworking`.
+    @MainActor
+    private func refreshQuotaFromServer() async {
+        // Re-read latest quota values from the database and update UI.
+        // Some backend processes update quota asynchronously; perform a short, bounded retry to catch updates quickly.
+        // NOTE: No direct networking call here because there is no getUserQuota API in NCNetworking.
+        let maxAttempts = 5
+        let delay: UInt64 = 400_000_000 // 0.4s
+        for attempt in 0..<maxAttempts {
+            if let updated = database.getTableAccount(predicate: NSPredicate(format: "account == %@", account)) {
+                configureQuota(tableAccount: updated)
+            }
+            // If not last attempt, wait briefly before trying again to catch backend update
+            if attempt < maxAttempts - 1 {
+                try? await Task.sleep(nanoseconds: delay)
+            }
+        }
+    }
+
+    /// Public method to refresh quota immediately.
+    ///
+    /// Other parts of the app can call this to trigger a quota refresh after uploads/deletions.
+    func refreshQuotaNow() {
+        Task { await self.refreshQuotaFromServer() }
     }
 
     /// Loads external site entries configured for the account.
@@ -574,4 +625,17 @@ final class NCMoreModel: ObservableObject {
 
         UIApplication.shared.open(url)
     }
+
+
+    /// Func to get the user display name + alias
+    func getUserName(_ tableAccount: tableAccount) -> String {
+        if !tableAccount.email.isEmpty {
+            return tableAccount.email
+        } else if tableAccount.email.isEmpty {//}|| tableAccount.alias.isEmpty {
+            return tableAccount.displayName
+        } else {
+            return tableAccount.alias
+        }
+    }
+
 }
