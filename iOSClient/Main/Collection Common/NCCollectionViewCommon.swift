@@ -384,6 +384,9 @@ class NCCollectionViewCommon: UIViewController, NCAccountSettingsModelDelegate, 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
 
+        // Re-evaluate in-app messages after viewDidAppear
+        MoEngageAnalytics.shared.displayInAppNotificationSafely(reason: "viewDidAppear")
+
         Task {
             await NCNetworking.shared.transferDispatcher.addDelegate(self)
         }
@@ -446,7 +449,15 @@ class NCCollectionViewCommon: UIViewController, NCAccountSettingsModelDelegate, 
     override var canBecomeFirstResponder: Bool {
         return true
     }
-    
+
+    func presentationControllerDidDismiss( _ presentationController: UIPresentationController) {
+        let viewController = presentationController.presentedViewController
+
+        if viewController is NCViewerRichWorkspaceWebView {
+            closeRichWorkspaceWebView()
+        }
+    }
+
     @objc func updateIcons() {
         collectionView.reloadData()
     }
