@@ -17,11 +17,18 @@ class tableAccount: Object {
     @objc dynamic var autoUploadDirectory = ""
     @objc dynamic var autoUploadFileName = ""
     @objc dynamic var autoUploadStart: Bool = false
+    /// Invalidates scans belonging to a previous start/stop session.
+    @objc dynamic var autoUploadSessionIdentifier = ""
     @objc dynamic var autoUploadImage: Bool = false
     @objc dynamic var autoUploadVideo: Bool = false
     @objc dynamic var autoUploadWWAnPhoto: Bool = false
     @objc dynamic var autoUploadWWAnVideo: Bool = false
+    /// Incremental restart date; nil scans the whole library. Advances only past confirmed uploads.
     @objc dynamic var autoUploadSinceDate: Date?
+    /// Preserves the whole-library selection independently of incremental progress.
+    @objc dynamic var autoUploadAllPhotos = false
+    /// Ignores completed uploads from previous sessions while preserving the local history.
+    @objc dynamic var autoUploadForceReupload = false
     @objc dynamic var backend = ""
     @objc dynamic var backendCapabilitiesSetDisplayName: Bool = false
     @objc dynamic var backendCapabilitiesSetPassword: Bool = false
@@ -73,6 +80,8 @@ class tableAccount: Object {
                                    autoUploadWWAnPhoto: self.autoUploadWWAnPhoto,
                                    autoUploadWWAnVideo: self.autoUploadWWAnVideo,
                                    autoUploadSinceDate: self.autoUploadSinceDate,
+                                   autoUploadAllPhotos: self.autoUploadAllPhotos,
+                                   autoUploadForceReupload: self.autoUploadForceReupload,
                                    user: self.user,
                                    userId: self.userId,
                                    urlBase: self.urlBase)
@@ -93,6 +102,9 @@ class tableAccount: Object {
         self.autoUploadVideo = codableObject.autoUploadVideo
         self.autoUploadWWAnPhoto = codableObject.autoUploadWWAnPhoto
         self.autoUploadWWAnVideo = codableObject.autoUploadWWAnVideo
+        self.autoUploadSinceDate = codableObject.autoUploadSinceDate
+        self.autoUploadAllPhotos = codableObject.autoUploadAllPhotos ?? (codableObject.autoUploadSinceDate == nil)
+        self.autoUploadForceReupload = codableObject.autoUploadForceReupload ?? false
 
         self.user = codableObject.user
         self.userId = codableObject.userId
@@ -115,6 +127,10 @@ struct tableAccountCodable: Codable {
     var autoUploadWWAnPhoto: Bool
     var autoUploadWWAnVideo: Bool
     var autoUploadSinceDate: Date?
+    // Optional so older backups infer the selection from their restart date.
+    var autoUploadAllPhotos: Bool?
+    // Optional so backups written before this setting remain readable.
+    var autoUploadForceReupload: Bool?
 
     var user: String
     var userId: String
@@ -210,14 +226,20 @@ extension NCManageDatabase {
 
     func addAccountAsync(_ account: String, urlBase: String, user: String, userId: String, password: String) async {
         await core.performRealmWriteAsync { realm in
+            let newAccount: tableAccount
             if let existing = realm.object(ofType: tableAccount.self, forPrimaryKey: account) {
+                // Re-registering an account preserves its incremental restart date.
+                newAccount = tableAccount(value: existing)
                 realm.delete(existing)
+            } else {
+                newAccount = tableAccount()
+                // Initialize once; opening settings or restarting Auto Upload never changes this date.
+                let startingDate = Date.now
+                newAccount.autoUploadSinceDate = startingDate
             }
 
             // Save password in Keychain
             NCPreferences().setPassword(account: account, password: password)
-
-            let newAccount = tableAccount()
 
             newAccount.account = account
             newAccount.urlBase = urlBase
@@ -363,6 +385,61 @@ extension NCManageDatabase {
             }
         }
     }
+
+    /// Advances only through the confirmed prefix of a scan, in the same active start/stop session.
+    func updateAutoUploadSinceDateIfEnabledAsync(_ date: Date, account: String, sessionIdentifier: String) async {
+        await core.performRealmWriteAsync { realm in
+            guard let current = realm.objects(tableAccount.self).filter("account == %@", account).first,
+                  current.autoUploadStart,
+                  current.autoUploadSessionIdentifier == sessionIdentifier else { return }
+            if let sinceDate = current.autoUploadSinceDate, date <= sinceDate { return }
+            current.autoUploadSinceDate = date
+        }
+    }
+
+    /// Changes the incremental restart date only while Auto Upload is stopped.
+    func setAutoUploadSinceDateAsync(_ date: Date?, account: String) async {
+        await core.performRealmWriteAsync { realm in
+            guard let current = realm.objects(tableAccount.self).filter("account == %@", account).first,
+                  !current.autoUploadStart else { return }
+            current.autoUploadSinceDate = date
+            current.autoUploadAllPhotos = date == nil
+        }
+    }
+
+    /// Selecting the whole library preserves the date until the next Start.
+    func setAutoUploadAllPhotosAsync(_ allPhotos: Bool, account: String) async {
+        await core.performRealmWriteAsync { realm in
+            guard let current = realm.objects(tableAccount.self).filter("account == %@", account).first,
+                  !current.autoUploadStart else { return }
+            current.autoUploadAllPhotos = allPhotos
+            if !allPhotos, current.autoUploadSinceDate == nil {
+                current.autoUploadSinceDate = Date.now
+            }
+        }
+    }
+
+    func setAutoUploadForceReuploadAsync(_ enabled: Bool, account: String) async {
+        await core.performRealmWriteAsync { realm in
+            guard let current = realm.objects(tableAccount.self).filter("account == %@", account).first,
+                  !current.autoUploadStart else { return }
+            current.autoUploadForceReupload = enabled
+        }
+    }
+
+    func setAutoUploadStartAsync(_ enabled: Bool, account: String) async {
+        await core.performRealmWriteAsync { realm in
+            let accounts = realm.objects(tableAccount.self)
+            guard let current = accounts.filter("account == %@", account).first else { return }
+            if enabled, !accounts.filter("autoUploadStart == true AND account != %@", account).isEmpty { return }
+            if current.autoUploadStart != enabled {
+                if enabled, current.autoUploadAllPhotos { current.autoUploadSinceDate = nil }
+                current.autoUploadSessionIdentifier = UUID().uuidString
+                current.autoUploadStart = enabled
+            }
+        }
+    }
+
     // MARK: - Realm Read
 
     func getTableAccount(predicate: NSPredicate) -> tableAccount? {
@@ -529,18 +606,26 @@ extension NCManageDatabase {
         return folderPhotos
     }
 
-    func getAccountAutoUploadSubfolderGranularity() -> Int {
+    func getAccountAutoUploadSubfolderGranularity(account: String? = nil) -> Int {
         core.performRealmRead { realm in
-            realm.objects(tableAccount.self)
+            if let account {
+                return realm.object(ofType: tableAccount.self, forPrimaryKey: account)?.autoUploadSubfolderGranularity
+            }
+
+            return realm.objects(tableAccount.self)
                 .filter("active == true")
                 .first?
                 .autoUploadSubfolderGranularity
         } ?? NCGlobal.shared.subfolderGranularityMonthly
     }
 
-    func getAccountAutoUploadSubfolderGranularityAsync() async -> Int {
+    func getAccountAutoUploadSubfolderGranularityAsync(account: String? = nil) async -> Int {
         await core.performRealmReadAsync { realm in
-            realm.objects(tableAccount.self)
+            if let account {
+                return realm.object(ofType: tableAccount.self, forPrimaryKey: account)?.autoUploadSubfolderGranularity
+            }
+
+            return realm.objects(tableAccount.self)
                 .filter("active == true")
                 .first?
                 .autoUploadSubfolderGranularity

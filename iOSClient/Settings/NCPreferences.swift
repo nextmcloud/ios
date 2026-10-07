@@ -1,5 +1,6 @@
 // SPDX-FileCopyrightText: Nextcloud GmbH
 // SPDX-FileCopyrightText: 2023 Marino Faggiana
+// SPDX-FileCopyrightText: 2026 Rasmus Wøldike
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 import Foundation
@@ -8,7 +9,24 @@ import KeychainAccess
 import NextcloudKit
 
 final class NCPreferences: NSObject {
+    private static let userDefaultsMigrationKey = "NCPreferencesUserDefaultsMigrationVersion"
+    private static let userDefaultsMigrationVersion = 1
+
+    /// Shared directory used by the app and its extensions for the persistent NextcloudKit log.
+    static var sharedLogDirectory: URL? {
+        FileManager.default
+            .containerURL(forSecurityApplicationGroupIdentifier: NCBrandOptions.shared.capabilitiesGroup)?
+            .appendingPathComponent("Logs", isDirectory: true)
+    }
+
     let keychain = Keychain(service: "com.nextcloud.keychain")
+    private let userDefaults: UserDefaults
+
+    override init() {
+        userDefaults = UserDefaults(suiteName: NCBrandOptions.shared.capabilitiesGroup) ?? .standard
+        super.init()
+        migrateUserDefaultsToAppGroupIfNeeded()
+    }
 
     var showDescription: Bool {
         get {
@@ -87,7 +105,27 @@ final class NCPreferences: NSObject {
         }
     }
 
+    /// Тhe deadline date when the wrong passcode attempt lockout expires.
+    var passcodeLockoutEnd: Date? {
+        get {
+            if let value = try? keychain.get("passcodeLockoutEnd"), let result = Double(value) {
+                return Date(timeIntervalSince1970: result)
+            }
+            return nil
+        }
+        set {
+            keychain["passcodeLockoutEnd"] = newValue.map { String($0.timeIntervalSince1970) }
+        }
+    }
+
+    func clearPasscodeFailures() {
+        passcodeCounterFail = 0
+        passcodeCounterFailReset = 0
+        passcodeLockoutEnd = nil
+    }
+
     var requestPasscodeAtStart: Bool {
+//    @objc var requestPasscodeAtStart: Bool {
         get {
             let keychainOLD = Keychain(service: "Crypto Cloud")
             if let value = keychainOLD["notPasscodeAtStart"], !value.isEmpty {
@@ -486,11 +524,112 @@ final class NCPreferences: NSObject {
         return true
     }
 
-    func clearAllKeysEndToEnd(account: String) {
+    /// Indicates that the locally active E2EE key set no longer matches the
+    /// key currently published by the server. The key material is retained so
+    /// it can continue to decrypt older storage spaces, but it must not write.
+    func isEndToEndServerKeyStale(account: String) -> Bool {
+        getBoolPreference(
+            key: "EndToEndServerKeyStale",
+            account: account,
+            defaultValue: false
+        )
+    }
+
+    func setEndToEndServerKeyStale(account: String, stale: Bool) {
+        let key = "EndToEndServerKeyStale_\(account)"
+        setUserDefaults(stale, forKey: key)
+    }
+
+    /// Archives the current E2EE credentials as an immutable Keychain item.
+    ///
+    /// Repeated attempts with unchanged credentials reuse the existing
+    /// snapshot. The archive index is written only after the snapshot itself,
+    /// so callers can safely stop before clearing the active credentials if
+    /// either Keychain operation fails.
+    @discardableResult
+    func archiveCurrentEndToEndKeySet(account: String) throws -> NCEndToEndKeySet? {
+        guard let candidate = NCEndToEndKeySet(
+            certificate: getEndToEndCertificate(account: account),
+            privateKey: getEndToEndPrivateKey(account: account),
+            publicKey: getEndToEndPublicKey(account: account),
+            passphrase: getEndToEndPassphrase(account: account)
+        ) else {
+            return nil
+        }
+
+        let archivedKeySets = try getArchivedEndToEndKeySets(account: account)
+        if let existingKeySet = archivedKeySets.first(where: { $0.containsSameKeyMaterial(as: candidate) }) {
+            return existingKeySet
+        }
+
+        let snapshotKey = archivedEndToEndKeySetKey(account: account, identifier: candidate.identifier)
+        let snapshotData = try JSONEncoder().encode(candidate)
+        try keychain.set(snapshotData, key: snapshotKey)
+
+        do {
+            let identifiers = archivedKeySets.map(\.identifier) + [candidate.identifier]
+            let indexData = try JSONEncoder().encode(identifiers)
+            try keychain.set(indexData, key: archivedEndToEndKeySetIndexKey(account: account))
+        } catch {
+            try? keychain.remove(snapshotKey)
+            throw error
+        }
+
+        return candidate
+    }
+
+    /// Returns E2EE snapshots in archival order without exposing mutation APIs.
+    func getArchivedEndToEndKeySets(account: String) throws -> [NCEndToEndKeySet] {
+        let indexKey = archivedEndToEndKeySetIndexKey(account: account)
+        guard let indexData = try keychain.getData(indexKey) else {
+            return []
+        }
+
+        let identifiers = try JSONDecoder().decode([String].self, from: indexData)
+        return try identifiers.map { identifier in
+            let snapshotKey = archivedEndToEndKeySetKey(account: account, identifier: identifier)
+            guard let snapshotData = try keychain.getData(snapshotKey) else {
+                throw CocoaError(.fileReadCorruptFile)
+            }
+
+            let keySet = try JSONDecoder().decode(NCEndToEndKeySet.self, from: snapshotData)
+            guard keySet.identifier == identifier else {
+                throw CocoaError(.fileReadCorruptFile)
+            }
+            return keySet
+        }
+    }
+
+    /// Clears only the active credentials, preserving archived key sets.
+    func clearCurrentKeysEndToEnd(account: String) {
         setEndToEndCertificate(account: account, certificate: nil)
         setEndToEndPrivateKey(account: account, privateKey: nil)
         setEndToEndPublicKey(account: account, publicKey: nil)
         setEndToEndPassphrase(account: account, passphrase: nil)
+    }
+
+    /// Clears active and archived E2EE credentials for explicit local removal.
+    func clearAllKeysEndToEnd(account: String) {
+        clearCurrentKeysEndToEnd(account: account)
+        setEndToEndServerKeyStale(account: account, stale: false)
+
+        let snapshotPrefix = archivedEndToEndKeySetPrefix(account: account)
+        for key in keychain.allKeys().filter({ $0.hasPrefix(snapshotPrefix) }) {
+            try? keychain.remove(key)
+        }
+        try? keychain.remove(archivedEndToEndKeySetIndexKey(account: account))
+    }
+
+    private func archivedEndToEndKeySetIndexKey(account: String) -> String {
+        "EndToEndArchivedKeySetIndex_" + account
+    }
+
+    private func archivedEndToEndKeySetPrefix(account: String) -> String {
+        "EndToEndArchivedKeySet_" + account + "_"
+    }
+
+    private func archivedEndToEndKeySetKey(account: String, identifier: String) -> String {
+        archivedEndToEndKeySetPrefix(account: account) + identifier
     }
 
     // MARK: - PUSH NOTIFICATION
@@ -587,6 +726,82 @@ final class NCPreferences: NSObject {
         return arrayValue
     }
 
+    // MARK: - Background Upload Extension
+
+    /// Reports whether this installation may expose the experimental background upload setting.
+    /// Debug builds are always eligible; release builds are eligible only with a TestFlight receipt.
+    static var canConfigureBackgroundUploadExtension: Bool {
+#if DEBUG
+        return true
+#else
+        let bundles = [
+            Bundle.main,
+            Bundle(url: Bundle.main.bundleURL.deletingLastPathComponent().deletingLastPathComponent())
+        ]
+
+        return bundles.contains {
+            $0?.appStoreReceiptURL?.lastPathComponent == "sandboxReceipt"
+        }
+#endif
+    }
+
+    /// Stores the user's opt-in for the experimental PhotoKit background upload extension.
+    /// The default is `false` and the value is shared with the extension through the App Group.
+    var backgroundUploadExtensionEnabled: Bool {
+        get {
+            getBoolPreference(key: "backgroundUploadExtensionEnabled", defaultValue: false)
+        }
+        set {
+            setUserDefaults(newValue, forKey: "backgroundUploadExtensionEnabled")
+        }
+    }
+
+    /// Returns the effective feature state after applying Debug or TestFlight eligibility.
+    /// This prevents a stored TestFlight opt-in from carrying over to an App Store installation.
+    var shouldUseBackgroundUploadExtension: Bool {
+        Self.canConfigureBackgroundUploadExtension && backgroundUploadExtensionEnabled
+    }
+
+    /// Reports whether automatic background uploads are suspended for the account.
+    /// The value is shared between the host app and its background upload extension.
+    func isBackgroundUploadSuspended(account: String) -> Bool {
+        getBoolPreference(key: "BackgroundUploadSuspended", account: account, defaultValue: false)
+    }
+
+    /// Suspends or resumes automatic background uploads for the account.
+    /// Resuming also clears the consecutive-failure circuit breaker for a fresh queue attempt.
+    func setBackgroundUploadSuspended(_ suspended: Bool, account: String) {
+        let key = "Preferences_BackgroundUploadSuspended_\(account)"
+
+        if suspended {
+            userDefaults.set(true, forKey: key)
+        } else {
+            userDefaults.removeObject(forKey: key)
+            resetBackgroundUploadConsecutiveFailures(account: account)
+        }
+    }
+
+    /// Records one terminal failure per distinct Photos asset and returns the consecutive count.
+    /// Repeated processing of the same failed asset does not advance the account circuit breaker.
+    func recordBackgroundUploadFailure(account: String, assetIdentifier: String) -> Int {
+        let failedAssetsKey = "Preferences_BackgroundUploadFailedAssets_\(account)"
+        var failedAssetIdentifiers = userDefaults.stringArray(forKey: failedAssetsKey) ?? []
+
+        guard !failedAssetIdentifiers.contains(assetIdentifier) else {
+            return failedAssetIdentifiers.count
+        }
+
+        failedAssetIdentifiers.append(assetIdentifier)
+        userDefaults.set(failedAssetIdentifiers, forKey: failedAssetsKey)
+        return failedAssetIdentifiers.count
+    }
+
+    /// Clears consecutive terminal failures after a successful upload.
+    /// This intentionally leaves an existing suspension flag unchanged until explicit user action.
+    func resetBackgroundUploadConsecutiveFailures(account: String) {
+        userDefaults.removeObject(forKey: "Preferences_BackgroundUploadFailedAssets_\(account)")
+    }
+
     // MARK: - Upload Asset (autoupload folder)
 
     func setUploadUseAutoUploadFolder(account: String, value: Bool) {
@@ -626,6 +841,69 @@ final class NCPreferences: NSObject {
         setUserDefaults(weekString, forKey: "cleaningWeek")
     }
 
+    // MARK: - Media Viewer
+
+    var mediaViewerRepeatCurrentItem: Bool {
+        get {
+            getBoolPreference(
+                key: "mediaViewerRepeatCurrentItem",
+                defaultValue: false
+            )
+        }
+        set {
+            setUserDefaults(
+                newValue,
+                forKey: "mediaViewerRepeatCurrentItem"
+            )
+        }
+    }
+
+    var mediaViewerAutoAdvance: Bool {
+        get {
+            getBoolPreference(
+                key: "mediaViewerAutoAdvance",
+                defaultValue: false
+            )
+        }
+        set {
+            setUserDefaults(
+                newValue,
+                forKey: "mediaViewerAutoAdvance"
+            )
+        }
+    }
+
+    // MARK: - Video
+
+    func alwaysUseVLCForVideo(account: String, ocId: String) -> Bool {
+        let key = alwaysUseVLCForVideoKey(
+            account: account,
+            ocId: ocId
+        )
+
+        return userDefaults.object(forKey: key) as? Bool == true
+    }
+
+    func setAlwaysUseVLCForVideo(_ value: Bool, account: String, ocId: String) {
+        let key = alwaysUseVLCForVideoKey(
+            account: account,
+            ocId: ocId
+        )
+
+        if value {
+            userDefaults.set(true, forKey: key)
+        } else {
+            userDefaults.removeObject(forKey: key)
+        }
+    }
+
+    private func alwaysUseVLCForVideoKey(
+        account: String,
+        ocId: String
+    ) -> String {
+        "Preferences_alwaysUseVLCForVideo_\(account)|\(ocId)"
+    }
+
     // MARK: -
 
     private func migrate(key: String) {
@@ -634,6 +912,92 @@ final class NCPreferences: NSObject {
             keychain[key] = value
             keychainOLD[key] = nil
         }
+    }
+
+    private func migrateUserDefaultsToAppGroupIfNeeded() {
+        guard userDefaults !== UserDefaults.standard,
+              Bundle.main.object(forInfoDictionaryKey: "NSExtension") == nil,
+              userDefaults.integer(forKey: Self.userDefaultsMigrationKey) < Self.userDefaultsMigrationVersion else {
+            return
+        }
+
+        defer {
+            userDefaults.set(Self.userDefaultsMigrationVersion, forKey: Self.userDefaultsMigrationKey)
+        }
+
+        guard let bundleIdentifier = Bundle.main.bundleIdentifier,
+              let legacyPreferences = UserDefaults.standard.persistentDomain(forName: bundleIdentifier) else {
+            return
+        }
+
+        for (key, value) in legacyPreferences where key.hasPrefix("Preferences_") {
+            if userDefaults.object(forKey: key) == nil {
+                userDefaults.set(value, forKey: key)
+            }
+        }
+    }
+
+    func removeAll() {
+        try? keychain.removeAll()
+    }
+
+    private func setUserDefaults(_ value: Any?, forKey key: String) {
+        let keyPreferences = "Preferences_\(key)"
+        userDefaults.set(value, forKey: keyPreferences)
+    }
+
+    private func getBoolPreference(key: String, account: String? = nil, defaultValue: Bool) -> Bool {
+        let suffix = account ?? ""
+        let userDefaultsKey = account != nil ? "Preferences_\(key)_\(suffix)" : "Preferences_\(key)"
+        let keychainKey = account != nil ? "\(key)\(suffix)" : key
+
+        if let value = userDefaults.object(forKey: userDefaultsKey) as? Bool {
+            return value
+        }
+
+        if let value = try? keychain.get(keychainKey), let boolValue = Bool(value) {
+            userDefaults.set(boolValue, forKey: userDefaultsKey)
+            try? keychain.remove(keychainKey)
+            return boolValue
+        }
+
+        return defaultValue
+    }
+
+    private func getStringPreference(key: String, account: String? = nil, defaultValue: String) -> String {
+        let suffix = account ?? ""
+        let userDefaultsKey = account != nil ? "Preferences_\(key)_\(suffix)" : "Preferences_\(key)"
+        let keychainKey = account != nil ? "\(key)\(suffix)" : key
+
+        if let value = userDefaults.object(forKey: userDefaultsKey) as? String {
+            return value
+        }
+
+        if let value = try? keychain.get(keychainKey) {
+            userDefaults.set(value, forKey: userDefaultsKey)
+            try? keychain.remove(keychainKey)
+            return value
+        }
+
+        return defaultValue
+    }
+
+    private func getIntPreference(key: String, account: String? = nil, defaultValue: Int) -> Int {
+        let suffix = account ?? ""
+        let userDefaultsKey = account != nil ? "Preferences_\(key)_\(suffix)" : "Preferences_\(key)"
+        let keychainKey = account != nil ? "\(key)\(suffix)" : key
+
+        if let value = userDefaults.object(forKey: userDefaultsKey) as? Int {
+            return value
+        }
+
+        if let value = try? keychain.get(keychainKey), let intValue = Int(value) {
+            userDefaults.set(intValue, forKey: userDefaultsKey)
+            try? keychain.remove(keychainKey)
+            return intValue
+        }
+
+        return defaultValue
     }
 
     func removeAll() {

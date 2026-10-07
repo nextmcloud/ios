@@ -25,6 +25,7 @@ import UIKit
 import WebKit
 import NextcloudKit
 //import FloatingPanel
+import FloatingPanel
 
 class NCLoginWeb: UIViewController {
 
@@ -156,6 +157,11 @@ class NCLoginWeb: UIViewController {
 
         // Stop timer error network
         appDelegate.timerErrorNetworking?.invalidate()
+        // Re-evaluate in-app messages after viewDidAppear
+        MoEngageAnalytics.shared.displayInAppNotificationSafely(reason: "viewDidAppear")
+
+        // Stop timer error network
+//        appDelegate.timerErrorNetworking?.invalidate()
 
         if let account = NCManageDatabase.shared.getActiveTableAccount(), NCPreferences().getPassword(account: account.account).isEmpty {
 
@@ -177,6 +183,7 @@ class NCLoginWeb: UIViewController {
 
         // Start timer error network
         appDelegate.startTimerErrorNetworking()
+//        appDelegate.startTimerErrorNetworking()
     }
 
     func loadWebPage(webView: WKWebView, url: URL) {
@@ -356,6 +363,14 @@ extension NCLoginWeb: WKNavigationDelegate {
 //                            SceneManager.shared.register(scene: scene, withRootViewController: controller)
 //                        }
 //                        
+//
+//                        window?.rootViewController = controller
+//                        window?.makeKeyAndVisible()
+//
+//                        if let scene = window?.windowScene {
+//                            SceneManager.shared.register(scene: scene, withRootViewController: controller)
+//                        }
+//
 //
 //                        window?.rootViewController = controller
 //                        window?.makeKeyAndVisible()

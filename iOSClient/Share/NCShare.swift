@@ -1,27 +1,7 @@
-//
-//  NCShare.swift
-//  Nextcloud
-//
-//  Created by Marino Faggiana on 17/07/2019.
-//  Copyright © 2019 Marino Faggiana. All rights reserved.
-//  Copyright © 2022 Henrik Storch. All rights reserved.
-//
-//  Author Marino Faggiana <marino.faggiana@nextcloud.com>
-//  Author Henrik Storch <henrik.storch@nextcloud.com>
-//
-//  This program is free software: you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
-//  the Free Software Foundation, either version 3 of the License, or
-//  (at your option) any later version.
-//
-//  This program is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
-//
-//  You should have received a copy of the GNU General Public License
-//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-//
+// SPDX-FileCopyrightText: Nextcloud GmbH
+// SPDX-FileCopyrightText: 2019 Marino Faggiana
+// SPDX-FileCopyrightText: 2022 Henrik Storch
+// SPDX-License-Identifier: GPL-3.0-or-later
 
 import UIKit
 import Parchment
@@ -47,6 +27,17 @@ class NCShare: UIViewController, NCSharePagingContent {
 //    var textField: UIView? { searchField }
     var textField: UITextField? { self.view.viewWithTag(Tag.searchField) as? UITextField }
 
+class NCShare: UIViewController, NCSharePagingContent {
+//    @IBOutlet weak var viewContainerConstraint: NSLayoutConstraint!
+//    @IBOutlet weak var sharedWithYouByView: UIView!
+//    @IBOutlet weak var sharedWithYouByImage: UIImageView!
+//    @IBOutlet weak var sharedWithYouByLabel: UILabel!
+//    @IBOutlet weak var searchFieldTopConstraint: NSLayoutConstraint!
+//    @IBOutlet weak var searchField: UISearchBar!
+//    var textField: UIView? { searchField }
+    var textField: UITextField? { self.view.viewWithTag(Tag.searchField) as? UITextField }
+
+    @IBOutlet weak var searchField: UISearchBar!
     @IBOutlet weak var tableView: UITableView!
 //    @IBOutlet weak var btnContact: UIButton!
 
@@ -88,6 +79,8 @@ class NCShare: UIViewController, NCSharePagingContent {
     var shareEmails: [tableShare] = []
     var shareOthers: [tableShare] = []
     private var cachedHeader: NCShareAdvancePermissionHeader?
+    
+//    var sendMail: Bool = false
     
     // MARK: - View Life Cycle
 
@@ -141,8 +134,14 @@ class NCShare: UIViewController, NCSharePagingContent {
             }
 
 //            reloadData()
+            self.metadata = await NCNetworking.shared.updateMetadataPlaceholder(metadata)
 
-            networking = NCShareNetworking(metadata: metadata, view: self.view, delegate: self, session: session, controller: controller)
+            reloadData()
+        }
+        
+        networking = NCShareNetworking(metadata: metadata, view: self.view, delegate: self, session: session, controller: controller)
+//            networking = NCShareNetworking(metadata: metadata, view: self.view, delegate: self, session: session)
+        if sharingEnabled {
             let isVisible = (self.navigationController?.topViewController as? NCSharePaging)?.page == .sharing
             networking?.readShare(showLoadingIndicator: isVisible)
 //            searchField.searchTextField.font = .systemFont(ofSize: 14)
@@ -207,6 +206,38 @@ class NCShare: UIViewController, NCSharePagingContent {
             }
         }
 
+//    @objc func openShareProfile(_ sender: UITapGestureRecognizer) {
+//        self.showProfileMenu(userId: metadata.ownerId, session: session, sender: sender.view)
+//    }
+
+    private func scrollToTopIfNeeded() {
+        if tableView.numberOfSections > 0 && tableView.numberOfRows(inSection: 0) > 0 {
+            self.tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: false)
+        }
+    }
+
+    @objc func keyboardWillShow(notification: Notification) {
+        if UIDevice.current.userInterfaceIdiom == .phone {
+            if UIScreen.main.bounds.width < 374 || UIDevice.current.orientation.isLandscape {
+                if let keyboardSize = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue {
+                    if view.frame.origin.y == 0 {
+                        scrollToTopIfNeeded()
+                        self.view.frame.origin.y -= keyboardSize.height
+                    }
+                }
+            } else if UIScreen.main.bounds.height < 850 {
+                if view.frame.origin.y == 0 {
+                    scrollToTopIfNeeded()
+                    self.view.frame.origin.y -= 70
+                }
+            } else {
+                if view.frame.origin.y == 0 {
+                    scrollToTopIfNeeded()
+                    self.view.frame.origin.y -= 40
+                }
+            }
+        }
+
         if UIDevice.current.userInterfaceIdiom == .pad, UIDevice.current.orientation.isLandscape {
             if view.frame.origin.y == 0 {
                 if tableView.numberOfSections > 0 && tableView.numberOfRows(inSection: 0) > 0 {
@@ -219,6 +250,82 @@ class NCShare: UIViewController, NCSharePagingContent {
         textField?.layer.borderColor = NCBrandColor.shared.brand.cgColor
     }
 
+    
+    @objc func keyboardWillHide(notification: Notification) {
+        if view.frame.origin.y != 0 {
+            self.view.frame.origin.y = 0
+        }
+        textField?.layer.borderColor = NCBrandColor.shared.label.cgColor
+    }
+    
+    @objc func keyboardWillShow(notification: Notification) {
+        if UIDevice.current.userInterfaceIdiom == .phone {
+           if (UIScreen.main.bounds.width < 374 || UIDevice.current.orientation.isLandscape) {
+                if let keyboardSize = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue {
+                    if view.frame.origin.y == 0 {
+                        self.tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: false)
+                        self.view.frame.origin.y -= keyboardSize.height
+                    }
+                }
+            } else if UIScreen.main.bounds.height < 850 {
+                if view.frame.origin.y == 0 {
+                    self.tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: false)
+                    self.view.frame.origin.y -= 70
+                }
+            } else {
+                if view.frame.origin.y == 0 {
+                    self.tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: false)
+                    self.view.frame.origin.y -= 40
+                }
+            }
+        }
+        
+        if UIDevice.current.userInterfaceIdiom == .pad, UIDevice.current.orientation.isLandscape {
+            if view.frame.origin.y == 0 {
+                self.tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: false)
+                self.view.frame.origin.y -= 230
+            }
+        }
+        textField?.layer.borderColor = NCBrandColor.shared.brand.cgColor
+    }
+    
+    @objc func keyboardWillHide(notification: Notification) {
+        if view.frame.origin.y != 0 {
+            self.view.frame.origin.y = 0
+        }
+        textField?.layer.borderColor = NCBrandColor.shared.label.cgColor
+    }
+    
+    @objc func keyboardWillShow(notification: Notification) {
+        if UIDevice.current.userInterfaceIdiom == .phone {
+           if (UIScreen.main.bounds.width < 374 || UIDevice.current.orientation.isLandscape) {
+                if let keyboardSize = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue {
+                    if view.frame.origin.y == 0 {
+                        self.tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: false)
+                        self.view.frame.origin.y -= keyboardSize.height
+                    }
+                }
+            } else if UIScreen.main.bounds.height < 850 {
+                if view.frame.origin.y == 0 {
+                    self.tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: false)
+                    self.view.frame.origin.y -= 70
+                }
+            } else {
+                if view.frame.origin.y == 0 {
+                    self.tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: false)
+                    self.view.frame.origin.y -= 40
+                }
+            }
+        }
+        
+        if UIDevice.current.userInterfaceIdiom == .pad, UIDevice.current.orientation.isLandscape {
+            if view.frame.origin.y == 0 {
+                self.tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: false)
+                self.view.frame.origin.y -= 230
+            }
+        }
+        textField?.layer.borderColor = NCBrandColor.shared.brand.cgColor
+    }
     
     @objc func keyboardWillHide(notification: Notification) {
         if view.frame.origin.y != 0 {
@@ -347,6 +454,11 @@ class NCShare: UIViewController, NCSharePagingContent {
             present(alertController, animated: true, completion:nil)
         } else if shares.firstShareLink == nil {
             networking?.createShareLink(password: "")
+
+        } else {
+            networking?.createShareLink(password: "")
+        }
+    }
 
         } else {
             networking?.createShareLink(password: "")
@@ -621,6 +733,12 @@ extension NCShare: UITableViewDataSource {
             }
             return cell
 
+//            self.sendMail = (tableShare.shareType != NKShare.ShareType.publicLink.rawValue)
+            cell.buttonDetail.menu = NCContextMenuShare(share: tableShare, isDirectory: metadata.isDirectory, canReshare: canReshare, shareController: self, controller: controller).viewMenu()
+            cell.buttonDetail.showsMenuAsPrimaryAction = true
+
+            return cell
+
         case .emails:
             let tableShare = shareEmails[indexPath.row]
             guard let cell = tableView.dequeueReusableCell(withIdentifier: "cellUser", for: indexPath) as? NCShareUserCell else {
@@ -628,6 +746,8 @@ extension NCShare: UITableViewDataSource {
             }
             cell.delegate = self
             cell.configure(with: tableShare, at: indexPath, isDirectory: metadata.directory, userId: session.userId)
+            cell.buttonMenu.menu = NCContextMenuShare(share: tableShare, isDirectory: metadata.isDirectory, canReshare: canReshare, shareController: self, controller: controller).viewMenu()
+            cell.buttonMenu.showsMenuAsPrimaryAction = true
             return cell
         }
     }

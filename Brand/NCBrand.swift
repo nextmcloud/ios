@@ -51,14 +51,18 @@ struct NextcloudVersion: Comparable {
     static let v32_0_2 = NextcloudVersion(32, 0, 2)
     static let v33 = NextcloudVersion(33)
     static let v34 = NextcloudVersion(34)
+    static let v35 = NextcloudVersion(35)
 
     static func < (lhs: NextcloudVersion, rhs: NextcloudVersion) -> Bool {
         (lhs.major, lhs.minor, lhs.micro) < (rhs.major, rhs.minor, rhs.micro)
     }
 }
 
-final class NCBrandOptions: @unchecked Sendable {
-    static let shared = NCBrandOptions()
+@objc class NCBrandOptions: NSObject, @unchecked Sendable {
+    @objc static let shared: NCBrandOptions = {
+        let instance = NCBrandOptions()
+        return instance
+    }()
 
     var brand:                           String = "MagentaCLOUD"
     var brandUserAgent:             String = "MagentaCLOUD"
@@ -72,7 +76,11 @@ final class NCBrandOptions: @unchecked Sendable {
     var privacy: String = "https://static.magentacloud.de/privacy/datenschutzhinweise_app.htm"
     var sourceCode: String = "https://github.com/nextcloud/ios"
     var mobileconfig: String = "/remote.php/dav/provisioning/apple-provisioning.mobileconfig"
-    var appStoreUrl: String = "https://apps.apple.com/in/app/nextcloud/id1125420102"
+    var appStoreUrl: String = "https://apps.apple.com/de/app/magentacloud-cloud-speicher/id312838242"
+
+    // Personalized
+    @objc public var webCloseViewProtocolPersonalized: String = ""                                                  // example "abc://change/plan"      Don't touch me !!
+    @objc public var folderBrandAutoUpload: String = ""                                                             // example "_auto_upload_folder_"   Don't touch me !!
 
     // Auto Upload default folder
 //    var folderDefaultAutoUpload: String = Locale.current.language.languageCode?.identifier == "de" ? "Kamera-Medien" : "Camera-Media"
@@ -83,6 +91,13 @@ final class NCBrandOptions: @unchecked Sendable {
     // Capabilities Group
 //    var capabilitiesGroup: String = "group.it.twsweb.Crypto-Cloud"
 //    var capabilitiesGroupApps: String = "group.com.nextcloud.apps"
+    var capabilitiesGroup:              String = "group.de.magentacloud.next.dev2.client"
+    var capabilitiesGroupApps:              String = "group.de.magentacloud.next.dev2.client.apps"
+
+//    var folderDefaultAutoUpload: String = Locale.current.language.languageCode?.identifier == "de" ? "Kamera-Medien" : "Camera-Media"
+    // Get the app's preferred language (the language the app is using, not the system language)
+    var folderDefaultAutoUpload: String = (Locale.preferredLanguages.first?.prefix(2) ?? "en") == "de" ? "Kamera-Medien" : "Camera-Media"
+    
 //#if DEBUG
     // QA :
     @objc public var capabilitiesGroup:              String = "group.com.t-systems.pu-ds.magentacloud.qa"
@@ -108,12 +123,27 @@ final class NCBrandOptions: @unchecked Sendable {
     var disable_intro:       Bool = true
     var disable_request_login_url:       Bool = true
     var disable_multiaccount:            Bool = true
+    // MDM settings
+    var disable_intro:       Bool = true
+    var disable_request_login_url:       Bool = true
+    var disable_multiaccount:            Bool = true
+    var disable_more_external_site: Bool = false
+    var disable_openin_file: Bool = false
+    var disable_crash_service:             Bool = true
+    var disable_log: Bool = false
+    var disable_mobileconfig: Bool = false  
+    var disable_show_more_nextcloud_apps_in_settings:         Bool = true
+    var disable_intro: Bool = false
+    var disable_request_login_url: Bool = false
+    var disable_multiaccount: Bool = false
     var disable_more_external_site: Bool = false
     var disable_openin_file: Bool = false                                                       // Don't touch me !!
     var disable_crash_service:             Bool = true
     var disable_log: Bool = false
     var disable_mobileconfig: Bool = false  
     var disable_show_more_nextcloud_apps_in_settings:         Bool = true
+    var disable_mobileconfig: Bool = false
+    var disable_show_more_nextcloud_apps_in_settings: Bool = true
     var doNotAskPasscodeAtStartup: Bool = false
     var disable_source_code_in_settings: Bool = false
     var enforce_passcode_lock = false
@@ -123,23 +153,23 @@ final class NCBrandOptions: @unchecked Sendable {
     var enforce_servers: [(name: String, url: String)] = []
 
     // Internal option behaviour
-    var cleanUpDay: Int = 0                                                                     // Set default "Delete all cached files older than" possible days value are: 0, 1, 7, 30, 90, 180, 365
+    var cleanUpDay: Int = 0 // Set default "Delete all cached files older than". Possible days value are: 0, 1, 7, 30, 90, 180, 365
 
-    // Max request/download/upload concurrent
+    // Max request/download/upload concurrent connections per host, default is 8 (same as iOS default)
     let httpMaximumConnectionsPerHost: Int = 8
     let httpMaximumConnectionsPerHostInDownload: Int = 8
     let httpMaximumConnectionsPerHostInUpload: Int = 8
 
-    // Max request/download/upload process
+    // Max request/download/upload processes
     let numMaximumProcess: Int = 20
 
-    // Number of failed attempts after reset app
+    // Number of failed attempts before resetting the app
     let resetAppPasscodeAttempts: Int = 10
     let passcodeSecondsFail: Int = 60
 
     // Info Paging
     enum NCInfoPagingTab: Int, CaseIterable {
-        case activity, sharing
+        case activity, sharing, details
     }
 
     init() {
@@ -184,8 +214,19 @@ final class NCBrandOptions: @unchecked Sendable {
     }
 
     func isServerVersion(_ capabilities: NKCapabilities.Capabilities,
-                         greaterOrEqualTo version: NextcloudVersion) -> Bool {
-        return NextcloudVersion(capabilities) >= version
+                         greaterOrEqualTo major: Int,
+                         _ minor: Int,
+                         _ micro: Int) -> Bool {
+
+        let server = (
+            capabilities.serverVersionMajor,
+            capabilities.serverVersionMinor,
+            capabilities.serverVersionMicro
+        )
+
+        let required = (major, minor, micro)
+
+        return server >= required
     }
 }
 
@@ -197,6 +238,8 @@ final class NCBrandColor: @unchecked Sendable {
     var customerText:             UIColor = UIColor(red: 255.0/255.0, green: 255.0/255.0, blue: 255.0/255.0, alpha: 1.0)
 //    let customer: UIColor = UIColor(red: 226.0/255.0, green: 0.0/255.0, blue: 116.0/255.0, alpha: 1.0)         // Nextcloud : #0082C9
 //    var customerText: UIColor = .white
+    let customer: UIColor = UIColor(red: 226.0/255.0, green: 0.0/255.0, blue: 116.0/255.0, alpha: 1.0)         // Nextcloud : #0082C9
+    var customerText: UIColor = .white
 
     var brand: UIColor                                                                                         // don't touch me
     var brandElement: UIColor                                                                                  // don't touch me

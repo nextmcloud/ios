@@ -1,0 +1,154 @@
+// SPDX-FileCopyrightText: Nextcloud GmbH
+// SPDX-FileCopyrightText: 2026 Dhanesh
+// SPDX-FileCopyrightText: 2026 Marino Faggiana
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+import SwiftUI
+
+struct AlbumDetailsScreen: View {
+    private unowned let controller: NCMainTabBarController
+    @StateObject private var viewModel: AlbumDetailsViewModel
+
+    init(controller: NCMainTabBarController, album: Album, navigator: AlbumsNavigator = AlbumsNavigator()) {
+        self.controller = controller
+        _viewModel = StateObject(
+            wrappedValue: AlbumDetailsViewModel(controller: controller, album: album, navigator: navigator)
+        )
+    }
+
+    var body: some View {
+        ZStack {
+            content()
+
+            if viewModel.isLoadingPopupVisible {
+                NCLoadingAlert()
+            }
+        }
+        .navigationTitle(viewModel.screenTitle)
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItemGroup(placement: .topBarTrailing) {
+                if !viewModel.isLoading {
+                    Button(action: handleAddPhotosIntent) {
+                        HStack(spacing: 6) {
+                            Image(systemName: "plus")
+                            Text(NSLocalizedString("_albums_photos_add_photos_btn_", comment: ""))
+                        }
+                        .fixedSize()
+                    }
+
+                    Menu {
+                        Button {
+                            viewModel.onRenameAlbumIntent()
+                        } label: {
+                            Label(
+                                NSLocalizedString("_albums_photos_rename_album_btn_", comment: ""),
+                                systemImage: "pencil"
+                            )
+                        }
+
+                        Button(role: .destructive) {
+                            viewModel.onDeleteAlbumIntent()
+                        } label: {
+                            Label(
+                                NSLocalizedString("_albums_photos_delete_album_btn_", comment: ""),
+                                systemImage: "trash"
+                            )
+                        }
+                        .tint(.red)
+                    } label: {
+                        Image(systemName: "ellipsis.circle")
+                            .imageScale(.large)
+                    }
+                    .buttonStyle(.plain)
+                    .tint(Color(NCBrandColor.shared.iconImageColor))
+                }
+            }
+        }
+        .sheet(
+            isPresented: $viewModel.isPhotoSelectionSheetVisible
+        ) {
+            PhotoSelectionSheet(controller: controller, onPhotosSelected: viewModel.onPhotosSelected)
+        }
+        .inputAlbumNameAlert(
+            isPresented: $viewModel.isRenameAlbumPopupVisible,
+            albumName: $viewModel.newAlbumName,
+            error: viewModel.newAlbumNameError,
+            isForRenamingAlbum: true,
+            onCreate: {
+                viewModel.onRenameAlbumPopupConfirm()
+            },
+            onCancel: {
+                viewModel.onRenameAlbumPopupCancel()
+            }
+        )
+        .alert(
+            NSLocalizedString("_albums_delete_album_popup_title_", comment: ""),
+            isPresented: $viewModel.isDeleteAlbumPopupVisible,
+            actions: {
+                Button(
+                    NSLocalizedString("_albums_delete_album_popup_positive_btn_", comment: ""),
+                    role: .destructive,
+                    action: viewModel.onDeleteAlbumPopupConfirm
+                )
+                Button(
+                    NSLocalizedString("_albums_delete_album_popup_negative_btn_", comment: ""),
+                    role: .cancel,
+                    action: viewModel.onDeleteAlbumPopupCancel
+                )
+            },
+            message: {
+                Text(NSLocalizedString("_albums_delete_album_popup_desc_", comment: ""))
+            }
+        )
+        .onAppear {
+            // Force end selection mode so the tab bar remains visible on this screen
+            NotificationCenter.default.post(name: Notification.Name("NCSelectionModeDidEnd"), object: nil)
+        }
+        .onDisappear {
+            NotificationCenter.default.post(name: Notification.Name("NCSelectionModeDidEnd"), object: nil)
+        }
+        .onChange(of: viewModel.isPhotoSelectionSheetVisible) { _, isPresented in
+            if isPresented == false {
+                NotificationCenter.default.post(name: Notification.Name("NCSelectionModeDidEnd"), object: nil)
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func content() -> some View {
+        if viewModel.isLoading && !viewModel.hasCachedPhotos {
+            ProgressView(NSLocalizedString("_albums_photos_loading_msg_", comment: ""))
+        } else if let error = viewModel.errorMessage {
+            Text(error)
+                .refreshable {
+                    viewModel.onPulledToRefresh()
+                }
+        } else if viewModel.photos.isEmpty {
+            NoPhotosEmptyView(
+                onAddPhotosIntent: handleAddPhotosIntent
+            )
+            .refreshable {
+                viewModel.onPulledToRefresh()
+            }
+        } else {
+            PhotosGridView(
+                controller: controller,
+                photos: viewModel.photos,
+                albumTitle: viewModel.screenTitle,
+                onRemovePhoto: { photo in
+                    Task { @MainActor in
+                        await viewModel.removePhoto(photo)
+                    }
+                }
+            )
+            .refreshable {
+                viewModel.onPulledToRefresh()
+            }
+        }
+    }
+
+    private func handleAddPhotosIntent() {
+        viewModel.onAddPhotosIntent()
+    }
+}

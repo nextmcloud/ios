@@ -1,23 +1,6 @@
-//
-//  NCShareNewUserAddComment.swift
-//  Nextcloud
-//
-//  Created by TSI-mc on 21/06/21.
-//  Copyright © 2022 All rights reserved.
-//
-//  This program is free software: you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
-//  the Free Software Foundation, either version 3 of the License, or
-//  (at your option) any later version.
-//
-//  This program is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
-//
-//  You should have received a copy of the GNU General Public License
-//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-//
+// SPDX-FileCopyrightText: Nextcloud GmbH
+// SPDX-FileCopyrightText: 2006 TSI-mc
+// SPDX-License-Identifier: GPL-3.0-or-later
 
 import UIKit
 import NextcloudKit
@@ -49,6 +32,11 @@ class NCShareNewUserAddComment: UIViewController, NCShareNavigationTitleSetting 
     var downloadLimit: DownloadLimitViewModel = .unlimited
     var downloadLimitChanged: Bool = false
 
+    var controller: NCMainTabBarController?
+    var windowScene: UIWindowScene? {
+        SceneManager.shared.getWindowScene(controller: controller)
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         self.setNavigationTitle()
@@ -123,6 +111,18 @@ class NCShareNewUserAddComment: UIViewController, NCShareNavigationTitleSetting 
             networking?.createShare(share, downloadLimit: self.downloadLimit)
         } else {
             networking?.updateShare(share, downloadLimit: self.downloadLimit, changeDownloadLimit: downloadLimitChanged)
+        if !share.note.isEmpty {
+            if isNewShare {
+                networking?.createShare(share, downloadLimit: self.downloadLimit)
+            } else {
+                networking?.updateShare(share, downloadLimit: self.downloadLimit, changeDownloadLimit: downloadLimitChanged)
+            }
+        } else {
+            Task {
+                await showErrorBanner(windowScene: self.windowScene,
+                                      text: "_share_note_should_not_be_empty_",
+                                      errorCode: 0)
+            }
         }
     
         self.navigationController?.popToRootViewController(animated: true)

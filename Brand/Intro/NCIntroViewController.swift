@@ -62,9 +62,9 @@ class NCIntroViewController: UIViewController, UICollectionViewDataSource, UICol
         self.navigationController?.navigationBar.tintColor = textColor
 
         if !NCManageDatabase.shared.getAllTableAccount().isEmpty {
-            let navigationItemCancel = UIBarButtonItem(image: UIImage(systemName: "xmark"), style: .plain, target: self, action: #selector(actionCancel(_:)))
+            let navigationItemCancel = UIBarButtonItem(image: UIImage(systemName: "xmark"), style: .done, target: self, action: #selector(self.actionCancel))
             navigationItemCancel.tintColor = textColor
-            navigationItem.leftBarButtonItem = navigationItemCancel
+            navigationItem.rightBarButtonItem = navigationItemCancel
         }
 
         pageControl.currentPageIndicatorTintColor = textColor
@@ -75,10 +75,13 @@ class NCIntroViewController: UIViewController, UICollectionViewDataSource, UICol
         buttonLogin.backgroundColor = textColor
         buttonLogin.setTitle(NSLocalizedString("_log_in_", comment: ""), for: .normal)
 
-        buttonSignUp.layer.cornerRadius = 8
+        buttonSignUp.layer.cornerRadius = 20
+        buttonSignUp.layer.borderColor = textColor.cgColor
+        buttonSignUp.layer.borderWidth = 1.0
         buttonSignUp.setTitleColor(textColor, for: .normal)
-        buttonSignUp.backgroundColor = textColor.withAlphaComponent(0.2)
+        buttonSignUp.backgroundColor = NCBrandColor.shared.customer
         buttonSignUp.titleLabel?.adjustsFontSizeToFitWidth = true
+        buttonSignUp.titleEdgeInsets = UIEdgeInsets(top: 0, left: 10, bottom: 0, right: 10)
         buttonSignUp.setTitle(NSLocalizedString("_sign_up_", comment: ""), for: .normal)
 
         buttonHost.layer.cornerRadius = 20
@@ -138,7 +141,7 @@ class NCIntroViewController: UIViewController, UICollectionViewDataSource, UICol
         }
     }
 
-    @objc func autoScroll(_ sender: Any?) {
+    @objc func autoScroll() {
         if pageControl.currentPage + 1 >= titles.count {
             pageControl.currentPage = 0
         } else {
@@ -176,13 +179,13 @@ class NCIntroViewController: UIViewController, UICollectionViewDataSource, UICol
     }
 
     func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
-        timer?.invalidate()
-        timer = nil
+        timerAutoScroll?.invalidate()
+        timerAutoScroll = nil
     }
 
     // MARK: - Action
 
-    @objc func actionCancel(_ sender: Any?) {
+    @objc func actionCancel() {
         dismiss(animated: true) { }
     }
 
@@ -217,6 +220,11 @@ class NCIntroViewController: UIViewController, UICollectionViewDataSource, UICol
 //            viewController.initialURLString = NCBrandOptions.shared.linkloginPreferredProviders
 //            self.navigationController?.pushViewController(viewController, animated: true)
 //        }
+        if let viewController = UIStoryboard(name: "NCLogin", bundle: nil).instantiateViewController(withIdentifier: "NCLoginProvider") as? NCLoginProvider {
+            viewController.controller = self.controller
+            viewController.initialURLString = NCBrandOptions.shared.linkloginPreferredProviders
+            self.navigationController?.pushViewController(viewController, animated: true)
+        }
     }
 
     @IBAction func host(_ sender: Any) {

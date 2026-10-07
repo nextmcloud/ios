@@ -10,8 +10,8 @@ import NextcloudKit
 import SwiftUI
 
 enum AutoUploadTimespan: String, CaseIterable, Identifiable {
-    case allPhotos = "_all_photos_"
-    case newPhotosOnly = "_new_photos_only_"
+    case allPhotos = "all"
+    case fromDate = "fromDate"
     var id: Self { self }
 }
 
@@ -27,6 +27,8 @@ class NCAutoUploadModel: ObservableObject, ViewOnAppearHandling {
     @Published var autoUploadWWAnVideo: Bool = false
     /// Whether auto upload is enabled or not
     @Published var autoUploadStart: Bool = false
+    /// Prevents a restart while start/stop cleanup is being reconciled.
+    @Published var isChangingAutoUpload = false
     /// Whether auto upload creates subfolders based on date or not
     @Published var autoUploadCreateSubfolder: Bool = false
     /// The granularity of the subfolders, either daily, monthly, or yearly
@@ -35,10 +37,28 @@ class NCAutoUploadModel: ObservableObject, ViewOnAppearHandling {
     @Published var autoUploadSinceDate: Date?
     /// Whether a warning should be shown if all photos must be uploaded.
     @Published var showUploadAllPhotosWarning = false
+    /// The incremental restart date, editable while Auto Upload is stopped.
+    @Published var autoUploadSinceDate: Date?
+    @Published var autoUploadForceReupload = false
+    @Published var autoUploadAllPhotos = false
+    var autoUploadTimespan: AutoUploadTimespan { autoUploadAllPhotos ? .allPhotos : .fromDate }
     /// Whether Photos permissions have been granted or not.
     @Published var photosPermissionsGranted = true
     /// Whether `Always` location authorization has been granted, enabling background location-based auto upload.
     @Published var locationAutoUploadPermissionGranted: Bool = false
+
+    /// Whether the experimental PhotoKit background upload extension is enabled.
+    @Published var backgroundUploadExtensionEnabled: Bool = false
+
+    /// Legacy controls remain available when PhotoKit is disabled or unsupported for this account.
+    var usesPhotoKitAutoUpload: Bool {
+        guard #available(iOS 27, *),
+              NCPreferences.canConfigureBackgroundUploadExtension,
+              backgroundUploadExtensionEnabled,
+              PHPhotoLibrary.authorizationStatus(for: .readWrite) == .authorized,
+              let capabilities = NCNetworking.shared.capabilities[session.account] else { return false }
+        return NCBrandOptions.shared.isServerVersion(capabilities, greaterOrEqualTo: .v35)
+    }
 
     /// Whether the error alert should be shown in the view.
     @Published var showErrorAlert: Bool = false
@@ -82,9 +102,12 @@ class NCAutoUploadModel: ObservableObject, ViewOnAppearHandling {
             autoUploadCreateSubfolder = tableAccount.autoUploadCreateSubfolder
             autoUploadSubfolderGranularity = Granularity(rawValue: tableAccount.autoUploadSubfolderGranularity) ?? .monthly
             autoUploadSinceDate = tableAccount.autoUploadSinceDate
+            autoUploadAllPhotos = tableAccount.autoUploadAllPhotos
+            autoUploadForceReupload = tableAccount.autoUploadForceReupload
         }
 
         serverUrl = NCUtilityFileSystem().getHomeServer(session: session)
+        backgroundUploadExtensionEnabled = NCPreferences().backgroundUploadExtensionEnabled
 
         requestAuthorization()
 
@@ -145,30 +168,175 @@ class NCAutoUploadModel: ObservableObject, ViewOnAppearHandling {
         } else {
             autoUploadSinceDate = nil
         }
+    /// Changes the selection without discarding progress before Start is pressed.
+    @MainActor
+    func handleAutoUploadTimespan(_ timespan: AutoUploadTimespan) {
+        guard !isChangingAutoUpload, !autoUploadStart else { return }
+        isChangingAutoUpload = true
+        let accountIdentifier = session.account
+        autoUploadAllPhotos = timespan == .allPhotos
+        let allPhotos = autoUploadAllPhotos
         Task {
-            await database.updateAccountPropertyAsync(\.autoUploadSinceDate, value: autoUploadSinceDate, account: session.account)
+            defer { isChangingAutoUpload = false }
+            await database.setAutoUploadAllPhotosAsync(allPhotos, account: accountIdentifier)
+            if let account = await database.getTableAccountAsync(predicate: NSPredicate(format: "account == %@", accountIdentifier)) {
+                autoUploadSinceDate = account.autoUploadSinceDate
+                autoUploadAllPhotos = account.autoUploadAllPhotos
+            }
+        }
+    }
+
+    /// Saves a new incremental restart date only while Auto Upload is stopped.
+    @MainActor
+    func handleAutoUploadSinceDate(_ date: Date?) {
+        guard !isChangingAutoUpload, !autoUploadStart else { return }
+        isChangingAutoUpload = true
+        let accountIdentifier = session.account
+        autoUploadSinceDate = date
+        autoUploadAllPhotos = date == nil
+        Task {
+            defer { isChangingAutoUpload = false }
+            await database.setAutoUploadSinceDateAsync(date, account: accountIdentifier)
+        }
+    }
+
+    @MainActor
+    func handleAutoUploadForceReupload(_ enabled: Bool) {
+        guard !isChangingAutoUpload, !autoUploadStart else { return }
+        isChangingAutoUpload = true
+        let accountIdentifier = session.account
+        autoUploadForceReupload = enabled
+        Task {
+            defer { isChangingAutoUpload = false }
+            await database.setAutoUploadForceReuploadAsync(enabled, account: accountIdentifier)
+        }
+    }
+
+    /// Stores the experimental extension opt-in and applies the new PhotoKit state immediately.
+    /// Enabling still requires Auto Upload, full Photos access, and a supported server.
+    func handleBackgroundUploadExtensionChange(newValue: Bool) {
+        NCPreferences().backgroundUploadExtensionEnabled = newValue
+
+        guard #available(iOS 27, *) else {
+            return
+        }
+
+        Task {
+            if newValue {
+                _ = await NCBackgroundUploadExtensionManager.shared.ensureEnabled()
+            } else {
+                _ = await NCBackgroundUploadExtensionManager.shared.disableIfIdle()
+            }
         }
     }
 
     /// Updates the auto-upload full content setting.
+    @MainActor
     func handleAutoUploadChange(newValue: Bool, assetCollections: [PHAssetCollection]) {
+        guard !isChangingAutoUpload else { return }
+        isChangingAutoUpload = true
+        let accountIdentifier = session.account
+
         Task {
-            if let tblAccount = await self.database.getTableAccountAsync(predicate: NSPredicate(format: "account == %@", session.account)),
-               tblAccount.autoUploadStart == newValue {
+            guard let account = await database.getTableAccountAsync(
+                predicate: NSPredicate(format: "account == %@", accountIdentifier)
+            ),
+            account.autoUploadStart != newValue else {
+                isChangingAutoUpload = false
                 return
             }
 
-            await database.updateAccountPropertyAsync(\.autoUploadStart, value: newValue, account: session.account)
-
             if newValue {
-                _ = await NCAutoUpload.shared.startManualAutoUploadForAlbums(controller: self.controller,
-                                                                             model: self,
-                                                                             assetCollections: assetCollections,
-                                                                             account: session.account)
+                if #available(iOS 27, *),
+                   await hasUnresolvedAutoUploadTransfers(account: accountIdentifier) {
+                    await cancelAutoUploadTransfers(account: accountIdentifier)
+                    guard !(await hasUnresolvedAutoUploadTransfers(account: accountIdentifier)) else {
+                        autoUploadStart = false
+                        error = NSLocalizedString("_autoupload_cleanup_pending_", comment: "")
+                        showErrorAlert = true
+                        isChangingAutoUpload = false
+                        return
+                    }
+                }
+                await database.setAutoUploadStartAsync(true, account: accountIdentifier)
+                // Enabling Auto Upload is an explicit request to resume a previously suspended queue.
+                NCPreferences().setBackgroundUploadSuspended(false, account: accountIdentifier)
+
+                guard let updatedAccount = await database.getTableAccountAsync(
+                    predicate: NSPredicate(format: "account == %@", accountIdentifier)
+                ), updatedAccount.autoUploadStart else {
+                    await MainActor.run {
+                        self.autoUploadStart = false
+                    }
+                    isChangingAutoUpload = false
+                    return
+                }
+
+                autoUploadSinceDate = updatedAccount.autoUploadSinceDate
+                // Stop remains available during the legacy initial scan.
+                isChangingAutoUpload = false
+                _ = await NCAutoUpload.shared.startManualAutoUploadForAlbums(
+                    controller: controller,
+                    model: self,
+                    assetCollections: assetCollections,
+                    account: accountIdentifier
+                )
             } else {
-                await database.clearMetadatasUploadAsync(account: session.account)
+                await database.setAutoUploadStartAsync(false, account: accountIdentifier)
+                await cancelAutoUploadTransfers(account: accountIdentifier)
+
+                if #available(iOS 27, *) {
+                    _ = await NCBackgroundUploadExtensionManager.shared.disableIfIdle()
+                }
+                autoUploadSinceDate = database.getTableAccount(account: accountIdentifier)?.autoUploadSinceDate
+                isChangingAutoUpload = false
             }
         }
+    }
+
+    private func hasUnresolvedAutoUploadTransfers(account: String) async -> Bool {
+        let remaining = await database.getMetadatasAsync(predicate: NSPredicate(
+            format: "account == %@ AND sessionSelector == %@ AND backgroundUploadJobIdentifier != ''",
+            account,
+            NCGlobal.shared.selectorUploadAutoUpload
+        ))
+        if !remaining.isEmpty { return true }
+        if #available(iOS 27, *) {
+            return NCBackgroundUploadExtensionManager.shared.hasOutstandingUploadJobs()
+        }
+        return false
+    }
+
+    private func cancelAutoUploadTransfers(account: String) async {
+        await database.requestBackgroundAutoUploadCancellationAsync(account: account)
+
+        if #available(iOS 27, *) {
+            await NCBackgroundUploadExtensionManager.shared.cancelUploads(account: account)
+        }
+
+        let predicate = NSPredicate(
+            format: "account == %@ AND sessionSelector == %@ AND backgroundUploadJobIdentifier == '' AND status != %d",
+            account,
+            NCGlobal.shared.selectorUploadAutoUpload,
+            NCGlobal.shared.metadataStatusNormal
+        )
+
+        let metadatas: [tableMetadata] = await database.getMetadatasAsync(
+            predicate: predicate
+        )
+
+        for metadata in metadatas {
+            await NCNetworking.shared.cancelTask(metadata: metadata)
+        }
+    }
+
+    func getOtherAutoUploadAccount() async -> tableAccount? {
+        await database.getTableAccountAsync(
+            predicate: NSPredicate(
+                format: "autoUploadStart == true AND account != %@",
+                session.account
+            )
+        )
     }
 
     /// Updates the auto-upload create subfolder setting.
@@ -202,6 +370,7 @@ class NCAutoUploadModel: ObservableObject, ViewOnAppearHandling {
     func setAutoUploadDirectory(serverUrl: String?) {
         guard let serverUrl else { return }
         Task {
+            let previousDestination = database.getAccountAutoUploadServerUrlBase(session: session)
             let home = NCUtilityFileSystem().getHomeServer(session: session)
             if home != serverUrl {
                 let fileName = (serverUrl as NSString).lastPathComponent
@@ -211,6 +380,9 @@ class NCAutoUploadModel: ObservableObject, ViewOnAppearHandling {
                 }
             }
 
+            if database.getAccountAutoUploadServerUrlBase(session: session) != previousDestination {
+                await database.setAutoUploadSinceDateAsync(nil, account: session.account)
+            }
             onViewAppear()
         }
     }

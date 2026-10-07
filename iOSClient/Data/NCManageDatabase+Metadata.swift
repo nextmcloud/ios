@@ -59,19 +59,15 @@ class tableMetadata: Object {
     let exifPhotos = List<NCKeyValue>()
     @objc dynamic var favorite: Bool = false
     @objc dynamic var fileId = ""
-    /// The file name as it exists on the server.  `fileName` is the same as `fileNameView`. The only exception is when E2EE is enabled, in which case the `fileName` is obfuscated, while the `fileNameView` shows the human-readable name.
     @objc dynamic var fileName = ""
-    /// The human readable file name . `fileName` is the same as `fileNameView`. The only exception is when E2EE is enabled, in which case the `fileName` is obfuscated, while the `fileNameView` shows the human-readable name.
     @objc dynamic var fileNameView = ""
     @objc dynamic var hasPreview: Bool = false
     @objc dynamic var hidden: Bool = false
     @objc dynamic var iconName = ""
     @objc dynamic var iconUrl = ""
-    /// Indicating if the file is sent as a live photo from the server, or if we should detect it as such and convert it client-side
-    @objc dynamic var isFlaggedAsLivePhotoByServer: Bool = false
+    @objc dynamic var isFlaggedAsLivePhotoByServer: Bool = false // Indicating if the file is sent as a live photo from the server, or if we should detect it as such and convert it client-side
     @objc dynamic var isExtractFile: Bool = false
-    /// If this is not empty, the media is a live photo. New media gets this straight from server, but old media needs to be detected as live photo (look isFlaggedAsLivePhotoByServer)
-    @objc dynamic var livePhotoFile = ""
+    @objc dynamic var livePhotoFile = "" // If this is not empty, the media is a live photo. New media gets this straight from server, but old media needs to be detected as live photo (look isFlaggedAsLivePhotoByServer)
     @objc dynamic var mountType = ""
     @objc dynamic var name = "" // for unifiedSearch is the provider.id
     @objc dynamic var note = ""
@@ -87,6 +83,7 @@ class tableMetadata: Object {
     @objc public var lockTime: Date?
     @objc public var lockTimeOut: Date?
     @objc dynamic var mediaSearch: Bool = false
+    @objc dynamic var placeholder: Bool = false
     @objc dynamic var path = ""
     @objc dynamic var permissions = ""
     @objc dynamic var placePhotos: String?
@@ -110,7 +107,7 @@ class tableMetadata: Object {
     @objc dynamic var status: Int = 0
     @objc dynamic var storeFlag: String?
     @objc dynamic var subline: String?
-    let tags = List<tableMetadataTag>()
+    let tags = List<String>()
     @objc dynamic var trashbinFileName = ""
     @objc dynamic var trashbinOriginalLocation = ""
     @objc dynamic var trashbinDeletionTime = NSDate()
@@ -151,10 +148,37 @@ extension tableMetadata {
         (fileNameView as NSString).deletingPathExtension
     }
 
+    var isRenameable: Bool {
+        if !NCMetadataPermissions.canRename(self) {
+            return false
+        }
+        if lock {
+            return false
+        }
+        if !isDirectoryE2EE && e2eEncrypted {
+            return false
+        }
+        return true
+    }
+
+    var isPrintable: Bool {
+        if isDocumentViewableOnly {
+            return false
+        }
+        if ["application/pdf", "com.adobe.pdf"].contains(contentType) || contentType.hasPrefix("text/") || classFile == NKTypeClassFile.image.rawValue {
+            return true
+        }
+        return false
+    }
+    
     var isSavebleInCameraRoll: Bool {
         return (classFile == NKTypeClassFile.image.rawValue && contentType != "image/svg+xml") || classFile == NKTypeClassFile.video.rawValue
     }
 
+    var isDocumentViewableOnly: Bool {
+        sharePermissionsCollaborationServices == NCPermissions().permissionReadShare && classFile == NKTypeClassFile.document.rawValue
+    }
+    
     var isAudioOrVideo: Bool {
         return classFile == NKTypeClassFile.audio.rawValue || classFile == NKTypeClassFile.video.rawValue
     }
@@ -190,6 +214,11 @@ extension tableMetadata {
 
     var isCopyableMovable: Bool {
         !isDirectoryE2EE && !e2eEncrypted
+//        !isDirectoryE2EE && !e2eEncrypted && NCMetadataPermissions.canMoveAndDelete(self)
+        !isDocumentViewableOnly && !isDirectoryE2EE && !e2eEncrypted
+//        !isDirectoryE2EE && !e2eEncrypted
+//        !isDirectoryE2EE && !e2eEncrypted
+        !isDirectoryE2EE && !e2eEncrypted && NCMetadataPermissions.canMoveAndDelete(self)
     }
 
     var isModifiableWithQuickLook: Bool {
@@ -218,6 +247,8 @@ extension tableMetadata {
 
     var isDeletable: Bool {
         if (!isDirectoryE2EE && e2eEncrypted) || !NCMetadataPermissions.canDelete(self) {
+//        if (!isDirectoryE2EE && e2eEncrypted) || !NCMetadataPermissions.canDelete(self) {
+        if (!isDirectoryE2EE && e2eEncrypted) || !NCMetadataPermissions.canDelete(self) || !NCMetadataPermissions.canMoveAndDelete(self) {
             return false
         }
         return true
@@ -235,7 +266,69 @@ extension tableMetadata {
         if !capabilities.fileSharingApiEnabled || (capabilities.e2EEEnabled && isDirectoryE2EE) {
             return false
         }
-        return true
+        return !e2eEncrypted
+    }
+    
+    var canShare: Bool {
+        return session.isEmpty && !directory && !NCBrandOptions.shared.disable_openin_file
+    }
+
+    var canSetDirectoryAsE2EE: Bool {
+        return directory && size == 0 && !e2eEncrypted && NCPreferences().isEndToEndEnabled(account: account)
+    }
+
+    var canUnsetDirectoryAsE2EE: Bool {
+        return !isDirectoryE2EE && directory && size == 0 && e2eEncrypted && NCPreferences().isEndToEndEnabled(account: account)
+    }
+
+        let utility = NCUtility()
+        let editors = utility.editorsDirectEditing(account: account, contentType: contentType)
+        let isRichDocument = utility.isTypeFileRichDocument(self)
+        return classFile == NKCommon.TypeClassFile.document.rawValue && editors.contains(NCGlobal.shared.editorText) && ((editors.contains(NCGlobal.shared.editorOnlyoffice) || isRichDocument))
+    }
+
+    var isWaitingTransfer: Bool {
+        status == NCGlobal.shared.metadataStatusWaitDownload || status == NCGlobal.shared.metadataStatusWaitUpload || status == NCGlobal.shared.metadataStatusUploadError
+    }
+
+    var isInTransfer: Bool {
+        status == NCGlobal.shared.metadataStatusDownloading || status == NCGlobal.shared.metadataStatusUploading
+    }
+
+    var isTransferInForeground: Bool {
+        (status > 0 && (chunk > 0 || e2eEncrypted))
+    }
+    
+    var isDownloadUpload: Bool {
+        status == NCGlobal.shared.metadataStatusDownloading || status == NCGlobal.shared.metadataStatusUploading
+    }
+    
+    var isDownload: Bool {
+        status == NCGlobal.shared.metadataStatusWaitDownload || status == NCGlobal.shared.metadataStatusDownloading
+    }
+
+    var isUpload: Bool {
+        status == NCGlobal.shared.metadataStatusWaitUpload || status == NCGlobal.shared.metadataStatusUploading
+    }
+
+    var isDirectory: Bool {
+        directory
+    }
+
+    @objc var isDirectoryE2EE: Bool {
+        return NCUtilityFileSystem().isDirectoryE2EE(serverUrl: serverUrl, urlBase: urlBase, userId: userId, account: account)
+    }
+
+    var isLivePhoto: Bool {
+        !livePhotoFile.isEmpty
+    }
+
+    var isNotFlaggedAsLivePhotoByServer: Bool {
+        !isFlaggedAsLivePhotoByServer
+    }
+
+    var imageSize: CGSize {
+        CGSize(width: width, height: height)
     }
 
     var hasPreviewBorder: Bool {
@@ -248,10 +341,8 @@ extension tableMetadata {
               NextcloudKit.shared.isNetworkReachable() else {
             return false
         }
-        let utility = NCUtility()
-        let directEditingEditors = utility.editorsDirectEditing(account: account, contentType: contentType).map { $0.lowercased() }
-        let richDocumentEditor = utility.isTypeFileRichDocument(self)
-        let capabilities = NCNetworking.shared.capabilities[account]
+        let directEditingEditors = NCDocumentEditorSupport.directEditingEditorIdentifiers(account: account, contentType: contentType)
+        let supportsRichdocuments = NCDocumentEditorSupport.isFileSupportedByRichdocuments(self)
 
         if let capabilities,
            capabilities.richDocumentsEnabled,
@@ -259,20 +350,27 @@ extension tableMetadata {
            directEditingEditors.isEmpty {
             // RichDocument: Collabora
             return true
-        } else if !directEditingEditors.isEmpty {
-            return true
+        } else if directEditingEditors.contains("nextcloud text") || directEditingEditors.contains("onlyoffice") {
+            // DirectEditing: Nextcloud Text - OnlyOffice
+           return true
         }
         return false
     }
 
-    var isAvailableRichDocumentEditorView: Bool {
-        guard let capabilities = NCNetworking.shared.capabilities[account],
+    var isLegacyRichdocumentsEditorAvailable: Bool {
+        guard !isPDF,
               classFile == NKTypeClassFile.document.rawValue,
-              capabilities.richDocumentsEnabled,
-              NextcloudKit.shared.isNetworkReachable() else { return false }
+              NextcloudKit.shared.isNetworkReachable(),
+              NCDocumentEditorSupport.isFileSupportedByRichdocuments(self) else {
+            return false
+        }
 
-        if NCUtility().isTypeFileRichDocument(self) {
-            return true
+        let directEditingEditors = NCDocumentEditorSupport.directEditingEditorIdentifiers(
+            account: account,
+            contentType: contentType
+        )
+        return !directEditingEditors.contains {
+            $0.caseInsensitiveCompare(NCGlobal.shared.editorCollabora) == .orderedSame
         }
         return false
     }
@@ -281,7 +379,7 @@ extension tableMetadata {
         guard (classFile == NKTypeClassFile.document.rawValue) && NextcloudKit.shared.isNetworkReachable() else {
             return false
         }
-        let editors = NCUtility().editorsDirectEditing(account: account, contentType: contentType)
+        let editors = NCDocumentEditorSupport.directEditingEditorIdentifiers(account: account, contentType: contentType)
         return !editors.isEmpty
     }
 
@@ -296,28 +394,62 @@ extension tableMetadata {
             return NCMetadataPermissions.canCreateFile(self)
         }
     }
+    
+    var isDOC: Bool {
+        return (contentType == "application/msword" || contentType == "application/vnd.openxmlformats-officedocument.wordprocessingml.document")
+    }
+    
+    var isXLS: Bool {
+        return (contentType == "application/vnd.ms-excel" || contentType == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+    }
+    
+    var isPPT: Bool {
+        return (contentType == "application/vnd.ms-powerpoint" ||
+                contentType == "application/vnd.openxmlformats-officedocument.presentationml.presentation" ||
+                contentType == "application/vnd.ms-powerpoint.presentation.macroEnabled.12")
+    }
+    
+    var isTXT: Bool {
+        return (contentType == "text/plain" ||
+                contentType == "text/markdown")
+    }
+    
+    var isZIP: Bool {
+        return (contentType == "application/zip" ||
+                contentType == "application/x-7z-compressed" ||
+                contentType == "application/x-rar-compressed" ||
+                contentType == "application/x-gzip" ||
+                contentType == "application/x-tar")
+    }
+
+    var isDOC: Bool {
+        return (contentType == "application/msword" || contentType == "application/vnd.openxmlformats-officedocument.wordprocessingml.document")
+    }
+
+    var isXLS: Bool {
+        return (contentType == "application/vnd.ms-excel" || contentType == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+    }
+
+    var isPPT: Bool {
+        return (contentType == "application/vnd.ms-powerpoint" ||
+                contentType == "application/vnd.openxmlformats-officedocument.presentationml.presentation" ||
+                contentType == "application/vnd.ms-powerpoint.presentation.macroEnabled.12")
+    }
+
+    var isTXT: Bool {
+        return (contentType == "text/plain" ||
+                contentType == "text/markdown")
+    }
+
+    var isZIP: Bool {
+        return (contentType == "application/zip" ||
+                contentType == "application/x-7z-compressed" ||
+                contentType == "application/x-rar-compressed" ||
+                contentType == "application/x-gzip" ||
+                contentType == "application/x-tar")
+    }
 
 #endif
-
-    var canShare: Bool {
-        return session.isEmpty && !directory && !NCBrandOptions.shared.disable_openin_file
-    }
-
-    var isDownload: Bool {
-        status == NCGlobal.shared.metadataStatusWaitDownload || status == NCGlobal.shared.metadataStatusDownloading
-    }
-
-    var isUpload: Bool {
-        status == NCGlobal.shared.metadataStatusWaitUpload || status == NCGlobal.shared.metadataStatusUploading
-    }
-
-    var isDirectory: Bool {
-        directory
-    }
-
-    var isLivePhoto: Bool {
-        !livePhotoFile.isEmpty
-    }
 
     var isLivePhotoVideo: Bool {
         !livePhotoFile.isEmpty && classFile == NKTypeClassFile.video.rawValue
@@ -327,55 +459,36 @@ extension tableMetadata {
         !livePhotoFile.isEmpty && classFile == NKTypeClassFile.image.rawValue
     }
 
-    var isNotFlaggedAsLivePhotoByServer: Bool {
-        !isFlaggedAsLivePhotoByServer
-    }
-
-    var imageSize: CGSize {
-        CGSize(width: width, height: height)
-    }
-
-    var tagNames: [String] {
-        tags.map(\.name)
-    }
-
     /// Returns false if the user is lokced out of the file. I.e. The file is locked but by somone else
     func canUnlock(as user: String) -> Bool {
         return !lock || (lockOwner == user && lockOwnerType == 0)
     }
 
+    // Return if is sharable
+    func isSharable() -> Bool {
+        guard let capabilities = NCNetworking.shared.capabilities[account] else {
+            return false
+        }
+        if !capabilities.fileSharingApiEnabled || (capabilities.e2EEEnabled && isDirectoryE2EE), !e2eEncrypted {
+            return false
+        }
+        return !e2eEncrypted
+    }
+
     /// Returns a detached (unmanaged) deep copy of the current `tableMetadata` object.
     ///
-    /// - Note: Primitive properties and lists of primitive values (for example `shareType`)
-    ///   are copied automatically by `init(value:)`.
-    ///   For `List` properties containing Realm objects (for example `exifPhotos` and `tags`),
-    ///   this method recreates each element explicitly to ensure the resulting copy is fully
-    ///   detached and safe to use across Realm contexts.
+    /// - Note: The Realm `List` properties containing primitive types (e.g., `tags`, `shareType`) are copied automatically
+    ///         by the Realm initializer `init(value:)`. For `List` containing Realm objects (e.g., `exifPhotos`), this method
+    ///         creates new instances to ensure the copy is fully detached and safe to use outside of a Realm context.
     ///
     /// - Returns: A new `tableMetadata` instance fully detached from Realm.
     func detachedCopy() -> tableMetadata {
-        // Use Realm's built-in copy constructor for primitive properties and lists of primitive values.
+        // Use Realm's built-in copy constructor for primitive properties and List of primitives
         let detached = tableMetadata(value: self)
 
-        // Deep copy of List of Realm objects
+        // Deep copy of List of Realm objects (exifPhotos)
         detached.exifPhotos.removeAll()
-        detached.exifPhotos.append(objectsIn: self.exifPhotos.map {
-            let copy = NCKeyValue()
-            copy.key = $0.key
-            copy.value = $0.value
-            return copy
-        })
-
-        detached.tags.removeAll()
-        detached.tags.append(objectsIn: self.tags.map {
-            let copy = tableMetadataTag()
-            copy.primaryKey = $0.primaryKey
-            copy.account = $0.account
-            copy.id = $0.id
-            copy.name = $0.name
-            copy.color = $0.color
-            return copy
-        })
+        detached.exifPhotos.append(objectsIn: self.exifPhotos.map { NCKeyValue(value: $0) })
 
         return detached
     }
@@ -485,6 +598,16 @@ extension NCManageDatabase {
         }
     }
 
+    func addMetadataIfNotExistsAsync(_ metadata: tableMetadata) async {
+        let detached = metadata.detachedCopy()
+
+        await core.performRealmWriteAsync { realm in
+            if realm.object(ofType: tableMetadata.self, forPrimaryKey: metadata.ocId) == nil {
+                realm.add(detached)
+            }
+        }
+    }
+
     func deleteMetadataAsync(predicate: NSPredicate) async {
         await core.performRealmWriteAsync { realm in
             let result = realm.objects(tableMetadata.self)
@@ -510,7 +633,33 @@ extension NCManageDatabase {
             }
         }
     }
+    
+    func deleteMetadataOcIds(_ ocIds: [String]) {
+        do {
+            let realm = try Realm()
+            try realm.write {
+                let results = realm.objects(tableMetadata.self).filter("ocId IN %@", ocIds)
+                realm.delete(results)
+            }
+        } catch let error as NSError {
+            nkLog(error: "Could not access database: \(error)")
 
+        }
+    }
+
+    func deleteMetadataOcIds(_ ocIds: [String]) {
+        do {
+            let realm = try Realm()
+            try realm.write {
+                let results = realm.objects(tableMetadata.self).filter("ocId IN %@", ocIds)
+                realm.delete(results)
+            }
+        } catch let error as NSError {
+            nkLog(error: "Could not access database: \(error)")
+
+        }
+    }
+    
     func replaceMetadataAsync(ocId: String, metadata: tableMetadata) async {
         let detached = metadata.detachedCopy()
 
@@ -565,6 +714,19 @@ extension NCManageDatabase {
             let results = realm.objects(tableMetadata.self)
                 .filter("ocId IN %@", ocIds)
             realm.delete(results)
+        }
+    }
+    
+    func deleteMetadataOcIds(_ ocIds: [String]) {
+        do {
+            let realm = try Realm()
+            try realm.write {
+                let results = realm.objects(tableMetadata.self).filter("ocId IN %@", ocIds)
+                realm.delete(results)
+            }
+        } catch let error as NSError {
+            nkLog(error: "Could not access database: \(error)")
+
         }
     }
 
@@ -752,19 +914,6 @@ extension NCManageDatabase {
         }
     }
 
-    func setMetadataTagsAsync(ocId: String, account: String, tags: [NKTag]) async {
-        await core.performRealmWriteAsync { realm in
-            guard let result = realm.objects(tableMetadata.self)
-                .filter("account == %@ AND ocId == %@", account, ocId)
-                .first else {
-                return
-            }
-
-            result.tags.removeAll()
-            result.tags.append(objectsIn: tags, account: account)
-        }
-    }
-
     func setMetadataFileNameViewAsync(serverUrl: String, fileName: String, newFileNameView: String, account: String) async {
         await core.performRealmWriteAsync { realm in
             let result = realm.objects(tableMetadata.self)
@@ -776,6 +925,194 @@ extension NCManageDatabase {
 
     func moveMetadataAsync(ocId: String, serverUrlTo: String) async {
         await core.performRealmWriteAsync { realm in
+            if let result = realm.objects(tableMetadata.self)
+                .filter("ocId == %@", ocId)
+                .first {
+                result.serverUrl = serverUrlTo
+            }
+        } catch let error {
+            NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] Could not write to database: \(error)")
+        }
+    }
+
+    func setLivePhotoFile(fileId: String, livePhotoFile: String) async {
+        await core.performRealmWriteAsync { realm in
+            let result = realm.objects(tableMetadata.self)
+                .filter("fileId == %@", fileId)
+                .first
+            result?.livePhotoFile = livePhotoFile
+        }
+    }
+
+    func clearAssetLocalIdentifiersAsync(_ assetLocalIdentifiers: [String]) async {
+        await core.performRealmWriteAsync { realm in
+            let results = realm.objects(tableMetadata.self)
+                .filter("assetLocalIdentifier IN %@", assetLocalIdentifiers)
+            for result in results {
+                result.assetLocalIdentifier = ""
+            }
+        }
+    }
+
+    /// Asynchronously sets the favorite status of a `tableMetadata` entry.
+    /// Optionally stores the previous favorite flag and updates the sync status.
+    func setMetadataFavoriteAsync(ocId: String, favorite: Bool?, saveOldFavorite: String?, status: Int) async {
+        await core.performRealmWriteAsync { realm in
+            guard let result = realm.objects(tableMetadata.self)
+                .filter("ocId == %@", ocId)
+                .first else {
+                return
+            }
+
+            if let favorite {
+                result.favorite = favorite
+            }
+
+            result.storeFlag = saveOldFavorite
+            result.status = status
+            result.sessionDate = (status == NCGlobal.shared.metadataStatusNormal) ? nil : Date()
+        }
+    }
+
+    /// Asynchronously updates a `tableMetadata` entry to set copy/move status and target server URL.
+    func setMetadataCopyMoveAsync(ocId: String, destination: String, overwrite: String?, status: Int) async {
+        await core.performRealmWriteAsync { realm in
+            guard let result = realm.objects(tableMetadata.self)
+                .filter("ocId == %@", ocId)
+                .first else {
+                return
+            }
+
+            result.destination = destination
+            result.storeFlag = overwrite
+            result.status = status
+            result.sessionDate = (status == NCGlobal.shared.metadataStatusNormal) ? nil : Date()
+        }
+    }
+
+    func requestBackgroundAutoUploadCancellationAsync(account: String) async {
+        await core.performRealmWriteAsync { realm in
+            let pendingMetadatas = realm.objects(tableMetadata.self).filter(
+                "account == %@ AND sessionSelector == %@ AND backgroundUploadJobIdentifier == %@",
+                account,
+                NCGlobal.shared.selectorUploadAutoUpload,
+                "pending"
+            )
+
+            realm.delete(pendingMetadatas)
+
+            let jobMetadatas = realm.objects(tableMetadata.self).filter(
+                "account == %@ AND sessionSelector == %@ AND backgroundUploadJobIdentifier != %@ AND backgroundUploadJobIdentifier != ''",
+                account,
+                NCGlobal.shared.selectorUploadAutoUpload,
+                "pending"
+            )
+
+            for metadata in jobMetadatas {
+                metadata.backgroundUploadCancellationRequested = true
+            }
+        }
+    }
+
+    func syncPlaceholderMetadatasAsync(
+        files: [NKFile],
+        metadatas: [tableMetadata]
+    ) async -> (inserted: Int, updated: Int, deleted: [tableMetadata]) {
+        guard !files.isEmpty else {
+            return (0, 0, [])
+        }
+
+        // Build lookup maps for fast diffing.
+        // Using merge strategy avoids crashes when duplicated ocIds are present.
+        let filesByOcId: [String: NKFile] = Dictionary(
+            files.map { ($0.ocId, $0) },
+            uniquingKeysWith: { _, new in new }
+        )
+
+        // Store detached copies because returned metadata objects must remain usable
+        // outside the Realm lifecycle.
+        let metadatasByOcId: [String: tableMetadata] = Dictionary(
+            metadatas.map { ($0.ocId, $0.detachedCopy()) },
+            uniquingKeysWith: { _, new in new }
+        )
+
+        let fileOcIds = Set(filesByOcId.keys)
+        let metadataOcIds = Set(metadatasByOcId.keys)
+
+        // INSERT: Remote files that are not present in the local date-window metadata list.
+        let toInsertOcIds = fileOcIds.subtracting(metadataOcIds)
+
+        // DELETE CANDIDATES: Local metadata entries that are no longer present
+        // in the current remote date-window result.
+        // They are returned to the caller and must be validated/deleted outside this function.
+        let toDeleteOcIds = metadataOcIds.subtracting(fileOcIds)
+
+        let deletedMetadatas: [tableMetadata] = toDeleteOcIds.compactMap { ocId in
+            metadatasByOcId[ocId]
+        }
+
+        // UPDATE: Existing placeholder metadata entries whose etag changed.
+        let toUpdateOcIds: [String] = Array(fileOcIds.intersection(metadataOcIds)).filter { ocId in
+            guard let file = filesByOcId[ocId],
+                  let metadata = metadatasByOcId[ocId] else {
+                return false
+            }
+
+            return file.etag != metadata.etag
+        }
+
+        let hasChanges = !toInsertOcIds.isEmpty ||
+                         !toUpdateOcIds.isEmpty
+
+        guard hasChanges else {
+            return (
+                inserted: 0,
+                updated: 0,
+                deleted: deletedMetadatas
+            )
+        }
+
+        let createMetadata = NCManageDatabaseCreateMetadata()
+
+        await core.performRealmWriteAsync { realm in
+            // MODIFY: Update lightweight fields for existing placeholder metadata entries.
+            if !toUpdateOcIds.isEmpty {
+                let resultsToModify = realm.objects(tableMetadata.self)
+                    .filter("ocId IN %@", Array(toUpdateOcIds))
+
+                for metadata in resultsToModify {
+                    guard let file = filesByOcId[metadata.ocId] else {
+                        continue
+                    }
+                    realm.add(tableMetadata(value: metadata), update: .all)
+                }
+            }
+        } catch let error {
+            NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] Could not write to database: \(error)")
+        }
+    }
+
+    func setMetadataFileNameViewAsync(serverUrl: String, fileName: String, newFileNameView: String, account: String) async {
+        await performRealmWriteAsync { realm in
+            let result = realm.objects(tableMetadata.self)
+                .filter("account == %@ AND serverUrl == %@ AND fileName == %@", account, serverUrl, fileName)
+                .first
+            result?.fileNameView = newFileNameView
+        }
+    }
+
+    func moveMetadata(ocId: String, serverUrlTo: String, sync: Bool = true) {
+        performRealmWrite(sync: sync) { realm in
+            if let result = realm.objects(tableMetadata.self)
+                .filter("ocId == %@", ocId)
+                .first {
+                result.serverUrl = serverUrlTo
+            }
+        }
+    }
+
+    func moveMetadataAsync(ocId: String, serverUrlTo: String) async {
+        await performRealmWriteAsync { realm in
             if let result = realm.objects(tableMetadata.self)
                 .filter("ocId == %@", ocId)
                 .first {
@@ -877,6 +1214,36 @@ extension NCManageDatabase {
         return true
     }
 
+    /// Syncs the remote and local metadata.
+    /// Returns true if there were changes (additions or deletions), false if everything was already up-to-date.
+    func mergeRemoteMetadatasAsync(remoteMetadatas: [tableMetadata], localMetadatas: [tableMetadata]) async -> Bool {
+        // Set of ocId
+        let remoteOcIds = Set(remoteMetadatas.map { $0.ocId })
+        let localOcIds = Set(localMetadatas.map { $0.ocId })
+
+        // Calculate diffs
+        let toDeleteOcIds = localOcIds.subtracting(remoteOcIds)
+        let toAddOcIds = remoteOcIds.subtracting(localOcIds)
+
+        guard !toDeleteOcIds.isEmpty || !toAddOcIds.isEmpty else {
+            return false // No changes needed
+        }
+
+        let toDeleteKeys = Array(toDeleteOcIds)
+
+        await core.performRealmWriteAsync { realm in
+            let toAdd = remoteMetadatas.filter { toAddOcIds.contains($0.ocId) }
+            let toDelete = toDeleteKeys.compactMap {
+                realm.object(ofType: tableMetadata.self, forPrimaryKey: $0)
+            }
+
+            realm.delete(toDelete)
+            realm.add(toAdd, update: .modified)
+        }
+
+        return true
+    }
+
     // MARK: - Realm Read
 
     func getAllTableMetadataAsync() async -> [tableMetadata] {
@@ -892,6 +1259,7 @@ extension NCManageDatabase {
                 .first
                 .map { $0.detachedCopy() }
         }
+        return nil
     }
 
     func getMetadataAsync(predicate: NSPredicate) async -> tableMetadata? {
@@ -900,6 +1268,24 @@ extension NCManageDatabase {
                 .filter(predicate)
                 .first
                 .map { $0.detachedCopy() }
+        }
+    }
+
+    func getMetadataAsync(predicate: NSPredicate) async -> tableMetadata? {
+        return await core.performRealmReadAsync { realm in
+            realm.objects(tableMetadata.self)
+                .filter(predicate)
+                .first
+                .map { $0.detachedCopy() }
+        }
+    }
+
+    func getMetadataAsync(backgroundUploadJobIdentifier: String) async -> tableMetadata? {
+        await core.performRealmReadAsync { realm in
+            realm.objects(tableMetadata.self)
+                .filter("backgroundUploadJobIdentifier == %@", backgroundUploadJobIdentifier)
+                .first?
+                .detachedCopy()
         }
     }
 
@@ -917,6 +1303,34 @@ extension NCManageDatabase {
                 .filter(predicate)
                 .map { $0.detachedCopy() }
         } ?? []
+    }
+    
+    func getMediaMetadatas(predicate: NSPredicate, sorted: String? = nil, ascending: Bool = false) -> ThreadSafeArray<tableMetadata>? {
+
+        do {
+            let realm = try Realm()
+            if let sorted {
+                var results: [tableMetadata] = []
+                switch sorted {//NCPreferences().mediaSortDate {
+                case "date":
+                    results = realm.objects(tableMetadata.self).filter(predicate).sorted { ($0.date as Date) > ($1.date as Date) }
+                case "creationDate":
+                    results = realm.objects(tableMetadata.self).filter(predicate).sorted { ($0.creationDate as Date) > ($1.creationDate as Date) }
+                case "uploadDate":
+                    results = realm.objects(tableMetadata.self).filter(predicate).sorted { ($0.uploadDate as Date) > ($1.uploadDate as Date) }
+                default:
+                    let results = realm.objects(tableMetadata.self).filter(predicate)
+                    return ThreadSafeArray(results.map { tableMetadata.init(value: $0) })
+                }
+                return ThreadSafeArray(results.map { tableMetadata.init(value: $0) })
+            } else {
+                let results = realm.objects(tableMetadata.self).filter(predicate)
+                return ThreadSafeArray(results.map { tableMetadata.init(value: $0) })
+            }
+        } catch let error as NSError {
+//            NextcloudKit.shared.nkCommonInstance.writeLog("Could not access database: \(error)")
+        }
+        return nil
     }
 
     func getMetadatas(predicate: NSPredicate,
@@ -939,21 +1353,6 @@ extension NCManageDatabase {
                 .filter(predicate)
                 .sorted(byKeyPath: sortedByKeyPath,
                         ascending: ascending)
-
-            if let limit {
-                let sliced = results.prefix(limit)
-                return sliced.map { $0.detachedCopy() }
-            } else {
-                return results.map { $0.detachedCopy() }
-            }
-        }
-    }
-
-    func getMetadatasAsync(predicate: NSPredicate,
-                           limit: Int? = nil) async -> [tableMetadata]? {
-        return await core.performRealmReadAsync { realm in
-            let results = realm.objects(tableMetadata.self)
-                .filter(predicate)
 
             if let limit {
                 let sliced = results.prefix(limit)
@@ -999,22 +1398,6 @@ extension NCManageDatabase {
         }
     }
 
-    /// Returns detached (unmanaged) copies of `tableMetadata` objects matching the provided ocIds.
-    ///
-    /// - Parameter ocIds: Array of ocId strings used to fetch corresponding metadata.
-    /// - Returns: An array of detached `tableMetadata` objects. Empty if no matches are found.
-    func getMetadatasFromOcIdsAsync(_ ocIds: [String]) async -> [tableMetadata] {
-        guard !ocIds.isEmpty else { return [] }
-
-        return await core.performRealmReadAsync { realm in
-            realm.objects(tableMetadata.self)
-                .where {
-                    $0.ocId.in(ocIds)
-                }
-                .map { $0.detachedCopy() }
-        } ?? []
-    }
-
     func getMetadataFromOcIdAndocIdTransferAsync(_ ocId: String?) async -> tableMetadata? {
         guard let ocId else {
             return nil
@@ -1025,22 +1408,6 @@ extension NCManageDatabase {
                 .filter("ocId == %@ OR ocIdTransfer == %@", ocId, ocId)
                 .first
                 .map { $0.detachedCopy() }
-        }
-    }
-
-    func getOwnerDisplayName(account: String?, ownerId: String?) async -> String? {
-        guard let account = account.isNotEmpty,
-              let ownerId = ownerId.isNotEmpty else {
-            return nil
-        }
-
-        return await core.performRealmReadAsync { realm in
-            let ownerDisplayName = realm.objects(tableMetadata.self)
-                .filter("account == %@ AND ownerId == %@", account, ownerId)
-                .first?
-                .ownerDisplayName
-
-            return ownerDisplayName.isNotEmpty
         }
     }
 
@@ -1203,6 +1570,58 @@ extension NCManageDatabase {
     }
 
     func getMetadataFromFileId(_ fileId: String?) -> tableMetadata? {
+    func getTableMetadatasDirectoryFavoriteIdentifierRankAsync(account: String) async -> [String: NSNumber] {
+        let result = await performRealmReadAsync { realm in
+            var listIdentifierRank: [String: NSNumber] = [:]
+            var counter = Int64(10)
+
+            let results = realm.objects(tableMetadata.self)
+                .filter("account == %@ AND directory == true AND favorite == true", account)
+                .sorted(byKeyPath: "fileNameView", ascending: true)
+
+            results.forEach { item in
+                counter += 1
+                listIdentifierRank[item.ocId] = NSNumber(value: counter)
+            }
+            return listIdentifierRank
+        }
+        return result ?? [:]
+    }
+
+    func getAssetLocalIdentifiersUploadedAsync() async -> [String]? {
+        return await core.performRealmReadAsync { realm in
+            let results = realm.objects(tableMetadata.self).filter("assetLocalIdentifier != ''")
+            return Self.uploadedAssetLocalIdentifiers(in: Array(results))
+        }
+    }
+
+    /// A local asset can only be deleted once every tracked transfer for it is complete.
+    /// Live Photo links contain a filename before server pairing and a file ID afterwards.
+    static func uploadedAssetLocalIdentifiers(in metadatas: [tableMetadata]) -> [String] {
+        let grouped = Dictionary(grouping: metadatas.filter { !$0.assetLocalIdentifier.isEmpty }, by: \.assetLocalIdentifier)
+        return grouped.compactMap { identifier, components in
+            guard components.allSatisfy({
+                $0.status == NCGlobal.shared.metadataStatusNormal && !$0.backgroundUploadCancellationRequested
+            }) else {
+                return nil
+            }
+
+            for component in components where component.isLivePhoto {
+                let hasCompletedCompanion = components.contains { companion in
+                    companion.ocId != component.ocId &&
+                    companion.account == component.account &&
+                    companion.serverUrl == component.serverUrl &&
+                    ((component.isLivePhotoImage && companion.isLivePhotoVideo) ||
+                     (component.isLivePhotoVideo && companion.isLivePhotoImage)) &&
+                    (companion.fileName == component.livePhotoFile || companion.fileId == component.livePhotoFile)
+                }
+                guard hasCompletedCompanion else { return nil }
+            }
+            return identifier
+        }.sorted()
+    }
+
+    func getMetadataFromFileId(_ fileId: String?, account: String?) -> tableMetadata? {
         guard let fileId else {
             return nil
         }
@@ -1343,6 +1762,7 @@ extension NCManageDatabase {
                 .first
             return object?.detachedCopy()
         }
+        return nil
     }
 
     func getTransferAsync(tranfersSuccess: [tableMetadata]) async -> [tableMetadata] {
@@ -1364,20 +1784,78 @@ extension NCManageDatabase {
         } ?? []
     }
 
-    func getMetadatasStatusCountAsync(status: [Int]) async -> Int {
-        await core.performRealmReadAsync { realm in
-            realm.objects(tableMetadata.self)
-                .filter("status IN %@", status)
-                .count
-        } ?? 0
-    }
-
     func metadataExistsAsync(predicate: NSPredicate) async -> Bool {
         await core.performRealmReadAsync { realm in
             realm.objects(tableMetadata.self)
                 .filter(predicate)
                 .first != nil
         } ?? false
+    }
+    
+    func getMetadatasInWaitingCountAsync() async -> Int {
+        await core.performRealmReadAsync { realm in
+            realm.objects(tableMetadata.self)
+                .filter("status IN %@", NCGlobal.shared.metadatasStatusInWaiting)
+                .count
+        } ?? 0
+    }
+    
+    func getMediaMetadatas(predicate: NSPredicate, sorted: String? = nil, ascending: Bool = false) -> ThreadSafeArray<tableMetadata>? {
+
+        do {
+            let realm = try Realm()
+            if let sorted {
+                var results: [tableMetadata] = []
+                switch NCKeychain().mediaSortDate {
+                case "date":
+                    results = realm.objects(tableMetadata.self).filter(predicate).sorted { ($0.date as Date) > ($1.date as Date) }
+                case "creationDate":
+                    results = realm.objects(tableMetadata.self).filter(predicate).sorted { ($0.creationDate as Date) > ($1.creationDate as Date) }
+                case "uploadDate":
+                    results = realm.objects(tableMetadata.self).filter(predicate).sorted { ($0.uploadDate as Date) > ($1.uploadDate as Date) }
+                default:
+                    let results = realm.objects(tableMetadata.self).filter(predicate)
+                    return ThreadSafeArray(results.map { tableMetadata.init(value: $0) })
+                }
+                return ThreadSafeArray(results.map { tableMetadata.init(value: $0) })
+            } else {
+                let results = realm.objects(tableMetadata.self).filter(predicate)
+                return ThreadSafeArray(results.map { tableMetadata.init(value: $0) })
+            }
+        } catch let error as NSError {
+            NextcloudKit.shared.nkCommonInstance.writeLog("Could not access database: \(error)")
+        }
+        return nil
+    }
+
+    func countMetadatasFor(serverUrl: String) -> Int {
+        core.performRealmRead { realm in
+            let results = realm.objects(tableMetadata.self)
+                .filter("serverUrl == %@", serverUrl)
+            return results.count
+        } ?? 0
+    }
+
+    /// Filters Auto Upload metadata entries, returning only the items that are not already queued in the local database.
+    /// - Parameter metadatas: The detached Auto Upload metadata entries generated from Photos assets.
+    /// - Returns: Only metadata entries that can be safely added to the upload queue.
+    func filterAutoUploadMetadatasNotAlreadyQueuedAsync(_ metadatas: [tableMetadata]) async -> [tableMetadata] {
+        await core.performRealmReadAsync { realm in
+            metadatas.filter { metadata in
+                guard !metadata.assetLocalIdentifier.isEmpty else {
+                    return false
+                }
+                return realm.objects(tableMetadata.self)
+                    .filter(
+                        "account == %@ AND sessionSelector == %@ AND assetLocalIdentifier == %@ AND session != %@",
+                        metadata.account,
+                        NCGlobal.shared.selectorUploadAutoUpload,
+                        metadata.assetLocalIdentifier,
+                        ""
+                    )
+                    .isEmpty
+            }
+        } ?? []
     }
 
     // MARK: - helpers
@@ -1450,5 +1928,46 @@ extension List where Element == tableMetadataTag {
         for tag in tags {
             append(tag, account: account)
         }
+    }
+    
+    func getAdvancedMetadatas(predicate: NSPredicate, page: Int = 0, limit: Int = 0, sorted: String, ascending: Bool) -> [tableMetadata] {
+
+        var metadatas: [tableMetadata] = []
+
+        do {
+            let realm = try Realm()
+            realm.refresh()
+            let results = realm.objects(tableMetadata.self).filter(predicate).sorted(byKeyPath: sorted, ascending: ascending)
+            if !results.isEmpty {
+                if page == 0 || limit == 0 {
+                    return Array(results.map { tableMetadata.init(value: $0) })
+                } else {
+                    let nFrom = (page - 1) * limit
+                    let nTo = nFrom + (limit - 1)
+                    for n in nFrom...nTo {
+                        if n == results.count {
+                            break
+                        }
+                        metadatas.append(tableMetadata.init(value: results[n]))
+                    }
+                }
+            }
+        } catch let error as NSError {
+            NextcloudKit.shared.nkCommonInstance.writeLog("Could not access database: \(error)")
+        }
+
+        return metadatas
+    }
+    
+    func getResultMetadataFromFileId(_ fileId: String?) -> tableMetadata? {
+        guard let fileId else { return nil }
+
+        do {
+            let realm = try Realm()
+            return realm.objects(tableMetadata.self).filter("fileId == %@", fileId).first
+        } catch let error as NSError {
+            NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] Could not access database: \(error)")
+        }
+        return nil
     }
 }

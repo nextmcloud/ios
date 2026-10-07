@@ -1,25 +1,6 @@
-//
-//  NCSelect.swift
-//  Nextcloud
-//
-//  Created by Marino Faggiana on 06/11/2018.
-//  Copyright © 2018 Marino Faggiana. All rights reserved.
-//
-//  Author Marino Faggiana <marino.faggiana@nextcloud.com>
-//
-//  This program is free software: you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
-//  the Free Software Foundation, either version 3 of the License, or
-//  (at your option) any later version.
-//
-//  This program is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
-//
-//  You should have received a copy of the GNU General Public License
-//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-//
+// SPDX-FileCopyrightText: Nextcloud GmbH
+// SPDX-FileCopyrightText: 2018 Marino Faggiana
+// SPDX-License-Identifier: GPL-3.0-or-later
 
 import UIKit
 import SwiftUI
@@ -63,6 +44,7 @@ class NCSelect: UIViewController, UIGestureRecognizerDelegate, UIAdaptivePresent
     var includeDirectoryE2EEncryption = false
     var includeImages = false
     var enableSelectFile = false
+    var allowedFileExtensions: Set<String>?
     var type = ""
     var items: [tableMetadata] = []
 
@@ -93,6 +75,7 @@ class NCSelect: UIViewController, UIGestureRecognizerDelegate, UIAdaptivePresent
 
         view.backgroundColor = .systemBackground
         collectionView.backgroundColor = .systemBackground
+        collectionView.hideTopScrollEdgeEffect()
 
         selectCommandViewSelect?.separatorView.backgroundColor = .separator
 
@@ -109,7 +92,9 @@ class NCSelect: UIViewController, UIGestureRecognizerDelegate, UIAdaptivePresent
         collectionView.alwaysBounceVertical = true
         collectionView.backgroundColor = .systemBackground
 
-        buttonCancel.title = NSLocalizedString("_cancel_", comment: "")
+        buttonCancel.title = nil
+        buttonCancel.image = UIImage(systemName: "xmark")
+        buttonCancel.accessibilityLabel = NSLocalizedString("_cancel_", comment: "")
         bottomContraint?.constant = UIApplication.shared.mainAppWindow?.rootViewController?.view.safeAreaInsets.bottom ?? 0
 
         // Type of command view
@@ -186,9 +171,8 @@ class NCSelect: UIViewController, UIGestureRecognizerDelegate, UIAdaptivePresent
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
 
-        Task {
-            await NCNetworking.shared.networkingTasks.cancel(identifier: "NCSelect")
-        }
+        dataSourceTask?.cancel()
+        dataSourceTask = nil
     }
 
     override func viewDidDisappear(_ animated: Bool) {
@@ -222,7 +206,7 @@ class NCSelect: UIViewController, UIGestureRecognizerDelegate, UIAdaptivePresent
 
     func transferProgressDidUpdate(progress: Float, totalBytes: Int64, totalBytesExpected: Int64, fileName: String, serverUrl: String) { }
 
-    func transferChange(status: String,
+    func transferChange(networkingStatus: String,
                         account: String,
                         fileName: String,
                         serverUrl: String,
@@ -239,7 +223,7 @@ class NCSelect: UIViewController, UIGestureRecognizerDelegate, UIAdaptivePresent
 
         Task { @MainActor in
             guard session.account == account,
-                  status == self.global.networkingStatusCreateFolder,
+                  networkingStatus == self.global.networkingStatusCreateFolder,
                   self.serverUrl == serverUrl,
                   let metadata = await NCManageDatabase.shared.getMetadataAsync(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@ AND fileName == %@", account, serverUrl, fileName))
             else {
@@ -292,7 +276,7 @@ class NCSelect: UIViewController, UIGestureRecognizerDelegate, UIAdaptivePresent
     }
 
     func tapRichWorkspace(_ sender: Any) { }
-    func tapRecommendations(with metadata: tableMetadata) { }
+    func tapRecommendations(with metadata: tableMetadata, viewerTransitionSource: NCMediaViewerTransitionSource?) { }
 
     // MARK: - Push metadata
 
@@ -314,12 +298,14 @@ class NCSelect: UIViewController, UIGestureRecognizerDelegate, UIAdaptivePresent
             viewController.includeDirectoryE2EEncryption = includeDirectoryE2EEncryption
             viewController.includeImages = includeImages
             viewController.enableSelectFile = enableSelectFile
+            viewController.allowedFileExtensions = allowedFileExtensions
             viewController.type = type
             viewController.overwrite = overwrite
             viewController.items = items
             viewController.titleCurrentFolder = metadata.fileNameView
             viewController.serverUrl = serverUrlPush
             viewController.session = session
+            viewController.controller = controller
 
             if let fileNameError = FileNameValidator.checkFileName(metadata.fileNameView, account: session.account, capabilities: capabilities) {
                 let message = "\(fileNameError.errorDescription) \(NSLocalizedString("_please_rename_file_", comment: ""))"
@@ -350,27 +336,6 @@ extension NCSelect: UICollectionViewDelegate {
 
 extension NCSelect: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-        guard let metadata = self.dataSource.getMetadata(indexPath: indexPath) else {
-            return
-        }
-
-        // Thumbnail
-        if !metadata.directory {
-            if let image = self.utility.getImage(ocId: metadata.ocId, etag: metadata.etag, ext: NCGlobal.shared.previewExt512, userId: metadata.userId, urlBase: metadata.urlBase) {
-                (cell as? NCListCell)?.previewImg?.image = image
-            } else {
-                if metadata.iconName.isEmpty {
-                    (cell as? NCListCell)?.previewImg?.image = NCImageCache.shared.getImageFile()
-                } else {
-                    (cell as? NCListCell)?.previewImg?.image = self.utility.loadImage(named: metadata.iconName, useTypeIconFile: true, account: metadata.account)
-                }
-                if metadata.hasPreview,
-                   metadata.status == NCGlobal.shared.metadataStatusNormal {
-                    for case let operation as NCCollectionViewDownloadThumbnail in NCNetworking.shared.downloadThumbnailQueue.operations where operation.metadata.ocId == metadata.ocId { return }
-                    NCNetworking.shared.downloadThumbnailQueue.addOperation(NCCollectionViewDownloadThumbnail(metadata: metadata, collectionView: collectionView, ext: NCGlobal.shared.previewExt256))
-                }
-            }
-        }
     }
 
     func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
@@ -539,9 +504,18 @@ extension NCSelect {
             }
         }
 
-        let metadatas = await self.database.getMetadatasAsync(predicate: predicate,
+        var metadatas = await self.database.getMetadatasAsync(predicate: predicate,
                                                               withLayout: NCDBLayoutForView(),
                                                               withAccount: session.account)
+
+        if let allowedFileExtensions {
+            metadatas = metadatas.filter { metadata in
+                metadata.directory || allowedFileExtensions.contains(
+                    (metadata.fileNameView as NSString).pathExtension.lowercased()
+                )
+            }
+        }
+
         self.dataSource = NCCollectionViewDataSource(metadatas: metadatas,
                                                      account: session.account)
         self.collectionView.reloadData()
@@ -549,13 +523,13 @@ extension NCSelect {
 
     func getServerData() async {
         // If is already in-flight, do nothing
-        if await NCNetworking.shared.networkingTasks.isReading(identifier: "NCSelect") {
+        if dataSourceTask?.state == .running || dataSourceTask?.state == .suspended {
             return
         }
 
         let resultsReadFolder = await NCNetworking.shared.readFolderAsync(serverUrl: serverUrl, account: session.account) { task in
-            Task {
-                await NCNetworking.shared.networkingTasks.track(identifier: "NCSelect", task: task)
+            Task { @MainActor in
+                self.dataSourceTask = task
             }
         }
         if resultsReadFolder.error == .success {

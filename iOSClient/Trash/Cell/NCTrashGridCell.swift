@@ -16,7 +16,7 @@ protocol NCTrashGridCellDelegate: AnyObject {
 }
 
 class NCTrashGridCell: UICollectionViewCell, NCTrashCellProtocol {
-    @IBOutlet weak var imageItem: UIImageView!
+    @IBOutlet weak var image: UIImageView!
     @IBOutlet weak var imageSelect: UIImageView!
     @IBOutlet weak var labelTitle: UILabel!
     @IBOutlet weak var labelExtension: UILabel!
@@ -26,11 +26,11 @@ class NCTrashGridCell: UICollectionViewCell, NCTrashCellProtocol {
     @IBOutlet weak var imageVisualEffect: UIVisualEffectView!
 
     weak var delegate: NCTrashGridCellDelegate?
-    var objectId = ""
+    var identifier = ""
 
     var statusImg: UIImageView? {
         get { return nil }
-        set { imageItem = newValue }
+        set { image = newValue }
     }
     var indexPath = IndexPath()
     var account = ""
@@ -75,8 +75,8 @@ class NCTrashGridCell: UICollectionViewCell, NCTrashCellProtocol {
         accessibilityValue = nil
         isAccessibilityElement = true
 
-        imageItem.layer.cornerRadius = 6
-        imageItem.layer.masksToBounds = true
+        image.layer.cornerRadius = 6
+        image.layer.masksToBounds = true
 
         imageVisualEffect.isHidden = false
         imageVisualEffect.effect = nil
@@ -148,7 +148,7 @@ class NCTrashGridCell: UICollectionViewCell, NCTrashCellProtocol {
     }
 
     @IBAction func touchUpInsideMore(_ sender: Any) {
-        delegate?.tapMoreGridItem(with: objectId, image: imageItem.image, sender: sender)
+        delegate?.tapMoreGridItem(with: identifier, image: image.image, sender: sender)
     }
 
     fileprivate func setA11yActions() {

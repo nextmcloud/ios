@@ -56,6 +56,34 @@ final class NCGlobal: Sendable {
     let nextcloudVersion33: Int                     = 33
     let nextcloudVersionFuture: Int                 = 99999
 
+    // Nextcloud unsupported
+    //
+    let nextcloud_unsupported_version: Int          = 20
+
+    // OFFICE
+    //
+    let editorText: String                          = "text"
+    let editorEuroOffice: String                    = "eurooffice"
+    let editorCollabora: String                     = "richdocuments"
+    let editorOnlyOffice: String                    = "onlyoffice"
+    let editorWhiteboard: String                    = "whiteboard"
+
+    // Nextcloud version
+    //
+    let nextcloudVersion18: Int                     = 18
+    let nextcloudVersion20: Int                     = 20
+    let nextcloudVersion23: Int                     = 23
+    let nextcloudVersion24: Int                     = 24
+    let nextcloudVersion25: Int                     = 25
+    let nextcloudVersion26: Int                     = 26
+    let nextcloudVersion27: Int                     = 27
+    let nextcloudVersion28: Int                     = 28
+    let nextcloudVersion30: Int                     = 30
+    let nextcloudVersion31: Int                     = 31
+    let nextcloudVersion32: Int                     = 32
+    let nextcloudVersion33: Int                     = 33
+    let nextcloudVersionFuture: Int                 = 99999
+
 
     // Nextcloud unsupported
     //
@@ -69,9 +97,14 @@ final class NCGlobal: Sendable {
     let introSignup: Int                            = 1
     let introSignUpWithProvider: Int                = 1
 
+    // Varie size GUI
+    //
+    @objc let heightCellSettings: CGFloat = 50
+    
     // Avatar
     //
-    let avatarSize: Int                             = 128 * Int(UIScreen.main.scale)
+    // Shared download resolution for a 128-point avatar at 3x scale, also used without a UI context.
+    let avatarSize: Int                             = 384
     let avatarSizeRounded: Int                      = 128
     
     // Preview size
@@ -84,6 +117,21 @@ final class NCGlobal: Sendable {
     let previewExt512                               = ".512.preview.jpg"
     let previewExt256                               = ".256.preview.jpg"
 
+    func getSizeExtension(column: Int, viewWidth: CGFloat) -> String {
+        if column == 0 { return previewExt256 }
+        let width = viewWidth / CGFloat(column)
+
+        switch (width * 4) {
+        case 0...384:
+            return previewExt256
+        case 385...768:
+            return previewExt512
+        default:
+            return previewExt1024
+        }
+    }
+
+    
     func getSizeExtension(column: Int) -> String {
         if column == 0 { return previewExt256 }
         let width = UIScreen.main.bounds.width / CGFloat(column)
@@ -98,6 +146,9 @@ final class NCGlobal: Sendable {
          }
     }
 
+    // MEDIA SEARCH
+    let mediaPropOrder                              = "getlastmodified"
+
     // E2EE
     //
     let e2eePassphraseTest                          = "more over television factory tendency independence international intellectual impress interest sentence pony"
@@ -105,6 +156,7 @@ final class NCGlobal: Sendable {
     let e2eeVersionV11                              = "1.1"
     let e2eeVersionV12                              = "1.2"
     let e2eeVersionV20                              = "2.0"
+    let e2eeCompatibleVersions                      = ["1.1", "1.2", "2.0", "2.1"]
 
     func isE2eeVersion2(_ version: String) -> Bool {
         if version == "2.0" || version == "2.1" {
@@ -163,6 +215,11 @@ final class NCGlobal: Sendable {
 
     // Text -  OnlyOffice - Collabora - QuickLook
     //
+//    let editorText                                  = "text"
+    let editorOnlyoffice                            = "onlyoffice"
+//    let editorCollabora                             = "collabora"
+    // Text -  OnlyOffice - Collabora - QuickLook
+    //
     let editorText                                  = "text"
     let editorOnlyoffice                            = "onlyoffice"
     let editorCollabora                             = "collabora"
@@ -192,7 +249,7 @@ final class NCGlobal: Sendable {
     let errorRequestExplicityCancelled: Int     = 15
     let errorNotModified: Int                   = 304
     let errorBadRequest: Int                    = 400
-    let errorUnauthorized401: Int               = 401
+    let errorUnauthorized: Int                  = 401
     let errorForbidden: Int                     = 403
     let errorResourceNotFound: Int              = 404
     let errorMethodNotSupported: Int            = 405
@@ -213,6 +270,7 @@ final class NCGlobal: Sendable {
     let errorInternalError: Int                 = -99999
     let errorFileNotSaved: Int                  = -99998
     let errorOfflineNotAllowed: Int             = -99997
+    let errorOffline: Int                       = -99997
     let errorCharactersForbidden: Int           = -99996
     let errorCreationFile: Int                  = -99995
     let errorReadFile: Int                      = -99994
@@ -223,27 +281,32 @@ final class NCGlobal: Sendable {
     let errorVersionMismatch: Int               = -99989
     let errorNCSessionNotFound: Int             = -99988
     let errorNotPermission: Int                 = -99987
+    let errorTaskCancelled: Int                 = -99986
 
     // E2EE
     let errorE2EENotEnabled: Int                = -98000
     let errorE2EEVersion: Int                   = -98001
     let errorE2EEKeyChecksums: Int              = -98002
-    let errorE2EEKeyEncodeMetadata: Int         = -98003
-    let errorE2EEKeyDecodeMetadataV12: Int      = -98004
-    let errorE2EEKeyVerifySignature: Int        = -98005
-    let errorE2EEKeyCiphertext: Int             = -98006
-    let errorE2EEKeyFiledropCiphertext: Int     = -98007
-    let errorE2EEJSon: Int                      = -98008
-    let errorE2EELock: Int                      = -98009
-    let errorE2EEEncryptFile: Int               = -98010
-    let errorE2EEEncryptPayloadFile: Int        = -98011
-    let errorE2EECounter: Int                   = -98012
-    let errorE2EEGenerateKey: Int               = -98013
-    let errorE2EEEncodedKey: Int                = -98014
-    let errorE2EENoUserFound: Int               = -98015
-    let errorE2EEUploadInProgress: Int          = -98016
-    let errorE2EEKeyDirectoryTop: Int           = -98017
-
+    let errorE2EEKeyChecksumsEmpty: Int         = -98003
+    let errorE2EEKeyEncodeMetadata: Int         = -98004
+    let errorE2EEKeyDecodeMetadataV12: Int      = -98005
+    let errorE2EEKeyVerifySignature: Int        = -98006
+    let errorE2EEKeyVerifySignatureEmpty: Int   = -98007
+    let errorE2EEKeyCiphertext: Int             = -98008
+    let errorE2EEKeyFiledropCiphertext: Int     = -98009
+    let errorE2EEJSon: Int                      = -98010
+    let errorE2EELock: Int                      = -98011
+    let errorE2EEEncryptFile: Int               = -98012
+    let errorE2EEEncryptPayloadFile: Int        = -98013
+    let errorE2EECounter: Int                   = -98014
+    let errorE2EEGenerateKey: Int               = -98015
+    let errorE2EEEncodedKey: Int                = -98016
+    let errorE2EENoUserFound: Int               = -98017
+    let errorE2EEUploadInProgress: Int          = -98018
+    let errorE2EEKeyDirectoryTop: Int           = -98019
+    let errorE2EESendMetadata: Int              = -98020
+    let errorE2EEReadOnly: Int                  = -98021
+    let errorE2EEServerKeyChanged: Int          = -98022
 
     // Selector
     //
@@ -257,8 +320,8 @@ final class NCGlobal: Sendable {
 
     let selectorUploadAutoUpload                = "uploadAutoUpload"
     let selectorUploadFile                      = "uploadFile"
-    let selectorUploadFileNODelete              = "UploadFileNODelete"
     let selectorUploadFileShareExtension        = "uploadFileShareExtension"
+    let selectorUploadFileNODelete              = "UploadFileNODelete"
 
     let selectorSaveAlbum                       = "saveAlbum"
     let selectorSaveAsScan                      = "saveAsScan"
@@ -304,13 +367,48 @@ final class NCGlobal: Sendable {
     let metadatasStatusInWaiting                = [-1, 1, 10, 11, 12, 13, 14, 15]
     let metadatasStatusInProgress               = [-2, 2]
 
+    let metadatasStatusInError                  = [-3, 3]
+    let metadatasStatusInProgress               = [-2, 2]
     let metadatasStatusInWaitingDownloadUpload  = [-1, 1]
     let metadatasStatusDownloadingUploading     = [-2, 2]
+    let metadatasStatusInProgress               = [-2, 2]
+    
+    let metadataStatusObserveNetworkingProcess  = [-1, 1, 10, 11, 12, 13, 14, 15]
+    let metadataStatusObserveTrasfers           = [-2, 2, 10, 11, 12, 13, 14, 15]
+
+    let metadataStatusObserveNetworkingProcess  = [-1, 1, 10, 11, 12, 13, 14, 15]
+    let metadataStatusObserveTrasfers           = [-2, 2, 10, 11, 12, 13, 14, 15]
+
+    let metadataStatusTransfers                 = [-2, -3, 2, 3, 10, 11, 12, 13, 14, 15]
+    
+    let metadataStatusObserveNetworkingProcess  = [-1, 1, 10, 11, 12, 13, 14, 15]
+    let metadataStatusObserveTrasfers           = [-2, 2, 10, 11, 12, 13, 14, 15]
+
+    let metadatasStatusInProgress               = [-2, 2]
+
+    let metadataStatusDownloadingAllMode        = [-1, -2, -3]
+    let metadataStatusForScreenAwake            = [-1, -2, 1, 2]
+    let metadataStatusUploadingAllMode          = [1,2,3]
+    let metadataStatusDownloadingAllMode        = [-1, -2, -3]
+    let metadataStatusForScreenAwake            = [-1, -2, 1, 2]
+    let metadataStatusInTransfer                = [-1, -2, 1, 2]
+    let metadataStatusFileDown                  = [-1, -2, -3]
+    let metadataStatusHideInView                = [1, 2, 3, 11]
+    let metadataStatusHideInFileExtension       = [1, 2, 3, 10, 11]
+    let metadataStatusWaitWebDav                = [10, 11, 12, 13, 14, 15]
+
+    let metadatasStatusInWaiting                = [-1, 1, 10, 11, 12, 13, 14, 15]
+    let metadatasStatusInProgress               = [-2, 2]
+
+    let metadatasStatusInWaitingDownloadUpload  = [-1, 1]
+    let metadatasStatusDownloadingUploading     = [-2, 2]
+    let metadatasStatusInProgress               = [-2, 2]
 
     //  Hidden files included in the read
     //
     let includeHiddenFiles: [String] = [".LivePhoto"]
     
+        
     
     let metadataStatusObserveNetworkingProcess  = [-1, 1, 10, 11, 12, 13, 14, 15]
     let metadataStatusObserveTrasfers           = [-2, 2, 10, 11, 12, 13, 14, 15]
@@ -339,6 +437,111 @@ final class NCGlobal: Sendable {
     let notificationCenterNetworkReachability                   = "networkReachability"
     let notificationCenterCreateMediaCacheEnded                 = "createMediaCacheEnded"
     let notificationCenterUpdateNotification                    = "updateNotification"
+    let notificationCenterClearCache                            = "clearCache"
+    let notificationCenterCreateMediaCacheEnded                 = "createMediaCacheEnded"
+    let notificationCenterUpdateNotification                    = "updateNotification"
+    let notificationCenterDidCreateShareLink                    = "didCreateShareLink"
+
+    let notificationCenterDeleteFile                            = "deleteFile"                      // userInfo: [ocId], error
+    let notificationCenterCopyMoveFile                          = "copyMoveFile"                    // userInfo: [ocId] serverUrl, account, dragdrop, type (copy, move)
+    let notificationCenterMoveFile                              = "moveFile"                        // userInfo: [ocId], [indexPath], error
+    let notificationCenterCopyFile                              = "copyFile"                        // userInfo: [ocId], [indexPath], error
+    let notificationCenterRenameFile                            = "renameFile"                      // userInfo: serverUrl, account, error
+    let notificationCenterFavoriteFile                          = "favoriteFile"                    // userInfo: ocId, serverUrl
+    let notificationCenterFileExists                            = "fileExists"                      // userInfo: ocId, fileExists
+    let notificationCenterReloadDataSource                      = "reloadDataSource"                // userInfo: serverUrl?, clearDataSource
+
+    let notificationCenterRenameFile                            = "renameFile"                      // userInfo: serverUrl, account, error
+    let notificationCenterDeleteFile                            = "deleteFile"                      // userInfo: [ocId], error
+    let notificationCenterCopyMoveFile                          = "copyMoveFile"                    // userInfo: [ocId] serverUrl, account, dragdrop, type (copy, move)
+    let notificationCenterMoveFile                              = "moveFile"                        // userInfo: [ocId], [indexPath], error
+    let notificationCenterCopyFile                              = "copyFile"                        // userInfo: [ocId], [indexPath], error
+    let notificationCenterFavoriteFile                          = "favoriteFile"                    // userInfo: ocId, serverUrl
+    let notificationCenterFileExists                            = "fileExists"                      // userInfo: ocId, fileExists
+    let notificationCenterReloadDataSource                      = "reloadDataSource"                // userInfo: serverUrl?, clearDataSource
+    let notificationCenterGetServerData                         = "getServerData"                   // userInfo: serverUrl?
+
+    let notificationCenterChangeStatusFolderE2EE                = "changeStatusFolderE2EE"          // userInfo: serverUrl
+
+    let notificationCenterDownloadStartFile                     = "downloadStartFile"               // userInfo: ocId, ocIdTransfer, session, serverUrl, account
+    let notificationCenterDownloadedFile                        = "downloadedFile"                  // userInfo: ocId, ocIdTransfer, session, session, serverUrl, account, selector, error
+    let notificationCenterDownloadCancelFile                    = "downloadCancelFile"              // userInfo: ocId, ocIdTransfer, session, serverUrl, account
+
+    let notificationCenterUploadStartFile                       = "uploadStartFile"                 // userInfo: ocId, ocIdTransfer, session, serverUrl, account, fileName, sessionSelector
+    let notificationCenterUploadedFile                          = "uploadedFile"                    // userInfo: ocId, ocIdTransfer, session, serverUrl, account, fileName, ocIdTransfer, error
+    let notificationCenterUploadedLivePhoto                     = "uploadedLivePhoto"               // userInfo: ocId, ocIdTransfer, session, serverUrl, account, fileName, ocIdTransfer, error
+    let notificationCenterUploadCancelFile                      = "uploadCancelFile"                // userInfo: ocId, ocIdTransfer, session, serverUrl, account
+
+    let notificationCenterProgressTask                          = "progressTask"                    // userInfo: account, ocId, ocIdTransfer, session, serverUrl, status, chunk, e2eEncrypted, progress, totalBytes, totalBytesExpected
+
+    let notificationCenterUpdateBadgeNumber                     = "updateBadgeNumber"               // userInfo: counterDownload, counterUpload
+
+    let notificationCenterCreateFolder                          = "createFolder"                    // userInfo: ocId, serverUrl, account, withPush, sceneIdentifier
+
+    let notificationCenterClearCache                            = "clearCache"
+    let notificationCenterCreateMediaCacheEnded                 = "createMediaCacheEnded"
+    let notificationCenterUpdateNotification                    = "updateNotification"
+    let notificationCenterDidCreateShareLink                    = "didCreateShareLink"
+
+    let notificationCenterDeleteFile                            = "deleteFile"                      // userInfo: [ocId], error
+    let notificationCenterCopyMoveFile                          = "copyMoveFile"                    // userInfo: [ocId] serverUrl, account, dragdrop, type (copy, move)
+    let notificationCenterMoveFile                              = "moveFile"                        // userInfo: [ocId], [indexPath], error
+    let notificationCenterCopyFile                              = "copyFile"                        // userInfo: [ocId], [indexPath], error
+    let notificationCenterRenameFile                            = "renameFile"                      // userInfo: serverUrl, account, error
+    let notificationCenterFavoriteFile                          = "favoriteFile"                    // userInfo: ocId, serverUrl
+    let notificationCenterFileExists                            = "fileExists"                      // userInfo: ocId, fileExists
+    let notificationCenterReloadDataSource                      = "reloadDataSource"                // userInfo: serverUrl?, clearDataSource
+
+    let notificationCenterGetServerData                         = "getServerData"                   // userInfo: serverUrl?
+    
+    let notificationCenterChangeStatusFolderE2EE                = "changeStatusFolderE2EE"          // userInfo: serverUrl
+    
+    let notificationCenterDownloadStartFile                     = "downloadStartFile"               // userInfo: ocId, ocIdTransfer, session, serverUrl, account
+    let notificationCenterDownloadedFile                        = "downloadedFile"                  // userInfo: ocId, ocIdTransfer, session, session, serverUrl, account, selector, error
+    let notificationCenterDownloadCancelFile                    = "downloadCancelFile"              // userInfo: ocId, ocIdTransfer, session, serverUrl, account
+    
+    let notificationCenterUploadStartFile                       = "uploadStartFile"                 // userInfo: ocId, ocIdTransfer, session, serverUrl, account, fileName, sessionSelector
+    let notificationCenterUploadedFile                          = "uploadedFile"                    // userInfo: ocId, ocIdTransfer, session, serverUrl, account, fileName, ocIdTransfer, error
+    let notificationCenterUploadedLivePhoto                     = "uploadedLivePhoto"               // userInfo: ocId, ocIdTransfer, session, serverUrl, account, fileName, ocIdTransfer, error
+    let notificationCenterUploadCancelFile                      = "uploadCancelFile"                // userInfo: ocId, ocIdTransfer, session, serverUrl, account
+    
+    let notificationCenterProgressTask                          = "progressTask"                    // userInfo: account, ocId, ocIdTransfer, session, serverUrl, status, chunk, e2eEncrypted, progress, totalBytes, totalBytesExpected
+    
+    let notificationCenterUpdateBadgeNumber                     = "updateBadgeNumber"               // userInfo: counterDownload, counterUpload
+    
+    let notificationCenterCreateFolder                          = "createFolder"                    // userInfo: ocId, serverUrl, account, withPush, sceneIdentifier
+    let notificationCenterCreateMediaCacheEnded                 = "createMediaCacheEnded"
+    let notificationCenterUpdateNotification                    = "updateNotification"
+
+    let notificationCenterDeleteFile                            = "deleteFile"                      // userInfo: [ocId], error
+    let notificationCenterCopyMoveFile                          = "copyMoveFile"                    // userInfo: [ocId] serverUrl, account, dragdrop, type (copy, move)
+    let notificationCenterMoveFile                              = "moveFile"                        // userInfo: [ocId], [indexPath], error
+    let notificationCenterCopyFile                              = "copyFile"                        // userInfo: [ocId], [indexPath], error
+    let notificationCenterRenameFile                            = "renameFile"                      // userInfo: serverUrl, account, error
+    let notificationCenterFavoriteFile                          = "favoriteFile"                    // userInfo: ocId, serverUrl
+    let notificationCenterFileExists                            = "fileExists"                      // userInfo: ocId, fileExists
+    let notificationCenterReloadDataSource                      = "reloadDataSource"                // userInfo: serverUrl?, clearDataSource
+
+    let notificationCenterGetServerData                         = "getServerData"                   // userInfo: serverUrl?
+    
+    let notificationCenterChangeStatusFolderE2EE                = "changeStatusFolderE2EE"          // userInfo: serverUrl
+    
+    let notificationCenterDownloadStartFile                     = "downloadStartFile"               // userInfo: ocId, ocIdTransfer, session, serverUrl, account
+    let notificationCenterDownloadedFile                        = "downloadedFile"                  // userInfo: ocId, ocIdTransfer, session, session, serverUrl, account, selector, error
+    let notificationCenterDownloadCancelFile                    = "downloadCancelFile"              // userInfo: ocId, ocIdTransfer, session, serverUrl, account
+    
+    let notificationCenterUploadStartFile                       = "uploadStartFile"                 // userInfo: ocId, ocIdTransfer, session, serverUrl, account, fileName, sessionSelector
+    let notificationCenterUploadedFile                          = "uploadedFile"                    // userInfo: ocId, ocIdTransfer, session, serverUrl, account, fileName, ocIdTransfer, error
+    let notificationCenterUploadedLivePhoto                     = "uploadedLivePhoto"               // userInfo: ocId, ocIdTransfer, session, serverUrl, account, fileName, ocIdTransfer, error
+    let notificationCenterUploadCancelFile                      = "uploadCancelFile"                // userInfo: ocId, ocIdTransfer, session, serverUrl, account
+    
+    let notificationCenterProgressTask                          = "progressTask"                    // userInfo: account, ocId, ocIdTransfer, session, serverUrl, status, chunk, e2eEncrypted, progress, totalBytes, totalBytesExpected
+    
+    let notificationCenterUpdateBadgeNumber                     = "updateBadgeNumber"               // userInfo: counterDownload, counterUpload
+    
+    let notificationCenterCreateFolder                          = "createFolder"                    // userInfo: ocId, serverUrl, account, withPush, sceneIdentifier
+    
+    let notificationCenterRenameFile                            = "renameFile"                      // userInfo: serverUrl, account, error
 
     let notificationCenterDeleteFile                            = "deleteFile"                      // userInfo: [ocId], error
     let notificationCenterCopyMoveFile                          = "copyMoveFile"                    // userInfo: [ocId] serverUrl, account, dragdrop, type (copy, move)
@@ -387,6 +590,8 @@ final class NCGlobal: Sendable {
     let notificationCenterUserInteractionMonitor                = "serInteractionMonitor"
 
     let notificationCenterNetworkingProcess                     = "networkingProcess"
+    let notificationCenterTransferCountChanged                  = "transferCountChanged"
+    let notificationCenterFavoriteStatusChanged                  = "favoriteStatusChanged"
 
     // Networking Status
     let networkingStatusCreateFolder                            = "statusCreateFolder"
@@ -413,6 +618,7 @@ final class NCGlobal: Sendable {
     let tipMediaDetailView                                      = "tipMediaDetailView"
     let tipAutoUploadButton                                     = "tipAutoUploadButton"
     let tipAutoUpload                                           = "tipAutoUpload"
+
     
     // ACTION
     //
@@ -515,6 +721,43 @@ final class NCGlobal: Sendable {
     let logTagServiceProficer               = "SERVICE PROVIDER"
     let logTagDatabase                      = "DB"
     let logTagSpeedUpSyncMetadata           = "SYNC METADATA"
+    let logTagMetadataUploadTransfers       = "METADATA UPLOAD TRANSFERS"
+    let logTagMetadataDownloadTransfers     = "METADATA DOWNLOAD TRANSFERS"
+    let logTagViewer                        = "VIEWERS"
+    let logTagMediaBackfill                 = "MEDIA BACKFILL"
+    let logTagMediaPlaceholder              = "MEDIA PLACEHOLDER"
+    let logTagMediaPreview                  = "MEDIA PREVIEW"
+    let logTagBackgroundUpload              = "BACKGROUND UPLOAD"
+    let logTagMetadataTransfers             = "METADATA TRANSFERS"
+    let logSpeedUpSyncMetadata              = "SYNC METADATA"
+    let logNetworkingTasks                  = "NETWORKING TASKS"
+
+    // MoEngage App Version
+    //
+    let moEngageAppVersion                  = 854
+    
+    // Filename Mask and Type
+    //
+    let keyFileNameMask                             = "fileNameMask"
+    let keyFileNameType                             = "fileNameType"
+    let keyFileNameAutoUploadMask                   = "fileNameAutoUploadMask"
+    let keyFileNameAutoUploadType                   = "fileNameAutoUploadType"
+    let keyFileNameOriginal                         = "fileNameOriginal"
+    let keyFileNameOriginalAutoUpload               = "fileNameOriginalAutoUpload"
+
+    
+    // LOG TAG
+    //
+    
+    let logTagTask                          = "BGT"
+    let logTagLocation                      = "LOCATION"
+    let logTagBgSync                        = "BGSYNC"
+    let logTagE2EE                          = "E2EE"
+    let logTagPN                            = "PUSH NOTIFICATION"
+    let logTagSync                          = "SYNC"
+    let logTagServiceProficer               = "SERVICE PROVIDER"
+    let logTagDatabase                      = "DB"
+    let logTagSpeedUpSyncMetadata           = "SYNC METADATA"
     let logTagNetworkingTasks               = "NETWORKING TASKS"
     let logTagMetadataTransfers             = "METADATA TRANSFERS"
     let logSpeedUpSyncMetadata              = "SYNC METADATA"
@@ -524,10 +767,15 @@ final class NCGlobal: Sendable {
     //
     let udMigrationMultiDomains             = "migrationMultiDomains"
     let udLastVersion                       = "lastVersion"
+    
+    // Album
+    //
+    let selectedTabIndexAlbum: Int                             = 3
 
     // Album
     //
     let selectedTabIndexAlbum: Int                             = 3
+
 }
 
 /**

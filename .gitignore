@@ -35,12 +35,9 @@ DerivedData
 *.hmap
 *.xccheckout
 
-## Package
-Carthage/
-
 ### SwiftPackageManager ###
 .swiftpm
-Package.resolved
+Nextcloud.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
 
-*.generated.swift
-/.env-vars
+## Claude Code
+.claude/

@@ -54,13 +54,12 @@ class NCFiles: NCCollectionViewCommon {
             self.serverUrl = utilityFileSystem.getHomeServer(session: session)
             self.titleCurrentFolder = getNavigationTitle()
 
-            NotificationCenter.default.addObserver(forName: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterChangeUser), object: nil, queue: nil) { notification in
-                Task { @MainActor in
-                    if let userInfo = notification.userInfo,
-                       let controller = userInfo["controller"] as? NCMainTabBarController {
-                        guard controller == self.controller else {
-                            return
-                        }
+            NotificationCenter.default.addObserver(forName: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterChangeUser), object: nil, queue: .main) { notification in
+                MainActor.assumeIsolated {
+                    guard let userInfo = notification.userInfo,
+                          let account = userInfo["account"] as? String,
+                          self.controller?.account == account else {
+                        return
                     }
                     if let userInfo = notification.userInfo,
                        let account = userInfo["account"] as? String {
@@ -88,9 +87,36 @@ class NCFiles: NCCollectionViewCommon {
                     self.titleCurrentFolder = self.getNavigationTitle()
                     self.navigationItem.title = self.titleCurrentFolder
 
-                    await (self.navigationController as? NCMainNavigationController)?.setNavigationLeftItems()
+//                    await (self.navigationController as? NCMainNavigationController)?.setNavigationLeftItems()
                     await self.reloadDataSource()
                     await self.getServerData()
+                }
+
+                    self.serverUrl = self.utilityFileSystem.getHomeServer(session: session)
+                    self.navigationController?.popToRootViewController(animated: false)
+                    self.isSearchingMode = false
+                    self.isEditMode = false
+                    self.fileSelect.removeAll()
+                    self.layoutForView = self.database.getLayoutForView(account: session.account, key: self.layoutKey, serverUrl: self.serverUrl)
+
+                if self.isLayoutList {
+                    self.collectionView?.collectionViewLayout = self.listLayout
+                } else if self.isLayoutGrid {
+                    self.collectionView?.collectionViewLayout = self.gridLayout
+                } else if self.isLayoutPhoto {
+                    self.collectionView?.collectionViewLayout = self.mediaLayout
+                }
+
+                self.titleCurrentFolder = self.getNavigationTitle()
+                ///Magentacloud branding changes hide user account button on left navigation bar
+//                self.setNavigationLeftItems()
+
+                    Task { @MainActor in
+                        await self.mainNavigationController?.menuPlus?.create(session: session)
+                        await (self.navigationController as? NCMainNavigationController)?.setNavigationLeftItems()
+                        await self.reloadDataSource()
+                        await self.getServerData()
+                    }
                 }
             }
         }
@@ -106,6 +132,9 @@ class NCFiles: NCCollectionViewCommon {
 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+
+        // Re-evaluate in-app messages after viewDidAppear
+        MoEngageAnalytics.shared.displayInAppNotificationSafely(reason: "viewDidAppear")
 
         if !self.dataSource.isEmpty() {
             blinkCell(fileName: self.fileNameBlink)
@@ -406,8 +435,8 @@ class NCFiles: NCCollectionViewCommon {
             navigationItem.title = self.titleCurrentFolder
         }
 
-        Task {
-            await (self.navigationController as? NCMainNavigationController)?.setNavigationLeftItems()
-        }
+//        Task {
+//            await (self.navigationController as? NCMainNavigationController)?.setNavigationLeftItems()
+//        }
     }
 }

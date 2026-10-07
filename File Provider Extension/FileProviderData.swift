@@ -42,7 +42,10 @@ class FileProviderData: NSObject {
         let tblAccounts = NCManageDatabase.shared.getAllTableAccount()
         var matchAccount: tableAccount?
 
-        NextcloudKit.configureLogger(logLevel: (NCBrandOptions.shared.disable_log ? .disabled : NCPreferences().log))
+        NextcloudKit.configureLogger(
+            logLevel: NCBrandOptions.shared.disable_log ? .disabled : NCPreferences().log,
+            logDirectory: NCPreferences.sharedLogDirectory
+        )
 
         if let domain {
             self.domain = domain
@@ -173,7 +176,7 @@ class FileProviderData: NSObject {
 
         if error == .success {
             if let metadata = await NCManageDatabase.shared.getMetadataFromOcIdAsync(ocId) {
-                await NCManageDatabase.shared.addLocalFilesAsync(metadatas: [metadata])
+                await NCManageDatabase.shared.addLocalFileAsync(metadata: metadata)
             }
         }
 

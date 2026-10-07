@@ -23,6 +23,8 @@
 
 import UIKit
 import RealmSwift
+import NextcloudKit
+import Foundation
 
 // MARK: UICollectionViewDelegate
 extension NCTrash: UICollectionViewDelegate {
@@ -55,6 +57,94 @@ extension NCTrash: UICollectionViewDataSource {
         return datasource?.count ?? 0
     }
 
+    func collectionView(_ collectionView: UICollectionView,
+                        didEndDisplaying cell: UICollectionViewCell,
+                        forItemAt indexPath: IndexPath) {
+        guard let cell = cell as? NCTrashCellProtocol else {
+            return
+        }
+
+        Task {
+            await NCTransferCoordinator.shared.cancel(identifier: cell.identifier)
+        }
+    }
+
+    func collectionView(_ collectionView: UICollectionView,
+                        willDisplay cell: UICollectionViewCell,
+                        forItemAt indexPath: IndexPath) {
+        guard let datasource,
+              indexPath.item >= 0,
+              indexPath.item < datasource.count else {
+            return
+        }
+        let result = datasource[indexPath.item]
+        let identifier = result.fileId
+        let etag = result.fileName
+        let iconName = result.iconName
+        let imageExists = utilityFileSystem.fileProviderStorageImageExists(identifier, etag: etag, userId: self.session.userId, urlBase: self.session.urlBase)
+
+        guard result.hasPreview,
+              !imageExists else {
+            return
+        }
+
+        Task {
+            await NCTransferCoordinator.shared.start(
+                identifier: identifier,
+                priority: .visible
+            ) {
+                let result = await NextcloudKit.shared.downloadTrashPreviewAsync(
+                    fileId: identifier,
+                    account: self.session.account)
+
+                guard !Task.isCancelled,
+                      result.error == .success,
+                      let data = result.responseData?.data else {
+                    return
+                }
+
+                let image = await NCUtility().createImageFileFrom(
+                    data: data,
+                    ocId: identifier,
+                    etag: etag,
+                    ext: NCGlobal.shared.previewExt256,
+                    userId: self.session.userId,
+                    urlBase: self.session.urlBase)
+
+                await MainActor.run {
+                    guard let visibleIndexPath = collectionView.indexPathsForVisibleItems.first(where: { visibleIndexPath in
+                        guard let fileId = self.datasource?[visibleIndexPath.item].fileId else {
+                            return false
+                        }
+                        return String(fileId) == identifier
+                    }),
+                    let cell = collectionView.cellForItem(at: visibleIndexPath) as? NCTrashCellProtocol,
+                        cell.identifier == identifier else {
+                            return
+                    }
+
+                    if let image {
+                        cell.image?.contentMode = .scaleAspectFill
+                        UIView.transition(
+                            with: cell.image,
+                            duration: 0.75,
+                            options: .transitionCrossDissolve
+                        ) {
+                            cell.image.image = image
+                        }
+                    } else {
+                        cell.image.contentMode = .scaleAspectFit
+                        cell.image.image = NCUtility().loadImage(
+                            named: iconName,
+                            useTypeIconFile: true,
+                            account: self.session.account
+                        )
+                    }
+                }
+            }
+        }
+    }
+
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         var image: UIImage?
         var cell: NCTrashCellProtocol & UICollectionViewCell
@@ -72,11 +162,22 @@ extension NCTrash: UICollectionViewDataSource {
         guard let resultTableTrash = datasource?[indexPath.item] else { return cell }
 
         cell.imageItem.contentMode = .scaleAspectFit
+        let contextMenu = NCContextMenuTrash(objectId: resultTableTrash.fileId, trashController: self)
+        if let listCell = cell as? NCTrashListCell {
+            listCell.buttonMore.menu = contextMenu.viewMenu()
+            listCell.buttonMore.showsMenuAsPrimaryAction = true
+        } else if let gridCell = cell as? NCTrashGridCell {
+            gridCell.buttonMore.menu = contextMenu.viewMenu()
+            gridCell.buttonMore.showsMenuAsPrimaryAction = true
+        }
+
+        cell.image.contentMode = .scaleAspectFit
 
         if resultTableTrash.iconName.isEmpty {
             image = NCImageCache.shared.getImageFile()
         } else {
-            image = NCUtility().loadImage(named: resultTableTrash.iconName, useTypeIconFile: true, account: resultTableTrash.account)
+//            image = NCUtility().loadImage(named: resultTableTrash.iconName, useTypeIconFile: true, account: resultTableTrash.account)
+            image = NCUtility().previewTrashIcon(for: resultTableTrash)
         }
 
         if let imageIcon = utility.getImage(ocId: resultTableTrash.fileId,
@@ -85,7 +186,7 @@ extension NCTrash: UICollectionViewDataSource {
                                             userId: session.userId,
                                             urlBase: session.urlBase) {
             image = imageIcon
-            cell.imageItem.contentMode = .scaleAspectFill
+            cell.image.contentMode = .scaleAspectFill
         } else {
             if resultTableTrash.hasPreview {
                 if NCNetworking.shared.downloadThumbnailTrashQueue.operations.filter({ ($0 as? NCOperationDownloadThumbnailTrash)?.fileId == resultTableTrash.fileId }).isEmpty {
@@ -96,6 +197,8 @@ extension NCTrash: UICollectionViewDataSource {
 
         cell.account = resultTableTrash.account
         cell.objectId = resultTableTrash.fileId
+        cell.identifier = resultTableTrash.fileId
+        cell.account = resultTableTrash.account
         cell.setupCellUI(tableTrash: resultTableTrash, image: image)
         cell.selected(selectOcId.contains(resultTableTrash.fileId), isEditMode: isEditMode, account: resultTableTrash.account)
 

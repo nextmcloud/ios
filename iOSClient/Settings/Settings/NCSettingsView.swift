@@ -4,10 +4,13 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 import SwiftUI
+import UIKit
+import Combine
 import NextcloudKit
 import FirebaseCrashlytics
 
 /// Settings view for Nextcloud
+@MainActor
 struct NCSettingsView: View {
     // State to control the visibility of the acknowledgements view
     @State private var showAcknowledgements = false
@@ -19,6 +22,11 @@ struct NCSettingsView: View {
     @State private var showBrowser = false
     // State to control the visibility of the Source Code  view
     @State private var showSourceCode = false
+#if DEBUG
+    @State private var isExportingDatabase = false
+    @State private var showDatabaseExportError = false
+    @State private var databaseExportError = ""
+#endif
     // Object of ViewModel of this view
     @ObservedObject var model: NCSettingsModel
 
@@ -28,26 +36,6 @@ struct NCSettingsView: View {
 
     var body: some View {
         Form {
-            // `Auto Upload` Section
-            Section(content: {
-                NavigationLink(destination: LazyView {
-                    NCAutoUploadView(model: NCAutoUploadModel(controller: model.controller), albumModel: AlbumModel(controller: model.controller))
-                }) {
-                    HStack {
-                        Image(systemName: "photo.on.rectangle.angled")
-                            .font(.icon())
-                            .foregroundColor(Color(NCBrandColor.shared.iconImageColor))
-                            .frame(width: 39)
-
-                        Text(NSLocalizedString("_settings_autoupload_", comment: ""))
-                            .font(.body)
-                    }
-                }
-            }, footer: {
-                Text(NSLocalizedString("_autoupload_description_", comment: ""))
-                    .font(.footnote)
-            })
-
             // `Privacy` Section
             Section(content: {
                 Button(action: {
@@ -151,6 +139,10 @@ struct NCSettingsView: View {
                     }
                 }
             })
+
+
+            // NMC-4558 - The following sections will be hidden / removed from the settings
+            /*
             // Calender & Contacts
             if !NCBrandOptions.shared.disable_mobileconfig {
                 Section(content: {
@@ -197,6 +189,8 @@ struct NCSettingsView: View {
                 Text(NSLocalizedString("_users_footer_", comment: ""))
                     .font(.footnote)
             })
+             */
+
             // E2EEncryption` Section
             if capabilities.e2EEEnabled {
                 E2EESection(model: model)
@@ -217,6 +211,70 @@ struct NCSettingsView: View {
                     }
                 }
             }
+
+            /// `Data Protection Section
+            Section(header: Text(NSLocalizedString("_data_protection_", comment: "")), content: {
+                /// Privacy Settings
+                Section(content: {
+                   NavigationLink(destination: LazyView {
+//                       NCFileNameView(model: NCFileNameModel(controller: model.controller))
+                       PrivacySettingsView()
+                   }) {
+                       Text(NSLocalizedString("_privacy_settings_", comment: ""))
+                           .font(.body)
+                   }
+                })
+
+                /// Privacy Policy
+                Section(content: {
+                   NavigationLink(destination: LazyView {
+                       NCBrowserWebView(urlBase: URL(string: "https://static.magentacloud.de/privacy/datenschutzhinweise_app.htm")!, browserTitle: NSLocalizedString("_privacy_policy_", comment: ""))
+                   }) {
+//                       "https://static.magentacloud.de/privacy/datenschutzhinweise_app.htm"
+                       Text(NSLocalizedString("_privacy_policy_", comment: ""))
+                           .font(.body)
+                   }
+                })
+
+                /// Opensource Software used
+                Section(content: {
+                   NavigationLink(destination: LazyView {
+                       NCBrowserWebView(urlBase: URL(string: "https://static.magentacloud.de/licences/ios.html")!, browserTitle: NSLocalizedString("_used_opensource_software_", comment: ""))
+                   }) {
+//                       "https://static.magentacloud.de/licences/ios.html"
+                       Text(NSLocalizedString("_used_opensource_software_", comment: ""))
+                           .font(.body)
+                   }
+                })
+            })
+
+            /// `Service Section
+            Section(header: Text(NSLocalizedString("_service_", comment: "")), content: {
+                /// Privacy Policy
+                Section(content: {
+                   NavigationLink(destination: LazyView {
+                       NCBrowserWebView(urlBase: URL(string: "https://cloud.telekom-dienste.de/hilfe")!, browserTitle: NSLocalizedString("_help_", comment: ""))
+                   }) {
+//                       "https://cloud.telekom-dienste.de/hilfe"
+                       Text(NSLocalizedString("_help_", comment: ""))
+                           .font(.body)
+                   }
+                })
+
+                /// Opensource Software used
+                Section(content: {
+                   NavigationLink(destination: LazyView {
+                       NCBrowserWebView(urlBase: URL(string: "https://www.telekom.de/impressum")!, browserTitle: NSLocalizedString("_imprint_", comment: ""))
+                   }) {
+//                       "https://www.telekom.de/impressum"
+                       Text(NSLocalizedString("_imprint_", comment: ""))
+                           .font(.body)
+                   }
+                })
+            })
+
+            // NMC-4558 - The following sections will be hidden / removed from the settings
+            /*
             // `Information` Section
             Section(header: Text(NSLocalizedString("_information_", comment: "")).font(.headline), content: {
                 // Acknowledgements
@@ -278,6 +336,20 @@ struct NCSettingsView: View {
             })
 #if DEBUG
             Section(header: Text("Debug").font(.headline), content: {
+                Button(action: exportDebugDatabase, label: {
+                    HStack {
+                        Image(systemName: "cylinder.split.1x2")
+                            .font(.icon())
+                            .foregroundColor(.orange)
+                            .frame(width: 39)
+
+                        Text(isExportingDatabase ? "Exporting GRDB database…" : "Export GRDB database")
+                            .font(.body)
+                    }
+                })
+                .tint(Color(NCBrandColor.shared.textColor))
+                .disabled(isExportingDatabase)
+
                 Button(action: {
                     Crashlytics.crashlytics().log("Test crash triggered")
                     fatalError("🔥 Crash test")
@@ -295,11 +367,13 @@ struct NCSettingsView: View {
                 .tint(Color(NCBrandColor.shared.textColor))
             })
 #endif
+             */
 
             // `Watermark` Section
             Section(content: {
             }, footer: {
-                Text(model.footerApp + model.footerServer + model.footerSlogan)
+//                Text(model.footerApp + model.footerServer + model.footerSlogan)
+                Text(model.footerApp + model.footerSlogan)
                     .font(.footnote)
             })
         }
@@ -309,9 +383,55 @@ struct NCSettingsView: View {
         .sheet(isPresented: $showChangePasscode) {
             SetupPasscodeView(isLockActive: $model.isLockActive, controller: model.controller, changePasscode: true)
         }
+#if DEBUG
+        .alert("Database export failed", isPresented: $showDatabaseExportError) {
+            Button("OK", role: .cancel) { }
+        } message: {
+            Text(databaseExportError)
+        }
+#endif
         .navigationBarTitle(NSLocalizedString("_settings_", comment: ""))
         .defaultViewModifier(model)
     }
+
+#if DEBUG
+    private func exportDebugDatabase() {
+        isExportingDatabase = true
+
+        Task {
+            defer { isExportingDatabase = false }
+
+            do {
+                let exportURL = try await Task.detached(priority: .userInitiated) {
+                    try NCLocalDatabase.shared.exportDebugDatabase()
+                }.value
+
+                guard let controller = model.controller else {
+                    throw CocoaError(.coderInvalidValue)
+                }
+                let presentingViewController = controller.topMostViewController()
+
+                let activityViewController = UIActivityViewController(
+                    activityItems: [exportURL],
+                    applicationActivities: nil
+                )
+                if let popover = activityViewController.popoverPresentationController {
+                    popover.sourceView = presentingViewController.view
+                    popover.sourceRect = CGRect(
+                        x: presentingViewController.view.bounds.midX,
+                        y: presentingViewController.view.bounds.midY,
+                        width: 0,
+                        height: 0
+                    )
+                }
+                presentingViewController.present(activityViewController, animated: true)
+            } catch {
+                databaseExportError = error.localizedDescription
+                showDatabaseExportError = true
+            }
+        }
+    }
+#endif
 }
 
 struct E2EESection: View {

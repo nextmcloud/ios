@@ -52,6 +52,14 @@ extension NCShare {
                     sender: sender,
                     action: { _ in
                         NCShareCommon.copyLink(link: share.url, viewController: self, sender: sender)
+        if share.shareType == NKShare.ShareType.publicLink.rawValue, canReshare {
+            actions.append(
+                NCMenuAction(
+                    title: NSLocalizedString("_share_add_sharelink_", comment: ""),
+                    icon: utility.loadImage(named: "plus", colors: [NCBrandColor.shared.iconImageColor]),
+                    sender: sender,
+                    action: { _ in
+                        self.makeNewLinkShare()
                     }
                 )
             )
@@ -95,6 +103,8 @@ extension NCShare {
                         viewNewUserComment.metadata = self.metadata
                         viewNewUserComment.share = tableShare(value: share)
 //                        viewNewUserComment.networking = self.networking
+                        viewNewUserComment.networking = self.networking
+                        viewNewUserComment.isFromMenu = true
                         self.navigationController?.pushViewController(viewNewUserComment, animated: true)
                     }
                 )
@@ -111,6 +121,7 @@ extension NCShare {
                         if share.shareType != NCShareCommon.shareTypeLink, let metadata = self.metadata, metadata.e2eEncrypted && capabilities.e2EEApiVersion == NCGlobal.shared.e2eeVersionV20 {
                             let serverUrl = metadata.serverUrl + "/" + metadata.fileName
                         if share.shareType != NKShare.ShareType.publicLink.rawValue, let metadata = self.metadata, metadata.e2eEncrypted && capabilities.e2EEApiVersion == NCGlobal.shared.e2eeVersionV20 {
+                        if share.shareType != NKShare.ShareType.publicLink.rawValue, let metadata = self.metadata, metadata.e2eEncrypted && NCGlobal.shared.isE2eeVersion2(capabilities.e2EEApiVersion) {
                             if await NCNetworkingE2EE().isInUpload(account: metadata.account, serverUrl: metadata.serverUrlFileName) {
                                 let error = NKError(errorCode: NCGlobal.shared.errorE2EEUploadInProgress, errorDescription: NSLocalizedString("_e2e_in_upload_", comment: ""))
                                 return NCContentPresenter().showInfo(error: error)
@@ -149,6 +160,7 @@ extension NCShare {
 //            )
 //        )
         
+
         self.presentMenu(with: actions, sender: sender)
     }
 

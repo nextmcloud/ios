@@ -12,7 +12,7 @@ extension NCNetworking {
     func termsOfService(account: String) async {
         let capabilities = await NKCapabilities.shared.getCapabilities(for: account)
         guard capabilities.termsOfService,
-              let groupDefaults = UserDefaults(suiteName: nkComm.groupIdentifier),
+              let groupDefaults = UserDefaults(suiteName: NCBrandOptions.shared.capabilitiesGroup),
               let controller = SceneManager.shared.getControllers().first(where: { $0.account == account }),
               controller.presentedViewController as? UIHostingController<NCTermOfServiceModelView> == nil
         else {
@@ -22,13 +22,8 @@ extension NCNetworking {
         var tosArray = groupDefaults.array(forKey: nkComm.groupDefaultsToS) as? [String] ?? []
         let options = NKRequestOptions(checkInterceptor: false)
 
-        let resultsGetToS = await NextcloudKit.shared.getTermsOfServiceAsync(account: account, options: options, taskHandler: { task in
-            Task {
-                let identifier = await NCNetworking.shared.networkingTasks.createIdentifier(account: account,
-                                                                                            name: "getTermsOfService")
-                await NCNetworking.shared.networkingTasks.track(identifier: identifier, task: task)
-            }
-        })
+        let resultsGetToS = await NextcloudKit.shared.getTermsOfServiceAsync(account: account, options: options)
+
         guard resultsGetToS.error == .success, let tos = resultsGetToS.tos, !tos.hasUserSigned() else {
             tosArray.removeAll { $0 == account }
             groupDefaults.set(tosArray, forKey: nkComm.groupDefaultsToS)
@@ -45,21 +40,15 @@ extension NCNetworking {
     func signTermsOfService(account: String, termId: Int) async -> NKError? {
         let capabilities = await NKCapabilities.shared.getCapabilities(for: account)
         guard capabilities.termsOfService,
-              let groupDefaults = UserDefaults(suiteName: nkComm.groupIdentifier)
+              let groupDefaults = UserDefaults(suiteName: NCBrandOptions.shared.capabilitiesGroup)
         else {
             return nil
         }
         var tosArray = groupDefaults.array(forKey: nkComm.groupDefaultsToS) as? [String] ?? []
         let options = NKRequestOptions(checkInterceptor: false)
 
-        let resultsSignToS = await  NextcloudKit.shared.signTermsOfServiceAsync(termId: "\(termId)", account: account, options: options) { task in
-            Task {
-                let identifier = await NCNetworking.shared.networkingTasks.createIdentifier(account: account,
-                                                                                            path: "\(termId)",
-                                                                                            name: "signTermsOfService")
-                await NCNetworking.shared.networkingTasks.track(identifier: identifier, task: task)
-            }
-        }
+        let resultsSignToS = await  NextcloudKit.shared.signTermsOfServiceAsync(termId: "\(termId)", account: account, options: options)
+
         if resultsSignToS.error == .success {
             tosArray.removeAll { $0 == account }
             groupDefaults.set(tosArray, forKey: nkComm.groupDefaultsToS)

@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: Nextcloud GmbH
 // SPDX-FileCopyrightText: 2024 Aditya Tyagi
 // SPDX-FileCopyrightText: 2024 Marino Faggiana
+// SPDX-FileCopyrightText: 2026 Rasmus Wøldike
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 import SwiftUI
@@ -66,6 +67,19 @@ struct NCSettingsAdvancedView: View {
                 Text(NSLocalizedString("_remove_photo_CameraRoll_desc_", comment: ""))
                     .font(.footnote)
             })
+
+            // Save camera media to camera roll
+            Section(content: {
+                Toggle(NSLocalizedString("_save_to_camera_roll_", comment: ""), isOn: $model.saveCameraMediaToCameraRoll)
+                    .font(.body)
+                    .tint(Color(NCBrandColor.shared.getElement(account: model.session.account)))
+                    .onChange(of: model.saveCameraMediaToCameraRoll) {
+                        model.updateSaveCameraMediaToCameraRoll()
+                    }
+            }, footer: {
+                Text(NSLocalizedString("_save_to_camera_roll_desc_", comment: ""))
+                    .font(.footnote)
+            })
             // Section : Files App
             if !NCBrandOptions.shared.disable_openin_file {
                 Section(content: {
@@ -109,10 +123,10 @@ struct NCSettingsAdvancedView: View {
             // Section: Diagnostic
             if !NCBrandOptions.shared.disable_log {
                 Section(content: {
-                    /// View Log File
-                    Button(action: {
-                        model.viewLogFile()
-                    }, label: {
+                    /// View active and rotated log files.
+                    NavigationLink(destination: LazyView {
+                        NCLogFilesView(model: model)
+                    }) {
                         HStack {
                             Image(systemName: "doc.badge.gearshape")
                                 .font(.icon())
@@ -121,7 +135,7 @@ struct NCSettingsAdvancedView: View {
                             Text(NSLocalizedString("_view_log_", comment: ""))
                                 .font(.body)
                         }
-                    })
+                    }
                     .tint(Color(UIColor.label))
                     // Set Log Level()
                     Picker(NSLocalizedString("_set_log_level_", comment: ""), selection: $model.selectedLogLevel) {
@@ -134,20 +148,6 @@ struct NCSettingsAdvancedView: View {
                     .onChange(of: model.selectedLogLevel) {
                         model.updateSelectedLogLevel()
                     }
-                    // Clear Log File
-                    Button(action: {
-                        model.clearLogFile()
-                    }, label: {
-                        HStack {
-                            Image(systemName: "xmark")
-                                .font(.icon())
-                                .frame(width: 26)
-                                .foregroundColor(Color(NCBrandColor.shared.iconImageColor))
-                            Text(NSLocalizedString("_clear_log_", comment: ""))
-                                .font(.body)
-                        }
-                    })
-                    .tint(Color(UIColor.label))
                 }, header: {
                     Text(NSLocalizedString("_diagnostics_", comment: ""))
                         .font(.headline)

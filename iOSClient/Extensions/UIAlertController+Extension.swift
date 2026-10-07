@@ -1,25 +1,6 @@
-//
-//  UIAlertController+Extension.swift
-//  Nextcloud
-//
-//  Created by Henrik Storch on 27.01.22.
-//  Copyright © 2022 Henrik Storch. All rights reserved.
-//
-//  Author Henrik Storch <henrik.storch@nextcloud.com>
-//
-//  This program is free software: you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
-//  the Free Software Foundation, either version 3 of the License, or
-//  (at your option) any later version.
-//
-//  This program is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
-//
-//  You should have received a copy of the GNU General Public License
-//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-//
+// SPDX-FileCopyrightText: Nextcloud GmbH
+// SPDX-FileCopyrightText: 2022 Henrik Storch
+// SPDX-License-Identifier: GPL-3.0-or-later
 
 import Foundation
 import UIKit
@@ -59,16 +40,8 @@ extension UIAlertController {
                     }
 #endif
                     let serverUrlFileName = NCUtilityFileSystem().createServerUrl(serverUrl: serverUrl, fileName: fileNameFolder)
-                    let createFolderResults = await NextcloudKit.shared.createFolderAsync(serverUrlFileName: serverUrlFileName, account: session.account) { task in
-                        Task {
-                            let identifier = await NCNetworking.shared.networkingTasks.createIdentifier(
-                                account: session.account,
-                                path: serverUrlFileName,
-                                name: "createFolder"
-                            )
-                            await NCNetworking.shared.networkingTasks.track(identifier: identifier, task: task)
-                        }
-                    }
+                    let createFolderResults = await NextcloudKit.shared.createFolderAsync(serverUrlFileName: serverUrlFileName, account: session.account)
+
                     if createFolderResults.error == .success {
                         let error = await NCNetworkingE2EEMarkFolder().markFolderE2ee(account: session.account, serverUrlFileName: serverUrlFileName, userId: session.userId, sceneIdentifier: nil)
                         if let banner, let token {
@@ -355,6 +328,99 @@ extension UIAlertController {
             }
 
             presenter.present(alert, animated: true)
+        }
+    }
+
+    @MainActor
+    static func failedPasscode(presenter: UIViewController, completion: (() -> Void)? = nil) {
+        let preferences = NCPreferences()
+        let deadline: Date
+
+        if let pending = preferences.passcodeLockoutEnd {
+            guard pending > Date() else {
+                endPasscodeLockout(completion: completion)
+                return
+            }
+
+            deadline = pending
+        } else {
+            deadline = Date().addingTimeInterval(TimeInterval(NCBrandOptions.shared.passcodeSecondsFail))
+            preferences.passcodeLockoutEnd = deadline
+        }
+
+        let alertController = UIAlertController(title: NSLocalizedString("_passcode_counter_fail_", comment: ""), message: nil, preferredStyle: .alert)
+        presenter.present(alertController, animated: true)
+
+        alertController.message = "\(Int(deadline.timeIntervalSinceNow.rounded(.up))) " + NSLocalizedString("_seconds_", comment: "")
+
+        _ = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { timer in
+            let seconds = Int(deadline.timeIntervalSinceNow.rounded(.up))
+
+            if seconds > 0 {
+                alertController.message = "\(seconds) " + NSLocalizedString("_seconds_", comment: "")
+            } else {
+                timer.invalidate()
+                alertController.dismiss(animated: true)
+                endPasscodeLockout(completion: completion)
+            }
+        }
+    }
+
+    private static func endPasscodeLockout(completion: (() -> Void)?) {
+        NCPreferences().clearPasscodeFailures()
+
+        completion?()
+    }
+
+    /// Presents a localized confirmation alert and asynchronously returns the user's choice.
+    ///
+    /// - Parameters:
+    ///   - viewController: The view controller used to present the alert.
+    ///   - title: The localization key for the alert title.
+    ///   - message: The localization key for the alert message.
+    ///   - cancelAction: The localization key for the cancel action title.
+    ///   - continueAction: The localization key for the destructive confirmation action title.
+    /// - Returns: `true` if the user confirms the action; otherwise, `false`.
+    @MainActor
+    static func showAlert(
+        from viewController: UIViewController?,
+        title: String,
+        message: String,
+        cancelAction: String,
+        cancelStyle: UIAlertAction.Style,
+        continueAction: String,
+        continueStyle: UIAlertAction.Style
+    ) async -> Bool {
+        guard let viewController else {
+            return false
+        }
+
+        return await withCheckedContinuation { continuation in
+            let alertController = UIAlertController(
+                title: NSLocalizedString(title, comment: ""),
+                message: NSLocalizedString(message, comment: ""),
+                preferredStyle: .alert
+            )
+
+            alertController.addAction(
+                UIAlertAction(
+                    title: NSLocalizedString(cancelAction, comment: ""),
+                    style: cancelStyle
+                ) { _ in
+                    continuation.resume(returning: false)
+                }
+            )
+
+            alertController.addAction(
+                UIAlertAction(
+                    title: NSLocalizedString(continueAction, comment: ""),
+                    style: continueStyle
+                ) { _ in
+                    continuation.resume(returning: true)
+                }
+            )
+
+            viewController.present(alertController, animated: true)
         }
     }
 }

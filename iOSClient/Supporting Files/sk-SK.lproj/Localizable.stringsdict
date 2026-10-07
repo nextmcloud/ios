@@ -13,13 +13,113 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>%d zostávajúce umožnené sťahovanie</string>
+			<string>%d zostávajúce umožnené stiahnutie</string>
 			<key>few</key>
-			<string>%d zostávajúce umožnené sťahovania</string>
+			<string>%d zostávajúcich umožnených sťahovaní</string>
 			<key>many</key>
 			<string>%d zostávajúcich umožnených sťahovaní</string>
 			<key>other</key>
 			<string>%d zostávajúcich umožnených sťahovaní</string>
+		</dict>
+	</dict>
+	<key>_auto_upload_files_in_queue_</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@files@</string>
+		<key>files</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>%d súbor v poradí</string>
+			<key>few</key>
+			<string>%d súborov v poradí</string>
+			<key>many</key>
+			<string>%d súborov v poradí</string>
+			<key>other</key>
+			<string>%d súborov v poradí</string>
+		</dict>
+	</dict>
+	<key>_focused_auto_upload_photos_to_back_up_</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@photos@</string>
+		<key>photos</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>Máte %d položku na zálohovanie</string>
+			<key>few</key>
+			<string>Máte %d položky na zálohovanie</string>
+			<key>many</key>
+			<string>Máte %d položiek na zálohovanie</string>
+			<key>other</key>
+			<string>Máte %d položiek na zálohovanie</string>
+		</dict>
+	</dict>
+	<key>_focused_auto_upload_failed_</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@failed@</string>
+		<key>failed</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>%d zlyhanie</string>
+			<key>few</key>
+			<string>%d zlyhania</string>
+			<key>many</key>
+			<string>%d zlyhaní</string>
+			<key>other</key>
+			<string>%d zlyhaní</string>
+		</dict>
+	</dict>
+	<key>_albums_photos_count_</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@photos@</string>
+		<key>photos</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>%d fotka</string>
+			<key>few</key>
+			<string>%d fotky</string>
+			<key>many</key>
+			<string>%d fotiek</string>
+			<key>other</key>
+			<string>%d fotiek</string>
+		</dict>
+	</dict>
+	<key>_albums_list_photos_and_videos_count_</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@media@</string>
+		<key>media</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>%d fotka alebo video</string>
+			<key>few</key>
+			<string>%d fotky alebo videá</string>
+			<key>many</key>
+			<string>%d fotiek alebo videí</string>
+			<key>other</key>
+			<string>%d fotiek alebo videí</string>
 		</dict>
 	</dict>
 </dict>

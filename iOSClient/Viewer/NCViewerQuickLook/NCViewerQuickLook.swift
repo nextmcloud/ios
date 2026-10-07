@@ -79,6 +79,10 @@ private var hasChangesQuickLook: Bool = false
 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+        
+        // Re-evaluate in-app messages after viewDidAppear
+        MoEngageAnalytics.shared.displayInAppNotificationSafely(reason: "viewDidAppear")
+
         // needs to be saved bc in didDisappear presentingVC is already nil
         parentVC = presentingViewController
     }
@@ -159,7 +163,7 @@ private var hasChangesQuickLook: Bool = false
         toolbarConfig.optionButtonFontSize = 16
         toolbarConfig.optionButtonFontSizeForPad = 21
         toolbarConfig.backgroundColor = .systemGray6
-        toolbarConfig.foregroundColor = .systemBlue
+        toolbarConfig.foregroundColor = NCBrandColor.shared.customer
 
         var viewConfig = CropViewConfig()
         viewConfig.cropMaskVisualEffectType = .none

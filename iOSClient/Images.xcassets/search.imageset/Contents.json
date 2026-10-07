@@ -12,6 +12,7 @@
         }
       ],
       "filename" : "searchDark.pdf",
+      "filename" : "Search.svg",
       "idiom" : "universal"
     }
   ],
@@ -22,5 +23,6 @@
   "properties" : {
     "preserves-vector-representation" : true,
     "template-rendering-intent" : "original"
+    "preserves-vector-representation" : true
   }
 }

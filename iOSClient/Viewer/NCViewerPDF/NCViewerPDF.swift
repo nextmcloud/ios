@@ -68,7 +68,11 @@ class NCViewerPDF: UIViewController, NCViewerPDFSearchDelegate {
                     UIDeferredMenuElement.uncached { [self] completion in
                         guard let metadata = self.metadata else { return }
 
-                        if let menu = NCContextMenuViewer(metadata: metadata, controller: self.tabBarController as? NCMainTabBarController, webView: false, sender: self).viewMenu() {
+                        if let menu = NCContextMenuViewer(metadata: metadata,
+                                                          controller: self.tabBarController as? NCMainTabBarController,
+                                                          viewController: self.tabBarController,
+                                                          webView: false,
+                                                          sender: self).viewMenu() {
                             completion(menu.children)
                         }
                     }
@@ -238,6 +242,9 @@ class NCViewerPDF: UIViewController, NCViewerPDFSearchDelegate {
 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+
+        // Re-evaluate in-app messages after viewDidAppear
+        MoEngageAnalytics.shared.displayInAppNotificationSafely(reason: "viewDidAppear")
 
         Task {
             await NCNetworking.shared.transferDispatcher.addDelegate(self)
@@ -424,7 +431,7 @@ class NCViewerPDF: UIViewController, NCViewerPDFSearchDelegate {
         pdfSelection.pages.forEach { page in
             let highlight = PDFAnnotation(bounds: pdfSelection.bounds(for: page), forType: .highlight, withProperties: nil)
             highlight.endLineStyle = .square
-            highlight.color = .systemBlue
+            highlight.color = NCBrandColor.shared.customer
             page.addAnnotation(highlight)
         }
         if let page = pdfSelection.pages.first {
@@ -520,7 +527,7 @@ extension NCViewerPDF: NCTransferDelegate {
 
     func transferProgressDidUpdate(progress: Float, totalBytes: Int64, totalBytesExpected: Int64, fileName: String, serverUrl: String) { }
 
-    func transferChange(status: String,
+    func transferChange(networkingStatus: String,
                         account: String,
                         fileName: String,
                         serverUrl: String,
@@ -536,7 +543,7 @@ extension NCViewerPDF: NCTransferDelegate {
                 return
             }
 
-            switch status {
+            switch networkingStatus {
             // DELETE
             case NCGlobal.shared.networkingStatusDelete:
                 if error == .success,

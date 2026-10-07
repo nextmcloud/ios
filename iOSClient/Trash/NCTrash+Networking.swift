@@ -124,13 +124,13 @@ class NCOperationDownloadThumbnailTrash: ConcurrentOperation, @unchecked Sendabl
             if error == .success, let data = responseData?.data {
                 NCUtility().createImageFileFrom(data: data, ocId: self.fileId, etag: self.fileName, userId: self.session.userId, urlBase: self.session.urlBase)
 
-                for case let cell as NCTrashCellProtocol in self.collectionView.visibleCells where cell.objectId == self.fileId {
-                    cell.imageItem?.contentMode = .scaleAspectFill
+                for case let cell as NCTrashCellProtocol in self.collectionView.visibleCells where cell.identifier == self.fileId {
+                    cell.image?.contentMode = .scaleAspectFill
 
-                    UIView.transition(with: cell.imageItem,
+                    UIView.transition(with: cell.image,
                                       duration: 0.75,
                                       options: .transitionCrossDissolve,
-                                      animations: { cell.imageItem.image = UIImage(data: data) },
+                                      animations: { cell.image.image = UIImage(data: data) },
                                       completion: nil)
                 }
             }

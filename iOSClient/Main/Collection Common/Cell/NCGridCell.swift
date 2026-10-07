@@ -30,6 +30,7 @@ class NCGridCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellMainP
     @IBOutlet weak var iconsStackView: UIStackView!
 
     weak var delegate: NCGridCellDelegate?
+    fileprivate var allowSelectionOverride: Bool?
 
     // Cell Protocol
     var metadata: tableMetadata? {
@@ -69,6 +70,7 @@ class NCGridCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellMainP
         super.prepareForReuse()
 
         initCell()
+        allowSelectionOverride = nil
     }
 
     func initCell() {
@@ -84,6 +86,8 @@ class NCGridCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellMainP
         imageStatus.image = nil
         imageFavorite.image = nil
         imageLocal.image = nil
+        imageSelect.isHidden = true
+        imageSelect.image = nil
 
         iconsStackView.addBlurBackground(style: .systemMaterial)
         iconsStackView.layer.cornerRadius = 8
@@ -97,6 +101,10 @@ class NCGridCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellMainP
 
         buttonMore.menu = nil
         buttonMore.showsMenuAsPrimaryAction = true
+
+//        imageSelect.alpha = 0
+//        imageSelect.isHidden = true
+//        imageSelect.image = NCImageCache.shared.getImageCheckedYes(color: NCBrandColor.shared.getElement(account: metadata?.account))
 
         // Dynamic Type Font Configuration
         //
@@ -163,6 +171,13 @@ class NCGridCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellMainP
     }
 
     func selected(_ status: Bool, isEditMode: Bool, color: UIColor) {
+        // Determine allowance from override set by data source (defaults to true if not provided)
+        let allowSelection = allowSelectionOverride ?? true
+
+        // Hide selection control for disallowed items; otherwise show only in edit mode
+        imageSelect.isHidden = allowSelection ? !isEditMode : true
+
+        // Buttons visibility respects edit mode
         if isEditMode {
             buttonMore.isHidden = true
             accessibilityCustomActions = nil
@@ -170,9 +185,15 @@ class NCGridCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellMainP
             buttonMore.isHidden = false
         }
 
-        imageVisualEffect.alpha = status ? 1 : 0
-        imageSelect.alpha = status ? 1 : 0
-        imageSelect.image = NCImageCache.shared.getImageCheckedYes(color: color)
+        // Selected state visuals: only apply when selection is allowed and in edit mode
+        if status && allowSelection && isEditMode {
+            imageSelect.image = NCImageCache.shared.getImageCheckedYes(color: color)
+            imageVisualEffect.isHidden = false
+        } else {
+            imageSelect.image = NCImageCache.shared.getImageCheckedNo(color: color)
+            backgroundView = nil
+            imageVisualEffect.isHidden = true
+        }
     }
 
     func writeInfoDateSize(date: NSDate, size: Int64) {
@@ -315,12 +336,14 @@ extension NCCollectionViewCommon {
             cell.imageLocal.image = nil
         }
 
+        // Set override for selection allowance based on E2EE encryption
+        cell.allowSelectionOverride = !metadata.e2eEncrypted
+
         // Edit mode
-        if fileSelect.contains(metadata.ocId) {
-            cell.selected(true, isEditMode: isEditMode, color: NCBrandColor.shared.getElement(account: session.account))
+        let isSelected = (cell.allowSelectionOverride ?? true) && fileSelect.contains(metadata.ocId)
+        cell.selected(isSelected, isEditMode: isEditMode, color: NCBrandColor.shared.getElement(account: session.account))
+        if isSelected {
             a11yValues.append(NSLocalizedString("_selected_", comment: ""))
-        } else {
-            cell.selected(false, isEditMode: isEditMode, color: NCBrandColor.shared.getElement(account: session.account))
         }
 
         // Accessibility

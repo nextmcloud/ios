@@ -1,30 +1,13 @@
-//
-//  NCShareUserCell.swift
-//  Nextcloud
-//
-//  Created by Henrik Storch on 15.11.2021.
-//  Copyright © 2021 Henrik Storch. All rights reserved.
-//
-//  Author Henrik Storch <henrik.storch@nextcloud.com>
-//
-//  This program is free software: you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
-//  the Free Software Foundation, either version 3 of the License, or
-//  (at your option) any later version.
-//
-//  This program is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
-//
-//  You should have received a copy of the GNU General Public License
-//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+// SPDX-FileCopyrightText: Nextcloud GmbH
+// SPDX-FileCopyrightText: 2021 Henrik Storch
+// SPDX-License-Identifier: GPL-3.0-or-later
 
 import UIKit
 import DropDown
 import NextcloudKit
 
 class NCShareUserCell: UITableViewCell {
+class NCShareUserCell: UITableViewCell, NCCellProtocol {
 
     @IBOutlet weak var imageItem: UIImageView!
     @IBOutlet weak var labelTitle: UILabel!
@@ -53,6 +36,7 @@ class NCShareUserCell: UITableViewCell {
                 imagePasswordSet.isHidden = share.password.isEmpty
                 imageExpiredDateSet.isHidden = (share.expirationDate == nil)
                 leadingContraintofImageRightArrow.constant = (imagePasswordSet.isHidden && imageExpiredDateSet.isHidden) ? 0 : 5
+                applyIconsIfNeeded()
             }
         }
     }
@@ -119,6 +103,76 @@ class NCShareUserCell: UITableViewCell {
 
         let permissions = NCPermissions()
 
+
+    // MARK: - Lifecycle
+    override func awakeFromNib() {
+        super.awakeFromNib()
+        setupCellUIAppearance()
+    }
+
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        if previousTraitCollection?.userInterfaceStyle != traitCollection.userInterfaceStyle {
+            setupCellUIAppearance()
+        }
+    }
+
+    // MARK: - Configure
+    func configure(with share: tableShare?, at indexPath: IndexPath, isDirectory: Bool, userId: String) {
+        self.indexPath = indexPath
+        self.tableShare = share
+        self.isDirectory = isDirectory
+        setupCellUI(userId: userId)
+        applyIconsIfNeeded()
+    }
+
+    func refresh(with share: tableShare?, userId: String) {
+        self.tableShare = share
+        setupCellUI(userId: userId)
+        applyIconsIfNeeded()
+    }
+
+    // MARK: - UI Setup
+    
+    private func setupCellUI(userId: String) {
+        guard let tableShare = tableShare else { return }
+
+        labelTitle.text = tableShare.shareWithDisplayname
+
+        let isOwner = tableShare.uidOwner == userId || tableShare.uidFileOwner == userId
+        isUserInteractionEnabled = isOwner
+        buttonMenu.isHidden = !isOwner
+        buttonMenu.accessibilityLabel = NSLocalizedString("_more_", comment: "")
+
+        btnQuickStatus.setTitle("", for: .normal)
+        btnQuickStatus.isEnabled = true
+        btnQuickStatus.accessibilityHint = NSLocalizedString("_user_sharee_footer_", comment: "")
+        btnQuickStatus.contentHorizontalAlignment = .left
+
+        imageExpiredDateSet.isHidden = true
+        imagePasswordSet.isHidden = true
+        
+        setupCellUIAppearance()
+        updatePermissionUI()
+    }
+    
+    private func setupCellUIAppearance() {
+        labelQuickStatus.textColor = NCBrandColor.shared.shareBlueColor
+        labelTitle.textColor = NCBrandColor.shared.label
+        imageRightArrow.image = UIImage(named: "rightArrow")?.image(color: NCBrandColor.shared.shareBlueColor)
+        imageExpiredDateSet.image = UIImage(named: "calenderNew")?.image(color: NCBrandColor.shared.shareBlueColor)
+        imagePasswordSet.image = UIImage(named: "lockNew")?.image(color: NCBrandColor.shared.shareBlueColor)
+        buttonMenu.setImage(NCImageCache.shared.getImageButtonMore().image(color: NCBrandColor.shared.brand, size: 24), for: .normal)
+
+        imagePermissionType.image = imagePermissionType.image?.image(color: NCBrandColor.shared.shareBlueColor)
+        // Permission UI is updated via tableShare didSet or explicit refresh
+    }
+
+    private func updatePermissionUI() {
+        guard let tableShare = tableShare else { return }
+
+        let permissions = NCPermissions()
+
         if tableShare.permissions == permissions.permissionCreateShare {
             labelQuickStatus.text = NSLocalizedString("_share_quick_permission_everyone_can_just_upload_", comment: "")
             imagePermissionType.image = UIImage(named: "upload")?.image(color: NCBrandColor.shared.shareBlueColor)
@@ -153,6 +207,17 @@ class NCShareUserCell: UITableViewCell {
 
         setupCellUIAppearance()
         updatePermissionUI()
+        applyIconsIfNeeded()
+    }
+    
+    // Ensures calendar icon visibility is correctly applied after configure/refresh
+    func applyIconsIfNeeded() {
+        guard let tableShare = tableShare else { return }
+        imagePasswordSet.isHidden = tableShare.password.isEmpty
+        // Show calendar icon when an expiration date is set
+        imageExpiredDateSet.isHidden = (tableShare.expirationDate == nil)
+        // Adjust spacing accordingly
+        leadingContraintofImageRightArrow.constant = (imagePasswordSet.isHidden && imageExpiredDateSet.isHidden) ? 0 : 5
     }
 
     private func getTypeString(_ tableShare: tableShareV2) -> String {
@@ -179,6 +244,10 @@ class NCShareUserCell: UITableViewCell {
     @IBAction func quickStatusClicked(_ sender: Any) {
         delegate?.tapQuickStatus(with: tableShare, sender: sender)
     }
+    
+    @objc func openQuickStatus(_ sender: UIGestureRecognizer) {
+        delegate?.tapQuickStatus(with: tableShare, sender: sender.view ?? sender)
+    }
 }
 
 protocol NCShareUserCellDelegate: AnyObject {
@@ -189,7 +258,7 @@ protocol NCShareUserCellDelegate: AnyObject {
 
 // MARK: - NCSearchUserDropDownCell
 
-class NCSearchUserDropDownCell: DropDownCell {
+class NCSearchUserDropDownCell: DropDownCell, NCCellProtocol {
 
     @IBOutlet weak var imageItem: UIImageView!
     @IBOutlet weak var imageStatus: UIImageView!

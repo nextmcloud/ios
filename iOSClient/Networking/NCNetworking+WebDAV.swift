@@ -1,10 +1,28 @@
-// SPDX-FileCopyrightText: Nextcloud GmbH
-// SPDX-FileCopyrightText: 2024 Marino Faggiana
-// SPDX-License-Identifier: GPL-3.0-or-later
+//
+//  NCNetworking+WebDAV.swift
+//  Nextcloud
+//
+//  Created by Marino Faggiana on 07/02/24.
+//  Copyright © 2024 Marino Faggiana. All rights reserved.
+//
+//  Author Marino Faggiana <marino.faggiana@nextcloud.com>
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//
 
 import UIKit
 import NextcloudKit
-import Queuer
 import Photos
 import LucidBanner
 
@@ -20,12 +38,6 @@ extension NCNetworking {
         let showHiddenFiles = NCPreferences().getShowHiddenFiles(account: account)
 
         let resultsReadFolder = await NextcloudKit.shared.readFileOrFolderAsync(serverUrlFileName: serverUrl, depth: "1", showHiddenFiles: showHiddenFiles, account: account, options: options) { task in
-            Task {
-                let identifier = await NCNetworking.shared.networkingTasks.createIdentifier(account: account,
-                                                                                            path: serverUrl,
-                                                                                            name: "readFileOrFolder")
-                await NCNetworking.shared.networkingTasks.track(identifier: identifier, task: task)
-            }
             taskHandler(task)
         }
 
@@ -53,6 +65,7 @@ extension NCNetworking {
                                                                                             name: "readFileOrFolder")
                 await NCNetworking.shared.networkingTasks.track(identifier: identifier, task: task)
             }
+        NextcloudKit.shared.readFileOrFolder(serverUrlFileName: serverUrlFileName, depth: "0", account: account) { task in
             taskHandler(task)
         } completion: { account, files, _, error in
             guard error == .success, files?.count == 1, let file = files?.first else {
@@ -74,12 +87,6 @@ extension NCNetworking {
                                                                       depth: "0",
                                                                       showHiddenFiles: showHiddenFiles,
                                                                       account: account) { task in
-            Task {
-                let identifier = await NCNetworking.shared.networkingTasks.createIdentifier(account: account,
-                                                                                            path: serverUrlFileName,
-                                                                                            name: "readFileOrFolder")
-                await NCNetworking.shared.networkingTasks.track(identifier: identifier, task: task)
-            }
             taskHandler(task)
         }
         guard results.error == .success, results.files?.count == 1, let file = results.files?.first else {
@@ -96,16 +103,20 @@ extension NCNetworking {
         let results = await NextcloudKit.shared.readFileOrFolderAsync(serverUrlFileName: serverUrlFileName,
                                                                       depth: "0",
                                                                       requestBody: requestBody,
-                                                                      account: account) { task in
-            Task {
-                let identifier = await NCNetworking.shared.networkingTasks.createIdentifier(account: account,
-                                                                                            path: serverUrlFileName,
-                                                                                            name: "readFileOrFolder")
-                await NCNetworking.shared.networkingTasks.track(identifier: identifier, task: task)
+                                                                      account: account)
+        return results.error
+    }
+
+    @discardableResult
+    func updateMetadataPlaceholder(_ metadata: tableMetadata) async -> tableMetadata {
+        if metadata.placeholder {
+            let results = await NCNetworking.shared.readFileAsync(serverUrlFileName: metadata.serverUrlFileName, account: metadata.account)
+            if results.error == .success, let metadata = results.metadata {
+                await NCManageDatabase.shared.addMetadataAsync(metadata)
+                return metadata
             }
         }
-
-        return results.error
+        return metadata
     }
 
     // MARK: - Create Filename
@@ -202,14 +213,7 @@ extension NCNetworking {
         }
 
         // Try to create the directory
-        let resultCreateFolder = await NextcloudKit.shared.createFolderAsync(serverUrlFileName: serverUrlFileName, account: session.account, options: options) { task in
-            Task {
-                let identifier = await NCNetworking.shared.networkingTasks.createIdentifier(account: session.account,
-                                                                                            path: serverUrlFileName,
-                                                                                            name: "createFolder")
-                await NCNetworking.shared.networkingTasks.track(identifier: identifier, task: task)
-            }
-        }
+        let resultCreateFolder = await NextcloudKit.shared.createFolderAsync(serverUrlFileName: serverUrlFileName, account: session.account, options: options)
 
         // If creation reported success → read new files -> createDirectory DB + success
         if resultCreateFolder.error == .success {
@@ -245,14 +249,7 @@ extension NCNetworking {
         }
 
         // Try to create the directory
-        let results = await NextcloudKit.shared.createFolderAsync(serverUrlFileName: serverUrlFileName, account: account) { task in
-            Task {
-                let identifier = await NCNetworking.shared.networkingTasks.createIdentifier(account: account,
-                                                                                            path: serverUrlFileName,
-                                                                                            name: "createFolder")
-                await NCNetworking.shared.networkingTasks.track(identifier: identifier, task: task)
-            }
-        }
+        let results = await NextcloudKit.shared.createFolderAsync(serverUrlFileName: serverUrlFileName, account: account)
 
         // If creation reported success → cleanup
         if results.error == .success {
@@ -283,7 +280,7 @@ extension NCNetworking {
 
         if let sceneIdentifier = metadata.sceneIdentifier {
             await transferDispatcher.notifyDelegates(forScene: sceneIdentifier) { delegate in
-                delegate.transferChange(status: self.global.networkingStatusCreateFolder,
+                delegate.transferChange(networkingStatus: self.global.networkingStatusCreateFolder,
                                         account: metadata.account,
                                         fileName: metadata.fileName,
                                         serverUrl: metadata.serverUrl,
@@ -296,7 +293,7 @@ extension NCNetworking {
             }
         } else {
             await transferDispatcher.notifyAllDelegates { delegate in
-                delegate.transferChange(status: self.global.networkingStatusCreateFolder,
+                delegate.transferChange(networkingStatus: self.global.networkingStatusCreateFolder,
                                         account: metadata.account,
                                         fileName: metadata.fileName,
                                         serverUrl: metadata.serverUrl,
@@ -328,8 +325,6 @@ extension NCNetworking {
             await NCManageDatabase.shared.deleteVideoAsync(metadata.ocId)
             await NCManageDatabase.shared.deleteLocalFileAsync(id: metadata.ocId)
             utilityFileSystem.removeFile(atPath: utilityFileSystem.getDirectoryProviderStorageOcId(metadata.ocId, userId: metadata.userId, urlBase: metadata.urlBase))
-
-            NCImageCache.shared.removeImageCache(ocIdPlusEtag: metadata.ocId + metadata.etag)
         }
 
         await NCManageDatabase.shared.cleanTablesOcIds(account: metadata.account, userId: metadata.userId, urlBase: metadata.urlBase)
@@ -393,14 +388,7 @@ extension NCNetworking {
     }
 
     func deleteFileOrFolder(metadata: tableMetadata) async -> NKError {
-        var results = await NextcloudKit.shared.deleteFileOrFolderAsync(serverUrlFileName: metadata.serverUrlFileName, account: metadata.account) { task in
-            Task {
-                let identifier = await NCNetworking.shared.networkingTasks.createIdentifier(account: metadata.account,
-                                                                                            path: metadata.serverUrlFileName,
-                                                                                            name: "deleteFileOrFolder")
-                await NCNetworking.shared.networkingTasks.track(identifier: identifier, task: task)
-            }
-        }
+        var results = await NextcloudKit.shared.deleteFileOrFolderAsync(serverUrlFileName: metadata.serverUrlFileName, account: metadata.account)
 
         if results.error == .success || results.error.errorCode == NCGlobal.shared.errorResourceNotFound || (results.error.errorCode == NCGlobal.shared.errorForbidden && metadata.isLivePhotoVideo) {
             do {
@@ -427,7 +415,7 @@ extension NCNetworking {
         }
 
         await transferDispatcher.notifyAllDelegates { delegate in
-            delegate.transferChange(status: NCGlobal.shared.networkingStatusDelete,
+            delegate.transferChange(networkingStatus: NCGlobal.shared.networkingStatusDelete,
                                     account: metadata.account,
                                     fileName: metadata.fileName,
                                     serverUrl: metadata.serverUrl,
@@ -439,7 +427,7 @@ extension NCNetworking {
 
         return results.error
     }
-
+    
     // MARK: - Rename
 
     func setStatusWaitRename(_ metadata: tableMetadata, fileNameNew: String, windowScene: UIWindowScene?) async -> NKError {
@@ -469,19 +457,56 @@ extension NCNetworking {
 
         return .success
     }
+    
+    func renameMetadata(_ metadata: tableMetadata,
+                        fileNameNew: String,
+                        indexPath: IndexPath,
+                        viewController: UIViewController?,
+                        completion: @escaping (_ error: NKError) -> Void) {
+        
+        let permission = NCMetadataPermissions.permissionsContainsString(metadata.permissions, permissions: NCMetadataPermissions.permissionCanRename)
+        if (!metadata.permissions.isEmpty && permission == false) ||
+            (metadata.status != global.metadataStatusNormal && metadata.status != global.metadataStatusWaitRename) {
+//            return NCContentPresenter().showInfo(error: NKError(errorCode: NCGlobal.shared.errorInternalError, errorDescription: "_no_permission_modify_file_"))
+//            let error = await NCNetworkingE2EERename().rename(metadata: metadata, fileNameNew: fileNameNew)
+//            DispatchQueue.main.async { completion(error) }
+            completion(NKError(errorCode: NCGlobal.shared.errorInternalError, errorDescription: "_no_permission_modify_file_"))
+        }
+
+        if metadata.isDirectoryE2EE {
+#if !EXTENSION
+            if isOffline {
+//                return NCContentPresenter().showInfo(error: NKError(errorCode: NCGlobal.shared.errorInternalError, errorDescription: "_offline_not_allowed_"))
+                completion(NKError(errorCode: NCGlobal.shared.errorInternalError, errorDescription: "_offline_not_allowed_"))
+            }
+            Task {
+                let error = await NCNetworkingE2EERename().rename(metadata: metadata, fileNameNew: fileNameNew)
+                if error != .success {
+//                    NCContentPresenter().showError(error: error)
+                    completion(error)
+                }
+            }
+#endif
+        } else {
+            Task {
+                await self.transferDispatcher.notifyAllDelegatesAsync { delegate in
+                    let status = self.global.metadataStatusWaitRename
+                    await NCManageDatabase.shared.renameMetadata(fileNameNew: fileNameNew, ocId: metadata.ocId, status: status)
+                    delegate.transferReloadData(serverUrl: metadata.serverUrl, status: status)
+                }
+                NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterRenameFile, userInfo: ["serverUrl": metadata.serverUrl, "account": metadata.account, "error": NKError(errorCode: 0, errorDescription: ""), "ocId": metadata.ocId, "indexPath": indexPath])
+
+            }
+            
+            completion(NKError(errorCode: 0, errorDescription: ""))
+        }
+    }
 
     func renameFileOrFolder(metadata: tableMetadata) async -> NKError {
         let serverUrlFileNameSource = metadata.serverUrlFileName
         let serverUrlFileNameDestination = utilityFileSystem.createServerUrl(serverUrl: metadata.serverUrl, fileName: metadata.fileName)
 
-        let results = await NextcloudKit.shared.moveFileOrFolderAsync(serverUrlFileNameSource: serverUrlFileNameSource, serverUrlFileNameDestination: serverUrlFileNameDestination, overwrite: false, account: metadata.account) { task in
-            Task {
-                let identifier = await NCNetworking.shared.networkingTasks.createIdentifier(account: metadata.account,
-                                                                                            path: serverUrlFileNameSource,
-                                                                                            name: "moveFileOrFolder")
-                await NCNetworking.shared.networkingTasks.track(identifier: identifier, task: task)
-            }
-        }
+        let results = await NextcloudKit.shared.moveFileOrFolderAsync(serverUrlFileNameSource: serverUrlFileNameSource, serverUrlFileNameDestination: serverUrlFileNameDestination, overwrite: false, account: metadata.account)
 
         if results.error == .success {
             await NCManageDatabase.shared.setMetadataServerUrlFileNameStatusNormalAsync(ocId: metadata.ocId)
@@ -490,7 +515,7 @@ extension NCNetworking {
         }
 
         await transferDispatcher.notifyAllDelegates { delegate in
-            delegate.transferChange(status: NCGlobal.shared.networkingStatusRename,
+            delegate.transferChange(networkingStatus: NCGlobal.shared.networkingStatusRename,
                                     account: metadata.account,
                                     fileName: metadata.fileName,
                                     serverUrl: metadata.serverUrl,
@@ -503,6 +528,51 @@ extension NCNetworking {
         return results.error
     }
 
+    func renameMetadata(_ metadata: tableMetadata,
+                        fileNameNew: String,
+                        indexPath: IndexPath,
+                        viewController: UIViewController?,
+                        completion: @escaping (_ error: NKError) -> Void) {
+        
+        let permission = NCMetadataPermissions.permissionsContainsString(metadata.permissions, permissions: NCMetadataPermissions.permissionCanRename)
+        if (!metadata.permissions.isEmpty && permission == false) ||
+            (metadata.status != global.metadataStatusNormal && metadata.status != global.metadataStatusWaitRename) {
+//            return NCContentPresenter().showInfo(error: NKError(errorCode: NCGlobal.shared.errorInternalError, errorDescription: "_no_permission_modify_file_"))
+//            let error = await NCNetworkingE2EERename().rename(metadata: metadata, fileNameNew: fileNameNew)
+//            DispatchQueue.main.async { completion(error) }
+            completion(NKError(errorCode: NCGlobal.shared.errorInternalError, errorDescription: "_no_permission_modify_file_"))
+        }
+
+        if metadata.isDirectoryE2EE {
+#if !EXTENSION
+            if isOffline {
+//                return NCContentPresenter().showInfo(error: NKError(errorCode: NCGlobal.shared.errorInternalError, errorDescription: "_offline_not_allowed_"))
+                completion(NKError(errorCode: NCGlobal.shared.errorInternalError, errorDescription: "_offline_not_allowed_"))
+            }
+            Task {
+                let error = await NCNetworkingE2EERename().rename(metadata: metadata, fileNameNew: fileNameNew)
+                if error != .success {
+//                    NCContentPresenter().showError(error: error)
+                    completion(error)
+                }
+            }
+#endif
+        } else {
+            Task {
+                let ocId = metadata.ocId
+                let serverUrl = metadata.serverUrl
+                await self.transferDispatcher.notifyAllDelegatesAsync { delegate in
+                    await NCManageDatabase.shared.renameMetadata(fileNameNew: fileNameNew, ocId: ocId, status: self.global.metadataStatusWaitRename)
+                    delegate.transferReloadDataSource(serverUrl: serverUrl, requestData: false, status: self.global.metadataStatusWaitRename)
+                }
+//                NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterRenameFile, userInfo: ["serverUrl": metadata.serverUrl, "account": metadata.account, "error": NKError(errorCode: 0, errorDescription: ""), "ocId": metadata.ocId, "indexPath": indexPath])
+
+            }
+            
+            completion(NKError(errorCode: 0, errorDescription: ""))
+        }
+    }
+    
     // MARK: - Move
 
     func setStatusWaitMove(_ metadata: tableMetadata, destination: String, overwrite: Bool) async -> NKError {
@@ -528,14 +598,7 @@ extension NCNetworking {
         let serverUrlFileNameDestination = utilityFileSystem.createServerUrl(serverUrl: destination, fileName: metadata.fileName)
         let overwrite = (metadata.storeFlag as? NSString)?.boolValue ?? false
 
-        let results = await NextcloudKit.shared.moveFileOrFolderAsync(serverUrlFileNameSource: metadata.serverUrlFileName, serverUrlFileNameDestination: serverUrlFileNameDestination, overwrite: overwrite, account: metadata.account) { task in
-            Task {
-                let identifier = await NCNetworking.shared.networkingTasks.createIdentifier(account: metadata.account,
-                                                                                            path: serverUrlFileNameDestination,
-                                                                                            name: "moveFileOrFolder")
-                await NCNetworking.shared.networkingTasks.track(identifier: identifier, task: task)
-            }
-        }
+        let results = await NextcloudKit.shared.moveFileOrFolderAsync(serverUrlFileNameSource: metadata.serverUrlFileName, serverUrlFileNameDestination: serverUrlFileNameDestination, overwrite: overwrite, account: metadata.account)
 
         await NCManageDatabase.shared.setMetadataSessionAsync(ocId: metadata.ocId,
                                                               status: global.metadataStatusNormal)
@@ -554,7 +617,7 @@ extension NCNetworking {
         }
 
         await transferDispatcher.notifyAllDelegates { delegate in
-            delegate.transferChange(status: self.global.networkingStatusCopyMove,
+            delegate.transferChange(networkingStatus: self.global.networkingStatusCopyMove,
                                     account: metadata.account,
                                     fileName: metadata.fileName,
                                     serverUrl: metadata.serverUrl,
@@ -598,14 +661,7 @@ extension NCNetworking {
             serverUrlFileNameDestination = utilityFileSystem.createServerUrl(serverUrl: destination, fileName: fileNameCopy)
         }
 
-        let results = await NextcloudKit.shared.copyFileOrFolderAsync(serverUrlFileNameSource: metadata.serverUrlFileName, serverUrlFileNameDestination: serverUrlFileNameDestination, overwrite: overwrite, account: metadata.account) { task in
-            Task {
-                let identifier = await NCNetworking.shared.networkingTasks.createIdentifier(account: metadata.account,
-                                                                                            path: serverUrlFileNameDestination,
-                                                                                            name: "copyFileOrFolder")
-                await NCNetworking.shared.networkingTasks.track(identifier: identifier, task: task)
-            }
-        }
+        let results = await NextcloudKit.shared.copyFileOrFolderAsync(serverUrlFileNameSource: metadata.serverUrlFileName, serverUrlFileNameDestination: serverUrlFileNameDestination, overwrite: overwrite, account: metadata.account)
 
         await NCManageDatabase.shared.setMetadataSessionAsync(ocId: metadata.ocId,
                                                               status: global.metadataStatusNormal)
@@ -618,7 +674,7 @@ extension NCNetworking {
         }
 
         await transferDispatcher.notifyAllDelegates { delegate in
-            delegate.transferChange(status: self.global.networkingStatusCopyMove,
+            delegate.transferChange(networkingStatus: self.global.networkingStatusCopyMove,
                                     account: metadata.account,
                                     fileName: metadata.fileName,
                                     serverUrl: metadata.serverUrl,
@@ -633,6 +689,7 @@ extension NCNetworking {
 
     // MARK: - Favorite
 
+    @discardableResult
     func setStatusWaitFavorite(_ metadata: tableMetadata) async -> NKError {
         if metadata.status != global.metadataStatusNormal,
            metadata.status != global.metadataStatusWaitFavorite {
@@ -643,8 +700,15 @@ extension NCNetworking {
         let serverUrl = metadata.serverUrl
         let favorite = metadata.favorite
         await self.transferDispatcher.notifyAllDelegatesAsync { delegate in
+
+#if !EXTENSION
+                if !metadata.favorite, !metadata.contentType.contains("directory") {
+                    AnalyticsHelper.shared.trackEventWithMetadata(eventName: .EVENT__ADD_FAVORITE ,metadata: metadata)
+                }
+#endif
             await NCManageDatabase.shared.setMetadataFavoriteAsync(ocId: ocId, favorite: !favorite, saveOldFavorite: favorite.description, status: self.global.metadataStatusWaitFavorite)
             delegate.transferReloadDataSource(serverUrl: serverUrl, requestData: false, status: self.global.metadataStatusWaitFavorite)
+
         }
 
         return .success
@@ -654,14 +718,7 @@ extension NCNetworking {
         let session = NCSession.Session(account: metadata.account, urlBase: metadata.urlBase, user: metadata.user, userId: metadata.userId)
         let fileName = utilityFileSystem.getRelativeFilePath(metadata.fileName, serverUrl: metadata.serverUrl, session: session)
 
-        let results = await NextcloudKit.shared.setFavoriteAsync(fileName: fileName, favorite: metadata.favorite, account: metadata.account) { task in
-            Task {
-                let identifier = await NCNetworking.shared.networkingTasks.createIdentifier(account: metadata.account,
-                                                                                            path: fileName,
-                                                                                            name: "setFavorite")
-                await NCNetworking.shared.networkingTasks.track(identifier: identifier, task: task)
-            }
-        }
+        let results = await NextcloudKit.shared.setFavoriteAsync(fileName: fileName, favorite: metadata.favorite, account: metadata.account)
 
         if results.error == .success {
             await NCManageDatabase.shared.setMetadataFavoriteAsync(ocId: metadata.ocId,
@@ -677,7 +734,7 @@ extension NCNetworking {
         }
 
         await transferDispatcher.notifyAllDelegates { delegate in
-            delegate.transferChange(status: self.global.networkingStatusFavorite,
+            delegate.transferChange(networkingStatus: self.global.networkingStatusFavorite,
                                     account: metadata.account,
                                     fileName: metadata.fileName,
                                     serverUrl: metadata.serverUrl,
@@ -729,13 +786,7 @@ extension NCNetworking {
         } else if utilityFileSystem.fileProviderStorageExists(metadata) {
             completition(URL(fileURLWithPath: utilityFileSystem.getDirectoryProviderStorageOcId(metadata.ocId, fileName: metadata.fileNameView, userId: metadata.userId, urlBase: metadata.urlBase)), false, .success)
         } else {
-            NextcloudKit.shared.getDirectDownload(fileId: metadata.fileId, account: metadata.account) { task in
-                Task {
-                    let identifier = await NCNetworking.shared.networkingTasks.createIdentifier(account: metadata.account,
-                                                                                                path: metadata.fileId,
-                                                                                                name: "getDirectDownload")
-                    await NCNetworking.shared.networkingTasks.track(identifier: identifier, task: task)
-                }
+            NextcloudKit.shared.getDirectDownload(fileId: metadata.fileId, account: metadata.account) { _ in
             } completion: { _, url, _, error in
                 if error == .success && url != nil {
                     if let url = URL(string: url!) {

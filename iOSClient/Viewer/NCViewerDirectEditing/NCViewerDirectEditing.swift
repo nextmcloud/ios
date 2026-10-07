@@ -171,14 +171,195 @@ class NCViewerDirectEditing: UIViewController, WKNavigationDelegate, WKScriptMes
     // MARK: -
 
     public func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
-        if message.name == "DirectEditingMobileInterface" {
-            if message.body as? String == "close" {
-                viewUnload()
+        let isDirectEditingMessage = message.name == directEditingMobileInterface
+        let isRichDocumentsMessage = editor == global.editorCollabora && message.name == richDocumentsMobileInterface
+
+        guard isDirectEditingMessage || isRichDocumentsMessage,
+              let mobileMessage = mobileMessage(from: message.body) else {
+            return
+        }
+
+        switch mobileMessage.command {
+        case "close":
+            viewUnload()
+
+        case "share":
+            NCCreate().createShare(
+                controller: controller,
+                presentViewController: controller,
+                metadata: metadata,
+                page: .sharing
+            )
+
+        case "reload":
+            webView.reload()
+
+        case "loading":
+            print("loading")
+
+        case "loaded", "documentLoaded":
+            print(mobileMessage.command)
+
+        case "paste":
+            UIApplication.shared.sendAction(
+                #selector(UIResponderStandardEditActions.paste(_:)),
+                to: nil,
+                from: self,
+                for: nil
+            )
+
+        case "insertGraphic":
+            presentImageSelector()
+
+        case "downloadAs":
+            guard let values = mobileMessage.values else { return }
+            downloadRichDocument(values: values)
+
+        case "fileRename":
+            guard let values = mobileMessage.values,
+                  let newName = values["NewName"] as? String else {
+                return
+            }
+            metadata.fileName = newName
+            metadata.fileNameView = newName
+
+        case "hyperlink":
+            guard let values = mobileMessage.values,
+                  let urlString = values["Url"] as? String,
+                  let url = URL(string: urlString) else {
+                return
+            }
+            UIApplication.shared.open(url)
+
+        default:
+            break
+        }
+    }
+
+    private func mobileMessage(from body: Any) -> (command: String, values: [AnyHashable: Any]?)? {
+        if let command = body as? String {
+            return (command, nil)
+        }
+
+        guard let parameters = body as? [AnyHashable: Any],
+              let command = parameters["MessageName"] as? String else {
+            return nil
+        }
+
+        return (command, parameters["Values"] as? [AnyHashable: Any])
+    }
+
+    private func presentImageSelector() {
+        let storyboard = UIStoryboard(name: "NCSelect", bundle: nil)
+        guard let navigationController = storyboard.instantiateInitialViewController() as? UINavigationController,
+              let viewController = navigationController.topViewController as? NCSelect else {
+            return
+        }
+
+        viewController.delegate = self
+        viewController.typeOfCommandView = .select
+        viewController.enableSelectFile = true
+        viewController.includeImages = true
+        viewController.type = ""
+        viewController.session = session
+        viewController.controller = controller
+
+        present(navigationController, animated: true)
+    }
+
+    private func downloadRichDocument(values: [AnyHashable: Any]) {
+        guard let type = values["Type"] as? String,
+              let urlString = values["URL"] as? String,
+              let url = URL(string: urlString) else {
+            return
+        }
+
+        var fileName = (metadata.fileName as NSString).deletingPathExtension
+        let fileNameLocalPath = utilityFileSystem.createServerUrl(
+            serverUrl: utilityFileSystem.directoryUserData,
+            fileName: fileName
+        )
+
+        if type == "slideshow" {
+            guard let browserWebViewController = UIStoryboard(name: "NCBrowserWeb", bundle: nil).instantiateInitialViewController() as? NCBrowserWeb else {
+                return
             }
 
-            if message.body as? String == "share" {
-                NCCreate().createShare(controller: self.controller,
-                                       metadata: metadata, page: .sharing)
+            browserWebViewController.urlBase = urlString
+            browserWebViewController.isHiddenButtonExit = false
+            present(browserWebViewController, animated: true)
+            return
+        }
+
+        NCActivityIndicator.shared.start(backgroundView: view)
+        NextcloudKit.shared.download(
+            serverUrlFileName: url,
+            fileNameLocalPath: fileNameLocalPath,
+            account: metadata.account,
+            requestHandler: { _ in },
+            taskHandler: { task in
+                Task {
+                    await self.database.setMetadataSessionAsync(
+                        ocId: self.metadata.ocId,
+                        sessionTaskIdentifier: task.taskIdentifier,
+                        status: self.global.metadataStatusDownloading
+                    )
+                }
+            },
+            progressHandler: { _ in },
+            completionHandler: { account, response, error in
+                NCActivityIndicator.shared.stop()
+
+                Task {
+                    let nkCommon = NextcloudKit.shared.nkCommonInstance
+                    let allHeaderFields = response?.response?.allHeaderFields
+                    let etag = nkCommon.normalizedETag(nkCommon.findHeader("oc-etag", allHeaderFields: allHeaderFields))
+
+                    await self.database.setMetadataSessionAsync(
+                        ocId: self.metadata.ocId,
+                        session: "",
+                        sessionTaskIdentifier: 0,
+                        sessionError: "",
+                        status: self.global.metadataStatusNormal,
+                        etag: etag
+                    )
+                }
+
+                guard error == .success, account == self.metadata.account else {
+                    Task {
+                        let windowScene = SceneManager.shared.getWindow(sceneIdentifier: self.sceneIdentifier)?.windowScene
+                        await showErrorBanner(windowScene: windowScene, text: error.errorDescription, errorCode: error.errorCode)
+                    }
+                    return
+                }
+
+                var item = fileNameLocalPath
+                if let disposition = NextcloudKit.shared.nkCommonInstance.findHeader(
+                    "Content-Disposition",
+                    allHeaderFields: response?.response?.allHeaderFields
+                ), let filenameContentDisposition = self.filenameFromContentDisposition(disposition) {
+                    fileName = filenameContentDisposition
+                    item = self.utilityFileSystem.createServerUrl(
+                        serverUrl: self.utilityFileSystem.directoryUserData,
+                        fileName: fileName
+                    )
+                    _ = self.utilityFileSystem.moveFile(atPath: fileNameLocalPath, toPath: item)
+                }
+
+                if type == "print" {
+                    let printController = UIPrintInteractionController.shared
+                    let printInfo = UIPrintInfo.printInfo()
+                    printInfo.outputType = .general
+                    printInfo.orientation = .portrait
+                    printInfo.jobName = "Document"
+                    printController.printInfo = printInfo
+                    printController.printingItem = URL(fileURLWithPath: item)
+                    printController.present(from: .zero, in: self.view, animated: true)
+                } else {
+                    self.documentController = UIDocumentInteractionController()
+                    self.documentController?.url = URL(fileURLWithPath: item)
+                    self.documentController?.presentOptionsMenu(from: .zero, in: self.view, animated: true)
+                }
             }
 
             if message.body as? String == "loading" {
@@ -226,6 +407,63 @@ class NCViewerDirectEditing: UIViewController, WKNavigationDelegate, WKScriptMes
             }
         }
         return nil
+    }
+
+    private func filenameFromContentDisposition(_ disposition: String) -> String? {
+        guard let range = disposition.range(of: "filename=") else {
+            return nil
+        }
+
+        var value = String(disposition[range.upperBound...]).trimmingCharacters(in: .whitespaces)
+        if let semicolonIndex = value.firstIndex(of: ";") {
+            value = String(value[..<semicolonIndex])
+        }
+        value = value.trimmingCharacters(in: CharacterSet(charactersIn: "\""))
+
+        return value.isEmpty ? nil : value
+    }
+
+    private func postRichDocumentsAsset(fileName: String, url: String) {
+        guard let fileNameData = try? JSONEncoder().encode(fileName),
+              let urlData = try? JSONEncoder().encode(url),
+              let fileNameLiteral = String(data: fileNameData, encoding: .utf8),
+              let urlLiteral = String(data: urlData, encoding: .utf8) else {
+            return
+        }
+
+        let function = "OCA.RichDocuments.documentsMain.postAsset(\(fileNameLiteral), \(urlLiteral))"
+        webView.evaluateJavaScript(function)
+    }
+}
+
+extension NCViewerDirectEditing: NCSelectDelegate {
+    func dismissSelect(serverUrl: String?,
+                       metadata: tableMetadata?,
+                       type: String,
+                       items: [Any],
+                       overwrite: Bool,
+                       copy: Bool,
+                       move: Bool,
+                       session: NCSession.Session,
+                       controller: NCMainTabBarController?) {
+        guard editor == global.editorCollabora,
+              let serverUrl,
+              let metadata else {
+            return
+        }
+
+        let path = utilityFileSystem.getRelativeFilePath(metadata.fileName, serverUrl: serverUrl, session: session)
+        NextcloudKit.shared.createRichdocumentsAssetURL(filePath: path, account: metadata.account) { _ in
+        } completion: { _, url, _, error in
+            if error == .success, let url {
+                self.postRichDocumentsAsset(fileName: metadata.fileNameView, url: url)
+            } else {
+                Task {
+                    let windowScene = SceneManager.shared.getWindow(sceneIdentifier: self.sceneIdentifier)?.windowScene
+                    await showErrorBanner(windowScene: windowScene, text: error.errorDescription, errorCode: error.errorCode)
+                }
+            }
+        }
     }
 }
 

@@ -1,0 +1,57 @@
+// SPDX-FileCopyrightText: Nextcloud GmbH
+// SPDX-FileCopyrightText: 2026 Marino Faggiana
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+import Foundation
+import Photos
+import NextcloudKit
+
+extension BackgroundUploadExtension {
+    /// Validates Photos access, feature settings, the active auto-upload account, and server support.
+    /// Configures the account's NextcloudKit session and returns `nil` when processing must be skipped.
+    func setupAccount() async -> tableAccount? {
+        guard PHPhotoLibrary.authorizationStatus(for: .readWrite) == .authorized else {
+            logInfo("Background upload account setup skipped: Photos authorization is not granted")
+            return nil
+        }
+
+        guard NCPreferences().shouldUseBackgroundUploadExtension else {
+            logInfo("Background upload account setup skipped: feature is disabled")
+            return nil
+        }
+
+        guard let account = await database.getTableAccountAsync(predicate: NSPredicate(format: "autoUploadStart == true")) else {
+            logInfo("Background upload account setup skipped: no Auto Upload account")
+            return nil
+        }
+
+        // The extension runs in its own process, so rebuild the in-memory session from shared account data.
+        NextcloudKit.shared.appendSession(
+            account: account.account,
+            urlBase: account.urlBase,
+            user: account.user,
+            userId: account.userId,
+            password: NCPreferences().getPassword(account: account.account),
+            userAgent: userAgent,
+            httpMaximumConnectionsPerHost: NCBrandOptions.shared.httpMaximumConnectionsPerHost,
+            httpMaximumConnectionsPerHostInDownload: NCBrandOptions.shared.httpMaximumConnectionsPerHostInDownload,
+            httpMaximumConnectionsPerHostInUpload: NCBrandOptions.shared.httpMaximumConnectionsPerHostInUpload,
+            groupIdentifier: NCBrandOptions.shared.capabilitiesGroup
+        )
+
+        guard let capabilities = await database.getCapabilities(account: account.account) else {
+            logError("Background upload account setup failed: capabilities not found for \(account.account)")
+            return nil
+        }
+
+        guard NCBrandOptions.shared.isServerVersion(
+            capabilities,
+            greaterOrEqualTo: .v35
+        ) else {
+            logInfo("Background upload extension stopped because account \(account.account) uses a server lower than version 35")
+            return nil
+        }
+
+        return account
+    }
+}

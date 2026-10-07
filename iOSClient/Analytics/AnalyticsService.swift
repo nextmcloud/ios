@@ -20,6 +20,7 @@ protocol AnalyticsService {
     func trackCreateFolder(isEncrypted: Bool, creationDate: Date)
     func trackEventWithMetadata(eventName: AnalyticEvents, metadata: tableMetadata)
     func displayInAppNotification()
+//    func displayInAppNotification()
 }
 
 // swiftlint:disable identifier_name

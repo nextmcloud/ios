@@ -8,40 +8,16 @@ import NextcloudKit
 import RealmSwift
 
 extension NCNetworking {
-    func cancelAllQueue() {
-        downloadThumbnailQueue.cancelAll()
-        downloadThumbnailActivityQueue.cancelAll()
-        downloadThumbnailTrashQueue.cancelAll()
-        downloadAvatarQueue.cancelAll()
-        saveLivePhotoQueue.cancelAll()
-    }
-
     func cancelAllTask() {
-        cancelAllQueue()
+        Task {
+            await NCTransferCoordinator.shared.cancelAll()
+        }
         cancelAllDataTask()
         cancelAllWaitTask()
-        cancelAllDownloadUploadTask()
-    }
-
-    func cancelAllDownloadTask() {
         cancelDownloadTasks()
         cancelDownloadBackgroundTask()
-    }
-
-    func cancelAllUploadTask() {
         cancelUploadTasks()
         cancelUploadBackgroundTask()
-    }
-
-    func cancelAllDownloadUploadTask() {
-        cancelAllDownloadTask()
-        cancelAllUploadTask()
-    }
-
-    func cancelAllTaskForGoInBackground() {
-        cancelAllQueue()
-        cancelDownloadTasks()
-        cancelUploadTasks()
     }
 
     // MARK: -
@@ -80,14 +56,16 @@ extension NCNetworking {
             }
         default:
             // DOWNLOAD
-            if metadata.session.contains("download") {
+            if metadata.session.contains("download") || global.metadataStatusDownloadingAllMode.contains(metadata.status) {
                 if metadata.session == sessionDownload {
                     cancelDownloadTasks(metadata: metadata)
                 } else if metadata.session == sessionDownloadBackground {
                     cancelDownloadBackgroundTask(metadata: metadata)
+                } else {
+                    await NCManageDatabase.shared.clearMetadatasSessionAsync(metadatas: [metadata])
                 }
                 await networking.transferDispatcher.notifyAllDelegates { delegate in
-                    delegate.transferChange(status: self.global.networkingStatusDownloadCancel,
+                    delegate.transferChange(networkingStatus: self.global.networkingStatusDownloadCancel,
                                             account: metadata.account,
                                             fileName: metadata.fileName,
                                             serverUrl: metadata.serverUrl,
@@ -97,7 +75,7 @@ extension NCNetworking {
                                             error: .success)
                 }
             // UPLOAD
-            } else if metadata.session.contains("upload") {
+            } else if metadata.session.contains("upload") || global.metadataStatusUploadingAllMode.contains(metadata.status) {
                 if metadata.session == nkComm.identifierSessionUpload {
                     cancelUploadTasks(metadata: metadata)
                 } else {
@@ -284,94 +262,105 @@ extension NCNetworking {
     // MARK: -
 
     func verifyZombie() async {
+        func removeMetadataAndLocalFile(_ metadata: tableMetadata) async {
+            await NCManageDatabase.shared.deleteMetadataAsync(id: metadata.ocId)
+            utilityFileSystem.removeFile(atPath: utilityFileSystem.getDirectoryProviderStorageOcId(metadata.ocId,
+                                                                                                   userId: metadata.userId,
+                                                                                                   urlBase: metadata.urlBase))
+        }
+
+        func restoreUploadIfPossible(_ metadata: tableMetadata) async {
+            guard NCUtilityFileSystem().fileProviderStorageExists(metadata) else {
+                await NCManageDatabase.shared.deleteMetadataAsync(id: metadata.ocId)
+                return
+            }
+
+            await NCManageDatabase.shared.setMetadataSessionAsync(ocId: metadata.ocId,
+                                                                  sessionError: "",
+                                                                  status: self.global.metadataStatusWaitUpload)
+        }
+
+        func restoreDownload(_ metadata: tableMetadata) async {
+            await NCManageDatabase.shared.setMetadataSessionAsync(ocId: metadata.ocId,
+                                                                  session: "",
+                                                                  sessionError: "",
+                                                                  selector: "",
+                                                                  status: self.global.metadataStatusNormal)
+        }
+
         // UPLOADING-FOREGROUND
         //
+        // PhotoKit jobs have neither a client URLSession task nor a local upload file.
+        // Restrict zombie recovery to traditional uploads so their Realm records remain intact.
         if let metadatas = await NCManageDatabase.shared.getMetadatasAsync(
-            predicate: NSPredicate(format: "session == %@ AND status == %d",
+            predicate: NSPredicate(format: "session == %@ AND status == %d AND backgroundUploadJobIdentifier == ''",
                                    sessionUpload,
-                                   self.global.metadataStatusUploading)) {
-            for metadata in metadatas {
-                guard let nkSession = nkComm.nksessions.session(forAccount: metadata.account) else {
-                    await NCManageDatabase.shared.deleteMetadataAsync(id: metadata.ocId)
-                    utilityFileSystem.removeFile(atPath: utilityFileSystem.getDirectoryProviderStorageOcId(metadata.ocId,
-                                                                                                           userId: metadata.userId,
-                                                                                                           urlBase: metadata.urlBase))
-                    continue
-                }
+                                   global.metadataStatusUploading)) {
+            let metadatasByAccount = Dictionary(grouping: metadatas, by: \.account)
 
-                // Verify in Metadata Transfer Success
-                guard await !metadataTranfersSuccess.exists(serverUrlFileName: metadata.serverUrlFileName) else {
-                    continue
-                }
-
-                var foundTask = false
-                let tasks = await nkSession.sessionData.session.tasks
-
-                for task in tasks.1 { // ([URLSessionDataTask], [URLSessionUploadTask], [URLSessionDownloadTask])
-                    if metadata.sessionTaskIdentifier == task.taskIdentifier {
-                        foundTask = true
+            for (account, accountMetadatas) in metadatasByAccount {
+                guard let nkSession = nkComm.nksessions.session(forAccount: account) else {
+                    for metadata in accountMetadatas {
+                        await removeMetadataAndLocalFile(metadata)
                     }
+                    continue
                 }
 
-                if !foundTask {
-                    if NCUtilityFileSystem().fileProviderStorageExists(metadata) {
-                        await NCManageDatabase.shared.setMetadataSessionAsync(ocId: metadata.ocId,
-                                                                              sessionError: "",
-                                                                              status: self.global.metadataStatusWaitUpload)
-                    } else {
-                        await NCManageDatabase.shared.deleteMetadataAsync(id: metadata.ocId)
+                let tasks = await nkSession.sessionData.session.tasks
+                let taskIdentifiers = Set(tasks.1.map(\.taskIdentifier))
+
+                for metadata in accountMetadatas {
+                    guard await !metadataUploadTranfersSuccess.exists(serverUrlFileName: metadata.serverUrlFileName) else {
+                        continue
+                    }
+
+                    guard taskIdentifiers.contains(metadata.sessionTaskIdentifier) else {
+                        await restoreUploadIfPossible(metadata)
+                        continue
                     }
                 }
             }
         }
 
-        // UPLOADING-BACKGROUND, NO sessionUploadBackgroundExt
+        // UPLOADING-BACKGROUND
         //
+        // Apply the same exclusion to background URLSession uploads managed by the host app.
         if let metadatas = await NCManageDatabase.shared.getMetadatasAsync(
-            predicate: NSPredicate(format: "(session == %@ OR session == %@) AND status == %d",
-                                   sessionUploadBackground,
-                                   sessionUploadBackgroundWWan,
-                                   self.global.metadataStatusUploading)) {
-            for metadata in metadatas {
-                guard var nkSession = nkComm.nksessions.session(forAccount: metadata.account) else {
-                    await NCManageDatabase.shared.deleteMetadataAsync(id: metadata.ocId)
-                    utilityFileSystem.removeFile(atPath: utilityFileSystem.getDirectoryProviderStorageOcId(metadata.ocId,
-                                                                                                           userId: metadata.userId,
-                                                                                                           urlBase: metadata.urlBase))
-                    continue
-                }
-                var session: URLSession?
+            predicate: NSPredicate(format: "session IN %@ AND status == %d AND backgroundUploadJobIdentifier == ''",
+                                   [sessionUploadBackground,
+                                    sessionUploadBackgroundWWan],
+                                   global.metadataStatusUploading)) {
+            let metadatasByAccount = Dictionary(grouping: metadatas, by: \.account)
 
-                if metadata.session == sessionUploadBackground {
-                    session = nkSession.sessionUploadBackground
-                } else if metadata.session == sessionUploadBackgroundWWan {
-                    session = nkSession.sessionUploadBackgroundWWan
-                } else if metadata.session == sessionUploadBackgroundExt {
-                    session = nkSession.sessionUploadBackgroundExt
-                }
-
-                var foundTask = false
-                guard let tasks = await session?.allTasks else {
-                    await NCManageDatabase.shared.deleteMetadataAsync(id: metadata.ocId)
-                    utilityFileSystem.removeFile(atPath: utilityFileSystem.getDirectoryProviderStorageOcId(metadata.ocId,
-                                                                                                           userId: metadata.userId,
-                                                                                                           urlBase: metadata.urlBase))
-                    continue
-                }
-
-                for task in tasks {
-                    if metadata.sessionTaskIdentifier == task.taskIdentifier {
-                        foundTask = true
+            for (account, accountMetadatas) in metadatasByAccount {
+                guard let nkSession = nkComm.nksessions.session(forAccount: account) else {
+                    for metadata in accountMetadatas {
+                        await removeMetadataAndLocalFile(metadata)
                     }
+                    continue
                 }
 
-                if !foundTask {
-                    if NCUtilityFileSystem().fileProviderStorageExists(metadata) {
-                        await NCManageDatabase.shared.setMetadataSessionAsync(ocId: metadata.ocId,
-                                                                              sessionError: "",
-                                                                              status: self.global.metadataStatusWaitUpload)
-                    } else {
-                        await NCManageDatabase.shared.deleteMetadataAsync(id: metadata.ocId)
+                let backgroundTaskIdentifiers = Set((await nkSession.sessionUploadBackground.allTasks).map(\.taskIdentifier))
+                let backgroundWWanTaskIdentifiers = Set((await nkSession.sessionUploadBackgroundWWan.allTasks).map(\.taskIdentifier))
+
+                for metadata in accountMetadatas {
+                    guard await !metadataUploadTranfersSuccess.exists(serverUrlFileName: metadata.serverUrlFileName) else {
+                        continue
+                    }
+
+                    let taskIdentifiers: Set<Int>
+                    switch metadata.session {
+                    case sessionUploadBackground:
+                        taskIdentifiers = backgroundTaskIdentifiers
+                    case sessionUploadBackgroundWWan:
+                        taskIdentifiers = backgroundWWanTaskIdentifiers
+                    default:
+                        taskIdentifiers = []
+                    }
+
+                    guard taskIdentifiers.contains(metadata.sessionTaskIdentifier) else {
+                        await restoreUploadIfPossible(metadata)
+                        continue
                     }
                 }
             }
@@ -382,30 +371,25 @@ extension NCNetworking {
         if let metadatas = await NCManageDatabase.shared.getMetadatasAsync(
             predicate: NSPredicate(format: "session == %@ AND status IN %@",
                                    sessionDownload,
-                                   self.global.metadataStatusDownloadingAllMode)) {
-            for metadata in metadatas {
-                guard let nkSession = nkComm.nksessions.session(forAccount: metadata.account) else {
-                    await NCManageDatabase.shared.deleteMetadataAsync(id: metadata.ocId)
-                    utilityFileSystem.removeFile(atPath: utilityFileSystem.getDirectoryProviderStorageOcId(metadata.ocId,
-                                                                                                           userId: metadata.userId,
-                                                                                                           urlBase: metadata.urlBase))
+                                   global.metadataStatusDownloadingAllMode)) {
+            let metadatasByAccount = Dictionary(grouping: metadatas, by: \.account)
+
+            for (account, accountMetadatas) in metadatasByAccount {
+                guard let nkSession = nkComm.nksessions.session(forAccount: account) else {
+                    for metadata in accountMetadatas {
+                        await removeMetadataAndLocalFile(metadata)
+                    }
                     continue
                 }
-                var foundTask = false
+
                 let tasks = await nkSession.sessionData.session.tasks
+                let taskIdentifiers = Set(tasks.2.map(\.taskIdentifier))
 
-                for task in tasks.2 { // ([URLSessionDataTask], [URLSessionUploadTask], [URLSessionDownloadTask])
-                    if metadata.sessionTaskIdentifier == task.taskIdentifier {
-                        foundTask = true
+                for metadata in accountMetadatas where !taskIdentifiers.contains(metadata.sessionTaskIdentifier) {
+                    guard await !metadataDownloadTranfersSuccess.exists(serverUrlFileName: metadata.serverUrlFileName) else {
+                        continue
                     }
-                }
-
-                if !foundTask {
-                    await NCManageDatabase.shared.setMetadataSessionAsync(ocId: metadata.ocId,
-                                                                          session: "",
-                                                                          sessionError: "",
-                                                                          selector: "",
-                                                                          status: self.global.metadataStatusNormal)
+                    await restoreDownload(metadata)
                 }
             }
         }
@@ -415,30 +399,24 @@ extension NCNetworking {
         if let metadatas = await NCManageDatabase.shared.getMetadatasAsync(
             predicate: NSPredicate(format: "session == %@ AND status == %d",
                                    sessionDownloadBackground,
-                                   self.global.metadataStatusDownloading)) {
-            for metadata in metadatas {
-                guard let nkSession = nkComm.nksessions.session(forAccount: metadata.account) else {
-                    await NCManageDatabase.shared.deleteMetadataAsync(id: metadata.ocId)
-                    utilityFileSystem.removeFile(atPath: utilityFileSystem.getDirectoryProviderStorageOcId(metadata.ocId,
-                                                                                                           userId: metadata.userId,
-                                                                                                           urlBase: metadata.urlBase))
+                                   global.metadataStatusDownloading)) {
+            let metadatasByAccount = Dictionary(grouping: metadatas, by: \.account)
+
+            for (account, accountMetadatas) in metadatasByAccount {
+                guard let nkSession = nkComm.nksessions.session(forAccount: account) else {
+                    for metadata in accountMetadatas {
+                        await removeMetadataAndLocalFile(metadata)
+                    }
                     continue
                 }
-                var foundTask = false
-                let tasks = await nkSession.sessionDownloadBackground.allTasks
 
-                for task in tasks {
-                    if metadata.sessionTaskIdentifier == task.taskIdentifier {
-                        foundTask = true
+                let taskIdentifiers = Set((await nkSession.sessionDownloadBackground.allTasks).map(\.taskIdentifier))
+
+                for metadata in accountMetadatas where !taskIdentifiers.contains(metadata.sessionTaskIdentifier) {
+                    guard await !metadataDownloadTranfersSuccess.exists(serverUrlFileName: metadata.serverUrlFileName) else {
+                        continue
                     }
-                }
-
-                if !foundTask {
-                    await NCManageDatabase.shared.setMetadataSessionAsync(ocId: metadata.ocId,
-                                                                          session: "",
-                                                                          sessionError: "",
-                                                                          selector: "",
-                                                                          status: self.global.metadataStatusNormal)
+                    await restoreDownload(metadata)
                 }
             }
         }

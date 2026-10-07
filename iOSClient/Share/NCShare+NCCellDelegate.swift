@@ -1,27 +1,9 @@
-//
-//  NCShare+NCCellDelegate.swift
-//  Nextcloud
-//
-//  Created by Henrik Storch on 03.01.22.
-//  Copyright © 2022 Henrik Storch. All rights reserved.
-//
-//  Author Henrik Storch <henrik.storch@nextcloud.com>
-//
-//  This program is free software: you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
-//  the Free Software Foundation, either version 3 of the License, or
-//  (at your option) any later version.
-//
-//  This program is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
-//
-//  You should have received a copy of the GNU General Public License
-//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-//
+// SPDX-FileCopyrightText: Nextcloud GmbH
+// SPDX-FileCopyrightText: 2022 Henrik Storch
+// SPDX-License-Identifier: GPL-3.0-or-later
 
 import UIKit
+import NextcloudKit
 
 // MARK: - NCCell Delegates
 extension NCShare: NCShareLinkCellDelegate, NCShareUserCellDelegate {
@@ -48,13 +30,20 @@ extension NCShare: NCShareLinkCellDelegate, NCShareUserCellDelegate {
         }
         NCShareCommon.copyLink(link: tableShare.url, viewController: self, sender: sender)
     }
-
+    
     func tapMenu(with tableShare: tableShare?, sender: Any) {
         // Menu is now shown via native context menu on the button
         // Only handle the case where there's no tableShare (add new link)
         if tableShare == nil {
             self.makeNewLinkShare()
         }
+//        if let tableShare = tableShare {
+//            
+//            self.toggleShareMenu(for: tableShare, sendMail: (tableShare.shareType != NKShare.ShareType.publicLink.rawValue), folder: metadata?.directory ?? false, sender: sender)
+//            
+//        } else {
+//            self.makeNewLinkShare()
+//        }
     }
 
     func tapProfileMenu(with tableShare: tableShare?) -> UIMenu? {

@@ -188,4 +188,12 @@ class NCTrash: UIViewController, NCTrashListCellDelegate, NCTrashGridCellDelegat
             return filePath + "/"
         }
     }
+
+    /// Refreshes the trash view after a mutation (e.g., delete/restore) so items show up immediately.
+    @MainActor
+    func reloadAfterTrashMutation() async {
+        // Update menu and data source, then fetch latest listing
+        await self.reloadDataSource()
+        await self.loadListingTrash()
+    }
 }

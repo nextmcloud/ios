@@ -10,6 +10,7 @@
 	<array>
 		<string>group.de.magentacloud.next.dev2.client.apps</string>
 		<string>group.de.magentacloud.next.dev2.client</string>
+		<string>group.com.t-systems.pu-ds.magentacloud.qa</string>
 	</array>
 	<key>com.apple.security.device.audio-input</key>
 	<true/>
@@ -24,6 +25,7 @@
 	<key>keychain-access-groups</key>
 	<array>
 		<string>$(AppIdentifierPrefix)de.magentacloud.next.dev2.client</string>
+		<string>$(AppIdentifierPrefix)MagentaCLOUD</string>
 	</array>
     <key>aps-environment</key>
     <string>development</string>

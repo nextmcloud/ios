@@ -60,7 +60,7 @@
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" id="Fwc-r9-U6E">
-                        <barButtonItem key="leftBarButtonItem" title="Item" id="hMa-Vi-h4E">
+                        <barButtonItem key="rightBarButtonItem" title="Item" id="hMa-Vi-h4E">
                             <connections>
                                 <action selector="actionCancel:" destination="BYZ-38-t0r" id="weO-9n-QVj"/>
                             </connections>

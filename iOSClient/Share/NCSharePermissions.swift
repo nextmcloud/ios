@@ -97,6 +97,10 @@ enum NCSharePermissions {
         }
 //        if canDelete && isDirectory {
 //            permission = permission + permissionDeleteShare
+            permission = permission + NKShare.Permission.update.rawValue
+        }
+//        if canDelete && isDirectory {
+//            permission = permission + NKShare.Permission.delete.rawValue
 //        }
         if canShare {
             permission = permission + permissionReshareShare

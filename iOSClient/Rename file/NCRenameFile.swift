@@ -84,6 +84,13 @@ class NCRenameFile: UIViewController, UITextFieldDelegate {
             }
 
             previewFile.image = imagePreview
+            NCUtility().createImageFileFrom(metadata: metadata)
+            if let image = NCUtility().getImage(ocId: metadata.ocId, etag: metadata.etag, ext: NCGlobal.shared.previewExt512, userId: metadata.userId, urlBase: metadata.urlBase) {
+                Task { @MainActor in
+                    previewFile.image = image
+                }
+            }
+
             previewFile.layer.cornerRadius = 10
             previewFile.layer.masksToBounds = true
 
@@ -91,6 +98,7 @@ class NCRenameFile: UIViewController, UITextFieldDelegate {
 
                 if imagePreview == nil {
                     previewFile.image = imageCache.getFolder(account: metadata.account)
+                    previewFile.image = imageCache.getFolder()
                 }
 
                 ext.isHidden = true
@@ -134,6 +142,7 @@ class NCRenameFile: UIViewController, UITextFieldDelegate {
         cancelButton.layer.borderWidth = 0.3
         cancelButton.layer.borderColor = NCBrandColor.shared.iconImageColor.cgColor
         
+
         renameButton.setTitle(NSLocalizedString("_rename_", comment: ""), for: .normal)
         renameButton.setTitleColor(NCBrandColor.shared.brandText, for: .normal)
         renameButton.layer.cornerRadius = 5
@@ -143,6 +152,9 @@ class NCRenameFile: UIViewController, UITextFieldDelegate {
 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+
+        // Re-evaluate in-app messages after viewDidAppear
+        MoEngageAnalytics.shared.displayInAppNotificationSafely(reason: "viewDidAppear")
 
         if metadata == nil && fileName == nil {
             dismiss(animated: true)

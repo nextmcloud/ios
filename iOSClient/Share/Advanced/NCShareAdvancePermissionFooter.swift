@@ -1,29 +1,10 @@
-//
-//  NCShareAdvancePermissionFooter.swift
-//  Nextcloud
-//
-//  Created by T-systems on 09/08/21.
-//  Copyright © 2022 Henrik Storch. All rights reserved.
-//
-//  Author Henrik Storch <henrik.storch@nextcloud.com>
-//
-//  This program is free software: you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
-//  the Free Software Foundation, either version 3 of the License, or
-//  (at your option) any later version.
-//
-//  This program is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
-//
-//  You should have received a copy of the GNU General Public License
-//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-//
+// SPDX-FileCopyrightText: Nextcloud GmbH
+// SPDX-FileCopyrightText: 2022 Henrik Storch
+// SPDX-License-Identifier: GPL-3.0-or-later
 
 import UIKit
 
-protocol NCShareAdvanceFooterDelegate: AnyObject {
+protocol NCShareAdvanceFotterDelegate: AnyObject {
     var isNewShare: Bool { get }
     func dismissShareAdvanceView(shouldSave: Bool)
 }
@@ -31,9 +12,9 @@ protocol NCShareAdvanceFooterDelegate: AnyObject {
 class NCShareAdvancePermissionFooter: UIView {
     @IBOutlet weak var buttonCancel: UIButton!
     @IBOutlet weak var buttonNext: UIButton!
-    weak var delegate: NCShareAdvanceFooterDelegate?
+    weak var delegate: NCShareAdvanceFotterDelegate?
 
-    func setupUI(delegate: NCShareAdvanceFooterDelegate?, account: String) {
+    func setupUI(delegate: NCShareAdvanceFotterDelegate?, account: String) {
         self.delegate = delegate
         buttonCancel.addTarget(self, action: #selector(cancelClicked), for: .touchUpInside)
         buttonNext.addTarget(self, action: #selector(nextClicked), for: .touchUpInside)

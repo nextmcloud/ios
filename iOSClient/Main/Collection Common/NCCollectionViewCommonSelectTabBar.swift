@@ -17,6 +17,8 @@ protocol NCCollectionViewCommonSelectTabBarDelegate: AnyObject {
 }
 
 class NCCollectionViewCommonSelectTabBar: ObservableObject {
+    static let height: CGFloat = 83
+
     var controller: NCMainTabBarController?
     var hostingController: UIViewController?
     open weak var delegate: NCCollectionViewCommonSelectTabBarDelegate?
@@ -26,6 +28,7 @@ class NCCollectionViewCommonSelectTabBar: ObservableObject {
     @Published var isAnyDirectory = false
     @Published var isAllDirectory = false
     @Published var isAnyLocked = false
+    @Published var isAnyEncrypted = false
     @Published var canUnlock = true
     @Published var enableLock = false
     @Published var isSelectedEmpty = true
@@ -41,8 +44,6 @@ class NCCollectionViewCommonSelectTabBar: ObservableObject {
             return
         }
         let rootView = NCCollectionViewCommonSelectTabBarView(tabBarSelect: self)
-        let bottomAreaInsets: CGFloat = controller.tabBar.safeAreaInsets.bottom == 0 ? 34 : 0
-        let height = controller.tabBar.frame.height + bottomAreaInsets
         hostingController = UIHostingController(rootView: rootView)
         guard let hostingController else {
             return
@@ -61,7 +62,7 @@ class NCCollectionViewCommonSelectTabBar: ObservableObject {
             hostingController.view.leadingAnchor.constraint(equalTo: viewController.view.leadingAnchor),
             hostingController.view.trailingAnchor.constraint(equalTo: viewController.view.trailingAnchor),
             hostingController.view.bottomAnchor.constraint(equalTo: viewController.view.bottomAnchor),
-            hostingController.view.heightAnchor.constraint(equalToConstant: height)
+            hostingController.view.heightAnchor.constraint(equalToConstant: Self.height)
         ])
     }
 
@@ -72,6 +73,8 @@ class NCCollectionViewCommonSelectTabBar: ObservableObject {
         }
 
         controller.hide()
+
+        NotificationCenter.default.post(name: Notification.Name("NCSelectionModeDidBegin"), object: nil)
 
         if hostingController.view.isHidden {
             hostingController.view.isHidden = false
@@ -89,6 +92,9 @@ class NCCollectionViewCommonSelectTabBar: ObservableObject {
         }
 
         hostingController.view.isHidden = true
+        
+        NotificationCenter.default.post(name: Notification.Name("NCSelectionModeDidEnd"), object: nil)
+
         controller.show()
     }
 
@@ -100,6 +106,7 @@ class NCCollectionViewCommonSelectTabBar: ObservableObject {
             isAnyDirectory = false
             isAllDirectory = true
             isAnyLocked = false
+            isAnyEncrypted = false
             canUnlock = true
             self.metadatas = metadatas
 
@@ -119,6 +126,11 @@ class NCCollectionViewCommonSelectTabBar: ObservableObject {
                     if metadata.lockOwner != userId {
                         canUnlock = false
                     }
+                }
+
+                // If any selected item is end-to-end encrypted, mark it so we can hide copy/move
+                if metadata.isDirectoryE2EE || metadata.e2eEncrypted {
+                    isAnyEncrypted = true
                 }
 
                 guard !isAnyOffline else { continue }
@@ -166,7 +178,7 @@ struct NCCollectionViewCommonSelectTabBarView: View {
                 }
                 .tint(Color(NCBrandColor.shared.iconImageColor))
                 .frame(maxWidth: .infinity)
-                .disabled(tabBarSelect.isSelectedEmpty)
+                .disabled(tabBarSelect.isSelectedEmpty || tabBarSelect.isAnyEncrypted)
 
                 Button {
                     tabBarSelect.delegate?.delete()

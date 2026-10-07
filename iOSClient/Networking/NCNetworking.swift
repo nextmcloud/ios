@@ -4,13 +4,13 @@
 
 #if !EXTENSION_FILE_PROVIDER_EXTENSION
 import OpenSSL
-import Queuer
 import SwiftUI
 #endif
 
 import UIKit
 import NextcloudKit
 import Alamofire
+import Queuer
 
 protocol ClientCertificateDelegate: AnyObject {
     func onIncorrectPassword()
@@ -20,7 +20,7 @@ protocol ClientCertificateDelegate: AnyObject {
 protocol NCTransferDelegate: AnyObject {
     var sceneIdentifier: String { get }
 
-    func transferChange(status: String,
+    func transferChange(networkingStatus: String,
                         account: String,
                         fileName: String,
                         serverUrl: String,
@@ -35,6 +35,209 @@ protocol NCTransferDelegate: AnyObject {
                                    totalBytesExpected: Int64,
                                    fileName: String,
                                    serverUrl: String)
+}
+
+enum NCServerCertificateTrustStatus: Sendable {
+    case systemTrusted
+    case userTrusted
+    case untrusted
+}
+
+extension NCTransferDelegate {
+    func transferChange(status: String,
+                        account: String,
+                        fileName: String,
+                        serverUrl: String,
+                        selector: String?,
+                        ocId: String,
+                        destination: String?,
+                        error: NKError) {}
+    func transferReloadData(serverUrl: String?, requestData: Bool, status: Int?) {}
+    func transferProgressDidUpdate(progress: Float,
+                                   totalBytes: Int64,
+                                   totalBytesExpected: Int64,
+                                   fileName: String,
+                                   serverUrl: String) {}
+}
+
+/// Actor-based delegate dispatcher using weak references.
+actor NCTransferDelegateDispatcher {
+    // Weak reference collection of delegates
+    private var transferDelegates = NSHashTable<AnyObject>.weakObjects()
+
+    /// Adds a delegate safely.
+    func addDelegate(_ delegate: NCTransferDelegate) {
+        transferDelegates.add(delegate)
+    }
+
+    /// Remove a delegate safely.
+    func removeDelegate(_ delegate: NCTransferDelegate) {
+        transferDelegates.remove(delegate)
+    }
+
+    /// Notifies all delegates.
+    func notifyAllDelegates(_ block: (NCTransferDelegate) -> Void) {
+        let delegatesCopy = transferDelegates.allObjects.compactMap { $0 as? NCTransferDelegate }
+        for delegate in delegatesCopy {
+            block(delegate)
+        }
+    }
+
+    func notifyAllDelegatesAsync(_ block: @escaping (NCTransferDelegate) async -> Void) async {
+        let delegatesCopy = transferDelegates.allObjects.compactMap { $0 as? NCTransferDelegate }
+        for delegate in delegatesCopy {
+            await block(delegate)
+        }
+    }
+
+    /// Notifies the delegate for a specific scene.
+    func notifyDelegate(forScene sceneIdentifier: String, _ block: (NCTransferDelegate) -> Void) {
+        let delegatesCopy = transferDelegates.allObjects.compactMap { $0 as? NCTransferDelegate }
+        for delegate in delegatesCopy {
+            if delegate.sceneIdentifier == sceneIdentifier {
+                block(delegate)
+            }
+        }
+    }
+
+    /// Notifies matching and non-matching delegates for a specific scene.
+    func notifyDelegates(forScene sceneIdentifier: String,
+                         matching: (NCTransferDelegate) -> Void,
+                         others: (NCTransferDelegate) -> Void) {
+        let delegatesCopy = transferDelegates.allObjects.compactMap { $0 as? NCTransferDelegate }
+        for delegate in delegatesCopy {
+            if delegate.sceneIdentifier == sceneIdentifier {
+                matching(delegate)
+            } else {
+                others(delegate)
+            }
+        }
+    }
+}
+
+/// A thread-safe registry for tracking in-flight `URLSessionTask` instances.
+///
+/// Each task is associated with a string identifier (`identifier`) that you define,
+/// allowing you to check whether a request is already running, avoid duplicates,
+/// and cancel all active tasks at once. The registry automatically removes
+/// completed tasks via `cleanupCompleted()` to keep memory usage compact.
+///
+/// Typical use cases:
+/// - Ensure only one task per identifier is active at a time.
+/// - Query whether a specific request is still running (`isReading`).
+/// - Forcefully stop a specific request (`cancel`).
+/// - Forcefully stop all tasks when leaving a screen (`cancelAll`).
+actor NetworkingTasks {
+    private var active: [(identifier: String, task: URLSessionTask)] = []
+
+    /// Returns whether there is an in-flight task for the given URL.
+    ///
+    /// A task is considered in-flight if its `state` is `.running` or `.suspended`.
+    /// - Parameter identifier: The identifier to check.
+    /// - Returns: `true` if a matching in-flight task exists; otherwise `false`.
+    func isReading(identifier: String) -> Bool {
+        // Drop finished/canceling tasks globally
+        cleanup()
+
+        return active.contains {
+            $0.identifier == identifier && ($0.task.state == .running || $0.task.state == .suspended)
+        }
+    }
+
+    /// Tracks a newly created `URLSessionTask` for the given identifier.
+    ///
+    /// If a running entry for the same identifier exists, it is removed before appending the new one.
+    /// - Parameters:
+    ///   - identifier: The identifier associated with the task.
+    ///   - task: The `URLSessionTask` to track.
+    func track(identifier: String, task: URLSessionTask) {
+        // Drop finished/canceling tasks globally
+        cleanup()
+
+        active.removeAll {
+            $0.identifier == identifier && $0.task.state == .running
+        }
+        active.append((identifier, task))
+        nkLog(tag: NCGlobal.shared.logNetworkingTasks, emoji: .start, message: "Start task for identifier: \(identifier)", consoleOnly: true)
+    }
+
+    /// create a Identifier
+    ///
+    func createIdentifier(account: String? = nil, path: String? = nil, name: String) -> String {
+        if let account,
+           let path {
+            return account + "_" + path + "_" + name
+        } else if let path {
+            return path + "_" + name
+        } else {
+            return name
+        }
+    }
+
+    /// Cancels and removes all tasks associated with the given id.
+    ///
+    /// - Parameter identifier: The identifier whose tasks should be canceled.
+    func cancel(identifier: String) {
+        // Drop finished/canceling tasks globally
+        cleanup()
+
+        for element in active where element.identifier == identifier {
+            element.task.cancel()
+            nkLog(tag: NCGlobal.shared.logNetworkingTasks, emoji: .cancel, message: "Cancel task for identifier: \(identifier)", consoleOnly: true)
+        }
+        active.removeAll {
+            $0.identifier == identifier
+        }
+    }
+
+    /// Cancels all tracked `URLSessionTask` and clears the registry.
+    ///
+    /// Call this when leaving the page/screen or when the operation must be forcefully stopped.
+    func cancelAll() {
+        active.forEach {
+            $0.task.cancel()
+            nkLog(tag: NCGlobal.shared.logNetworkingTasks, emoji: .cancel, message: "Cancel task with identifier: \($0.identifier)", consoleOnly: true)
+        }
+        active.removeAll()
+    }
+
+    /// Removes tasks that have completed from the registry.
+    ///
+    /// Useful to keep the in-memory list compact during long-running operations.
+    func cleanup() {
+        active.removeAll {
+            $0.task.state == .completed || $0.task.state == .canceling
+        }
+    }
+}
+
+/// Quantizes per-task progress updates to integer percentages (0...100).
+/// Each (serverUrlFileName) pair is tracked separately, so you get
+/// at most one update per integer percent for each transfer.
+actor ProgressQuantizer {
+    private var lastPercent: [String: Int] = [:]
+
+    /// Returns `true` only when integer percent changes (or hits 100).
+    ///
+    /// - Parameters:
+    ///   - serverUrlFileName: The name of the file being transferred.
+    ///   - fraction: Progress fraction [0.0 ... 1.0].
+    func shouldEmit(serverUrlFileName: String, fraction: Double) -> Bool {
+        let percent = min(max(Int((fraction * 100).rounded(.down)), 0), 100)
+
+        let last = lastPercent[serverUrlFileName] ?? -1
+        guard percent != last || percent == 100 else {
+            return false
+        }
+
+        lastPercent[serverUrlFileName] = percent
+        return true
+    }
+
+    /// Clears stored state for a finished transfer.
+    func clear(serverUrlFileName: String) {
+        lastPercent.removeValue(forKey: serverUrlFileName)
+    }
 }
 
 class NCNetworking: @unchecked Sendable, NextcloudKitDelegate {
@@ -59,6 +262,12 @@ class NCNetworking: @unchecked Sendable, NextcloudKitDelegate {
     let backgroundSession = NKBackground(nkCommonInstance: NextcloudKit.shared.nkCommonInstance)
     let nkComm = NextcloudKit.shared.nkCommonInstance
 
+    private let certificateTrustStatusQueue = DispatchQueue(
+        label: "com.nextcloud.networking.certificate-trust-status",
+        attributes: .concurrent
+    )
+    private var certificateTrustStatuses: [String: NCServerCertificateTrustStatus] = [:]
+
     var lastReachability: Bool = true
     var networkReachability: NKTypeReachability?
     weak var certificateDelegate: ClientCertificateDelegate?
@@ -80,10 +289,15 @@ class NCNetworking: @unchecked Sendable, NextcloudKitDelegate {
 
     // Actors
     let transferDispatcher = NCTransferDelegateDispatcher()
-    let networkingTasks = NetworkingTasks()
     let progressQuantizer = ProgressQuantizer()
 
 #if !EXTENSION
+    let metadataDownloadTranfersSuccess = NCMetadataDownloadTranfersSuccess()
+    let metadataUploadTranfersSuccess = NCMetadataUploadTranfersSuccess()
+    // OPERATIONQUEUE
+    let downloadThumbnailQueue = Queuer(name: "downloadThumbnailQueue", maxConcurrentOperationCount: 10, qualityOfService: .default)
+    let fileExistsQueue = Queuer(name: "fileExistsQueue", maxConcurrentOperationCount: 10, qualityOfService: .default)
+
     let metadataTranfersSuccess = NCMetadataTranfersSuccess()
 
     // OPERATIONQUEUE
@@ -92,7 +306,9 @@ class NCNetworking: @unchecked Sendable, NextcloudKitDelegate {
     let downloadThumbnailTrashQueue = Queuer(name: "downloadThumbnailTrashQueue", maxConcurrentOperationCount: 10, qualityOfService: .default)
     let saveLivePhotoQueue = Queuer(name: "saveLivePhotoQueue", maxConcurrentOperationCount: 1, qualityOfService: .default)
     let downloadAvatarQueue = Queuer(name: "downloadAvatarQueue", maxConcurrentOperationCount: 10, qualityOfService: .default)
+    let fileExistsQueue = Queuer(name: "fileExistsQueue", maxConcurrentOperationCount: 10, qualityOfService: .default)
 #endif
+    let downloadQueue = Queuer(name: "downloadQueue", maxConcurrentOperationCount: NCBrandOptions.shared.httpMaximumConnectionsPerHostInDownload, qualityOfService: .default)
 
     // MARK: - init
 
@@ -145,6 +361,40 @@ class NCNetworking: @unchecked Sendable, NextcloudKitDelegate {
 
     func request<Value>(_ request: DataRequest, didParseResponse response: AFDataResponse<Value>) { }
 
+    func certificateTrustStatus(for host: String) -> NCServerCertificateTrustStatus? {
+        guard !host.isEmpty else {
+            return nil
+        }
+
+        return certificateTrustStatusQueue.sync {
+            certificateTrustStatuses[host.lowercased()]
+        }
+    }
+
+    func requiresUserTrustedCertificate(for host: String) -> Bool {
+        certificateTrustStatus(for: host) == .userTrusted
+    }
+
+    func resetCertificateTrustStatus(for host: String) {
+        guard !host.isEmpty else {
+            return
+        }
+
+        _ = certificateTrustStatusQueue.sync(flags: .barrier) {
+            certificateTrustStatuses.removeValue(forKey: host.lowercased())
+        }
+    }
+
+    private func setCertificateTrustStatus(_ status: NCServerCertificateTrustStatus, for host: String) {
+        guard !host.isEmpty else {
+            return
+        }
+
+        certificateTrustStatusQueue.async(flags: .barrier) {
+            self.certificateTrustStatuses[host.lowercased()] = status
+        }
+    }
+
     // MARK: - Pinning check
 
     public func checkTrustedChallenge(_ session: URLSession,
@@ -161,6 +411,12 @@ class NCNetworking: @unchecked Sendable, NextcloudKitDelegate {
         }
 #else
         let protectionSpace = challenge.protectionSpace
+
+        guard protectionSpace.authenticationMethod == NSURLAuthenticationMethodServerTrust else {
+            completionHandler(.performDefaultHandling, nil)
+            return
+        }
+
         let directoryCertificate = utilityFileSystem.directoryCertificates
         let host = protectionSpace.host
         let certificateSavedPath = (directoryCertificate as NSString).appendingPathComponent("\(host).der")
@@ -168,6 +424,7 @@ class NCNetworking: @unchecked Sendable, NextcloudKitDelegate {
         guard let trust = protectionSpace.serverTrust,
               let certificates = SecTrustCopyCertificateChain(trust) as? [SecCertificate],
               let certificate = certificates.first else {
+            setCertificateTrustStatus(.untrusted, for: host)
             completionHandler(.performDefaultHandling, nil)
             return
         }
@@ -184,19 +441,25 @@ class NCNetworking: @unchecked Sendable, NextcloudKitDelegate {
             let tmpPath = (directoryCertificate as NSString).appendingPathComponent("\(host).tmp")
             try? certificateData.write(to: URL(fileURLWithPath: tmpPath), options: .atomic)
 
-            var isTrusted = false
+            let trustStatus: NCServerCertificateTrustStatus
 
             if isServerTrusted {
-                isTrusted = true
+                trustStatus = .systemTrusted
             } else if let savedData = try? Data(contentsOf: URL(fileURLWithPath: certificateSavedPath)),
                       savedData == certificateData {
-                isTrusted = true
+                trustStatus = .userTrusted
+            } else {
+                trustStatus = .untrusted
             }
 
+            self.setCertificateTrustStatus(trustStatus, for: host)
+
             DispatchQueue.main.async {
-                if isTrusted {
+                switch trustStatus {
+                case .systemTrusted, .userTrusted:
                     completionHandler(.useCredential, URLCredential(trust: trust))
-                } else {
+
+                case .untrusted:
                     (UIApplication.shared.delegate as? AppDelegate)?.trustCertificateError(host: host)
                     completionHandler(.performDefaultHandling, nil)
                 }

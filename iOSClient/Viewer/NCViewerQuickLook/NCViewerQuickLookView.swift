@@ -27,7 +27,12 @@ struct NCViewerQuickLookView: UIViewControllerRepresentable {
         model.startTimer(navigationItem: controller.navigationItem)
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-            if model.previewStore[index].assetType == .livePhoto && model.previewStore[index].asset.type == .livePhoto && model.previewStore[index].data == nil {
+            if index < model.previewStore.count,
+               let asset = model.previewStore[index].asset,
+               model.previewStore[index].assetType == .livePhoto,
+               asset.type == .livePhoto,
+               model.previewStore[index].data == nil {
+
                 Task {
                     let windowScene = SceneManager.shared.getWindowScene(controller: self.model.controller)
                     await showInfoBanner(windowScene: windowScene, text: "_message_disable_livephoto_")
@@ -56,9 +61,7 @@ struct NCViewerQuickLookView: UIViewControllerRepresentable {
             super.init()
 
             NotificationCenter.default.addObserver(forName: UIApplication.didEnterBackgroundNotification, object: nil, queue: nil) { _ in
-                Task {
-                    await parent.model.stopTimer()
-                }
+                parent.model.stopTimer()
             }
 
             NotificationCenter.default.addObserver(forName: UIApplication.didBecomeActiveNotification, object: nil, queue: nil) { [weak self] _ in
@@ -66,9 +69,7 @@ struct NCViewerQuickLookView: UIViewControllerRepresentable {
                       let navigationItem = self.viewController?.navigationItem else {
                     return
                 }
-                Task {
-                    await parent.model.startTimer(navigationItem: navigationItem)
-                }
+                parent.model.startTimer(navigationItem: navigationItem)
             }
         }
 
@@ -135,7 +136,7 @@ struct NCViewerQuickLookView: UIViewControllerRepresentable {
             toolbarConfig.optionButtonFontSize = 16
             toolbarConfig.optionButtonFontSizeForPad = 21
             toolbarConfig.backgroundColor = .systemGray6
-            toolbarConfig.foregroundColor = .systemBlue
+            toolbarConfig.foregroundColor = NCBrandColor.shared.customer
 
             var viewConfig = CropViewConfig()
             viewConfig.cropMaskVisualEffectType = .none

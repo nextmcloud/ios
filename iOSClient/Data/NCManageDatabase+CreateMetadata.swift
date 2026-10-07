@@ -9,6 +9,132 @@ import NextcloudKit
 import Photos
 
 final class NCManageDatabaseCreateMetadata {
+    func convertFileToMetadataAsync(_ file: NKFile, isDirectoryE2EE: Bool? = nil) async -> tableMetadata {
+        let metadata = self.createMetadata(file)
+        let e2eEncryptedDirectory: Bool
+        if let value = isDirectoryE2EE {
+            e2eEncryptedDirectory = value
+        } else {
+            e2eEncryptedDirectory = await NCUtilityFileSystem().isDirectoryE2EEAsync(
+                serverUrl: file.serverUrl,
+                urlBase: file.urlBase,
+                userId: file.userId,
+                account: file.account)
+        }
+
+#if !EXTENSION_FILE_PROVIDER_EXTENSION && !EXTENSION_BACKGROUNDUPLOAD
+        // E2EE find the fileName for fileNameView
+        if e2eEncryptedDirectory || file.e2eEncrypted {
+            if let tableE2eEncryption = await NCManageDatabase.shared.getE2eEncryptionAsync(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@ AND fileNameIdentifier == %@", file.account, file.serverUrl, file.fileName)) {
+                metadata.fileNameView = tableE2eEncryption.fileName
+            } else if e2eEncryptedDirectory {
+                metadata.fileNameView = NSLocalizedString("_e2e_file_encrypted_", comment: "")
+            }
+        }
+#endif
+
+        if !metadata.directory {
+            let results = await NKTypeIdentifiers.shared.getInternalType(fileName: metadata.fileNameView, mimeType: file.contentType, directory: file.directory, account: file.account)
+
+            metadata.contentType = results.mimeType
+            metadata.iconName = results.iconName
+            metadata.classFile = results.classFile
+            metadata.typeIdentifier = results.typeIdentifier
+        }
+
+        return metadata.detachedCopy()
+    }
+
+    func convertFileToMetadata(_ file: NKFile, capabilities: NKCapabilities.Capabilities?, isDirectoryE2EE: Bool? = nil, completion: @escaping (tableMetadata) -> Void) {
+        let metadata = self.createMetadata(file)
+#if !EXTENSION_FILE_PROVIDER_EXTENSION && !EXTENSION_BACKGROUNDUPLOAD
+        let e2eEncryptedDirectory: Bool = isDirectoryE2EE ?? NCUtilityFileSystem().isDirectoryE2EE(
+            serverUrl: file.serverUrl,
+            urlBase: file.urlBase,
+            userId: file.userId,
+            account: file.account)
+
+        // E2EE find the fileName for fileNameView
+        if e2eEncryptedDirectory || file.e2eEncrypted {
+            if let tableE2eEncryption = NCManageDatabase.shared.getE2eEncryption(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@ AND fileNameIdentifier == %@", file.account, file.serverUrl, file.fileName)) {
+                metadata.fileNameView = tableE2eEncryption.fileName
+            } else if e2eEncryptedDirectory {
+                metadata.fileNameView = NSLocalizedString("_e2e_file_encrypted_", comment: "")
+            }
+        }
+#endif
+
+        if !metadata.directory {
+            let results = NKTypeIdentifiersHelper.shared.getInternalType(fileName: metadata.fileNameView, mimeType: file.contentType, directory: file.directory, capabilities: capabilities ?? NKCapabilities.Capabilities())
+
+            metadata.contentType = results.mimeType
+            metadata.iconName = results.iconName
+            metadata.classFile = results.classFile
+            metadata.typeIdentifier = results.typeIdentifier
+        }
+        completion(metadata)
+    }
+
+    func convertFilesToMetadatasAsync(_ files: [NKFile], serverUrlMetadataFolder: String? = nil) async -> (metadataFolder: tableMetadata, metadatas: [tableMetadata]) {
+        var counter: Int = 0
+        var isDirectoryE2EE: Bool = false
+        var listServerUrl: [String: Bool] = [:]
+        var metadataFolder = tableMetadata()
+        var metadatas: [tableMetadata] = []
+
+        for file in files {
+#if !EXTENSION_FILE_PROVIDER_EXTENSION && !EXTENSION_BACKGROUNDUPLOAD
+                if let key = listServerUrl[file.serverUrl] {
+                    isDirectoryE2EE = key
+                } else {
+                    isDirectoryE2EE = NCUtilityFileSystem().isDirectoryE2EE(serverUrl: file.serverUrl, urlBase: file.urlBase, userId: file.userId, account: file.account)
+                    listServerUrl[file.serverUrl] = isDirectoryE2EE
+                }
+#endif
+
+            let metadata = await convertFileToMetadataAsync(file, isDirectoryE2EE: isDirectoryE2EE)
+
+            if serverUrlMetadataFolder == metadata.serverUrlFileName || metadata.fileName == NextcloudKit.shared.nkCommonInstance.rootFileName {
+                metadataFolder = metadata
+            } else {
+                metadatas.append(metadata)
+            }
+
+            counter += 1
+        }
+        return (metadataFolder.detachedCopy(), metadatas)
+    }
+    
+    func convertFilesToMetadatasAsync(_ files: [NKFile], serverUrlMetadataFolder: String? = nil, mediaSearch: Bool = false) async -> (metadataFolder: tableMetadata, metadatas: [tableMetadata]) {
+        var counter: Int = 0
+        var isDirectoryE2EE: Bool = false
+        var listServerUrl: [String: Bool] = [:]
+        var metadataFolder = tableMetadata()
+        var metadatas: [tableMetadata] = []
+
+        for file in files {
+#if !EXTENSION_FILE_PROVIDER_EXTENSION
+                if let key = listServerUrl[file.serverUrl] {
+                    isDirectoryE2EE = key
+                } else {
+                    isDirectoryE2EE = NCUtilityFileSystem().isDirectoryE2EE(serverUrl: file.serverUrl, urlBase: file.urlBase, userId: file.userId, account: file.account)
+                    listServerUrl[file.serverUrl] = isDirectoryE2EE
+                }
+#endif
+
+            let metadata = await convertFileToMetadataAsync(file, mediaSearch: mediaSearch, isDirectoryE2EE: isDirectoryE2EE)
+
+            if serverUrlMetadataFolder == metadata.serverUrlFileName || metadata.fileName == NextcloudKit.shared.nkCommonInstance.rootFileName {
+                metadataFolder = metadata
+            } else {
+                metadatas.append(metadata)
+            }
+
+            counter += 1
+        }
+        return (metadataFolder.detachedCopy(), metadatas)
+    }
+    
     func convertFileToMetadataAsync(_ file: NKFile, mediaSearch: Bool = false, isDirectoryE2EE: Bool? = nil) async -> tableMetadata {
         let metadata = self.createMetadata(file)
         let e2eEncryptedDirectory: Bool
@@ -46,67 +172,7 @@ final class NCManageDatabaseCreateMetadata {
         return metadata.detachedCopy()
     }
 
-    func convertFileToMetadata(_ file: NKFile, capabilities: NKCapabilities.Capabilities?, isDirectoryE2EE: Bool? = nil, completion: @escaping (tableMetadata) -> Void) {
-        let metadata = self.createMetadata(file)
-#if !EXTENSION_FILE_PROVIDER_EXTENSION
-        let e2eEncryptedDirectory: Bool = isDirectoryE2EE ?? NCUtilityFileSystem().isDirectoryE2EE(
-            serverUrl: file.serverUrl,
-            urlBase: file.urlBase,
-            userId: file.userId,
-            account: file.account)
-
-        // E2EE find the fileName for fileNameView
-        if e2eEncryptedDirectory || file.e2eEncrypted {
-            if let tableE2eEncryption = NCManageDatabase.shared.getE2eEncryption(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@ AND fileNameIdentifier == %@", file.account, file.serverUrl, file.fileName)) {
-                metadata.fileNameView = tableE2eEncryption.fileName
-            } else if e2eEncryptedDirectory {
-                metadata.fileNameView = NSLocalizedString("_e2e_file_encrypted_", comment: "")
-            }
-        }
-#endif
-
-        if !metadata.directory {
-            let results = NKTypeIdentifiersHelper.shared.getInternalType(fileName: metadata.fileNameView, mimeType: file.contentType, directory: file.directory, capabilities: capabilities ?? NKCapabilities.Capabilities())
-
-            metadata.contentType = results.mimeType
-            metadata.iconName = results.iconName
-            metadata.classFile = results.classFile
-            metadata.typeIdentifier = results.typeIdentifier
-        }
-        completion(metadata)
-    }
-
-    func convertFilesToMetadatasAsync(_ files: [NKFile], serverUrlMetadataFolder: String? = nil, mediaSearch: Bool = false) async -> (metadataFolder: tableMetadata, metadatas: [tableMetadata]) {
-        var counter: Int = 0
-        var isDirectoryE2EE: Bool = false
-        var listServerUrl: [String: Bool] = [:]
-        var metadataFolder = tableMetadata()
-        var metadatas: [tableMetadata] = []
-
-        for file in files {
-#if !EXTENSION_FILE_PROVIDER_EXTENSION
-                if let key = listServerUrl[file.serverUrl] {
-                    isDirectoryE2EE = key
-                } else {
-                    isDirectoryE2EE = NCUtilityFileSystem().isDirectoryE2EE(serverUrl: file.serverUrl, urlBase: file.urlBase, userId: file.userId, account: file.account)
-                    listServerUrl[file.serverUrl] = isDirectoryE2EE
-                }
-#endif
-
-            let metadata = await convertFileToMetadataAsync(file, mediaSearch: mediaSearch, isDirectoryE2EE: isDirectoryE2EE)
-
-            if serverUrlMetadataFolder == metadata.serverUrlFileName || metadata.fileName == NextcloudKit.shared.nkCommonInstance.rootFileName {
-                metadataFolder = metadata
-            } else {
-                metadatas.append(metadata)
-            }
-
-            counter += 1
-        }
-        return (metadataFolder.detachedCopy(), metadatas)
-    }
-
-#if !EXTENSION_FILE_PROVIDER_EXTENSION
+#if !EXTENSION_FILE_PROVIDER_EXTENSION && !EXTENSION_BACKGROUNDUPLOAD
     func convertFilesToMetadatas(_ files: [NKFile], capabilities: NKCapabilities.Capabilities?, serverUrlMetadataFolder: String? = nil, completion: @escaping (_ metadataFolder: tableMetadata?, _ metadatas: [tableMetadata]) -> Void) {
         var counter: Int = 0
         var isDirectoryE2EE: Bool = false
@@ -202,7 +268,9 @@ final class NCManageDatabaseCreateMetadata {
         for element in file.shareType {
             metadata.shareType.append(element)
         }
-        metadata.tags.append(objectsIn: file.tags, account: metadata.account)
+        for element in file.tags {
+            metadata.tags.append(element)
+        }
         metadata.size = file.size
         metadata.classFile = file.classFile
         // iOS 12.0,* don't detect UTI text/markdown, text/x-markdown
@@ -396,7 +464,7 @@ final class NCManageDatabaseCreateMetadata {
         return metadata
     }
 
-    #if !EXTENSION_FILE_PROVIDER_EXTENSION
+#if !EXTENSION_FILE_PROVIDER_EXTENSION && !EXTENSION_BACKGROUNDUPLOAD
     private func createMetadatasFolder(assets: [PHAsset],
                                        useSubFolder: Bool,
                                        metadatasFolder: [tableMetadata],
@@ -442,9 +510,9 @@ final class NCManageDatabaseCreateMetadata {
 
         // Create Auto Upload SubDirectory - Granularity
         if useSubFolder {
-            let autoUploadServerUrlBase = NCManageDatabase.shared.getAccountAutoUploadServerUrlBase(session: session)
-            let autoUploadSubfolderGranularity = NCManageDatabase.shared.getAccountAutoUploadSubfolderGranularity()
-            let folders = Set(assets.map { utilityFileSystem.createGranularityPath(asset: $0) }).sorted()
+            let folders = Set(assets.map {
+                utilityFileSystem.createGranularityPath(asset: $0, granularity: autoUploadSubfolderGranularity)
+            }).sorted()
 
             for folder in folders {
                 let componentsDate = folder.split(separator: "/")
@@ -482,7 +550,7 @@ final class NCManageDatabaseCreateMetadata {
         let predicate = NSPredicate(format: "account == %@ AND serverUrl BEGINSWITH %@ AND directory == true", session.account, autoUploadDirectory)
         let metadatasFolder = NCManageDatabase.shared.getMetadatas(predicate: predicate)
         let autoUploadServerUrlBase = NCManageDatabase.shared.getAccountAutoUploadServerUrlBase(session: session)
-        let autoUploadSubfolderGranularity = NCManageDatabase.shared.getAccountAutoUploadSubfolderGranularity()
+        let autoUploadSubfolderGranularity = NCManageDatabase.shared.getAccountAutoUploadSubfolderGranularity(account: session.account)
         let metadatas = self.createMetadatasFolder(assets: assets,
                                                    useSubFolder: useSubFolder,
                                                    metadatasFolder: metadatasFolder,
@@ -500,7 +568,7 @@ final class NCManageDatabaseCreateMetadata {
         let predicate = NSPredicate(format: "account == %@ AND serverUrl BEGINSWITH %@ AND directory == true", session.account, autoUploadDirectory)
         let metadatasFolder = await NCManageDatabase.shared.getMetadatasAsync(predicate: predicate)
         let autoUploadServerUrlBase = await NCManageDatabase.shared.getAccountAutoUploadServerUrlBaseAsync(session: session)
-        let autoUploadSubfolderGranularity = await NCManageDatabase.shared.getAccountAutoUploadSubfolderGranularityAsync()
+        let autoUploadSubfolderGranularity = await NCManageDatabase.shared.getAccountAutoUploadSubfolderGranularityAsync(account: session.account)
         let metadatas = self.createMetadatasFolder(assets: assets,
                                                    useSubFolder: useSubFolder,
                                                    metadatasFolder: metadatasFolder,
@@ -510,5 +578,5 @@ final class NCManageDatabaseCreateMetadata {
                                                    session: session)
         return metadatas
     }
-    #endif
+#endif
 }

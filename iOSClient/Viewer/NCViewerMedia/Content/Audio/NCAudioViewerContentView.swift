@@ -1,0 +1,707 @@
+// SPDX-FileCopyrightText: Nextcloud GmbH
+// SPDX-FileCopyrightText: 2026 Marino Faggiana
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+import SwiftUI
+import AVFoundation
+import NextcloudKit
+
+// MARK: - Audio Viewer View
+
+struct NCAudioViewerContentView: View {
+    let metadata: tableMetadata
+    let localURL: URL
+    let previewURL: URL?
+    let backgroundStyle: NCViewerBackgroundStyle
+    let navigationBar: UINavigationBar?
+    let canGoPrevious: Bool
+    let canGoNext: Bool
+    let isSelected: Bool
+    let shouldAutoPlay: Bool
+    @ObservedObject var playbackOptions: NCMediaPlaybackOptions
+    let onPrevious: (_ shouldAutoPlay: Bool) -> Void
+    let onNext: (_ shouldAutoPlay: Bool) -> Void
+    let onPlayNextMedia: NCMediaPlaybackAdvanceRequest
+    let onAutoPlayConsumed: () -> Void
+    let onToggleChrome: () -> Void
+
+    @Environment(\.layoutDirection) private var layoutDirection
+    @StateObject private var model: NCAudioViewerModel
+
+    init(
+        metadata: tableMetadata,
+        localURL: URL,
+        previewURL: URL? = nil,
+        backgroundStyle: NCViewerBackgroundStyle = .system,
+        navigationBar: UINavigationBar? = nil,
+        canGoPrevious: Bool = false,
+        canGoNext: Bool = false,
+        isSelected: Bool = true,
+        shouldAutoPlay: Bool = false,
+        playbackOptions: NCMediaPlaybackOptions,
+        onPrevious: @escaping (_ shouldAutoPlay: Bool) -> Void = { _ in },
+        onNext: @escaping (_ shouldAutoPlay: Bool) -> Void = { _ in },
+        onPlayNextMedia: @escaping NCMediaPlaybackAdvanceRequest = { completion in
+            completion(false)
+        },
+        onAutoPlayConsumed: @escaping () -> Void = {},
+        onToggleChrome: @escaping () -> Void = {}
+    ) {
+        self.metadata = metadata
+        self.localURL = localURL
+        self.previewURL = previewURL
+        self.backgroundStyle = backgroundStyle
+        self.navigationBar = navigationBar
+        self.canGoPrevious = canGoPrevious
+        self.canGoNext = canGoNext
+        self.isSelected = isSelected
+        self.shouldAutoPlay = shouldAutoPlay
+        self.playbackOptions = playbackOptions
+        self.onPrevious = onPrevious
+        self.onNext = onNext
+        self.onPlayNextMedia = onPlayNextMedia
+        self.onAutoPlayConsumed = onAutoPlayConsumed
+        self.onToggleChrome = onToggleChrome
+
+        _model = StateObject(
+            wrappedValue: NCAudioViewerPlaybackRegistry.shared.model(
+                for: metadata.ocId
+            )
+        )
+    }
+
+    var body: some View {
+        GeometryReader { proxy in
+            let mainSpacing: CGFloat = 18
+            let sliderHorizontalPadding: CGFloat = 32
+            let buttonSpacing: CGFloat = 24
+            let sideButtonSize: CGFloat = 30
+            let playButtonSize: CGFloat = 64
+            let safeAreaTop = max(proxy.safeAreaInsets.top, navigationBar?.window?.safeAreaInsets.top ?? 0)
+            let windowInsets = navigationBar?.window?.safeAreaInsets ?? .zero
+            let leadingSafeArea = max(proxy.safeAreaInsets.leading, layoutDirection == .leftToRight ? windowInsets.left : windowInsets.right)
+            let trailingSafeArea = max(proxy.safeAreaInsets.trailing, layoutDirection == .leftToRight ? windowInsets.right : windowInsets.left)
+            let navigationBarBottom = self.navigationBarBottom(in: proxy) ?? (safeAreaTop + 44)
+            let thumbnailReservedHeight = NCMediaViewerThumbnail.preferredHeight + 40
+
+            ZStack {
+                Color.ncViewerBackground(backgroundStyle)
+                    .contentShape(Rectangle())
+                    .onTapGesture {
+                        onToggleChrome()
+                    }
+
+                VStack(spacing: 0) {
+                    Color.clear
+                        .frame(height: navigationBarBottom + 12)
+
+                    HStack(spacing: 8) {
+                        audioPlaybackOptionButton(
+                            systemName: playbackOptions.isRepeatEnabled ? "repeat.1.circle.fill" : "repeat.1",
+                            accessibilityLabel: "_repeat_current_media_"
+                        ) {
+                            playbackOptions.toggleRepeat()
+                        }
+
+                        audioPlaybackOptionButton(
+                            systemName: playbackOptions.isAutoAdvanceEnabled ? "forward.end.fill" : "forward.end",
+                            accessibilityLabel: "_play_next_media_automatically_"
+                        ) {
+                            playbackOptions.toggleAutoAdvance()
+                        }
+
+                        Spacer()
+                    }
+                    .padding(.leading, 28)
+                    .padding(.bottom, mainSpacing)
+
+                    VStack(spacing: mainSpacing) {
+                        GeometryReader { artworkProxy in
+                            let size = min(180, min(artworkProxy.size.width, artworkProxy.size.height))
+                            if size >= 72 {
+                                artworkView(size: size)
+                                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                            }
+                        }
+                        .frame(minHeight: 0, maxHeight: .infinity)
+
+                        VStack(spacing: 10) {
+                            Slider(
+                                value: Binding(
+                                    get: { model.currentTime },
+                                    set: { model.seek(to: $0) }
+                                ),
+                                in: 0...max(model.duration, 1)
+                            )
+                            .disabled(!isSelected || model.duration <= 0)
+
+                            HStack {
+                                Text(formatTime(model.currentTime))
+
+                                Spacer()
+
+                                Text(formatTime(model.duration))
+                            }
+                            .font(.caption.monospacedDigit())
+                            .foregroundStyle(secondaryForegroundStyle)
+                        }
+                        .padding(.horizontal, sliderHorizontalPadding)
+                        .fixedSize(horizontal: false, vertical: true)
+
+                        ZStack {
+                            Button {
+                                model.togglePlayback()
+                            } label: {
+                                Image(systemName: model.isPlaying ? "pause.circle.fill" : "play.circle.fill")
+                                    .font(.system(size: playButtonSize, weight: .regular))
+                                    .foregroundStyle(primaryForegroundStyle)
+                            }
+                            .buttonStyle(.plain)
+                            .disabled(!isSelected)
+
+                            Button {
+                                model.restart()
+                            } label: {
+                                Image(systemName: "backward.end.circle.fill")
+                                    .font(.system(size: sideButtonSize, weight: .regular))
+                                    .foregroundStyle(primaryForegroundStyle)
+                            }
+                            .buttonStyle(.plain)
+                            .disabled(!isSelected || model.duration <= 0)
+                            .offset(
+                                x: -(playButtonSize / 2 + buttonSpacing + sideButtonSize / 2)
+                            )
+                        }
+                        .frame(height: playButtonSize)
+                        .frame(maxWidth: .infinity)
+                    }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .padding(.bottom, 10)
+
+                    Color.clear
+                        .frame(height: thumbnailReservedHeight)
+                }
+                .padding(.leading, leadingSafeArea)
+                .padding(.trailing, trailingSafeArea)
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+        }
+        .task(id: localURL) {
+            guard isSelected else {
+                return
+            }
+
+            model.configurePlaybackCompletion(
+                options: playbackOptions,
+                onPlayNextMedia: onPlayNextMedia
+            )
+            await model.load(url: localURL)
+            await consumeAutoPlayIfNeeded()
+        }
+        .onChange(of: isSelected) { _, selected in
+            guard selected else {
+                model.stop()
+                return
+            }
+
+            Task { @MainActor in
+                model.configurePlaybackCompletion(
+                    options: playbackOptions,
+                    onPlayNextMedia: onPlayNextMedia
+                )
+                await model.load(url: localURL)
+                await consumeAutoPlayIfNeeded()
+            }
+        }
+        .onChange(of: shouldAutoPlay) { _, newValue in
+            guard newValue else {
+                return
+            }
+
+            Task { @MainActor in
+                await consumeAutoPlayIfNeeded()
+            }
+        }
+        // Stop all audio playback when the media viewer performs a global playback teardown.
+        // This notification is intentionally viewer-wide and should not be used for normal
+        // audio page-to-page state changes.
+        .onReceive(NotificationCenter.default.publisher(for: .ncMediaViewerStopPlayback)) { _ in
+            NCAudioViewerPlaybackRegistry.shared.stopAll()
+        }
+    }
+
+    // MARK: - Views
+
+    private func navigationBarBottom(in proxy: GeometryProxy) -> CGFloat? {
+        guard let navigationBar, let window = navigationBar.window, !navigationBar.isHidden else {
+            return nil
+        }
+
+        let navigationContent = navigationBar.topItem?.titleView ?? navigationBar
+        let frame = navigationContent.convert(navigationContent.bounds, to: window)
+        return max(0, frame.maxY - proxy.frame(in: .global).minY)
+    }
+
+    private func artworkView(size: CGFloat) -> some View {
+        ZStack {
+            if let previewImage {
+                Image(uiImage: previewImage)
+                    .resizable()
+                    .scaledToFill()
+                    .frame(width: size, height: size)
+                    .clipShape(RoundedRectangle(cornerRadius: 24))
+            } else {
+                Circle()
+                    .fill(artworkPlaceholderBackground)
+                    .frame(width: size, height: size)
+
+                Image(systemName: "waveform")
+                    .font(.system(size: size * 76 / 180, weight: .regular))
+                    .foregroundStyle(primaryForegroundStyle.opacity(0.9))
+            }
+        }
+    }
+
+    private func audioPlaybackOptionButton(systemName: String, accessibilityLabel: String, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Image(systemName: systemName)
+                .font(.system(size: 17, weight: .regular))
+                .foregroundStyle(.primary)
+                .frame(width: 38, height: 38)
+                .audioControlGlassBackground(shape: Circle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(NSLocalizedString(accessibilityLabel, comment: ""))
+    }
+
+    private var previewImage: UIImage? {
+        guard let previewURL,
+              previewURL.isFileURL else {
+            return nil
+        }
+
+        return UIImage(contentsOfFile: previewURL.path)
+    }
+
+    private var primaryForegroundStyle: Color {
+        switch backgroundStyle {
+        case .black:
+            return .white
+
+        case .white:
+            return .black
+
+        case .system:
+            return .primary
+
+        case .custom:
+            return .white
+        }
+    }
+
+    private var secondaryForegroundStyle: Color {
+        switch backgroundStyle {
+        case .black:
+            return .white.opacity(0.55)
+
+        case .white:
+            return .black.opacity(0.55)
+
+        case .system:
+            return .secondary
+
+        case .custom:
+            return .white.opacity(0.65)
+        }
+    }
+
+    private var artworkPlaceholderBackground: Color {
+        switch backgroundStyle {
+        case .black:
+            return .white.opacity(0.08)
+
+        case .white:
+            return .black.opacity(0.06)
+
+        case .system:
+            return .secondary.opacity(0.10)
+
+        case .custom:
+            return .white.opacity(0.10)
+        }
+    }
+
+    // MARK: - Private
+
+    @MainActor
+    private func consumeAutoPlayIfNeeded() async {
+        guard shouldAutoPlay else {
+            return
+        }
+
+        // The viewer-wide stop notification also releases players belonging to
+        // prefetched audio pages. Recreate this page's player before autoplaying
+        // instead of relying on the previous preload still being alive.
+        await model.load(url: localURL)
+
+        guard shouldAutoPlay else {
+            return
+        }
+
+        model.play()
+        onAutoPlayConsumed()
+    }
+
+    private func formatTime(_ seconds: Double) -> String {
+        guard seconds.isFinite,
+              seconds >= 0 else {
+            return "00:00"
+        }
+
+        let totalSeconds = Int(seconds.rounded())
+        let minutes = totalSeconds / 60
+        let remainingSeconds = totalSeconds % 60
+
+        return String(
+            format: "%02d:%02d",
+            minutes,
+            remainingSeconds
+        )
+    }
+}
+
+private extension View {
+    @ViewBuilder
+    func audioControlGlassBackground<BackgroundShape: SwiftUI.Shape>(shape: BackgroundShape) -> some View {
+        if #available(iOS 26.0, *) {
+            self.glassEffect(.regular.interactive(), in: shape)
+        } else {
+            self.background(.regularMaterial).clipShape(shape)
+        }
+    }
+}
+
+// MARK: - Audio Viewer Playback Registry
+
+// Keeps audio models alive across SwiftUI rebuilds.
+@MainActor
+final class NCAudioViewerPlaybackRegistry {
+    static let shared = NCAudioViewerPlaybackRegistry()
+
+    private var modelsByOcId: [String: NCAudioViewerModel] = [:]
+
+    private init() { }
+
+    func model(for ocId: String) -> NCAudioViewerModel {
+        if let model = modelsByOcId[ocId] {
+            return model
+        }
+
+        let model = NCAudioViewerModel()
+        modelsByOcId[ocId] = model
+        return model
+    }
+
+    // Do not remove models while SwiftUI pages may still hold them.
+    func stopAll() {
+        modelsByOcId.values.forEach { $0.stop() }
+    }
+}
+
+// MARK: - Audio Viewer Model
+
+@MainActor
+final class NCAudioViewerModel: ObservableObject {
+
+    // MARK: - Published State
+
+    @Published private(set) var isPlaying = false
+    @Published private(set) var duration: Double = 0
+    @Published var currentTime: Double = 0
+
+    // MARK: - Private State
+
+    private var player: AVPlayer?
+    private var playbackTask: Task<Void, Never>?
+    private var timeObserver: Any?
+    private var endObserver: NSObjectProtocol?
+    private var currentURL: URL?
+    private var loadedURL: URL?
+    private weak var playbackOptions: NCMediaPlaybackOptions?
+    private var onPlayNextMedia: NCMediaPlaybackAdvanceRequest?
+
+    // MARK: - Public API
+
+    func configurePlaybackCompletion(options: NCMediaPlaybackOptions, onPlayNextMedia: @escaping NCMediaPlaybackAdvanceRequest) {
+        playbackOptions = options
+        self.onPlayNextMedia = onPlayNextMedia
+    }
+
+    func load(url: URL) async {
+        guard currentURL != url else {
+            return
+        }
+
+        stop()
+
+        currentURL = url
+        loadedURL = url
+
+        let asset = AVURLAsset(url: url)
+        let item = AVPlayerItem(asset: asset)
+        let player = AVPlayer(playerItem: item)
+
+        player.actionAtItemEnd = .pause
+
+        self.player = player
+
+        addTimeObserver(to: player)
+        addEndObserver(for: item, player: player)
+
+        _ = await configureAudioSession()
+        guard self.player === player else {
+            return
+        }
+
+        Task { [weak self] in
+            let loadedDuration: Double
+
+            if let duration = try? await asset.load(.duration),
+               duration.seconds.isFinite {
+                loadedDuration = duration.seconds
+            } else {
+                loadedDuration = 0
+            }
+
+            await MainActor.run {
+                guard let self,
+                      self.currentURL == url,
+                      self.player === player else {
+                    return
+                }
+
+                self.duration = loadedDuration
+            }
+        }
+    }
+
+    func play() {
+        guard let player else {
+            guard let loadedURL else {
+                return
+            }
+
+            Task { @MainActor in
+                await load(url: loadedURL)
+                play()
+            }
+            return
+        }
+
+        if duration > 0,
+           currentTime >= duration - 0.2 {
+            seek(to: 0)
+        }
+
+        playbackTask?.cancel()
+        isPlaying = true
+        playbackTask = Task { [weak self] in
+            guard let self else {
+                return
+            }
+
+            let activated = await configureAudioSession()
+            guard !Task.isCancelled, self.player === player, isPlaying else {
+                return
+            }
+
+            guard activated else {
+                isPlaying = false
+                return
+            }
+
+            player.play()
+        }
+    }
+
+    func togglePlayback() {
+        if isPlaying {
+            pause()
+        } else {
+            play()
+        }
+    }
+
+    func restart() {
+        seek(to: 0)
+
+        if isPlaying {
+            play()
+        }
+    }
+
+    func seek(to seconds: Double) {
+        guard let player else {
+            return
+        }
+
+        let clampedSeconds = min(
+            max(seconds, 0),
+            max(duration, 0)
+        )
+
+        currentTime = clampedSeconds
+
+        let time = CMTime(
+            seconds: clampedSeconds,
+            preferredTimescale: 600
+        )
+
+        player.seek(
+            to: time,
+            toleranceBefore: .zero,
+            toleranceAfter: .zero
+        )
+    }
+
+    func pause() {
+        playbackTask?.cancel()
+        playbackTask = nil
+        player?.pause()
+        isPlaying = false
+    }
+
+    func stop() {
+        playbackTask?.cancel()
+        playbackTask = nil
+
+        if let player {
+            player.pause()
+        }
+
+        if let timeObserver,
+           let player {
+            player.removeTimeObserver(timeObserver)
+        }
+
+        if let endObserver {
+            NotificationCenter.default.removeObserver(endObserver)
+        }
+
+        timeObserver = nil
+        endObserver = nil
+        player = nil
+        currentURL = nil
+
+        isPlaying = false
+        currentTime = 0
+        duration = 0
+    }
+
+    // MARK: - Private
+
+    private func configureAudioSession() async -> Bool {
+        do {
+            try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
+                DispatchQueue.global(qos: .userInitiated).async {
+                    do {
+                        let session = AVAudioSession.sharedInstance()
+                        try session.setCategory(.playback, mode: .default, options: [])
+                        if #unavailable(iOS 27.0) {
+                            try session.setActive(true)
+                        }
+                        continuation.resume()
+                    } catch {
+                        continuation.resume(throwing: error)
+                    }
+                }
+            }
+
+            if #available(iOS 27.0, *) {
+                return try await AVAudioSession.sharedInstance().activate(options: [])
+            }
+
+            return true
+        } catch {
+            nkLog(
+                tag: NCGlobal.shared.logTagViewer,
+                emoji: .error,
+                message: "AUDIO session error: \(error.localizedDescription)",
+                consoleOnly: true
+            )
+            return false
+        }
+    }
+
+    private func addTimeObserver(to player: AVPlayer) {
+        let interval = CMTime(
+            seconds: 0.25,
+            preferredTimescale: 600
+        )
+
+        timeObserver = player.addPeriodicTimeObserver(
+            forInterval: interval,
+            queue: .main
+        ) { [weak self] time in
+            guard let self else {
+                return
+            }
+
+            Task { @MainActor in
+                guard self.player === player else {
+                    return
+                }
+
+                self.currentTime = time.seconds.isFinite ? time.seconds : 0
+            }
+        }
+    }
+
+    private func addEndObserver(for item: AVPlayerItem, player: AVPlayer) {
+        endObserver = NotificationCenter.default.addObserver(
+            forName: AVPlayerItem.didPlayToEndTimeNotification,
+            object: item,
+            queue: .main
+        ) { [weak self, weak player] _ in
+            guard let self,
+                  let player else {
+                return
+            }
+
+            Task { @MainActor in
+                guard self.player === player else {
+                    return
+                }
+
+                switch self.playbackOptions?.completionAction ?? .stop {
+                case .repeatCurrentItem:
+                    self.currentTime = 0
+
+                    player.seek(
+                        to: .zero,
+                        toleranceBefore: .zero,
+                        toleranceAfter: .zero
+                    ) { _ in
+                        Task { @MainActor in
+                            guard self.player === player else {
+                                return
+                            }
+
+                            player.play()
+                            self.isPlaying = true
+                        }
+                    }
+
+                case .playNextItem:
+                    self.currentTime = self.duration
+                    self.isPlaying = false
+                    self.onPlayNextMedia? { _ in }
+
+                case .stop:
+                    self.currentTime = self.duration
+                    self.isPlaying = false
+                }
+            }
+        }
+    }
+}

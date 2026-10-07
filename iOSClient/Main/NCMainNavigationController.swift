@@ -12,7 +12,7 @@ class NCMainNavigationController: UINavigationController, UINavigationController
     let utility = NCUtility()
     let utilityFileSystem = NCUtilityFileSystem()
     let appDelegate = (UIApplication.shared.delegate as? AppDelegate)!
-    let menuToolbar = UIToolbar()
+    let menuPlusButton: UIButton = NCMenuPlusButton(type: .system)
 
     var controller: NCMainTabBarController? {
         self.tabBarController as? NCMainTabBarController
@@ -76,22 +76,19 @@ class NCMainNavigationController: UINavigationController, UINavigationController
         Task {
             optionButtonItem.image = UIImage(systemName: "ellipsis")
             optionButtonItem.tintColor = NCBrandColor.shared.iconImageColor
-            optionButtonItem.menu = await createOptionMenu()
+            setOptionMenu(await createOptionMenu())
         }
 
-        assistantButtonItem.image = UIImage(systemName: "sparkles")
-        assistantButtonItem.title = NSLocalizedString("_assistant_", comment: "")
-        assistantButtonItem.tintColor = NCBrandColor.shared.iconImageColor
         assistantButtonItem.primaryAction = UIAction(handler: { _ in
             let inputModel = NCAssistantInputModel()
             let assistant = NCAssistant(assistantModel: NCAssistantModel(controller: self.controller, inputModel: inputModel), chatModel: NCAssistantChatModel(controller: self.controller, inputModel: inputModel), conversationsModel: NCAssistantChatConversationsModel(controller: self.controller))
             let hostingController = UIHostingController(rootView: assistant)
             self.present(hostingController, animated: true, completion: nil)
         })
+        assistantButtonItem.image = UIImage(systemName: "sparkles")
+        assistantButtonItem.title = NSLocalizedString("_assistant_", comment: "")
+        assistantButtonItem.tintColor = NCBrandColor.shared.iconImageColor
 
-        notificationsButtonItem.image = UIImage(systemName: "bell.fill")
-        notificationsButtonItem.title = NSLocalizedString("_notifications_", comment: "")
-        notificationsButtonItem.tintColor = NCBrandColor.shared.iconImageColor
         notificationsButtonItem.primaryAction = UIAction(handler: { _ in
             if let navigationController = UIStoryboard(name: "NCNotification", bundle: nil).instantiateInitialViewController() as? UINavigationController,
                let viewController = navigationController.topViewController as? NCNotification {
@@ -100,12 +97,12 @@ class NCMainNavigationController: UINavigationController, UINavigationController
                 self.present(navigationController, animated: true, completion: nil)
             }
         })
+        notificationsButtonItem.image = UIImage(systemName: "bell.fill")
+        notificationsButtonItem.title = NSLocalizedString("_notifications_", comment: "")
+        notificationsButtonItem.tintColor = NCBrandColor.shared.iconImageColor
 
-        transfersButtonItem.image = UIImage(systemName: "arrow.left.arrow.right.circle.fill")
-        transfersButtonItem.title = NSLocalizedString("_transfers_", comment: "")
-        transfersButtonItem.tintColor = NCBrandColor.shared.iconImageColor
         transfersButtonItem.primaryAction = UIAction(handler: { _ in
-            let rootView = TransfersView(session: self.session, onClose: { [weak self] in
+            let rootView = TransfersView(session: self.session, onClose: { [weak self = self] in
                 self?.dismiss(animated: true)
             })
             let hosting = UIHostingController(rootView: rootView)
@@ -113,81 +110,81 @@ class NCMainNavigationController: UINavigationController, UINavigationController
 
             self.present(hosting, animated: true)
         })
+        transfersButtonItem.image = UIImage(systemName: "arrow.left.arrow.right.circle.fill")
+        transfersButtonItem.title = NSLocalizedString("_transfers_", comment: "")
+        transfersButtonItem.tintColor = NCBrandColor.shared.iconImageColor
 
         // PLUS BUTTON MENU
-        let widthAnchor: CGFloat
-        let trailingAnchor: CGFloat
-        let trailingAnchorPad: CGFloat
+        let buttonSize: CGFloat = 44
+        let plusConfiguration = UIImage.SymbolConfiguration(pointSize: 18, weight: .regular)
+        let plusImage = UIImage(systemName: "plus", withConfiguration: plusConfiguration)?.withRenderingMode(.alwaysTemplate)
 
         if #available(iOS 26.0, *) {
-            widthAnchor = 44
-            trailingAnchor = -15
-            trailingAnchorPad = -20
+            var glassConfiguration = UIButton.Configuration.prominentGlass()
+            glassConfiguration.image = plusImage
+            menuPlusButton.configuration = glassConfiguration
         } else {
-            let appearance = UIToolbarAppearance()
-            appearance.configureWithTransparentBackground()
-            appearance.backgroundColor = .clear
-            appearance.backgroundEffect = nil
-            appearance.shadowColor = .clear
-
-            menuToolbar.standardAppearance = appearance
-            menuToolbar.compactAppearance  = appearance
-            menuToolbar.scrollEdgeAppearance = appearance
-            menuToolbar.isTranslucent = true
-
-            widthAnchor = 100
-            trailingAnchor = 28
-            trailingAnchorPad = -10
+            menuPlusButton.setImage(plusImage, for: .normal)
+            menuPlusButton.contentHorizontalAlignment = .center
+            menuPlusButton.contentVerticalAlignment = .center
+            menuPlusButton.layer.cornerRadius = buttonSize / 2
+            menuPlusButton.layer.masksToBounds = false
+            menuPlusButton.layer.shadowColor = UIColor.black.cgColor
+            menuPlusButton.layer.shadowOpacity = 0.18
+            menuPlusButton.layer.shadowRadius = 8
+            menuPlusButton.layer.shadowOffset = CGSize(width: 0, height: 4)
         }
 
-        view.addSubview(menuToolbar)
-        menuToolbar.translatesAutoresizingMaskIntoConstraints = false
+        menuPlusButton.setPlusButtonColor(NCBrandColor.shared.getElement(account: session.account))
+        menuPlusButton.showsMenuAsPrimaryAction = true
+        menuPlusButton.translatesAutoresizingMaskIntoConstraints = false
+        menuPlusButton.accessibilityLabel = NSLocalizedString("_add_", comment: "")
 
-        if UIDevice.current.userInterfaceIdiom == .pad {
-            NSLayoutConstraint.activate([
-                menuToolbar.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: trailingAnchorPad),
-                menuToolbar.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -20),
-                menuToolbar.widthAnchor.constraint(equalToConstant: widthAnchor)
-            ])
-        } else {
-            NSLayoutConstraint.activate([
-                menuToolbar.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: trailingAnchor),
-                menuToolbar.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -10),
-                menuToolbar.widthAnchor.constraint(equalToConstant: widthAnchor)
-            ])
-        }
+        view.addSubview(menuPlusButton)
 
-        menuPlus = NCContextMenuPlus(menuToolbar: menuToolbar, controller: controller)
+        let trailingAnchor: CGFloat = UIDevice.current.userInterfaceIdiom == .pad ? -28 : -22
+        let bottomAnchor: CGFloat = UIDevice.current.userInterfaceIdiom == .pad ? -28 : -22
+
+        NSLayoutConstraint.activate([
+            menuPlusButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: trailingAnchor),
+            menuPlusButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: bottomAnchor),
+            menuPlusButton.widthAnchor.constraint(equalToConstant: buttonSize),
+            menuPlusButton.heightAnchor.constraint(equalToConstant: buttonSize)
+        ])
+
+        menuPlus = NCContextMenuPlus(menuPlusButton: menuPlusButton, controller: controller)
 
         // CAPABILITIES UPDATE
         //
-        NotificationCenter.default.addObserver(forName: NSNotification.Name(rawValue: self.global.notificationCenterServerDidUpdate), object: nil, queue: nil) { notification in
+        NotificationCenter.default.addObserver(forName: NSNotification.Name(rawValue: self.global.notificationCenterServerDidUpdate), object: nil, queue: nil) { [weak self] notification in
             guard let userInfo = notification.userInfo,
                   let account = userInfo["account"] as? String else {
                 return
             }
 
-            Task { @MainActor in
+            Task { @MainActor [weak self] in
+                guard let self,
+                      let controller = self.controller,
+                      controller.account == account else {
+                    return
+                }
+
                 let capabilities = await NKCapabilities.shared.getCapabilities(for: account)
+                guard controller.account == account else { return }
                 let session = NCSession.shared.getSession(account: account)
 
                 // Notification
                 //
                 if capabilities.notification.count == 0 {
-                    self.controller?.availableNotifications = false
+                    controller.availableNotifications = false
                 } else {
-                    _ = await NextcloudKit.shared.getNotificationsAsync(account: account) { task in
-                        Task {
-                            let identifier = await NCNetworking.shared.networkingTasks.createIdentifier(
-                                account: account,
-                                name: "getNotifications"
-                            )
-                            await NCNetworking.shared.networkingTasks.track(identifier: identifier, task: task)
-                        }
-                    }
-                    self.controller?.availableNotifications = true
+                    _ = await NextcloudKit.shared.getNotificationsAsync(account: account)
+                    guard controller.account == account else { return }
+                    controller.availableNotifications = true
                 }
+                guard controller.account == account else { return }
                 await self.collectionViewCommonTrailingItemGroups()
+                // (+)
                 await self.menuPlus?.create(session: session)
             }
         }
@@ -198,7 +195,7 @@ class NCMainNavigationController: UINavigationController, UINavigationController
             Task { @MainActor [weak self] in
                 guard let self else { return }
 
-                // Menu Plus
+                // (+)
                 await self.menuPlus?.create(session: session)
             }
         }
@@ -206,11 +203,15 @@ class NCMainNavigationController: UINavigationController, UINavigationController
 
     func navigationController(_ navigationController: UINavigationController, willShow viewController: UIViewController, animated: Bool) {
         Task { @MainActor in
+            // (+)
             // PLUS BUTTON ONLY IN FILES
-            if viewController is NCFiles {
-                self.menuPlus?.hiddenPlusButton(false)
+            if let viewController = viewController as? NCFiles {
+                self.menuPlus?.hiddenPlusButton(isEditMode: viewController.isEditMode,
+                                                isSearchingMode: viewController.isSearchingMode,
+                                                animation: false)
             } else {
-                self.menuPlus?.hiddenPlusButton(true, animation: false)
+                self.menuPlus?.hiddenPlusButton(true,
+                                                animation: false)
             }
             // MENU
             setNavigationBarAppearance()
@@ -236,13 +237,14 @@ class NCMainNavigationController: UINavigationController, UINavigationController
             collectionViewCommon.navigationItem.searchController = nil
 
             let cancel = UIBarButtonItem(
-                title: NSLocalizedString("_cancel_", comment: ""),
+                image: UIImage(systemName: "xmark"),
                 style: .plain
             ) {
                 Task {
                     await collectionViewCommon.setEditMode(false)
                 }
             }
+            cancel.accessibilityLabel = NSLocalizedString("_cancel_", comment: "")
 
             let group = UIBarButtonItemGroup(
                 barButtonItems: [cancel],
@@ -260,11 +262,12 @@ class NCMainNavigationController: UINavigationController, UINavigationController
             trashViewController.tabBarSelect.show()
 
             let cancel = UIBarButtonItem(
-                title: NSLocalizedString("_cancel_", comment: ""),
+                image: UIImage(systemName: "xmark"),
                 style: .plain
             ) {
                 trashViewController.setEditMode(false)
             }
+            cancel.accessibilityLabel = NSLocalizedString("_cancel_", comment: "")
 
             let group = UIBarButtonItemGroup(
                 barButtonItems: [cancel],
@@ -284,7 +287,7 @@ class NCMainNavigationController: UINavigationController, UINavigationController
     }
 
     @MainActor
-    private func collectionViewCommonTrailingItemGroups() async {
+    func collectionViewCommonTrailingItemGroups() async {
         guard let topViewController else {
             return
         }
@@ -292,9 +295,9 @@ class NCMainNavigationController: UINavigationController, UINavigationController
         guard !(collectionViewCommon?.isEditMode ?? false),
               !(trashViewController?.isEditMode ?? false),
               !(mediaViewController?.isEditMode ?? false),
-              !(topViewController is NCViewerMediaPage),
+//              !(topViewController is NCViewerMediaPage),
               !(topViewController is NCViewerPDF),
-              !(topViewController is NCViewerRichDocument),
+              !(topViewController is NCViewerRichdocuments),
               !(topViewController is NCViewerDirectEditing)
         else {
             return
@@ -319,7 +322,7 @@ class NCMainNavigationController: UINavigationController, UINavigationController
         desiredItems.append(transfersButtonItem)
 
         if let optionMenu = await createOptionMenu() {
-            optionButtonItem.menu = optionMenu
+            setOptionMenu(optionMenu)
             desiredItems.append(optionButtonItem)
         }
 
@@ -359,12 +362,25 @@ class NCMainNavigationController: UINavigationController, UINavigationController
             return
         }
 
-        optionButtonItem.menu = await createOptionMenu()
+        setOptionMenu(await createOptionMenu())
 
         // Force refresh of the bar button group if the menu instance changed.
         let currentGroups = topViewController.navigationItem.trailingItemGroups
         if !currentGroups.isEmpty {
             topViewController.navigationItem.trailingItemGroups = currentGroups
+        }
+    }
+
+    /// Configures the options button for both direct toolbar display and UIKit's
+    /// navigation-bar overflow menu.
+    ///
+    /// The button keeps its regular menu when it is displayed in the bar. When
+    /// UIKit moves it into the system overflow, the inline representation avoids
+    /// presenting another ellipsis submenu inside that overflow menu.
+    func setOptionMenu(_ menu: UIMenu?) {
+        optionButtonItem.menu = menu
+        optionButtonItem.menuRepresentation = menu.map {
+            UIMenu(title: "", options: .displayInline, children: $0.children)
         }
     }
 
@@ -446,6 +462,38 @@ class NCMainNavigationController: UINavigationController, UINavigationController
             for item in visibleItems {
                 applyTint(item, color: color)
             }
+        }
+    }
+}
+
+private final class NCMenuPlusButton: UIButton {
+    // Keep hit testing so taps don't fall through if the button is disabled, hidden or low alpha.
+    override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
+        if let view = super.hitTest(point, with: event) {
+            return view
+        }
+
+        guard !isEnabled, !isHidden, alpha >= 0.01, bounds.contains(point) else {
+            return nil
+        }
+
+        return self
+    }
+
+    override func contextMenuInteraction(_ interaction: UIContextMenuInteraction, configurationForMenuAtLocation location: CGPoint) -> UIContextMenuConfiguration? {
+        guard isEnabled else { return nil }
+
+        return super.contextMenuInteraction(interaction, configurationForMenuAtLocation: location)
+    }
+}
+
+extension UIButton {
+    func setPlusButtonColor(_ color: UIColor) {
+        if #available(iOS 26.0, *) {
+            tintColor = color
+        } else {
+            backgroundColor = color
+            tintColor = .white
         }
     }
 }

@@ -102,6 +102,7 @@
     NSString *versionE2EE = [[NCGlobal shared] capabilityE2EEApiVersion];
 
     if (isE2EEEnabled == YES && [NCGlobal.shared.e2eeVersions containsObject:versionE2EE]) {
+    if (isE2EEEnabled == YES && [NCGlobal.shared.e2eeCompatibleVersions containsObject:versionE2EE]) {
 
         // EndToEnd Encryption
         NSString *title = [NSString stringWithFormat:@"%@",NSLocalizedString(@"_e2e_settings_", nil)];

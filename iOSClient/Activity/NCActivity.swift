@@ -11,7 +11,7 @@ class NCActivity: UIViewController, NCSharePagingContent {
     @IBOutlet weak var tableView: UITableView!
 
     var commentView: NCActivityCommentView?
-    var textField: UIView? { commentView?.newCommentField }
+    var textField: UITextField? { commentView?.newCommentField }
     var height: CGFloat = 0
     var metadata: tableMetadata?
     var showComments: Bool = false
@@ -48,7 +48,7 @@ class NCActivity: UIViewController, NCSharePagingContent {
     internal var windowScene: UIWindowScene? {
        SceneManager.shared.getWindowScene(controller: self.tabBarController as? NCMainTabBarController)
     }
-
+    
     // MARK: - View Life Cycle
 
     override func viewDidLoad() {
@@ -223,7 +223,6 @@ extension NCActivity: UITableViewDataSource {
         cell.indexPath = indexPath
         cell.tableComments = comment
         cell.delegate = self
-        cell.configureAvatarMenu()
 
         // Avatar
         let fileName = NCSession.shared.getFileName(urlBase: metadata.urlBase, user: comment.actorId)
@@ -253,7 +252,6 @@ extension NCActivity: UITableViewDataSource {
         // Button Menu
         if comment.actorId == metadata.userId {
             cell.buttonMenu.isHidden = false
-            cell.configureCommentMenu()
         } else {
             cell.buttonMenu.isHidden = true
         }
@@ -297,7 +295,6 @@ extension NCActivity: UITableViewDataSource {
             cell.avatar.isHidden = false
             cell.user = activity.user
             cell.subjectLeadingConstraint.constant = 15
-            cell.configureAvatarMenu()
 
             let fileName = NCSession.shared.getFileName(urlBase: session.urlBase, user: activity.user)
             let results = NCManageDatabase.shared.getImageAvatarLoaded(fileName: fileName)

@@ -437,6 +437,7 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
         } else if item.url == "openAssistant" {
             let assistant = NCAssistant()
                 .environmentObject(NCAssistantModel(controller: self.controller))
+            let assistant = NCAssistant(assistantModel: NCAssistantModel(controller: self.controller), chatModel: NCAssistantChatModel(controller: self.controller), conversationsModel: NCAssistantChatConversationsModel(controller: self.controller))
             let hostingController = UIHostingController(rootView: assistant)
             present(hostingController, animated: true, completion: nil)
         } else if item.url == "openSettings" {

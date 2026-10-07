@@ -176,7 +176,8 @@ extension NCSectionFirstHeader: UICollectionViewDataSource {
                 cell.image.image = image
                 cell.image.contentMode = .scaleAspectFill
             } else {
-                cell.image.image = self.utility.loadImage(named: metadata.iconName, useTypeIconFile: true, account: metadata.account)
+//                cell.image.image = self.utility.loadImage(named: metadata.iconName, useTypeIconFile: true, account: metadata.account)
+                cell.image.image = self.utility.previewIcon(for: metadata)
                 cell.image.contentMode = .scaleAspectFit
                 if recommendedFiles.hasPreview {
                     Task {
