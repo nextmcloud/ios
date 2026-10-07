@@ -20,6 +20,7 @@
 	<string>$(MARKETING_VERSION)</string>
 	<key>CFBundleVersion</key>
 	<string>42310</string>
+    <string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsArbitraryLoads</key>
@@ -27,13 +28,9 @@
 	</dict>
 	<key>NSExtension</key>
 	<dict>
-		<key>NSExtensionAttributes</key>
-    		<dict>
-        		<key>NSFileProviderSupportsMultipleDomains</key>
-        		<true/>
-    		</dict>
 		<key>NSExtensionFileProviderDocumentGroup</key>
 		<string>group.de.magentacloud.next.dev2.client</string>
+		<string>group.de.telekom.Mediencenter</string>
 		<key>NSExtensionFileProviderSupportsEnumeration</key>
 		<true/>
 		<key>NSExtensionFileProviderSupportsPickingFolders</key>

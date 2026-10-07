@@ -76,6 +76,16 @@ class AppUpdater {
                         }
                     }
 
+//                    let iOSVersion = remoteConfig["ios_app_version"].stringValue ?? "default_value"
+//                    let isForcheUpdate = remoteConfig["ios_force_update"].boolValue
+//                    if let currentVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String {
+//                        if iOSVersion != currentVersion {
+//                            // There is an update available
+//                            completion(iOSVersion,isForcheUpdate)
+//                        } else {
+//                            completion(nil, nil)
+//                        }
+//                    }
                 }
             } else {
                 // Handle error

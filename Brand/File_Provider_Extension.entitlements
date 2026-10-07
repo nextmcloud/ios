@@ -9,6 +9,11 @@
 	<key>keychain-access-groups</key>
 	<array>
 		<string>$(AppIdentifierPrefix)de.magentacloud.next.dev2.client</string>
+		<string>group.com.t-systems.pu-ds.magentacloud.qa</string>
+	</array>
+	<key>keychain-access-groups</key>
+	<array>
+		<string>$(AppIdentifierPrefix)MagentaCLOUD</string>
 	</array>
 </dict>
 </plist>

@@ -113,6 +113,7 @@ import XLForm
         row = XLFormRowDescriptor(tag: "ButtonDestinationFolder", rowType: "kNMCFolderCustomCellType", title: "")
         row.action.formSelector = #selector(changeDestinationFolder(_:))
         row.cellConfig["folderImage.image"] =  NCImageCache.shared.getFolder().withTintColor(NCBrandColor.shared.customer)
+        row.cellConfig["folderImage.image"] =  UIImage(named: "folder")!.withTintColor(NCBrandColor.shared.customer)
         row.cellConfig["photoLabel.textAlignment"] = NSTextAlignment.left.rawValue
         row.cellConfig["photoLabel.font"] = UIFont.systemFont(ofSize: 15.0)
         row.cellConfig["photoLabel.textColor"] = UIColor.label //photos
@@ -230,6 +231,7 @@ import XLForm
     // MARK: - Action
 
     func dismissSelect(serverUrl: String?, metadata: tableMetadata?, type: String, items: [Any], overwrite: Bool, copy: Bool, move: Bool, session: NCSession.Session, controller: NCMainTabBarController?) {
+    func dismissSelect(serverUrl: String?, metadata: tableMetadata?, type: String, items: [Any], overwrite: Bool, copy: Bool, move: Bool, session: NCSession.Session) {
 
         guard let serverUrl = serverUrl else { return }
 
@@ -300,6 +302,7 @@ import XLForm
             let session = NCSession.shared.getSession(controller: self.controller)
             let capabilities = await NKCapabilities.shared.getCapabilities(for: session.account)
             fileName = FileAutoRenamer.rename(fileNameForm, isFolderPath: true, capabilities: capabilities)
+            fileName = FileAutoRenamer.rename(fileNameForm, isFolderPath: true, capabilities: capabilities) 
 
             let result = await NKTypeIdentifiers.shared.getInternalType(fileName: fileNameForm, mimeType: "", directory: false, account: session.account)
             
@@ -569,6 +572,8 @@ import XLForm
         }, progressHandler: { _ in
 
         }, completionHandler: { account, response, error in
+        }) { account, _, _, _, _, _, error in
+
             if error == .success && account == self.session.account {
                 self.collectionView.reloadItems(at: [indexPath])
             } else if error != .success {
@@ -577,6 +582,7 @@ import XLForm
                 print("[ERROR] It has been changed user during networking process, error.")
             }
         })
+        }
     }
     
     func getFileExtension() -> String {
