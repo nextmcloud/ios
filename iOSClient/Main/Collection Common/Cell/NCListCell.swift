@@ -385,6 +385,7 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellMainP
         }
     }
 
+    
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
         // Ensure share button stays fully visible across light/dark switches
@@ -462,6 +463,7 @@ extension NCCollectionViewCommon {
         // Combined Logic
         let hasEmailAndLinkShares = hasLinkShares && hasEmailShares
 
+        
         defer {
             let capabilities = NCNetworking.shared.capabilities[session.account] ?? NKCapabilities.Capabilities()
             if !metadata.isSharable() || (!capabilities.fileSharingApiEnabled && !capabilities.filesComments && capabilities.activity.isEmpty) {
@@ -541,6 +543,17 @@ extension NCCollectionViewCommon {
             cell.buttonShared.setImage(imageCache.getImageCanShare().withTintColor(.label, renderingMode: .alwaysOriginal), for: .normal)
         }
 
+        if isSharedWithMe {
+            cell.buttonShared.setImage(imageCache.getImageSharedWithMe(), for: .normal)
+        } else if isCrossAccount {
+            cell.buttonShared.setImage(imageCache.getImageShared(), for: .normal)
+        } else if hasAnyShare || isShare {
+            // Shared by me or has link/email shares
+            cell.buttonShared.setImage(imageCache.getImageShared().withTintColor(NCBrandColor.shared.customer, renderingMode: .alwaysOriginal), for: .normal)
+        } else {
+            cell.buttonShared.setImage(imageCache.getImageCanShare().withTintColor(.label, renderingMode: .alwaysOriginal), for: .normal)
+        }
+        
         // Button More
         if metadata.lock == true {
             cell.setButtonMore(image: imageCache.getImageButtonMoreLock())

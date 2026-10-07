@@ -25,7 +25,6 @@ class NCCollectionViewCommon: UIViewController, NCAccountSettingsModelDelegate, 
     internal let appDelegate = (UIApplication.shared.delegate as? AppDelegate)!
     internal var pinchGesture: UIPinchGestureRecognizer = UIPinchGestureRecognizer()
     private var isNavigatingMetadata = false
-    private var collectionViewLayoutSize: CGSize = .zero
 
     internal var autoUploadFileName = ""
     internal var autoUploadDirectory = ""
@@ -34,10 +33,7 @@ class NCCollectionViewCommon: UIViewController, NCAccountSettingsModelDelegate, 
     internal var backgroundImageView = UIImageView()
     internal var serverUrl: String = ""
     internal var isEditMode = false
-    // whether the displayed folder is E2EE; refreshed on each collection view data-source pass
-    internal var isCurrentDirectoryE2EE = false
-    // whether the displayed E2EE folder was decoded with active or archived keys
-    internal var endToEndKeySetAccess: NCEndToEndKeySetAccess = .unavailable
+    internal var isDirectoryE2EE = false
     internal var fileSelect: [String] = []
     internal var metadataFolder: tableMetadata?
     internal var richWorkspaceText: String?
@@ -60,7 +56,6 @@ class NCCollectionViewCommon: UIViewController, NCAccountSettingsModelDelegate, 
 
     internal var tipViewAccounts: EasyTipView?
     internal var syncMetadatasTask: Task<Void, Never>?
-    internal var syncMetadataNetworkTask: URLSessionTask?
 
     // Edit Menu
     //
@@ -98,7 +93,7 @@ class NCCollectionViewCommon: UIViewController, NCAccountSettingsModelDelegate, 
     internal var currentScale: CGFloat = 1.0
     internal var maxColumns: Int {
         let screenWidth = min(UIScreen.main.bounds.width, UIScreen.main.bounds.height)
-        let column = Int(screenWidth / 55)
+        let column = Int(screenWidth / 44)
 
         return column
     }
@@ -211,7 +206,6 @@ class NCCollectionViewCommon: UIViewController, NCAccountSettingsModelDelegate, 
         self.navigationController?.presentationController?.delegate = self
         collectionView.alwaysBounceVertical = true
         collectionView.accessibilityIdentifier = "NCCollectionViewCommon"
-        collectionView.hideTopScrollEdgeEffect()
 
         view.backgroundColor = .systemBackground
         collectionView.backgroundColor = .systemBackground
@@ -267,7 +261,6 @@ class NCCollectionViewCommon: UIViewController, NCAccountSettingsModelDelegate, 
 
                 // Wait 1.5 seconds before resetting the button alpha
                 try? await Task.sleep(for: .seconds(1.5))
-                // (+)
                 self.mainNavigationController?.menuPlus?.resetPlusButtonAlpha()
             }
         }
@@ -365,7 +358,7 @@ class NCCollectionViewCommon: UIViewController, NCAccountSettingsModelDelegate, 
         Task {
             await NCNetworking.shared.transferDispatcher.addDelegate(self)
 
-            await (self.navigationController as? NCMainNavigationController)?.setNavigationLeftItems()
+//            await (self.navigationController as? NCMainNavigationController)?.setNavigationLeftItems()
             await (self.navigationController as? NCMainNavigationController)?.setNavigationRightItems()
         }
 
@@ -401,16 +394,6 @@ class NCCollectionViewCommon: UIViewController, NCAccountSettingsModelDelegate, 
         NotificationCenter.default.addObserver(self, selector: #selector(closeRichWorkspaceWebView), name: NSNotification.Name(rawValue: global.notificationCenterCloseRichWorkspaceWebView), object: nil)
     }
 
-    override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-
-        let layoutSize = collectionView.bounds.size
-        guard layoutSize != collectionViewLayoutSize else { return }
-
-        collectionViewLayoutSize = layoutSize
-        collectionView.collectionViewLayout.invalidateLayout()
-    }
-
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         dismissTip()
@@ -444,9 +427,6 @@ class NCCollectionViewCommon: UIViewController, NCAccountSettingsModelDelegate, 
 
         coordinator.animate(alongsideTransition: { _ in
             self.collectionView?.collectionViewLayout.invalidateLayout()
-        }, completion: { _ in
-            self.collectionView?.collectionViewLayout.invalidateLayout()
-            self.collectionView?.layoutIfNeeded()
         })
 
         self.dismissTip()
@@ -462,6 +442,25 @@ class NCCollectionViewCommon: UIViewController, NCAccountSettingsModelDelegate, 
         if viewController is NCViewerRichWorkspaceWebView {
             closeRichWorkspaceWebView()
         }
+    }
+    
+    @objc func updateIcons() {
+        Task {
+            await self.reloadDataSource()
+        }
+    }
+
+    func isApplicationUpdated() -> Bool {
+        let appVersion = Bundle.main.infoDictionary?["CFBundleInfoDictionaryVersion"] as? String ?? ""
+        let currentVersion = UserDefaults.standard.string(forKey: "CurrentAppVersion")
+        return currentVersion != appVersion
+    }
+
+    func redirectToPrivacyViewController() {
+        let storyBoard: UIStoryboard = UIStoryboard(name: "NCSettings", bundle: nil)
+        let newViewController = storyBoard.instantiateViewController(withIdentifier: "privacySettingsNavigation") as? UINavigationController
+        newViewController?.modalPresentationStyle = .fullScreen
+        self.present(newViewController!, animated: true, completion: nil)
     }
 
     @objc func updateIcons() {
@@ -517,7 +516,6 @@ class NCCollectionViewCommon: UIViewController, NCAccountSettingsModelDelegate, 
     // MARK: - NotificationCenter
 
     @objc func applicationWillResignActive(_ notification: NSNotification) {
-        // (+)
         self.mainNavigationController?.menuPlus?.resetPlusButtonAlpha()
     }
 
@@ -644,14 +642,14 @@ class NCCollectionViewCommon: UIViewController, NCAccountSettingsModelDelegate, 
         // TIP
         dismissTip()
 
+        // (+)
+        self.mainNavigationController?.menuPlus?.hiddenPlusButton(true)
+
         if !isSearchingMode {
             self.isSearchingMode = true
             self.dataSource.removeAll()
             self.collectionView.reloadData()
         }
-
-        // (+)
-        self.mainNavigationController?.menuPlus?.hiddenPlusButton(isEditMode: self.isEditMode, isSearchingMode: self.isSearchingMode)
     }
 
     func searchBarTextDidEndEditing(_ searchBar: UISearchBar) {
@@ -663,29 +661,14 @@ class NCCollectionViewCommon: UIViewController, NCAccountSettingsModelDelegate, 
         }
     }
 
-    @MainActor
-    func setSearchBarLoading(_ loading: Bool) {
-        guard let textField = searchController?.searchBar.searchTextField else {
-            return
-        }
-        if loading {
-            let spinner = UIActivityIndicatorView(style: .medium)
-            spinner.startAnimating()
-            textField.rightView = spinner
-            textField.rightViewMode = .always
-        } else {
-            textField.rightView = nil
-        }
-    }
+    func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
+        // (+)
+        self.mainNavigationController?.menuPlus?.hiddenPlusButton(false)
 
-    func willDismissSearchController(_ searchController: UISearchController) {
         self.isSearchingMode = false
         self.networkSearchInProgress = false
         self.searchResultText = nil
         self.searchResultStore = nil
-
-        // (+)
-        self.mainNavigationController?.menuPlus?.hiddenPlusButton(isEditMode: self.isEditMode, isSearchingMode: self.isSearchingMode)
 
         Task {
             await searchOperationHandle.cancel()
@@ -701,6 +684,21 @@ class NCCollectionViewCommon: UIViewController, NCAccountSettingsModelDelegate, 
 
             // update Option menu
             await mainNavigationController?.updateMenuOption()
+        }
+    }
+
+    @MainActor
+    func setSearchBarLoading(_ loading: Bool) {
+        guard let textField = searchController?.searchBar.searchTextField else {
+            return
+        }
+        if loading {
+            let spinner = UIActivityIndicatorView(style: .medium)
+            spinner.startAnimating()
+            textField.rightView = spinner
+            textField.rightViewMode = .always
+        } else {
+            textField.rightView = nil
         }
     }
 
@@ -926,7 +924,6 @@ class NCCollectionViewCommon: UIViewController, NCAccountSettingsModelDelegate, 
             $0.navigationController === navigationController && $0.serverUrl == serverUrlPush
         }) {
             let viewController = existingEntry.viewController
-            viewController.endToEndKeySetAccess = endToEndKeySetAccess
 
             if navigationController.topViewController === viewController {
                 return
@@ -948,7 +945,6 @@ class NCCollectionViewCommon: UIViewController, NCAccountSettingsModelDelegate, 
         viewController.serverUrl = serverUrlPush
         viewController.titlePreviusFolder = navigationItem.title
         viewController.titleCurrentFolder = metadata.fileNameView
-        viewController.endToEndKeySetAccess = endToEndKeySetAccess
 
         navigationCollectionViewCommon.append(
             NavigationCollectionViewCommon(
@@ -1000,11 +996,10 @@ class NCCollectionViewCommon: UIViewController, NCAccountSettingsModelDelegate, 
         var height: CGFloat = 0
         let isLandscape = view.bounds.width > view.bounds.height
         let isIphone = UIDevice.current.userInterfaceIdiom == .phone
-        let hasCompactWidth = traitCollection.horizontalSizeClass == .compact
 
         if self.dataSource.isEmpty() {
             height = utility.getHeightHeaderEmptyData(view: view, portraitOffset: emptyDataPortaitOffset, landscapeOffset: emptyDataLandscapeOffset)
-        } else if isEditMode || (isLandscape && isIphone && hasCompactWidth) {
+        } else if isEditMode || (isLandscape && isIphone) {
             return CGSize.zero
         } else {
             let (heightHeaderRichWorkspace, heightHeaderRecommendations, heightHeaderSection) = getHeaderHeight(section: section)
@@ -1017,11 +1012,12 @@ class NCCollectionViewCommon: UIViewController, NCAccountSettingsModelDelegate, 
     // MARK: - Footer size
 
     func sizeForFooterInSection(section: Int) -> CGSize {
-        guard controller != nil else {
+        guard let controller else {
             return CGSize.zero
         }
         let sections = dataSource.numberOfSections()
-        let height = NCCollectionViewCommonSelectTabBar.height
+        let bottomAreaInsets: CGFloat = controller.tabBar.safeAreaInsets.bottom == 0 ? 34 : 0
+        let height = controller.tabBar.frame.height + bottomAreaInsets
 
         if isEditMode {
             return CGSize(width: collectionView.frame.width, height: 90 + height)
@@ -1055,9 +1051,9 @@ extension NCCollectionViewCommon: NCSectionFirstHeaderDelegate {
         }
     }
 
-    func tapRecommendations(with metadata: tableMetadata, viewerTransitionSource: NCMediaViewerTransitionSource?) {
+    func tapRecommendations(with metadata: tableMetadata) {
         Task {
-            await didSelectMetadata(metadata, withOcIds: false, viewerTransitionSource: viewerTransitionSource)
+            await didSelectMetadata(metadata, withOcIds: false)
         }
     }
 }
@@ -1083,7 +1079,7 @@ extension NCCollectionViewCommon: NCTransferDelegate {
         }
     }
 
-    func transferChange(networkingStatus: String,
+    func transferChange(status: String,
                         account: String,
                         fileName: String,
                         serverUrl: String,
@@ -1108,7 +1104,7 @@ extension NCCollectionViewCommon: NCTransferDelegate {
                 return
             }
 
-            switch networkingStatus {
+            switch status {
             case self.global.networkingStatusCreateFolder:
                 if error == .success,
                    serverUrl == self.serverUrl,

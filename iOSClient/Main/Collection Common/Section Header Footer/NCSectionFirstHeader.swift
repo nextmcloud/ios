@@ -8,7 +8,7 @@ import NextcloudKit
 
 protocol NCSectionFirstHeaderDelegate: AnyObject {
     func tapRichWorkspace(_ sender: Any)
-    func tapRecommendations(with metadata: tableMetadata, viewerTransitionSource: NCMediaViewerTransitionSource?)
+    func tapRecommendations(with metadata: tableMetadata)
 }
 
 class NCSectionFirstHeader: UICollectionReusableView, UIGestureRecognizerDelegate {
@@ -18,8 +18,6 @@ class NCSectionFirstHeader: UICollectionReusableView, UIGestureRecognizerDelegat
 
     @IBOutlet weak var viewRichWorkspaceHeightConstraint: NSLayoutConstraint!
     @IBOutlet weak var viewRecommendationsHeightConstraint: NSLayoutConstraint!
-    @IBOutlet private weak var viewRecommendationsLeadingConstraint: NSLayoutConstraint!
-    @IBOutlet private weak var viewRecommendationsTrailingConstraint: NSLayoutConstraint!
     @IBOutlet weak var viewSectionHeightConstraint: NSLayoutConstraint!
 
     @IBOutlet weak var textViewRichWorkspace: UITextView!
@@ -35,10 +33,7 @@ class NCSectionFirstHeader: UICollectionReusableView, UIGestureRecognizerDelegat
     private let richWorkspaceGradient: CAGradientLayer = CAGradientLayer()
     private var recommendations: [tableRecommendedFiles] = []
     private var viewController: UIViewController?
-    private weak var parentCollectionView: UICollectionView?
     private var sceneIdentifier: String = ""
-    private var recommendationsIdentity: [String] = []
-    private var contentRequestID = UUID()
 
 #if !EXTENSION
     @MainActor
@@ -49,10 +44,6 @@ class NCSectionFirstHeader: UICollectionReusableView, UIGestureRecognizerDelegat
 
     override func awakeFromNib() {
         super.awakeFromNib()
-
-        // The recommendations carousel is intentionally allowed to extend beyond
-        // the safe-area-sized parent collection view.
-        clipsToBounds = false
 
         //
         // RichWorkspace
@@ -80,7 +71,6 @@ class NCSectionFirstHeader: UICollectionReusableView, UIGestureRecognizerDelegat
         layout.scrollDirection = .horizontal
 
         collectionViewRecommendations.collectionViewLayout = layout
-        collectionViewRecommendations.contentInsetAdjustmentBehavior = .never
         collectionViewRecommendations.register(UINib(nibName: "NCRecommendationsCell", bundle: nil), forCellWithReuseIdentifier: "cell")
         labelRecommendations.text = NSLocalizedString("_recommended_files_", comment: "")
 
@@ -98,37 +88,6 @@ class NCSectionFirstHeader: UICollectionReusableView, UIGestureRecognizerDelegat
         setRichWorkspaceColor()
     }
 
-    override func layoutSubviews() {
-        super.layoutSubviews()
-        updateRecommendationsLayout()
-    }
-
-    private func updateRecommendationsLayout() {
-        guard let viewController else { return }
-
-        let safeAreaInsets = viewController.view.safeAreaInsets
-        viewRecommendationsLeadingConstraint.constant = -safeAreaInsets.left
-        viewRecommendationsTrailingConstraint.constant = -safeAreaInsets.right
-
-        // Keep the final recommendation clear of the safe-area overlay when
-        // scrolled all the way to the end of the carousel.
-        if collectionViewRecommendations.contentInset.right != safeAreaInsets.right {
-            var contentInset = collectionViewRecommendations.contentInset
-            contentInset.right = safeAreaInsets.right
-            collectionViewRecommendations.contentInset = contentInset
-        }
-
-        if collectionViewRecommendations.horizontalScrollIndicatorInsets.right != safeAreaInsets.right {
-            var horizontalScrollIndicatorInsets = collectionViewRecommendations.horizontalScrollIndicatorInsets
-            horizontalScrollIndicatorInsets.right = safeAreaInsets.right
-            collectionViewRecommendations.horizontalScrollIndicatorInsets = horizontalScrollIndicatorInsets
-        }
-    }
-
-    private func setParentCollectionViewClipping(_ clipsToBounds: Bool) {
-        parentCollectionView?.clipsToBounds = clipsToBounds
-    }
-
     func setContent(heightHeaderRichWorkspace: CGFloat,
                     richWorkspaceText: String?,
                     heightHeaderRecommendations: CGFloat,
@@ -136,7 +95,6 @@ class NCSectionFirstHeader: UICollectionReusableView, UIGestureRecognizerDelegat
                     heightHeaderSection: CGFloat,
                     sectionText: String?,
                     viewController: UIViewController?,
-                    parentCollectionView: UICollectionView?,
                     sceneItentifier: String,
                     delegate: NCSectionFirstHeaderDelegate?) {
         viewRichWorkspaceHeightConstraint.constant = heightHeaderRichWorkspace
@@ -148,19 +106,11 @@ class NCSectionFirstHeader: UICollectionReusableView, UIGestureRecognizerDelegat
             self.richWorkspaceText = richWorkspaceText
         }
         setRichWorkspaceColor()
-        let accountChanged = self.recommendations.first?.account != recommendations.first?.account
-        contentRequestID = UUID()
-        let requestID = contentRequestID
         self.recommendations = recommendations
         self.labelSection.text = sectionText
         self.viewController = viewController
-        self.parentCollectionView = parentCollectionView
         self.sceneIdentifier = sceneItentifier
         self.delegate = delegate
-
-        let recommendationsVisible = heightHeaderRecommendations != 0 && !recommendations.isEmpty
-        setParentCollectionViewClipping(!recommendationsVisible)
-        updateRecommendationsLayout()
 
         if heightHeaderRichWorkspace != 0, let richWorkspaceText, !richWorkspaceText.isEmpty {
             viewRichWorkspace.isHidden = false
@@ -168,7 +118,7 @@ class NCSectionFirstHeader: UICollectionReusableView, UIGestureRecognizerDelegat
             viewRichWorkspace.isHidden = true
         }
 
-        if recommendationsVisible {
+        if heightHeaderRecommendations != 0 && !recommendations.isEmpty {
             viewRecommendations.isHidden = false
         } else {
             viewRecommendations.isHidden = true
@@ -180,42 +130,14 @@ class NCSectionFirstHeader: UICollectionReusableView, UIGestureRecognizerDelegat
             viewSection.isHidden = false
         }
 
-        if accountChanged {
-            recommendationsIdentity = []
-            collectionViewRecommendations.reloadData()
-        }
-
 #if EXTENSION
         self.collectionViewRecommendations.reloadData()
 #else
-        Task { [weak self] in
-            guard let self else { return }
-
-            let isPause = await (viewController as? NCCollectionViewCommon)?
-                .debouncerReloadDataSource
-                .isPausedNow() ?? false
-
-            guard !isPause, self.contentRequestID == requestID else {
-                return
+        Task {
+            let isPause = await (viewController as? NCCollectionViewCommon)?.debouncerReloadDataSource.isPausedNow() ?? false
+            if !isPause {
+                self.collectionViewRecommendations.reloadData()
             }
-
-            let fileIds = recommendations.map(\.id)
-            let metadatas = await NCManageDatabase.shared.getMetadatasFromFileIdsAsync(fileIds, account: recommendations.first?.account ?? "")
-            let etagsByFileId = Dictionary(
-                metadatas.map { ($0.fileId, $0.etag) },
-                uniquingKeysWith: { current, _ in current }
-            )
-            let newRecommendationsIdentity = recommendations.map {
-                "\($0.account)|\($0.id)|\($0.reason)|\(etagsByFileId[$0.id] ?? "")"
-            }
-
-            guard self.contentRequestID == requestID,
-                  self.recommendationsIdentity != newRecommendationsIdentity else {
-                return
-            }
-
-            self.recommendationsIdentity = newRecommendationsIdentity
-            self.collectionViewRecommendations.reloadData()
         }
 #endif
     }
@@ -241,160 +163,67 @@ extension NCSectionFirstHeader: UICollectionViewDataSource {
     }
 
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let recommendedFile = self.recommendations[indexPath.row]
-        guard let cell = collectionView.dequeueReusableCell(
-            withReuseIdentifier: "cell",
-            for: indexPath
-        ) as? NCRecommendationsCell else {
-            fatalError("Unable to dequeue NCRecommendationsCell")
-        }
+        let recommendedFiles = self.recommendations[indexPath.row]
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as? NCRecommendationsCell else { fatalError() }
 
-        cell.representedFileId = recommendedFile.id
-        cell.representedAccount = recommendedFile.account
-        cell.imageRequestID = UUID()
-        cell.metadata = nil
-        let imageRequestID = cell.imageRequestID
-        cell.labelInfo.text = recommendedFile.reason
-        cell.delegate = self
-        cell.image.image = nil
-        cell.image.contentMode = .scaleAspectFit
-        cell.setImageCorner(withBorder: false)
-
-        let fileId = recommendedFile.id
-        let account = recommendedFile.account
-
-        Task { [weak self, weak cell] in
-            guard let self,
-                  let metadata = await NCManageDatabase.shared.getMetadataFromFileIdAsync(fileId, account: account),
-                  !Task.isCancelled else {
-                return
-            }
-
-            await MainActor.run {
-                guard let cell,
-                      cell.representedFileId == fileId,
-                      cell.representedAccount == account,
-                      cell.imageRequestID == imageRequestID else {
-                    return
-                }
-
-                cell.metadata = metadata
-                cell.setBidiSafeFilename(
-                    metadata.fileNameView,
-                    isDirectory: metadata.directory,
-                    titleLabel: cell.labelFilename,
-                    extensionLabel: cell.labelExtensionFilename
-                )
-
-                let hasDocumentPreview = metadata.hasPreview &&
-                metadata.classFile == NKTypeClassFile.document.rawValue
-
-                cell.setImageCorner(withBorder: hasDocumentPreview)
-            }
+        if let metadata = NCManageDatabase.shared.getMetadataFromFileId(recommendedFiles.id) {
+            let imagePreview = self.utility.getImage(ocId: metadata.ocId, etag: metadata.etag, ext: global.previewExt512, userId: metadata.userId, urlBase: metadata.urlBase)
 
             if metadata.directory {
-                let icon = self.utility.loadImage(
-                    named: metadata.iconName,
-                    useTypeIconFile: true,
-                    account: metadata.account
-                )
-
-                await MainActor.run {
-                    guard let cell,
-                          cell.representedFileId == fileId,
-                          cell.representedAccount == account,
-                          cell.imageRequestID == imageRequestID else {
-                        return
-                    }
-
-                    cell.image.image = icon
-                    cell.image.contentMode = .scaleAspectFit
-                }
-
-                return
-            }
-
-            if let image = self.utility.getImage(
-                ocId: metadata.ocId,
-                etag: metadata.etag,
-                ext: self.global.previewExt512,
-                userId: metadata.userId,
-                urlBase: metadata.urlBase
-            ) {
-                await MainActor.run {
-                    guard let cell,
-                          cell.representedFileId == fileId,
-                          cell.representedAccount == account,
-                          cell.imageRequestID == imageRequestID else {
-                        return
-                    }
-
-                    cell.image.image = image
-                    cell.image.contentMode = .scaleAspectFill
-                }
-
-                return
-            }
-
-            let icon = self.utility.loadImage(
-                named: metadata.iconName,
-                useTypeIconFile: true,
-                account: metadata.account
-            )
-
-            await MainActor.run {
-                guard let cell,
-                      cell.representedFileId == fileId,
-                      cell.representedAccount == account,
-                      cell.imageRequestID == imageRequestID else {
-                    return
-                }
-
-                cell.image.image = icon
+                cell.image.image = self.utility.loadImage(named: metadata.iconName, useTypeIconFile: true, account: metadata.account)
                 cell.image.contentMode = .scaleAspectFit
-            }
-
-            let result = await NextcloudKit.shared.downloadPreviewAsync(
-                fileId: fileId,
-                etag: metadata.etag,
-                account: metadata.account
-            )
-
-            guard result.error == .success,
-                  let data = result.responseData?.data,
-                  let image = utility.createImageFileFrom(
-                    data: data,
-                    ocId: metadata.ocId,
-                    etag: metadata.etag,
-                    ext: self.global.previewExt512,
-                    userId: metadata.userId,
-                    urlBase: metadata.urlBase
-                  ) else {
-                return
-            }
-
-            await MainActor.run {
-                guard let cell,
-                      cell.representedFileId == fileId,
-                      cell.representedAccount == account,
-                      cell.imageRequestID == imageRequestID else {
-                    return
-                }
-
+            } else if let image = imagePreview {
+                cell.image.image = image
                 cell.image.contentMode = .scaleAspectFill
-
-                if metadata.classFile == NKTypeClassFile.document.rawValue {
-                    cell.setImageCorner(withBorder: true)
-                }
-
-                UIView.transition(
-                    with: cell.image,
-                    duration: 0.25,
-                    options: .transitionCrossDissolve
-                ) {
-                    cell.image.image = image
+            } else {
+//                cell.image.image = self.utility.loadImage(named: metadata.iconName, useTypeIconFile: true, account: metadata.account)
+                cell.image.image = self.utility.previewIcon(for: metadata)
+                cell.image.contentMode = .scaleAspectFit
+                if recommendedFiles.hasPreview {
+                    Task {
+                        let resultsPreview = await NextcloudKit.shared.downloadPreviewAsync(fileId: metadata.fileId, etag: metadata.etag, account: metadata.account) { task in
+                            Task {
+                                let identifier = await NCNetworking.shared.networkingTasks.createIdentifier(account: metadata.account,
+                                                                                                            path: metadata.fileId,
+                                                                                                            name: "DownloadPreview")
+                                await NCNetworking.shared.networkingTasks.track(identifier: identifier, task: task)
+                            }
+                        }
+                        if resultsPreview.error == .success, let data = resultsPreview.responseData?.data {
+                            self.utility.createImageFileFrom(data: data, ocId: metadata.ocId, etag: metadata.etag, userId: metadata.userId, urlBase: metadata.urlBase)
+                            if let image = self.utility.getImage(ocId: metadata.ocId, etag: metadata.etag, ext: self.global.previewExt512, userId: metadata.userId, urlBase: metadata.urlBase) {
+                                Task { @MainActor in
+                                    for case let cell as NCRecommendationsCell in self.collectionViewRecommendations.visibleCells {
+                                        if cell.metadata?.fileId == recommendedFiles.id {
+                                            cell.image.contentMode = .scaleAspectFill
+                                            if metadata.classFile == NKTypeClassFile.document.rawValue {
+                                                cell.setImageCorner(withBorder: true)
+                                            }
+                                            UIView.transition(with: cell.image, duration: 0.75, options: .transitionCrossDissolve, animations: {
+                                                cell.image.image = image
+                                            }, completion: nil)
+                                            break
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             }
+
+            if metadata.hasPreview, metadata.classFile == NKTypeClassFile.document.rawValue, imagePreview != nil {
+                cell.setImageCorner(withBorder: true)
+            } else {
+                cell.setImageCorner(withBorder: false)
+            }
+
+            cell.setBidiSafeFilename(metadata.fileNameView, isDirectory: metadata.directory, titleLabel: cell.labelFilename, extensionLabel: cell.labelExtensionFilename)
+            cell.labelInfo.text = recommendedFiles.reason
+
+            cell.delegate = self
+            cell.metadata = metadata
+            cell.recommendedFiles = recommendedFiles
         }
 
         return cell
@@ -404,18 +233,16 @@ extension NCSectionFirstHeader: UICollectionViewDataSource {
 extension NCSectionFirstHeader: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let recommendedFiles = self.recommendations[indexPath.row]
-        guard let metadata = NCManageDatabase.shared.getMetadataFromFileId(recommendedFiles.id, account: recommendedFiles.account),
-            let cell = collectionView.cellForItem(at: indexPath) as? NCRecommendationsCell else {
+        guard let metadata = NCManageDatabase.shared.getMetadataFromFileId(recommendedFiles.id) else {
             return
         }
-        let viewerTransitionSource = cell.viewerTransitionSource()
 
-        self.delegate?.tapRecommendations(with: metadata, viewerTransitionSource: viewerTransitionSource)
+        self.delegate?.tapRecommendations(with: metadata)
     }
 
     func collectionView(_ collectionView: UICollectionView, contextMenuConfigurationForItemAt indexPath: IndexPath, point: CGPoint) -> UIContextMenuConfiguration? {
         let recommendedFiles = self.recommendations[indexPath.row]
-        guard let metadata = NCManageDatabase.shared.getMetadataFromFileId(recommendedFiles.id, account: recommendedFiles.account),
+        guard let metadata = NCManageDatabase.shared.getMetadataFromFileId(recommendedFiles.id),
               metadata.classFile != NKTypeClassFile.url.rawValue,
               let viewController else {
             return nil
@@ -448,11 +275,12 @@ extension NCSectionFirstHeader: UICollectionViewDelegateFlowLayout {
 extension NCSectionFirstHeader: NCRecommendationsCellDelegate {
     func openContextMenu(with metadata: tableMetadata?, button: UIButton, sender: Any) {
 #if !EXTENSION
-        guard let viewController = self.viewController, let metadata else {
-            button.menu = nil
-            return
+        Task {
+            guard let viewController = self.viewController, let metadata else {
+                return
+            }
+            button.menu = NCContextMenuMain(metadata: metadata, viewController: viewController, controller: self.controller, sender: sender).viewMenu()
         }
-        button.menu = NCContextMenuMain(metadata: metadata, viewController: viewController, controller: self.controller, sender: sender).viewMenu()
 #endif
     }
 
