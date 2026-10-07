@@ -92,6 +92,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
             logLevel: NCBrandOptions.shared.disable_log ? .disabled : NCPreferences().log,
             logDirectory: NCPreferences.sharedLogDirectory
         )
+        if NCBrandOptions.shared.disable_log {
+            utilityFileSystem.removeFile(atPath: NextcloudKit.shared.nkCommonInstance.filenamePathLog)
+            utilityFileSystem.removeFile(atPath: NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).first! + "/" + NextcloudKit.shared.nkCommonInstance.filenameLog)
+        } else {
+            NextcloudKit.shared.setupLog(pathLog: utilityFileSystem.directoryGroup,
+                                         levelLog: NCKeychain().logLevel,
+                                         copyLogToDocumentDirectory: true)
+            NextcloudKit.shared.nkCommonInstance.writeLog("[INFO] Start session with level \(NCKeychain().logLevel) " + versionNextcloudiOS)
+        }
 
         #if DEBUG
 //      For the tags look NCGlobal LOG TAG
