@@ -5,6 +5,7 @@
 import UIKit
 import RealmSwift
 import NextcloudKit
+import Foundation
 
 // MARK: UICollectionViewDelegate
 extension NCTrash: UICollectionViewDelegate {
@@ -156,7 +157,8 @@ extension NCTrash: UICollectionViewDataSource {
         if resultTableTrash.iconName.isEmpty {
             image = NCImageCache.shared.getImageFile()
         } else {
-            image = NCUtility().loadImage(named: resultTableTrash.iconName, useTypeIconFile: true, account: resultTableTrash.account)
+//            image = NCUtility().loadImage(named: resultTableTrash.iconName, useTypeIconFile: true, account: resultTableTrash.account)
+            image = NCUtility().previewTrashIcon(for: resultTableTrash)
         }
 
         if let imageIcon = utility.getImage(ocId: resultTableTrash.fileId,
@@ -166,9 +168,16 @@ extension NCTrash: UICollectionViewDataSource {
                                             urlBase: session.urlBase) {
             image = imageIcon
             cell.image.contentMode = .scaleAspectFill
+        } else {
+            if resultTableTrash.hasPreview {
+                if NCNetworking.shared.downloadThumbnailTrashQueue.operations.filter({ ($0 as? NCOperationDownloadThumbnailTrash)?.fileId == resultTableTrash.fileId }).isEmpty {
+                    NCNetworking.shared.downloadThumbnailTrashQueue.addOperation(NCOperationDownloadThumbnailTrash(fileId: resultTableTrash.fileId, fileName: resultTableTrash.fileName, session: session, collectionView: collectionView))
+                }
+            }
         }
 
         cell.identifier = resultTableTrash.fileId
+        cell.account = resultTableTrash.account
         cell.setupCellUI(tableTrash: resultTableTrash, image: image)
         cell.selected(selectOcId.contains(resultTableTrash.fileId), isEditMode: isEditMode, color: NCBrandColor.shared.getElement(account: session.account))
 
