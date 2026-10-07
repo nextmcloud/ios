@@ -187,6 +187,7 @@
 		B52FAECF2DA8EF84001AB1BD /* TextFileWithOcrSwitchView.xib in Resources */ = {isa = PBXBuildFile; fileRef = B52FAEBE2DA8EF84001AB1BD /* TextFileWithOcrSwitchView.xib */; };
 		B52FAED02DA8EF84001AB1BD /* JPGImageSaveSwitchView.xib in Resources */ = {isa = PBXBuildFile; fileRef = B52FAEB02DA8EF84001AB1BD /* JPGImageSaveSwitchView.xib */; };
 		B52FAED12DA8EF84001AB1BD /* PdfWithoutOcrSwitchView.xib in Resources */ = {isa = PBXBuildFile; fileRef = B52FAEB62DA8EF84001AB1BD /* PdfWithoutOcrSwitchView.xib */; };
+		B52FAED32DA8F22F001AB1BD /* MoveAndCopyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B52FAED22DA8F22F001AB1BD /* MoveAndCopyTests.swift */; };
 		C04E2F232A17BB4D001BAD85 /* FilesIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C04E2F222A17BB4D001BAD85 /* FilesIntegrationTests.swift */; };
 		D575039F27146F93008DC9DC /* String+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7A0D1342591FBC5008F8A13 /* String+Extension.swift */; };
 		D5B6AA7827200C7200D49C24 /* NCActivityTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5B6AA7727200C7200D49C24 /* NCActivityTableViewCell.swift */; };
@@ -1600,6 +1601,7 @@
 		B52FAEBC2DA8EF84001AB1BD /* SetPDFPasswordSwitchView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SetPDFPasswordSwitchView.xib; sourceTree = "<group>"; };
 		B52FAEBD2DA8EF84001AB1BD /* TextFileWithOcrSwitchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextFileWithOcrSwitchView.swift; sourceTree = "<group>"; };
 		B52FAEBE2DA8EF84001AB1BD /* TextFileWithOcrSwitchView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = TextFileWithOcrSwitchView.xib; sourceTree = "<group>"; };
+		B52FAED22DA8F22F001AB1BD /* MoveAndCopyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoveAndCopyTests.swift; sourceTree = "<group>"; };
 		C0046CDA2A17B98400D87C9D /* NextcloudUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NextcloudUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		C04E2F202A17BB4D001BAD85 /* NextcloudIntegrationTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NextcloudIntegrationTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		C0DECA012F65000100C0D001 /* NCCameraRollTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCCameraRollTests.swift; sourceTree = "<group>"; };
@@ -2529,6 +2531,11 @@
 				B52FAEA92DA8EF0C001AB1BD /* ScanTests.swift */,
 				AF8ED1FB2757821000B8DBC4 /* NextcloudUnitTests.swift */,
 			);
+ 				CA1700013000000000000002 /* NCUploadedAssetsCleanupTests.swift */,
+				AA52EB452D42AC5A0089C348 /* Placeholder.swift */,
+				B52FAED22DA8F22F001AB1BD /* MoveAndCopyTests.swift */,
+				AF8ED1FB2757821000B8DBC4 /* NextcloudUnitTests.swift */,
+ 			);
 			path = NextcloudUnitTests;
 			sourceTree = "<group>";
 		};
