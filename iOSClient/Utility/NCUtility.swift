@@ -14,6 +14,84 @@ final class NCUtility: NSObject, Sendable {
     let utilityFileSystem = NCUtilityFileSystem()
     let global = NCGlobal.shared
 
+    func isTypeFileRichDocument(_ metadata: tableMetadata) -> Bool {
+        let fileExtension = (metadata.fileNameView as NSString).pathExtension
+        guard let capabilities = NCNetworking.shared.capabilities[metadata.account],
+              !fileExtension.isEmpty,
+              let mimeType = UTType(tag: fileExtension.uppercased(), tagClass: .filenameExtension, conformingTo: nil)?.identifier else {
+            return false
+        }
+
+        /// contentype
+        if !capabilities.richDocumentsMimetypes.filter({ $0.contains(metadata.contentType) || $0.contains("text/plain") }).isEmpty {
+            return true
+        }
+
+        /// mimetype
+        if !capabilities.richDocumentsMimetypes.isEmpty && mimeType.components(separatedBy: ".").count > 2 {
+            let mimeTypeArray = mimeType.components(separatedBy: ".")
+            let mimeType = mimeTypeArray[mimeTypeArray.count - 2] + "." + mimeTypeArray[mimeTypeArray.count - 1]
+            if !capabilities.richDocumentsMimetypes.filter({ $0.contains(mimeType) }).isEmpty {
+                return true
+            }
+        }
+        return false
+    }
+
+    func editorsDirectEditing(account: String, contentType: String) -> [String] {
+        var identifiers: [String] = []
+        let capabilities = NCNetworking.shared.capabilities[account]
+
+        capabilities?.directEditingEditors.forEach { editor in
+            editor.mimetypes.forEach { mimetype in
+                if mimetype == contentType {
+                    identifiers.append(editor.identifier)
+                }
+                // HARDCODE
+                // https://github.com/nextcloud/text/issues/913
+                if mimetype == "text/markdown" && contentType == "text/x-markdown" {
+                    identifiers.append(editor.identifier)
+                }
+                if contentType == "text/html" {
+                    identifiers.append(editor.identifier)
+                }
+            }
+
+            editor.optionalMimetypes.forEach { mimetype in
+                if mimetype == contentType {
+                    identifiers.append(editor.identifier)
+                }
+            }
+        }
+
+        return Array(Set(identifiers))
+    }
+
+    func getCustomUserAgentNCText() -> String {
+        if UIDevice.current.userInterfaceIdiom == .phone {
+            // NOTE: Hardcoded (May 2022)
+            // Tested for iPhone SE (1st), iOS 12 iPhone Pro Max, iOS 15.4
+            // 605.1.15 = WebKit build version
+            // 15E148 = frozen iOS build number according to: https://chromestatus.com/feature/4558585463832576
+            return userAgent + " " + "AppleWebKit/605.1.15 Mobile/15E148"
+        } else {
+            return userAgent
+        }
+    }
+
+    func getCustomUserAgentOnlyOffice() -> String {
+        let appVersion = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString")!
+        if UIDevice.current.userInterfaceIdiom == .pad {
+            return "Mozilla/5.0 (iPad) Nextcloud-iOS/\(appVersion)"
+        } else {
+            return "Mozilla/5.0 (iPhone) Mobile Nextcloud-iOS/\(appVersion)"
+        }
+    }
+
+    func isQuickLookDisplayable(metadata: tableMetadata) -> Bool {
+        return true
+    }
+
     func ocIdToFileId(ocId: String?) -> String? {
         guard let ocId = ocId else { return nil }
         let items = ocId.components(separatedBy: "oc")
@@ -138,7 +216,7 @@ final class NCUtility: NSObject, Sendable {
         return isEqual
     }
 
-#if !EXTENSION_FILE_PROVIDER_EXTENSION && !EXTENSION_BACKGROUNDUPLOAD
+    #if !EXTENSION_FILE_PROVIDER_EXTENSION
     func getLocation(latitude: Double, longitude: Double, completion: @escaping (String?) -> Void) {
         let geocoder = CLGeocoder()
         let llocation = CLLocation(latitude: latitude, longitude: longitude)
@@ -159,7 +237,7 @@ final class NCUtility: NSObject, Sendable {
             }
         }
     }
-#endif
+    #endif
 
     // https://stackoverflow.com/questions/5887248/ios-app-maximum-memory-budget/19692719#19692719
     // https://stackoverflow.com/questions/27556807/swift-pointer-problems-with-mach-task-basic-info/27559770#27559770
@@ -198,6 +276,66 @@ final class NCUtility: NSObject, Sendable {
             height = (view.frame.height / 2) + landscapeOffset
         }
         return height
+    }
+
+    // E-mail validations
+    // 1. Basic Email Validator (ASCII only)
+    func isValidEmail(_ email: String) -> Bool {
+        let emailRegex = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,64}$"
+        let predicate = NSPredicate(format: "SELF MATCHES[c] %@", emailRegex)
+        return predicate.evaluate(with: email)
+    }
+
+    // 2. Manually Convert Unicode Domain to Punycode with German Char Support
+    func convertToPunycode(email: String) -> String? {
+        guard let atIndex = email.firstIndex(of: "@") else { return nil }
+
+        let localPart = String(email[..<atIndex])
+        var domainPart = String(email[email.index(after: atIndex)...])
+
+        // Normalize the domain part before converting to Punycode
+        let normalizedDomainPart = domainPart.precomposedStringWithCanonicalMapping
+
+        // Attempt to convert Unicode to Punycode using a custom conversion function
+        if let punycodeDomain = punycodeEncode(normalizedDomainPart) {
+            return "\(localPart)@\(punycodeDomain)"
+        }
+
+        return nil
+    }
+
+    // 3. Convert Unicode String to Punycode (Manually Handling German Characters)
+    func punycodeEncode(_ domain: String) -> String? {
+        // Mapping of common German characters to their corresponding Punycode equivalents
+        var punycodeDomain = domain.lowercased()
+
+        let germanCharToPunycode: [String: String] = [
+            "ü": "xn--u-1fa",  // ü → xn--u-1fa
+            "ä": "xn--a-1fa",  // ä → xn--a-1fa
+            "ö": "xn--o-1fa",  // ö → xn--o-1fa
+            "ß": "xn--ss-1fa", // ß → xn--ss-1fa
+            "é": "xn--e-1fa",  // é → xn--e-1fa
+            "è": "xn--e-1f",   // è → xn--e-1f
+            "à": "xn--a-1f",   // à → xn--a-1f
+        ]
+
+        // Replace each German character with the corresponding Punycode equivalent
+        for (char, punycode) in germanCharToPunycode {
+            punycodeDomain = punycodeDomain.replacingOccurrences(of: char, with: punycode)
+        }
+
+        // If no change occurred, return the domain as it is (i.e., no Punycode needed)
+        return punycodeDomain
+    }
+
+    // 4. IDN Email Validator (handles Unicode domain by converting to Punycode)
+    func isValidIDNEmail(_ email: String) -> Bool {
+        // Convert domain part to Punycode and validate using basic email regex
+        guard let punycodeEmail = convertToPunycode(email: email) else {
+            return false
+        }
+
+        return isValidEmail(punycodeEmail)
     }
 
     func formatBadgeCount(_ count: Int) -> String {
