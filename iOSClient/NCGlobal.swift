@@ -97,6 +97,10 @@ final class NCGlobal: Sendable {
     let introSignup: Int                            = 1
     let introSignUpWithProvider: Int                = 1
 
+    // Varie size GUI
+    //
+    @objc let heightCellSettings: CGFloat = 50
+    
     // Avatar
     //
     // Shared download resolution for a 128-point avatar at 3x scale, also used without a UI context.
@@ -127,6 +131,7 @@ final class NCGlobal: Sendable {
         }
     }
 
+    
     func getSizeExtension(column: Int) -> String {
         if column == 0 { return previewExt256 }
         let width = UIScreen.main.bounds.width / CGFloat(column)
@@ -151,6 +156,7 @@ final class NCGlobal: Sendable {
     let e2eeVersionV11                              = "1.1"
     let e2eeVersionV12                              = "1.2"
     let e2eeVersionV20                              = "2.0"
+    let e2eeCompatibleVersions                      = ["1.1", "1.2", "2.0", "2.1"]
 
     func isE2eeVersion2(_ version: String) -> Bool {
         if version == "2.0" || version == "2.1" {
@@ -258,6 +264,7 @@ final class NCGlobal: Sendable {
     let errorInternalError: Int                 = -99999
     let errorFileNotSaved: Int                  = -99998
     let errorOfflineNotAllowed: Int             = -99997
+    let errorOffline: Int                       = -99997
     let errorCharactersForbidden: Int           = -99996
     let errorCreationFile: Int                  = -99995
     let errorReadFile: Int                      = -99994
@@ -318,6 +325,7 @@ final class NCGlobal: Sendable {
     let selectorPrint                           = "print"
     let selectorDeleteFile                      = "deleteFile"
 
+    
     // Metadata : Status
     //
     //   0 normal
@@ -341,7 +349,7 @@ final class NCGlobal: Sendable {
     let metadataStatusWaitFavorite: Int         = 13
     let metadataStatusWaitCopy: Int             = 14
     let metadataStatusWaitMove: Int             = 15
-
+    
     let metadataStatusUploadingAllMode          = [1,2,3]
     let metadataStatusDownloadingAllMode        = [-1, -2, -3]
     let metadataStatusForScreenAwake            = [-1, -2, 1, 2]
@@ -361,11 +369,20 @@ final class NCGlobal: Sendable {
     let metadataStatusObserveTrasfers           = [-2, 2, 10, 11, 12, 13, 14, 15]
 
     let metadataStatusTransfers                 = [-2, -3, 2, 3, 10, 11, 12, 13, 14, 15]
+    
+    let metadataStatusObserveNetworkingProcess  = [-1, 1, 10, 11, 12, 13, 14, 15]
+    let metadataStatusObserveTrasfers           = [-2, 2, 10, 11, 12, 13, 14, 15]
+
+    let metadatasStatusInProgress               = [-2, 2]
+
+    let metadataStatusDownloadingAllMode        = [-1, -2, -3]
+    let metadataStatusForScreenAwake            = [-1, -2, 1, 2]
 
     //  Hidden files included in the read
     //
     let includeHiddenFiles: [String] = [".LivePhoto"]
     
+        
     // Auto upload subfolder granularity
     //
     let subfolderGranularityDaily               = 2
@@ -420,6 +437,7 @@ final class NCGlobal: Sendable {
     let notificationCenterClearCache                            = "clearCache"
     let notificationCenterCreateMediaCacheEnded                 = "createMediaCacheEnded"
     let notificationCenterUpdateNotification                    = "updateNotification"
+    let notificationCenterDidCreateShareLink                    = "didCreateShareLink"
 
     let notificationCenterDeleteFile                            = "deleteFile"                      // userInfo: [ocId], error
     let notificationCenterCopyMoveFile                          = "copyMoveFile"                    // userInfo: [ocId] serverUrl, account, dragdrop, type (copy, move)
@@ -469,6 +487,7 @@ final class NCGlobal: Sendable {
 
     let notificationCenterNetworkingProcess                     = "networkingProcess"
     let notificationCenterTransferCountChanged                  = "transferCountChanged"
+    let notificationCenterFavoriteStatusChanged                  = "favoriteStatusChanged"
 
     // Networking Status
     let networkingStatusCreateFolder                            = "statusCreateFolder"
@@ -584,6 +603,7 @@ final class NCGlobal: Sendable {
     let keyFileNameOriginal                         = "fileNameOriginal"
     let keyFileNameOriginalAutoUpload               = "fileNameOriginalAutoUpload"
 
+    
     // LOG TAG
     //
     let logTagTask                          = "BGT"

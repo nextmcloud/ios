@@ -57,6 +57,7 @@ class NCViewerMedia: UIViewController {
         (self.tabBarController as? NCMainTabBarController)?.sceneIdentifier ?? ""
     }
     
+
     internal var windowScene: UIWindowScene? {
         SceneManager.shared.getWindowScene(controller: self.tabBarController as? NCMainTabBarController)
     }
@@ -113,6 +114,9 @@ class NCViewerMedia: UIViewController {
         self.imageVideoContainer.image = nil
 
         loadImage()
+        Task {@MainActor in
+            await loadImage()
+        }
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -125,11 +129,15 @@ class NCViewerMedia: UIViewController {
         }
 
         viewerMediaPage?.navigationItem.title = (metadata.fileNameView as NSString).deletingPathExtension
+        viewerMediaPage?.navigationItem.setBidiSafeTitle(metadata.fileNameView)
 
         if metadata.isImage, let viewerMediaPage = self.viewerMediaPage {
             if viewerMediaPage.modifiedOcId.contains(metadata.ocId) {
                 viewerMediaPage.modifiedOcId.removeAll(where: { $0 == metadata.ocId })
                 loadImage()
+                Task {@MainActor in
+                    await loadImage()
+                }
             }
         }
     }
@@ -257,6 +265,8 @@ class NCViewerMedia: UIViewController {
     // MARK: - Image
 
     func loadImage() {
+    @MainActor
+    func loadImage() async {
         guard let metadata = self.database.getMetadataFromOcId(metadata.ocId) else { return }
         self.metadata = metadata
         let fileNamePath = utilityFileSystem.getDirectoryProviderStorageOcId(metadata.ocId,
@@ -282,6 +292,7 @@ class NCViewerMedia: UIViewController {
             Task {
                 await downloadImage()
             }
+            await downloadImage()
         }
 
         if metadata.isVideo && !metadata.hasPreview {
@@ -326,6 +337,28 @@ class NCViewerMedia: UIViewController {
                 }
                 self.image = self.utility.loadImage(named: "photo", colors: [NCBrandColor.shared.iconImageColor2])
                 self.imageVideoContainer.image = self.image
+                do {
+                    let fileNamePathPNG = utilityFileSystem.replaceExtension(fileNamePath: fileNamePath, with: "png")
+                    if FileManager.default.fileExists(atPath: fileNamePathPNG) {
+                        let data = try Data(contentsOf: URL(fileURLWithPath: fileNamePathPNG))
+                        self.image = UIImage(data: data)
+                        self.imageVideoContainer.image = self.image
+                    } else {
+                        let svgData = try Data(contentsOf: URL(fileURLWithPath: fileNamePath))
+                        if let image = try await NCSVGRenderer().renderSVGToUIImage(svgData: svgData, size: CGSize(width: 1024, height: 1024)),
+                           let data = image.pngData() {
+                            self.image = image
+                            self.imageVideoContainer.image = self.image
+                            try data.write(to: URL(fileURLWithPath: fileNamePathPNG))
+                            utility.createImageFileFrom(data: data, metadata: metadata)
+                        }
+                    }
+                    return
+                } catch {
+                    print("Unsupported image format: \(error.localizedDescription)")
+                    self.image = self.utility.loadImage(named: "photo", colors: [NCBrandColor.shared.iconImageColor2])
+                    self.imageVideoContainer.image = self.image
+                }
                 return
             } else if let image = UIImage(contentsOfFile: fileNamePath) {
                 self.image = image

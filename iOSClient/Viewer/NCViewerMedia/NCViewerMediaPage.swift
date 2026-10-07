@@ -54,6 +54,7 @@ class NCViewerMediaPage: UIViewController {
         menu: UIMenu(title: "", children: [
             UIDeferredMenuElement.uncached { [self] completion in
                 if let menu = NCViewerContextMenu.makeContextMenu(controller: self.tabBarController as? NCMainTabBarController, metadata: currentViewController.metadata, webView: false, sender: self) {
+                if let menu = NCContextMenuViewer(metadata: currentViewController.metadata, controller: self.tabBarController as? NCMainTabBarController, webView: false, sender: self).viewMenu() {
                     completion(menu.children)
                 }
             }
@@ -115,6 +116,7 @@ class NCViewerMediaPage: UIViewController {
         pageViewController.view.addGestureRecognizer(longtapGestureRecognizer)
 
         progressView.tintColor = NCBrandColor.shared.getElement(account: metadata.account)
+        progressView.tintColor = NCBrandColor.shared.brand
         progressView.trackTintColor = .clear
         progressView.progress = 0
 
@@ -124,6 +126,8 @@ class NCViewerMediaPage: UIViewController {
         NotificationCenter.default.addObserver(self, selector: #selector(pageViewController.enableSwipeGesture), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterEnableSwipeGesture), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(pageViewController.disableSwipeGesture), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterDisableSwipeGesture), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(applicationDidBecomeActive(_:)), name: UIApplication.didBecomeActiveNotification, object: nil)
+
+        NotificationCenter.default.addObserver(self, selector: #selector(renameFile(_:)), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterRenameFile), object: nil)
 
         if currentViewController.metadata.isImage {
             navigationItem.rightBarButtonItems = [moreNavigationItem, imageDetailNavigationItem]
@@ -282,6 +286,11 @@ class NCViewerMediaPage: UIViewController {
         }
 
         viewerMediaScreenMode = mode
+        // Re-assert the title after any nav bar visibility/appearance changes
+        self.navigationItem.title = currentViewController.metadata.fileNameView
+        self.navigationController?.navigationBar.setNeedsLayout()
+        self.navigationController?.navigationBar.layoutIfNeeded()
+
         print("Screen mode: \(viewerMediaScreenMode)")
 
         startTimerAutoHide()
@@ -309,6 +318,34 @@ class NCViewerMediaPage: UIViewController {
         changeScreenMode(mode: .normal)
     }
 
+    @objc func renameFile(_ notification: NSNotification) {
+
+        guard let userInfo = notification.userInfo as NSDictionary?,
+              let ocId = userInfo["ocId"] as? String,
+//              let index = metadatas.firstIndex(where: {$0.ocId == ocId}),
+//              let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId)
+                let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId)
+
+        else { return }
+
+        DispatchQueue.main.async {
+            // Stop media
+            if let ncplayer = self.currentViewController.ncplayer, ncplayer.isPlaying() {
+                ncplayer.playerPause()
+            }
+
+            self.navigationItem.title = metadata.fileNameView
+            self.currentViewController.metadata = metadata
+
+            // Force navigation bar to refresh its layout so title updates visually
+            self.navigationController?.navigationBar.setNeedsLayout()
+            self.navigationController?.navigationBar.layoutIfNeeded()
+
+            // If detail UI depends on filename, refresh it
+            self.currentViewController.reloadDetail()
+        }
+    }
+    
     // MARK: - Command Center
 
     func updateCommandCenter(ncplayer: NCPlayer, title: String) {
@@ -628,12 +665,14 @@ extension NCViewerMediaPage: NCTransferDelegate {
                     }
                 } else if metadata.isImage {
                     self.currentViewController.loadImage()
+                    await self.currentViewController.loadImage()
                 }
             // UPLOAD
             case self.global.networkingStatusUploaded:
                 guard error == .success else { return }
                 if self.currentViewController.metadata.ocId == ocId {
                     self.currentViewController.loadImage()
+                    await self.currentViewController.loadImage()
                 } else {
                     self.modifiedOcId.append(ocId)
                 }
@@ -653,3 +692,4 @@ extension NCViewerMediaPage: NCTransferDelegate {
         }
     }
 }
+

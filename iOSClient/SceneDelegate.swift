@@ -21,6 +21,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         guard let windowScene = (scene as? UIWindowScene) else {
             return
         }
+        
         // Ensure MoEngage is initialized for multi-scene setups
 //        MoEngageAnalytics.setupIfNeeded()
 
@@ -126,7 +127,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
                     UserDefaults.standard.setValue(lastUpdateCheckDate, forKey: AppUpdaterKey.lastUpdateCheckDate)
                 }
             }
-
+            
             if NCBrandOptions.shared.disable_intro {
                 if let viewController = UIStoryboard(name: "NCLogin", bundle: nil).instantiateViewController(withIdentifier: "NCLogin") as? NCLogin {
                     let navigationController = UINavigationController(rootViewController: viewController)
@@ -194,10 +195,12 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             //
             window?.rootViewController = controller
             window?.makeKeyAndVisible()
+            
             // Re-evaluate in-app messages after main interface is visible
 //            Task { @MainActor in
                 MoEngageAnalytics.shared.displayInAppNotificationSafely(reason: "main interface launched")
 //            }
+            
             //
             if activateSceneForAccount {
                 self.activateSceneForAccount(scene, account: activeTblAccount.account, controller: controller)
@@ -283,6 +286,14 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             } else {
                 showPrivacyProtectionWindow()
             }
+            showPrivacyProtectionWindow()
+//            if SwiftEntryKit.isCurrentlyDisplaying {
+//                SwiftEntryKit.dismiss {
+//                    self.showPrivacyProtectionWindow()
+//                }
+//            } else {
+//                showPrivacyProtectionWindow()
+//            }
         }
     }
 
@@ -310,11 +321,10 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             // Timeout auto
             let didFinish = await withTaskGroup(of: Bool.self) { group -> Bool in
                 group.addTask {
-                    // TransferCoordinator
-                    await NCTransferCoordinator.shared.cancelAll()
+                    // QUEUE
+                    NCNetworking.shared.cancelAllQueue()
                     // FLUSH TRANSFERS SUCCESS
-                    await NCNetworking.shared.metadataDownloadTranfersSuccess.flush()
-                    await NCNetworking.shared.metadataUploadTranfersSuccess.flush()
+                    await NCNetworking.shared.metadataTranfersSuccess.flush()
                     // BACKUP
                     await NCManageDatabase.shared.backupTableAccountToFileAsync()
                     // LOG
@@ -440,19 +450,14 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
                     case self.global.actionTextDocument:
                         let session = SceneManager.shared.getSession(scene: scene)
                         let capabilities = await NKCapabilities.shared.getCapabilities(for: session.account)
-                        guard let creator = capabilities.directEditingCreators.first(where: { $0.editor == global.editorText }) else {
+                        guard let creator = capabilities.directEditingCreators.first(where: { $0.editor == "text" }) else {
                             return
                         }
                         let serverUrl = controller.currentServerUrl()
                         let fileName = await NCNetworking.shared.createFileName(fileNameBase: NSLocalizedString("_untitled_", comment: "") + "." + creator.ext, account: session.account, serverUrl: serverUrl)
+                        let fileNamePath = NCUtilityFileSystem().getRelativeFilePath(String(describing: fileName), serverUrl: serverUrl, session: session)
 
-                        await NCCreate().createDocument(controller: controller,
-                                                        serverUrl: serverUrl,
-                                                        fileName: fileName,
-                                                        editorId: global.editorText,
-                                                        creatorId: creator.identifier,
-                                                        templateId: "document",
-                                                        session: session)
+                        await NCCreate().createDocument(controller: controller, fileNamePath: fileNamePath, fileName: String(describing: fileName), editorId: "text", creatorId: creator.identifier, templateId: "document", account: session.account)
                     case self.global.actionVoiceMemo:
                         NCAskAuthorization().askAuthorizationAudioRecord(controller: controller) { hasPermission in
                             if hasPermission {
@@ -581,6 +586,10 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
                 requestedAccount(controller: controller)
             }
         }
+        
+        // Re-evaluate in-app messages after activating scene for account
+        MoEngageAnalytics.shared.displayInAppNotificationSafely(reason: "activated scene for account")
+
 
         // Re-evaluate in-app messages after activating scene for account
         MoEngageAnalytics.shared.displayInAppNotificationSafely(reason: "activated scene for account")
@@ -673,17 +682,6 @@ final class SceneManager: @unchecked Sendable {
         return nil
     }
 
-    func getController(account: String?) -> NCMainTabBarController? {
-        if let account {
-            for controller in sceneController.keys {
-                if account == controller.account {
-                    return controller
-                }
-            }
-        }
-        return nil
-    }
-
     func getControllers() -> [NCMainTabBarController] {
         return Array(sceneController.keys)
     }
@@ -726,36 +724,27 @@ final class SceneManager: @unchecked Sendable {
         // Try exact match via your registry
         if let sceneIdentifier,
            let controller = sceneController.keys.first(where: { $0.sceneIdentifier == sceneIdentifier }),
-           let scene = sceneController[controller],
-           let window = getWindow(scene: scene)?.windowScene?.resolvedWindow {
-            return window
+           let scene = sceneController[controller] {
+            return getWindow(scene: scene)
         }
-
-        let windowScenes = UIApplication.shared.connectedScenes
-            .compactMap { $0 as? UIWindowScene }
 
         // Fallback: prefer a foregroundActive window scene
-        if let window = windowScenes
-            .first(where: { $0.activationState == .foregroundActive })?
-            .resolvedWindow {
-            return window
+        if let active = UIApplication.shared.connectedScenes
+            .compactMap({ $0 as? UIWindowScene })
+            .first(where: { $0.activationState == .foregroundActive }),
+           let w = active.keyWindow {
+            return w
         }
 
-        // Fallback: foregroundInactive window scene
-        if let window = windowScenes
-            .first(where: { $0.activationState == .foregroundInactive })?
-            .resolvedWindow {
-            return window
+        // Last resort: first connected window scene
+        if let any = UIApplication.shared.connectedScenes
+            .compactMap({ $0 as? UIWindowScene })
+            .first,
+           let w = any.keyWindow {
+            return w
         }
 
-        // Last resort: first connected window scene with a resolved window
-        if let window = windowScenes
-            .compactMap({ $0.resolvedWindow })
-            .first {
-            return window
-        }
-
-        // Absolute last resort
+        // Absolute last resort (if you keep it)
         return UIApplication.shared.mainAppWindow
     }
 

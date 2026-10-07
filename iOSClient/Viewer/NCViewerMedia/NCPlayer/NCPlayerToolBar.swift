@@ -66,6 +66,11 @@ class NCPlayerToolBar: UIView {
 
         audioButton.setImage(utility.loadImage(named: "speaker.zzz", colors: [.white]), for: .normal)
         audioButton.isEnabled = false
+        subtitleButton.showsMenuAsPrimaryAction = true
+
+        audioButton.setImage(utility.loadImage(named: "speaker.zzz", colors: [.white]), for: .normal)
+        audioButton.isEnabled = false
+        audioButton.showsMenuAsPrimaryAction = true
 
         if UIDevice.current.userInterfaceIdiom == .pad {
             pointSize = 60
@@ -143,6 +148,9 @@ class NCPlayerToolBar: UIView {
         }
 
         MPNowPlayingInfoCenter.default().nowPlayingInfo?[MPNowPlayingInfoPropertyPlaybackRate] = position
+
+        setupSubtitleButton()
+        setupAudioButton()
     }
 
     public func updatePlaybackPosition() {
@@ -267,6 +275,46 @@ class NCPlayerToolBar: UIView {
         let audioTrackIndexes = player.audioTrackIndexes
 
         toggleMenuAudio(audioTracks: audioTracks, audioTrackIndexes: audioTrackIndexes, sender: sender)
+    private func setupSubtitleButton() {
+        guard let player = ncplayer?.player else { return }
+
+        var currentIndex: Int?
+        if let data = database.getVideo(metadata: metadata), let idx = data.currentVideoSubTitleIndex {
+            currentIndex = idx
+        } else {
+            currentIndex = Int(player.currentVideoSubTitleIndex)
+        }
+
+        subtitleButton.menu = NCContextMenuPlayerTracks(
+            trackType: .subtitle,
+            tracks: player.videoSubTitlesNames,
+            trackIndexes: player.videoSubTitlesIndexes,
+            currentIndex: currentIndex,
+            ncplayer: ncplayer,
+            metadata: metadata,
+            viewerMediaPage: viewerMediaPage
+        ).viewMenu()
+    }
+
+    private func setupAudioButton() {
+        guard let player = ncplayer?.player else { return }
+
+        var currentIndex: Int?
+        if let data = database.getVideo(metadata: metadata), let idx = data.currentAudioTrackIndex {
+            currentIndex = idx
+        } else {
+            currentIndex = Int(player.currentAudioTrackIndex)
+        }
+
+        audioButton.menu = NCContextMenuPlayerTracks(
+            trackType: .audio,
+            tracks: player.audioTrackNames,
+            trackIndexes: player.audioTrackIndexes,
+            currentIndex: currentIndex,
+            ncplayer: ncplayer,
+            metadata: metadata,
+            viewerMediaPage: viewerMediaPage
+        ).viewMenu()
     }
 
     @IBAction func tapPlayerPause(_ sender: Any) {
@@ -445,6 +493,8 @@ extension NCPlayerToolBar {
 
 extension NCPlayerToolBar: NCSelectDelegate {
     func dismissSelect(serverUrl: String?, metadata: tableMetadata?, type: String, items: [Any], overwrite: Bool, copy: Bool, move: Bool, session: NCSession.Session) {
+extension NCPlayerToolBar: NCSelectDelegate {
+    func dismissSelect(serverUrl: String?, metadata: tableMetadata?, type: String, items: [Any], overwrite: Bool, copy: Bool, move: Bool, session: NCSession.Session, controller: NCMainTabBarController?) {
         if let metadata = metadata, let viewerMediaPage = viewerMediaPage {
             let fileNameLocalPath = NCUtilityFileSystem().getDirectoryProviderStorageOcId(metadata.ocId, fileName: metadata.fileNameView, userId: metadata.userId, urlBase: metadata.urlBase)
             let windowScene = SceneManager.shared.getWindowScene(controller: viewerMediaPage.tabBarController)
@@ -481,12 +531,17 @@ extension NCPlayerToolBar: NCSelectDelegate {
                                        for: token)
                     }
                 }) { _, etag, _, _, _, _, error in
+                }) { _, response, error in
                     Task {
                         if let banner {
                             banner.dismiss()
                         }
 
                         let ocId = metadata.ocId
+                        let allHeaderFields = response?.response?.allHeaderFields
+                        let nkComm = NextcloudKit.shared.nkCommonInstance
+                        let etag = nkComm.normalizedETag(nkComm.findHeader("oc-etag", allHeaderFields: allHeaderFields))
+
                         await self.database.setMetadataSessionAsync(ocId: ocId,
                                                                     session: "",
                                                                     sessionTaskIdentifier: 0,

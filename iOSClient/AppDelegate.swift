@@ -187,7 +187,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
             notificationCenter.add(req)
         }
 
-        nkLog(debug: "App is terminating")
+        nkLog(debug: "bye bye")
     }
 
     // MARK: - UISceneSession Lifecycle
@@ -204,6 +204,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         // Use this method to release any resources that were specific to the discarded scenes, as they will not return.
     }
 
+    /*
     // MARK: - Background Task
 
     /*
@@ -408,6 +409,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         }
     }
 
+*/
+    
     // MARK: - Background Networking Session
 
     func application(_ application: UIApplication, handleEventsForBackgroundURLSession identifier: String, completionHandler: @escaping () -> Void) {
@@ -856,6 +859,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
 
     @objc private func checkErrorNetworking() {
         guard !account.isEmpty, NCKeychain().getPassword(account: account).isEmpty else { return }
+        guard !account.isEmpty, NCPreferences().getPassword(account: account).isEmpty else { return }
         openLogin(viewController: window?.rootViewController, selector: NCGlobal.shared.introLogin, openLoginWeb: true)
     }
 }
