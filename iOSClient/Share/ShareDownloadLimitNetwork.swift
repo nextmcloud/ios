@@ -30,6 +30,7 @@ class NMCCommunication: NSObject, XMLParserDelegate {
     func getDownloadLimit(token: String, completion: @escaping (_ downloadLimit: DownloadLimit?, _ errorDescription: String) -> Void)  {
         let baseUrl = session.urlBase       // NCBrandOptions.shared.loginBaseUrl
     
+        
     func getDownloadLimit(token: String, completion: @escaping (_ downloadLimit: DownloadLimit?, _ errorDescription: String) -> Void)  {
         let baseUrl = session.urlBase       // NCBrandOptions.shared.loginBaseUrl
         let endPoint = "/ocs/v2.php/apps/files_downloadlimit/\(token)/limit"
@@ -119,6 +120,7 @@ class NMCCommunication: NSObject, XMLParserDelegate {
         let accountDetails = NCManageDatabase.shared.getAllTableAccount().first
         let accountDetails = NCManageDatabase.shared.getAllAccount().first
         let password = NCKeychain().getPassword(account: accountDetails?.account ?? "") 
+        let password = NCKeychain().getPassword(account: accountDetails?.account ?? "")
         let password = NCKeychain().getPassword(account: accountDetails?.account ?? "")
         let username = accountDetails?.user ?? ""
         let credential = Data("\(username):\(password)".utf8).base64EncodedString()
