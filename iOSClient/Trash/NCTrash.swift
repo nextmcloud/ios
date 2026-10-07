@@ -9,7 +9,6 @@ import RealmSwift
 class NCTrash: UIViewController, NCTrashListCellDelegate, NCTrashGridCellDelegate {
     @IBOutlet weak var collectionView: UICollectionView!
 
-    internal var dataSourceTask: URLSessionTask?
     var filePath = ""
     var titleCurrentFolder = NSLocalizedString("_trash_view_", comment: "")
     var blinkFileId: String?
@@ -64,8 +63,6 @@ class NCTrash: UIViewController, NCTrashListCellDelegate, NCTrashGridCellDelegat
         collectionView.alwaysBounceVertical = true
         collectionView.backgroundColor = .systemBackground
 
-        collectionView.hideTopScrollEdgeEffect()
-
         listLayout = NCListLayout()
         gridLayout = NCGridLayout()
 
@@ -104,13 +101,18 @@ class NCTrash: UIViewController, NCTrashListCellDelegate, NCTrashGridCellDelegat
             await self.reloadDataSource()
             await loadListingTrash()
         }
+        AnalyticsHelper.shared.trackEvent(eventName: .SCREEN_EVENT__DELETED_FILES)
     }
 
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
 
-        dataSourceTask?.cancel()
-        dataSourceTask = nil
+        Task {
+            await NCNetworking.shared.networkingTasks.cancel(identifier: "NCTrash")
+        }
+
+        // Cancel Queue & Retrieves Properties
+//        NCNetworking.shared.downloadThumbnailTrashQueue.cancelAll()
     }
 
     // MARK: TAP EVENT
@@ -185,5 +187,13 @@ class NCTrash: UIViewController, NCTrashListCellDelegate, NCTrashGridCellDelegat
         } else {
             return filePath + "/"
         }
+    }
+
+    /// Refreshes the trash view after a mutation (e.g., delete/restore) so items show up immediately.
+    @MainActor
+    func reloadAfterTrashMutation() async {
+        // Update menu and data source, then fetch latest listing
+        await self.reloadDataSource()
+        await self.loadListingTrash()
     }
 }
