@@ -538,6 +538,8 @@ final class NCGlobal: Sendable {
     
     let notificationCenterCreateFolder                          = "createFolder"                    // userInfo: ocId, serverUrl, account, withPush, sceneIdentifier
     
+    let notificationCenterRenameFile                            = "renameFile"                      // userInfo: serverUrl, account, error
+
     let notificationCenterMenuSearchTextPDF                     = "menuSearchTextPDF"
     let notificationCenterMenuGotToPageInPDF                    = "menuGotToPageInPDF"
 

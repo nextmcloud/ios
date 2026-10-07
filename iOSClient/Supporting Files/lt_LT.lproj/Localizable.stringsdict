@@ -22,20 +22,24 @@
 			<string>%d likusių leidžiamų atsisiuntimų skaičius</string>
 		</dict>
 	</dict>
-	<key>_auto_upload_files_in_queue_</key>
+	<key>_focused_auto_upload_items_left_</key>
 	<dict>
 		<key>NSStringLocalizedFormatKey</key>
-		<string>%#@files@</string>
-		<key>files</key>
+		<string>%#@items@</string>
+		<key>items</key>
 		<dict>
 			<key>NSStringFormatSpecTypeKey</key>
 			<string>NSStringPluralRuleType</string>
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>%d file in queue</string>
+			<string>liko %d elementas</string>
+			<key>few</key>
+			<string>liko %d elementai</string>
+			<key>many</key>
+			<string>liko %d elementų</string>
 			<key>other</key>
-			<string>%d files in queue</string>
+			<string>liko %d elementų</string>
 		</dict>
 	</dict>
 	<key>_focused_auto_upload_photos_to_back_up_</key>
@@ -76,38 +80,6 @@
 			<string>%d nepavyko</string>
 			<key>other</key>
 			<string>%d nepavyko</string>
-		</dict>
-	</dict>
-	<key>_albums_photos_count_</key>
-	<dict>
-		<key>NSStringLocalizedFormatKey</key>
-		<string>%#@photos@</string>
-		<key>photos</key>
-		<dict>
-			<key>NSStringFormatSpecTypeKey</key>
-			<string>NSStringPluralRuleType</string>
-			<key>NSStringFormatValueTypeKey</key>
-			<string>d</string>
-			<key>one</key>
-			<string>%d photo</string>
-			<key>other</key>
-			<string>%d photos</string>
-		</dict>
-	</dict>
-	<key>_albums_list_photos_and_videos_count_</key>
-	<dict>
-		<key>NSStringLocalizedFormatKey</key>
-		<string>%#@media@</string>
-		<key>media</key>
-		<dict>
-			<key>NSStringFormatSpecTypeKey</key>
-			<string>NSStringPluralRuleType</string>
-			<key>NSStringFormatValueTypeKey</key>
-			<string>d</string>
-			<key>one</key>
-			<string>%d photo or video</string>
-			<key>other</key>
-			<string>%d photos and videos</string>
 		</dict>
 	</dict>
 </dict>
