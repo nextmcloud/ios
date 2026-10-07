@@ -217,6 +217,8 @@ extension tableMetadata {
 //        !isDirectoryE2EE && !e2eEncrypted && NCMetadataPermissions.canMoveAndDelete(self)
         !isDocumentViewableOnly && !isDirectoryE2EE && !e2eEncrypted
 //        !isDirectoryE2EE && !e2eEncrypted
+//        !isDirectoryE2EE && !e2eEncrypted
+        !isDirectoryE2EE && !e2eEncrypted && NCMetadataPermissions.canMoveAndDelete(self)
     }
 
     var isModifiableWithQuickLook: Bool {
@@ -245,6 +247,8 @@ extension tableMetadata {
 
     var isDeletable: Bool {
         if (!isDirectoryE2EE && e2eEncrypted) || !NCMetadataPermissions.canDelete(self) {
+//        if (!isDirectoryE2EE && e2eEncrypted) || !NCMetadataPermissions.canDelete(self) {
+        if (!isDirectoryE2EE && e2eEncrypted) || !NCMetadataPermissions.canDelete(self) || !NCMetadataPermissions.canMoveAndDelete(self) {
             return false
         }
         return true
@@ -337,7 +341,7 @@ extension tableMetadata {
               NextcloudKit.shared.isNetworkReachable() else {
             return false
         }
-        let directEditingEditors = NCDocumentEditorSupport.directEditingEditorIdentifiers(account: account, contentType: contentType, fileName: fileNameView)
+        let directEditingEditors = NCDocumentEditorSupport.directEditingEditorIdentifiers(account: account, contentType: contentType)
         let supportsRichdocuments = NCDocumentEditorSupport.isFileSupportedByRichdocuments(self)
 
         if let capabilities,
@@ -354,7 +358,8 @@ extension tableMetadata {
     }
 
     var isLegacyRichdocumentsEditorAvailable: Bool {
-        guard classFile == NKTypeClassFile.document.rawValue,
+        guard !isPDF,
+              classFile == NKTypeClassFile.document.rawValue,
               NextcloudKit.shared.isNetworkReachable(),
               NCDocumentEditorSupport.isFileSupportedByRichdocuments(self) else {
             return false
@@ -362,8 +367,7 @@ extension tableMetadata {
 
         let directEditingEditors = NCDocumentEditorSupport.directEditingEditorIdentifiers(
             account: account,
-            contentType: contentType,
-            fileName: fileNameView
+            contentType: contentType
         )
         return !directEditingEditors.contains {
             $0.caseInsensitiveCompare(NCGlobal.shared.editorCollabora) == .orderedSame
@@ -375,7 +379,7 @@ extension tableMetadata {
         guard (classFile == NKTypeClassFile.document.rawValue) && NextcloudKit.shared.isNetworkReachable() else {
             return false
         }
-        let editors = NCDocumentEditorSupport.directEditingEditorIdentifiers(account: account, contentType: contentType, fileName: fileNameView)
+        let editors = NCDocumentEditorSupport.directEditingEditorIdentifiers(account: account, contentType: contentType)
         return !editors.isEmpty
     }
 
@@ -389,6 +393,33 @@ extension tableMetadata {
         } else {
             return NCMetadataPermissions.canCreateFile(self)
         }
+    }
+    
+    var isDOC: Bool {
+        return (contentType == "application/msword" || contentType == "application/vnd.openxmlformats-officedocument.wordprocessingml.document")
+    }
+    
+    var isXLS: Bool {
+        return (contentType == "application/vnd.ms-excel" || contentType == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+    }
+    
+    var isPPT: Bool {
+        return (contentType == "application/vnd.ms-powerpoint" ||
+                contentType == "application/vnd.openxmlformats-officedocument.presentationml.presentation" ||
+                contentType == "application/vnd.ms-powerpoint.presentation.macroEnabled.12")
+    }
+    
+    var isTXT: Bool {
+        return (contentType == "text/plain" ||
+                contentType == "text/markdown")
+    }
+    
+    var isZIP: Bool {
+        return (contentType == "application/zip" ||
+                contentType == "application/x-7z-compressed" ||
+                contentType == "application/x-rar-compressed" ||
+                contentType == "application/x-gzip" ||
+                contentType == "application/x-tar")
     }
 
     var isDOC: Bool {
@@ -551,20 +582,6 @@ extension NCManageDatabase {
         }
     }
 
-    /// Inserts discovered transfers only if the start/stop session is still current.
-    func addAutoUploadMetadatasAsync(_ metadatas: [tableMetadata], account: String, sessionIdentifier: String, seedOcId: String? = nil) async {
-        let detached = metadatas.map { $0.detachedCopy() }
-        await core.performRealmWriteAsync { realm in
-            guard let current = realm.objects(tableAccount.self).filter("account == %@", account).first,
-                  current.autoUploadStart,
-                  current.autoUploadSessionIdentifier == sessionIdentifier else { return }
-            if let seedOcId {
-                guard realm.objects(tableMetadata.self).filter("account == %@ AND (ocId == %@ OR ocIdTransfer == %@)", account, seedOcId, seedOcId).first != nil else { return }
-            }
-            realm.add(detached, update: .all)
-        }
-    }
-
     func addMetadatas(_ metadatas: [tableMetadata], sync: Bool = true) {
         let detached = metadatas.map { $0.detachedCopy() }
 
@@ -630,28 +647,19 @@ extension NCManageDatabase {
         }
     }
 
-    /// Updates an existing job without recreating a deleted transfer or clearing cancellation.
-    /// Requeueing also requires the same active auto-upload session.
-    func updateBackgroundUploadMetadataAsync(_ metadata: tableMetadata, expectedJobIdentifier: String, sessionIdentifier: String? = nil) async {
-        let detached = metadata.detachedCopy()
-        await core.performRealmWriteAsync { realm in
-            guard let current = realm.object(ofType: tableMetadata.self, forPrimaryKey: detached.ocId),
-                  current.backgroundUploadJobIdentifier == expectedJobIdentifier else { return }
-            if let sessionIdentifier {
-                guard !current.backgroundUploadCancellationRequested,
-                      let account = realm.objects(tableAccount.self).filter("account == %@", detached.account).first,
-                      account.autoUploadStart,
-                      account.autoUploadSessionIdentifier == sessionIdentifier else {
-                    // This terminal job has already been acknowledged; do not leave a stale identifier.
-                    if current.status != NCGlobal.shared.metadataStatusNormal { realm.delete(current) }
-                    return
-                }
+    func deleteMetadataOcIds(_ ocIds: [String]) {
+        do {
+            let realm = try Realm()
+            try realm.write {
+                let results = realm.objects(tableMetadata.self).filter("ocId IN %@", ocIds)
+                realm.delete(results)
             }
-            detached.backgroundUploadCancellationRequested = current.backgroundUploadCancellationRequested || detached.backgroundUploadCancellationRequested
-            realm.add(detached, update: .modified)
+        } catch let error as NSError {
+            nkLog(error: "Could not access database: \(error)")
+
         }
     }
-
+    
     func replaceMetadataAsync(ocId: String, metadata: tableMetadata) async {
         let detached = metadata.detachedCopy()
 
@@ -933,6 +941,16 @@ extension NCManageDatabase {
                 .filter("fileId == %@", fileId)
                 .first
             result?.livePhotoFile = livePhotoFile
+        }
+    }
+
+    func clearAssetLocalIdentifiersAsync(_ assetLocalIdentifiers: [String]) async {
+        await core.performRealmWriteAsync { realm in
+            let results = realm.objects(tableMetadata.self)
+                .filter("assetLocalIdentifier IN %@", assetLocalIdentifiers)
+            for result in results {
+                result.assetLocalIdentifier = ""
+            }
         }
     }
 
@@ -1269,20 +1287,6 @@ extension NCManageDatabase {
                 .first?
                 .detachedCopy()
         }
-    }
-
-    /// Returns metadata stored before PhotoKit supplied its persistent job identifier.
-    /// The caller must still match the destination because a Live Photo has two resources per asset.
-    func getPendingBackgroundUploadMetadatasAsync(assetLocalIdentifier: String) async -> [tableMetadata] {
-        await core.performRealmReadAsync { realm in
-            realm.objects(tableMetadata.self)
-                .filter(
-                    "assetLocalIdentifier == %@ AND backgroundUploadJobIdentifier == %@",
-                    assetLocalIdentifier,
-                    "pending"
-                )
-                .map { $0.detachedCopy() }
-        } ?? []
     }
 
     func getResultsMetadatasAsync(predicate: NSPredicate) async -> Results<tableMetadata>? {
