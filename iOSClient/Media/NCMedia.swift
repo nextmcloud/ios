@@ -54,6 +54,7 @@ class NCMedia: UIViewController {
     var ocIdDoNotExists: ThreadSafeArray<String> = ThreadSafeArray()
 //    var searchMediaInProgress: Bool = false
 
+    var searchMediaInProgress: Bool = false
     // Tracks whether we have completed an explicit preload before presentation
     private var didCompleteInitialPreload = false
     private var explicitPreloadTask: Task<Void, Never>?
@@ -124,6 +125,7 @@ class NCMedia: UIViewController {
         }
     }
     
+
     var imageLoadingTasks: [String: Task<Void, Never>] = [:]
     let debouncerLoadDataSource = NCDebouncer(delay: .seconds(3), maxEventCount: 10)
     let debouncerSearch = NCDebouncer(delay: .seconds(2), maxEventCount: 10)
@@ -190,9 +192,29 @@ class NCMedia: UIViewController {
         (self.tabBarController as? NCMainTabBarController)?.sceneIdentifier ?? ""
     }
 
+//    var isInGeneralPhotosSelectionContext: Bool = false
+
+    // MARK: - Programmatic Preload API
+    /// Preloads the media data (data source and initial search) so that the controller is ready when presented.
+    /// Safe to call while the media tab hasn't been opened yet. Idempotent across multiple calls.
     @MainActor
-    internal var windowScene: UIWindowScene? {
-       SceneManager.shared.getWindowScene(controller: self.tabBarController as? NCMainTabBarController)
+    func preloadIfNeeded() {
+        // Avoid re-running if already completed
+        if didCompleteInitialPreload { return }
+        // Cancel any previous explicit preload
+        explicitPreloadTask?.cancel()
+        explicitPreloadTask = Task { [weak self] in
+            guard let self else { return }
+            // Ensure view is loaded to set up collectionView/layout safely
+            _ = self.view
+            // Run the same loading sequence used in view lifecycle, but explicitly
+            await self.loadDataSource()
+            await self.searchMediaUI(true)
+            self.didCompleteInitialPreload = true
+            await MainActor.run {
+                self.onInitialLoadCompleted?()
+            }
+        }
     }
     
 //    var isInGeneralPhotosSelectionContext: Bool = false
@@ -248,6 +270,8 @@ class NCMedia: UIViewController {
 //        layoutType = database.getLayoutForView(account: session.account, key: global.layoutViewMedia, serverUrl: "", layout: global.mediaLayoutRatio).layout
         layoutType = database.getLayoutForView(account: session.account, key: global.layoutViewMedia, serverUrl: "", layoutType: global.mediaLayoutRatio).layout
         
+        layoutType = database.getLayoutForView(account: session.account, key: global.layoutViewMedia, serverUrl: "", layout: global.mediaLayoutRatio).layout
+
 //        tabBarSelect = NCMediaSelectTabBar(controller: self.tabBarController, viewController: self, delegate: self)
 
         titleDate.text = ""
@@ -302,6 +326,37 @@ class NCMedia: UIViewController {
         activityIndicator.color = .white
         navigationItem.leftItemsSupplementBackButton = true
         navigationItem.leftBarButtonItem = nil
+        gradientLayer.locations = [0.0, 0.20, 0.40, 0.60, 0.75, 0.85, 0.95, 1.0]
+        gradientView.layer.insertSublayer(gradientLayer, at: 0)
+
+        activeAccount = NCManageDatabase.shared.getActiveTableAccount() ?? tableAccount()
+
+        collectionView.refreshControl = refreshControl
+        refreshControl.action(for: .valueChanged) { _ in
+            DispatchQueue.global().async {
+                Task {
+                    await self.loadDataSource()
+                    await self.searchMediaUI(true)
+                }
+            }
+            self.refreshControl.endRefreshing()
+        }
+
+        // Title + Activity indicator
+        if UIDevice.current.userInterfaceIdiom == .pad {
+            titleConstraint.constant = 0
+        } else {
+            if #available(iOS 26.0, *) {
+                titleConstraint.constant = -44
+            } else {
+                titleConstraint.constant = -34
+            }
+        }
+
+        titleDate.text = ""
+        titleDate?.textColor = .white
+        activityIndicator.color = .white
+
         gradientLayer.locations = [0.0, 0.20, 0.40, 0.60, 0.75, 0.85, 0.95, 1.0]
         gradientView.layer.insertSublayer(gradientLayer, at: 0)
 
@@ -389,6 +444,7 @@ class NCMedia: UIViewController {
         NotificationCenter.default.addObserver(self, selector: #selector(deleteFile(_:)), name: NSNotification.Name(rawValue: global.notificationCenterDeleteFile), object: nil)
 
         NotificationCenter.default.addObserver(self, selector: #selector(reloadDataSource(_:)), name: NSNotification.Name(rawValue: global.notificationCenterReloadDataSource), object: nil)
+
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -445,6 +501,7 @@ class NCMedia: UIViewController {
             }
         }
 //        AnalyticsHelper.shared.trackEvent(eventName: .SCREEN_EVENT__MEDIA)
+        AnalyticsHelper.shared.trackEvent(eventName: .SCREEN_EVENT__MEDIA)
     }
 
     override func viewDidAppear(_ animated: Bool) {
@@ -464,6 +521,17 @@ class NCMedia: UIViewController {
         Task { [weak self] in
             await self?.loadDataSource()
         }
+        // Re-evaluate in-app messages after viewDidAppear
+        MoEngageAnalytics.shared.displayInAppNotificationSafely(reason: "viewDidAppear")
+
+        Task {
+            await networking.transferDispatcher.addDelegate(self)
+        }
+
+        NotificationCenter.default.addObserver(self, selector: #selector(copyMoveFile(_:)), name: NSNotification.Name(rawValue: global.notificationCenterCopyMoveFile), object: nil)
+
+        NotificationCenter.default.addObserver(self, selector: #selector(enterForeground(_:)), name: UIApplication.willEnterForegroundNotification, object: nil)
+
         if !didCompleteInitialPreload {
             onInitialLoadCompleted?()
         }
@@ -552,6 +620,8 @@ class NCMedia: UIViewController {
 
         NCNetworking.shared.fileExistsQueue.cancel()
         NCNetworking.shared.downloadThumbnailQueue.cancel()
+        NCNetworking.shared.fileExistsQueue.cancelAll()
+        networking.downloadThumbnailQueue.cancelAll()
 
         let tasks = await networking.getAllDataTask()
         for task in tasks.filter({ $0.taskDescription == global.taskDescriptionRetrievesProperties }) {
@@ -624,6 +694,7 @@ class NCMedia: UIViewController {
            !ocIdDoNotExists.isEmpty,
            let ocIdDoNotExists = self.ocIdDoNotExists.getArray() {
             dataSource.removeCompactMetadata(ocIdDoNotExists)
+            dataSource.removeMetadata(ocIdDoNotExists)
             database.deleteMetadataOcIds(ocIdDoNotExists)
             self.ocIdDoNotExists.removeAll()
             collectionViewReloadData()
@@ -733,6 +804,50 @@ class NCMedia: UIViewController {
         } else {
             self.mediaCommandView?.toggleEmptyView(isEmpty: false)
             self.mediaCommandView?.isHidden = false
+        }
+    }
+}
+
+// MARK: -
+
+extension NCMedia: UIScrollViewDelegate {
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        if !dataSource.metadatas.isEmpty {
+            isTop = scrollView.contentOffset.y <= -(insetsTop + view.safeAreaInsets.top - 25)
+            //            setTitleDate()
+            if lastContentOffsetY == 0 || lastContentOffsetY / 2 <= scrollView.contentOffset.y || lastContentOffsetY / 2 >= scrollView.contentOffset.y {
+                setTitleDate()
+                lastContentOffsetY = scrollView.contentOffset.y
+            }
+            setNeedsStatusBarAppearanceUpdate()
+        }
+    }
+
+    func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+        searchNewMedia()
+    }
+
+    func scrollViewDidScrollToTop(_ scrollView: UIScrollView) {
+        let y = view.safeAreaInsets.top
+        scrollView.contentOffset.y = -(insetsTop + y)
+    }
+}
+
+// MARK: -
+
+extension NCMedia: NCSelectDelegate {
+    func dismissSelect(serverUrl: String?, metadata: tableMetadata?, type: String, items: [Any], overwrite: Bool, copy: Bool, move: Bool, session: NCSession.Session) {
+        guard let serverUrl else { return }
+
+        Task {
+            let home = utilityFileSystem.getHomeServer(session: session)
+            let mediaPath = serverUrl.replacingOccurrences(of: home, with: "")
+
+            await database.setAccountMediaPathAsync(mediaPath, account: session.account)
+
+            imageCache.removeAll()
+            await loadDataSource()
+            searchNewMedia()
         }
     }
 }

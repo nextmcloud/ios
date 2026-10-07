@@ -148,10 +148,37 @@ extension tableMetadata {
         (fileNameView as NSString).deletingPathExtension
     }
 
+    var isRenameable: Bool {
+        if !NCMetadataPermissions.canRename(self) {
+            return false
+        }
+        if lock {
+            return false
+        }
+        if !isDirectoryE2EE && e2eEncrypted {
+            return false
+        }
+        return true
+    }
+
+    var isPrintable: Bool {
+        if isDocumentViewableOnly {
+            return false
+        }
+        if ["application/pdf", "com.adobe.pdf"].contains(contentType) || contentType.hasPrefix("text/") || classFile == NKTypeClassFile.image.rawValue {
+            return true
+        }
+        return false
+    }
+    
     var isSavebleInCameraRoll: Bool {
         return (classFile == NKTypeClassFile.image.rawValue && contentType != "image/svg+xml") || classFile == NKTypeClassFile.video.rawValue
     }
 
+    var isDocumentViewableOnly: Bool {
+        sharePermissionsCollaborationServices == NCPermissions().permissionReadShare && classFile == NKTypeClassFile.document.rawValue
+    }
+    
     var isAudioOrVideo: Bool {
         return classFile == NKTypeClassFile.audio.rawValue || classFile == NKTypeClassFile.video.rawValue
     }
@@ -187,6 +214,9 @@ extension tableMetadata {
 
     var isCopyableMovable: Bool {
         !isDirectoryE2EE && !e2eEncrypted
+//        !isDirectoryE2EE && !e2eEncrypted && NCMetadataPermissions.canMoveAndDelete(self)
+        !isDocumentViewableOnly && !isDirectoryE2EE && !e2eEncrypted
+//        !isDirectoryE2EE && !e2eEncrypted
     }
 
     var isModifiableWithQuickLook: Bool {
@@ -247,6 +277,28 @@ extension tableMetadata {
         return !isDirectoryE2EE && directory && size == 0 && e2eEncrypted && NCPreferences().isEndToEndEnabled(account: account)
     }
 
+        let utility = NCUtility()
+        let editors = utility.editorsDirectEditing(account: account, contentType: contentType)
+        let isRichDocument = utility.isTypeFileRichDocument(self)
+        return classFile == NKCommon.TypeClassFile.document.rawValue && editors.contains(NCGlobal.shared.editorText) && ((editors.contains(NCGlobal.shared.editorOnlyoffice) || isRichDocument))
+    }
+
+    var isWaitingTransfer: Bool {
+        status == NCGlobal.shared.metadataStatusWaitDownload || status == NCGlobal.shared.metadataStatusWaitUpload || status == NCGlobal.shared.metadataStatusUploadError
+    }
+
+    var isInTransfer: Bool {
+        status == NCGlobal.shared.metadataStatusDownloading || status == NCGlobal.shared.metadataStatusUploading
+    }
+
+    var isTransferInForeground: Bool {
+        (status > 0 && (chunk > 0 || e2eEncrypted))
+    }
+    
+    var isDownloadUpload: Bool {
+        status == NCGlobal.shared.metadataStatusDownloading || status == NCGlobal.shared.metadataStatusUploading
+    }
+    
     var isDownload: Bool {
         status == NCGlobal.shared.metadataStatusWaitDownload || status == NCGlobal.shared.metadataStatusDownloading
     }
@@ -379,6 +431,17 @@ extension tableMetadata {
     /// Returns false if the user is lokced out of the file. I.e. The file is locked but by somone else
     func canUnlock(as user: String) -> Bool {
         return !lock || (lockOwner == user && lockOwnerType == 0)
+    }
+
+    // Return if is sharable
+    func isSharable() -> Bool {
+        guard let capabilities = NCNetworking.shared.capabilities[account] else {
+            return false
+        }
+        if !capabilities.fileSharingApiEnabled || (capabilities.e2EEEnabled && isDirectoryE2EE), !e2eEncrypted {
+            return false
+        }
+        return !e2eEncrypted
     }
 
     /// Returns a detached (unmanaged) deep copy of the current `tableMetadata` object.
@@ -1237,6 +1300,34 @@ extension NCManageDatabase {
                 .map { $0.detachedCopy() }
         } ?? []
     }
+    
+    func getMediaMetadatas(predicate: NSPredicate, sorted: String? = nil, ascending: Bool = false) -> ThreadSafeArray<tableMetadata>? {
+
+        do {
+            let realm = try Realm()
+            if let sorted {
+                var results: [tableMetadata] = []
+                switch sorted {//NCPreferences().mediaSortDate {
+                case "date":
+                    results = realm.objects(tableMetadata.self).filter(predicate).sorted { ($0.date as Date) > ($1.date as Date) }
+                case "creationDate":
+                    results = realm.objects(tableMetadata.self).filter(predicate).sorted { ($0.creationDate as Date) > ($1.creationDate as Date) }
+                case "uploadDate":
+                    results = realm.objects(tableMetadata.self).filter(predicate).sorted { ($0.uploadDate as Date) > ($1.uploadDate as Date) }
+                default:
+                    let results = realm.objects(tableMetadata.self).filter(predicate)
+                    return ThreadSafeArray(results.map { tableMetadata.init(value: $0) })
+                }
+                return ThreadSafeArray(results.map { tableMetadata.init(value: $0) })
+            } else {
+                let results = realm.objects(tableMetadata.self).filter(predicate)
+                return ThreadSafeArray(results.map { tableMetadata.init(value: $0) })
+            }
+        } catch let error as NSError {
+//            NextcloudKit.shared.nkCommonInstance.writeLog("Could not access database: \(error)")
+        }
+        return nil
+    }
 
     func getMetadatas(predicate: NSPredicate,
                       sortedByKeyPath: String,
@@ -1475,6 +1566,58 @@ extension NCManageDatabase {
     }
 
     func getMetadataFromFileId(_ fileId: String?) -> tableMetadata? {
+    func getTableMetadatasDirectoryFavoriteIdentifierRankAsync(account: String) async -> [String: NSNumber] {
+        let result = await performRealmReadAsync { realm in
+            var listIdentifierRank: [String: NSNumber] = [:]
+            var counter = Int64(10)
+
+            let results = realm.objects(tableMetadata.self)
+                .filter("account == %@ AND directory == true AND favorite == true", account)
+                .sorted(byKeyPath: "fileNameView", ascending: true)
+
+            results.forEach { item in
+                counter += 1
+                listIdentifierRank[item.ocId] = NSNumber(value: counter)
+            }
+            return listIdentifierRank
+        }
+        return result ?? [:]
+    }
+
+    func getAssetLocalIdentifiersUploadedAsync() async -> [String]? {
+        return await core.performRealmReadAsync { realm in
+            let results = realm.objects(tableMetadata.self).filter("assetLocalIdentifier != ''")
+            return Self.uploadedAssetLocalIdentifiers(in: Array(results))
+        }
+    }
+
+    /// A local asset can only be deleted once every tracked transfer for it is complete.
+    /// Live Photo links contain a filename before server pairing and a file ID afterwards.
+    static func uploadedAssetLocalIdentifiers(in metadatas: [tableMetadata]) -> [String] {
+        let grouped = Dictionary(grouping: metadatas.filter { !$0.assetLocalIdentifier.isEmpty }, by: \.assetLocalIdentifier)
+        return grouped.compactMap { identifier, components in
+            guard components.allSatisfy({
+                $0.status == NCGlobal.shared.metadataStatusNormal && !$0.backgroundUploadCancellationRequested
+            }) else {
+                return nil
+            }
+
+            for component in components where component.isLivePhoto {
+                let hasCompletedCompanion = components.contains { companion in
+                    companion.ocId != component.ocId &&
+                    companion.account == component.account &&
+                    companion.serverUrl == component.serverUrl &&
+                    ((component.isLivePhotoImage && companion.isLivePhotoVideo) ||
+                     (component.isLivePhotoVideo && companion.isLivePhotoImage)) &&
+                    (companion.fileName == component.livePhotoFile || companion.fileId == component.livePhotoFile)
+                }
+                guard hasCompletedCompanion else { return nil }
+            }
+            return identifier
+        }.sorted()
+    }
+
+    func getMetadataFromFileId(_ fileId: String?, account: String?) -> tableMetadata? {
         guard let fileId else {
             return nil
         }
@@ -1615,6 +1758,7 @@ extension NCManageDatabase {
                 .first
             return object?.detachedCopy()
         }
+        return nil
     }
 
     func getTransferAsync(tranfersSuccess: [tableMetadata]) async -> [tableMetadata] {
