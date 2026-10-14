@@ -15,7 +15,7 @@ class NCOffline: NCCollectionViewCommon {
         layoutKey = NCGlobal.shared.layoutViewOffline
         enableSearchBar = false
         headerRichWorkspaceDisable = true
-        emptyImageName = "icloud.and.arrow.down"
+        emptyImageName = "cloudDownload"
         emptyTitle = "_files_no_files_"
         emptyDescription = "_tutorial_offline_view_"
         emptyDataPortaitOffset = 30
@@ -30,6 +30,7 @@ class NCOffline: NCCollectionViewCommon {
         Task {
             await getServerData()
         }
+        AnalyticsHelper.shared.trackEvent(eventName: .SCREEN_EVENT__OFFLINE_FILES)
     }
 
     // MARK: - DataSource
@@ -62,6 +63,8 @@ class NCOffline: NCCollectionViewCommon {
                                                      layoutForView: layoutForView,
                                                      account: session.account)
         await super.reloadDataSource()
+
+        cachingAsync(metadatas: metadatas)
     }
 
     override func getServerData(forced: Bool = false) async {

@@ -64,7 +64,7 @@ extension NCCollectionViewCommon {
     /// 3) Retaining the current network task so `stopSyncMetadata()` can cancel it.
     ///
     /// - Parameter metadatas: The list of `tableMetadata` entries to scan and refresh.
-    private func networkSyncMetadata(metadatas: [tableMetadata]) async {
+    func networkSyncMetadata(metadatas: [tableMetadata]) async {
         // Order by date (descending)
         let metadatas = metadatas.sorted {
             ($0.date as Date) > ($1.date as Date)

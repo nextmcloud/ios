@@ -10,7 +10,7 @@ import LucidBanner
 
 extension NCCollectionViewCommon: UICollectionViewDelegate {
     @MainActor
-    func didSelectMetadata(_ metadata: tableMetadata, withOcIds: Bool, viewerTransitionSource: NCMediaViewerTransitionSource?) async {
+    func didSelectMetadata(_ metadata: tableMetadata, withOcIds: Bool) async {
         let capabilities = await NKCapabilities.shared.getCapabilities(for: session.account)
 
         if metadata.e2eEncrypted {
@@ -94,7 +94,7 @@ extension NCCollectionViewCommon: UICollectionViewDelegate {
             // --- E2EE -------
             if metadata.isDirectoryE2EE {
                 if fileExists {
-                    if let vc = await NCViewer().getViewerController(metadata: metadata, delegate: self, viewerTransitionSource: viewerTransitionSource) {
+                    if let vc = await NCViewer().getViewerController(metadata: metadata, delegate: self) {
                         self.navigationController?.pushViewController(vc, animated: true)
                     }
                 } else {
@@ -110,11 +110,11 @@ extension NCCollectionViewCommon: UICollectionViewDelegate {
                     $0.classFile == NKTypeClassFile.video.rawValue ||
                     $0.classFile == NKTypeClassFile.audio.rawValue }.map(\.ocId)
 
-                if let vc = await NCViewer().getViewerController(metadata: metadata, ocIds: withOcIds ? ocIds : nil, image: image, delegate: self, viewerTransitionSource: viewerTransitionSource) {
+                if let vc = await NCViewer().getViewerController(metadata: metadata, ocIds: withOcIds ? ocIds : nil, image: image, delegate: self) {
                     self.navigationController?.pushViewController(vc, animated: true)
                 }
-            } else if !metadata.isDirectoryE2EE, metadata.isDocumentEditorAvailable || utilityFileSystem.fileProviderStorageExists(metadata) || metadata.name == self.global.talkName {
-                if let vc = await NCViewer().getViewerController(metadata: metadata, image: image, delegate: self, viewerTransitionSource: viewerTransitionSource) {
+            } else if !metadata.isDirectoryE2EE, metadata.isAvailableEditorView || utilityFileSystem.fileProviderStorageExists(metadata) || metadata.name == self.global.talkName {
+                if let vc = await NCViewer().getViewerController(metadata: metadata, image: image, delegate: self) {
                     self.navigationController?.pushViewController(vc, animated: true)
                 }
             } else if NextcloudKit.shared.isNetworkReachable() {
@@ -128,7 +128,7 @@ extension NCCollectionViewCommon: UICollectionViewDelegate {
                 if metadata.name == "files" {
                     await downloadFile()
                 } else if !metadata.url.isEmpty,
-                          let vc = await NCViewer().getViewerController(metadata: metadata, delegate: self, viewerTransitionSource: viewerTransitionSource) {
+                          let vc = await NCViewer().getViewerController(metadata: metadata, delegate: self) {
                     self.navigationController?.pushViewController(vc, animated: true)
                 }
             } else {
@@ -141,26 +141,23 @@ extension NCCollectionViewCommon: UICollectionViewDelegate {
         guard let metadata = self.dataSource.getMetadata(indexPath: indexPath) else {
             return
         }
-        var viewerTransitionSource: NCMediaViewerTransitionSource?
 
         if self.isEditMode {
-            if let index = self.fileSelect.firstIndex(of: metadata.ocId) {
-                self.fileSelect.remove(at: index)
-            } else {
-                self.fileSelect.append(metadata.ocId)
+            if !metadata.e2eEncrypted {
+                if let index = self.fileSelect.firstIndex(of: metadata.ocId) {
+                    self.fileSelect.remove(at: index)
+                } else {
+                    self.fileSelect.append(metadata.ocId)
+                }
+                self.collectionView.reloadItems(at: [indexPath])
+                self.tabBarSelect?.update(fileSelect: self.fileSelect, metadatas: self.getSelectedMetadatas(), userId: metadata.userId)
             }
-            self.collectionView.reloadItems(at: [indexPath])
-            self.tabBarSelect?.update(fileSelect: self.fileSelect, metadatas: self.getSelectedMetadatas(), userId: metadata.userId)
             self.collectionView.collectionViewLayout.invalidateLayout()
             return
         }
 
-        if let cell = collectionView.cellForItem(at: indexPath) as? NCCellMainProtocol {
-            viewerTransitionSource = cell.viewerTransitionSource()
-        }
-
         Task {
-            await didSelectMetadata(metadata, withOcIds: true, viewerTransitionSource: viewerTransitionSource)
+            await didSelectMetadata(metadata, withOcIds: true)
         }
     }
 

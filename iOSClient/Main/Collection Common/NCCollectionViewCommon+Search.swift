@@ -54,7 +54,13 @@ extension NCCollectionViewCommon {
             showHiddenFiles: showHiddenFiles,
             account: self.session.account
         ) { task in
-            Task { @MainActor in
+            Task {
+                let identifier = await NCNetworking.shared.networkingTasks.createIdentifier(
+                    account: self.session.account,
+                    path: urlBase,
+                    name: "searchLiteral"
+                )
+                await NCNetworking.shared.networkingTasks.track(identifier: identifier, task: task)
                 self.searchTask = task
             }
         }
@@ -62,8 +68,8 @@ extension NCCollectionViewCommon {
         if results.error == .success,
            let files = results.files {
             let (_, metadatas) = await NCManageDatabaseCreateMetadata().convertFilesToMetadatasAsync(files)
-            database.addMetadatas(metadatas)
-            dataSource = NCCollectionViewDataSource(
+            NCManageDatabase.shared.addMetadatas(metadatas)
+            self.dataSource = NCCollectionViewDataSource(
                 metadatas: metadatas,
                 layoutForView: self.layoutForView,
                 account: self.session.account
@@ -74,7 +80,7 @@ extension NCCollectionViewCommon {
                                   errorCode: results.error.errorCode)
         }
 
-        collectionView.reloadData()
+        self.collectionView.reloadData()
     }
 
     // MARK: - Unifield Search
