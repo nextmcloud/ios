@@ -25,6 +25,9 @@ class NCTrashGridCell: UICollectionViewCell, NCTrashCellProtocol {
         get { return nil }
         set { image = newValue }
     }
+    var indexPath = IndexPath()
+    var account = ""
+    var user = ""
 
     override func awakeFromNib() {
         super.awakeFromNib()
