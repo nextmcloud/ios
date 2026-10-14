@@ -24,26 +24,26 @@
 			<string>%d íosluchtú fágtha ceadaithe</string>
 		</dict>
 	</dict>
-	<key>_auto_upload_files_in_queue_</key>
+	<key>_focused_auto_upload_items_left_</key>
 	<dict>
 		<key>NSStringLocalizedFormatKey</key>
-		<string>%#@files@</string>
-		<key>files</key>
+		<string>%#@items@</string>
+		<key>items</key>
 		<dict>
 			<key>NSStringFormatSpecTypeKey</key>
 			<string>NSStringPluralRuleType</string>
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>%d comhad sa scuaine</string>
+			<string>%d mír fágtha</string>
 			<key>two</key>
-			<string>%d comhad sa scuaine</string>
+			<string>%d míreanna fágtha</string>
 			<key>few</key>
-			<string>%d comhad sa scuaine</string>
+			<string>%d míreanna fágtha</string>
 			<key>many</key>
-			<string>%d comhad sa scuaine</string>
+			<string>%d míreanna fágtha</string>
 			<key>other</key>
-			<string>%d comhad sa scuaine</string>
+			<string>%d míreanna fágtha</string>
 		</dict>
 	</dict>
 	<key>_focused_auto_upload_photos_to_back_up_</key>
@@ -88,50 +88,6 @@
 			<string>Theip ar %d</string>
 			<key>other</key>
 			<string>Theip ar %d</string>
-		</dict>
-	</dict>
-	<key>_albums_photos_count_</key>
-	<dict>
-		<key>NSStringLocalizedFormatKey</key>
-		<string>%#@photos@</string>
-		<key>photos</key>
-		<dict>
-			<key>NSStringFormatSpecTypeKey</key>
-			<string>NSStringPluralRuleType</string>
-			<key>NSStringFormatValueTypeKey</key>
-			<string>d</string>
-			<key>one</key>
-			<string>%d grianghraf</string>
-			<key>two</key>
-			<string>%d grianghraf</string>
-			<key>few</key>
-			<string>%d grianghraf</string>
-			<key>many</key>
-			<string>%d grianghraf</string>
-			<key>other</key>
-			<string>%d grianghraf</string>
-		</dict>
-	</dict>
-	<key>_albums_list_photos_and_videos_count_</key>
-	<dict>
-		<key>NSStringLocalizedFormatKey</key>
-		<string>%#@media@</string>
-		<key>media</key>
-		<dict>
-			<key>NSStringFormatSpecTypeKey</key>
-			<string>NSStringPluralRuleType</string>
-			<key>NSStringFormatValueTypeKey</key>
-			<string>d</string>
-			<key>one</key>
-			<string>%d grianghraf nó físeán</string>
-			<key>two</key>
-			<string>%d grianghraf agus físeán</string>
-			<key>few</key>
-			<string>%d grianghraf agus físeán</string>
-			<key>many</key>
-			<string>%d grianghraf agus físeán</string>
-			<key>other</key>
-			<string>%d grianghraf agus físeán</string>
 		</dict>
 	</dict>
 </dict>

@@ -20,22 +20,22 @@
 			<string>%d downloads restantes permitidos</string>
 		</dict>
 	</dict>
-	<key>_auto_upload_files_in_queue_</key>
+	<key>_focused_auto_upload_items_left_</key>
 	<dict>
 		<key>NSStringLocalizedFormatKey</key>
-		<string>%#@files@</string>
-		<key>files</key>
+		<string>%#@items@</string>
+		<key>items</key>
 		<dict>
 			<key>NSStringFormatSpecTypeKey</key>
 			<string>NSStringPluralRuleType</string>
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>%d arquivo na fila</string>
+			<string>Resta %d item</string>
 			<key>many</key>
-			<string>%d de arquivos na fila</string>
+			<string>Restam %d de itens</string>
 			<key>other</key>
-			<string>%d arquivos na fila</string>
+			<string>Restam %d itens</string>
 		</dict>
 	</dict>
 	<key>_focused_auto_upload_photos_to_back_up_</key>
@@ -72,42 +72,6 @@
 			<string>%d falharam</string>
 			<key>other</key>
 			<string>%d falharam</string>
-		</dict>
-	</dict>
-	<key>_albums_photos_count_</key>
-	<dict>
-		<key>NSStringLocalizedFormatKey</key>
-		<string>%#@photos@</string>
-		<key>photos</key>
-		<dict>
-			<key>NSStringFormatSpecTypeKey</key>
-			<string>NSStringPluralRuleType</string>
-			<key>NSStringFormatValueTypeKey</key>
-			<string>d</string>
-			<key>one</key>
-			<string>%d foto</string>
-			<key>many</key>
-			<string>%d de fotos</string>
-			<key>other</key>
-			<string>%d fotos</string>
-		</dict>
-	</dict>
-	<key>_albums_list_photos_and_videos_count_</key>
-	<dict>
-		<key>NSStringLocalizedFormatKey</key>
-		<string>%#@media@</string>
-		<key>media</key>
-		<dict>
-			<key>NSStringFormatSpecTypeKey</key>
-			<string>NSStringPluralRuleType</string>
-			<key>NSStringFormatValueTypeKey</key>
-			<string>d</string>
-			<key>one</key>
-			<string>%d foto e vídeo</string>
-			<key>many</key>
-			<string>%d de fotos e vídeos</string>
-			<key>other</key>
-			<string>%d fotos e vídeos</string>
 		</dict>
 	</dict>
 </dict>
