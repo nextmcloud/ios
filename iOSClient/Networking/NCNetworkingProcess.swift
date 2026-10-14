@@ -344,7 +344,15 @@ actor NCNetworkingProcess {
 
                 await updateTimerIntervalIfNeeded(hasPendingTransfers: true)
             } else {
-                await updateTimerIntervalIfNeeded(hasPendingTransfers: false)
+                // Remove upload asset
+                await removeUploadedAssetsIfNeeded()
+
+                // Set Live Photo
+                await NCNetworking.shared.setLivePhoto(account: currentAccount)
+
+                if lastUsedInterval != maxInterval {
+                    await startTimer(interval: maxInterval)
+                }
             }
         }
     }
