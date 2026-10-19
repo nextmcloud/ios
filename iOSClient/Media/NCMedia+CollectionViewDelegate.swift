@@ -13,8 +13,6 @@ extension NCMedia: UICollectionViewDelegate {
                 return
             }
 
-            cell.imageSelect.isHidden = !isEditMode ? true : false
-
             if isEditMode {
                 guard let cell = collectionView.cellForItem(at: indexPath) as? NCMediaCell else {
                     return

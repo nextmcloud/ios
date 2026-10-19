@@ -45,6 +45,9 @@ class NCLogin: UIViewController, UITextFieldDelegate, NCLoginQRCodeDelegate {
     private var p12Data: Data?
     private var p12Password: String?
 
+    private var QRCodeCheck: Bool = false
+    private var activeLoginProvider: NCLoginProvider?
+
     // LucidBanner
     var banner: LucidBanner?
     
@@ -201,6 +204,7 @@ class NCLogin: UIViewController, UITextFieldDelegate, NCLoginQRCodeDelegate {
             self.banner = LucidBannerRegistry.shared.banner(for: windowScene)
 
             showAlertActionBanner(lucidBanner: banner,
+                                  windowScene: windowScene,
                                   title: title,
                                   subtitle: subtitle) {
                 self.openShareAccountsViewController(nil)
@@ -237,12 +241,16 @@ class NCLogin: UIViewController, UITextFieldDelegate, NCLoginQRCodeDelegate {
 
         // AppConfig
         if let url = configServerUrl {
-            if let user = self.configUsername, let password = configAppPassword {
-                return createAccount(urlBase: url, user: user, password: password)
-            } else if let user = self.configUsername, let password = configPassword {
-                return getAppPassword(urlBase: url, user: user, password: password)
-            } else {
-                urlBase = url
+            Task {
+                if let user = self.configUsername, let password = configAppPassword {
+                    await createAccount(urlBase: url, user: user, password: password)
+                    return
+                } else if let user = self.configUsername, let password = configPassword {
+                    await getAppPassword(urlBase: url, user: user, password: password)
+                    return
+                } else {
+                    urlBase = url
+                }
             }
         }
     }
@@ -357,12 +365,21 @@ class NCLogin: UIViewController, UITextFieldDelegate, NCLoginQRCodeDelegate {
                     // Login Flow V2
                     if error == .success, let token, let endpoint, let login {
                         nkLog(debug: "Successfully received login flow information.")
-                        let safariVC = NCLoginProvider()
-                        safariVC.initialURLString = login
-                        safariVC.uiColor = textColor
-                        safariVC.delegate = self
-                        safariVC.startPolling(loginFlowV2Token: token, loginFlowV2Endpoint: endpoint, loginFlowV2Login: login)
-                        navigationController?.pushViewController(safariVC, animated: true)
+//                        let safariVC = NCLoginProvider()
+//                        safariVC.initialURLString = login
+//                        safariVC.uiColor = textColor
+//                        safariVC.delegate = self
+//                        safariVC.startPolling(loginFlowV2Token: token, loginFlowV2Endpoint: endpoint, loginFlowV2Login: login)
+//                        navigationController?.pushViewController(safariVC, animated: true)
+                        let loginProvider = NCLoginProvider()
+                        loginProvider.initialURLString = login
+                        loginProvider.delegate = self
+                        loginProvider.controller = self.controller
+                        loginProvider.presentingViewController = self
+                        loginProvider.startPolling(loginFlowV2Token: token, loginFlowV2Endpoint: endpoint, loginFlowV2Login: login)
+                        loginProvider.startAuthentication()
+                        self.activeLoginProvider = loginProvider
+
                     }
                 }
             case .failure(let error):
@@ -419,48 +436,65 @@ class NCLogin: UIViewController, UITextFieldDelegate, NCLoginQRCodeDelegate {
     // MARK: - QRCode
 
     func dismissQRCode(_ value: String?, metadataType: String?) {
-        guard var value = value else { return }
-        let protocolLogin = NCBrandOptions.shared.webLoginAutenticationProtocol + "login/"
-        if value.hasPrefix(protocolLogin) && value.contains("user:") && value.contains("password:") && value.contains("server:") {
-            value = value.replacingOccurrences(of: protocolLogin, with: "")
-            let valueArray = value.components(separatedBy: "&")
-            if valueArray.count == 3 {
-                let user = valueArray[0].replacingOccurrences(of: "user:", with: "")
-                let password = valueArray[1].replacingOccurrences(of: "password:", with: "")
-                let urlBase = valueArray[2].replacingOccurrences(of: "server:", with: "")
-                let serverUrl = urlBase + "/remote.php/dav"
-                loginButton.isEnabled = false
-                NextcloudKit.shared.checkServer(serverUrl: serverUrl) { _, error in
-                    self.loginButton.isEnabled = true
-                    if error == .success {
-                        self.createAccount(urlBase: urlBase, user: user, password: password)
-                    } else {
-                        Task {
-                            let windowScene = SceneManager.shared.getWindowScene(controller: self.controller)
-                            await showErrorBanner(windowScene: windowScene, text: error.errorDescription, errorCode: error.errorCode)
-                            self.dismiss(animated: true, completion: nil)
-                        }
-                    }
-                }
-            }
+        guard let value, !QRCodeCheck else {
+            return
         }
-    }
+        QRCodeCheck = true
 
-    private func getAppPassword(urlBase: String, user: String, password: String) {
-        NextcloudKit.shared.getAppPassword(url: urlBase, user: user, password: password) { token, _, error in
-            if error == .success, let password = token {
-                self.createAccount(urlBase: urlBase, user: user, password: password)
+        Task { @MainActor in
+            let protocolLogin = NCBrandOptions.shared.webLoginAutenticationProtocol + "login/"
+            let protocolLoginOneTime = NCBrandOptions.shared.webLoginAutenticationProtocol + "onetime-login/"
+            var parameters: String = ""
+
+            if value.hasPrefix(protocolLoginOneTime) {
+                parameters = value.replacingOccurrences(of: protocolLoginOneTime, with: "")
+            } else if value.hasPrefix(protocolLogin) {
+                parameters = value.replacingOccurrences(of: protocolLogin, with: "")
             } else {
-                Task {
+                QRCodeCheck = false
+                return
+            }
+
+            guard parameters.contains("user:"),
+                  parameters.contains("password:"),
+                  parameters.contains("server:") else {
+                QRCodeCheck = false
+                return
+            }
+            let parametersArray = parameters.components(separatedBy: "&")
+            let user = parametersArray[0].replacingOccurrences(of: "user:", with: "")
+            let password = parametersArray[1].replacingOccurrences(of: "password:", with: "")
+            let server = parametersArray[2].replacingOccurrences(of: "server:", with: "")
+
+            if value.hasPrefix(protocolLoginOneTime) {
+                let results = await NextcloudKit.shared.getAppPasswordOnetimeAsync(url: server, user: user, onetimeToken: password)
+                if results.error == .success, let token = results.token {
+                    await createAccount(urlBase: server, user: user, password: token)
+                } else {
                     let windowScene = SceneManager.shared.getWindowScene(controller: self.controller)
-                    await showErrorBanner(windowScene: windowScene, text: error.errorDescription, errorCode: error.errorCode)
-                    self.dismiss(animated: true, completion: nil)
+                    await showErrorBanner(windowScene: windowScene, text: results.error.errorDescription, errorCode: results.error.errorCode)
+                    dismiss(animated: true, completion: nil)
                 }
+            } else if value.hasPrefix(protocolLogin) {
+                await self.createAccount(urlBase: server, user: user, password: password)
             }
         }
     }
 
-    private func createAccount(urlBase: String, user: String, password: String) {
+    private func getAppPassword(urlBase: String, user: String, password: String) async {
+        let results = await NextcloudKit.shared.getAppPasswordAsync(url: urlBase, user: user, password: password)
+
+        if results.error == .success, let password = results.token {
+            await self.createAccount(urlBase: urlBase, user: user, password: password)
+        } else {
+            let windowScene = SceneManager.shared.getWindowScene(controller: self.controller)
+            await showErrorBanner(windowScene: windowScene, text: results.error.errorDescription, errorCode: results.error.errorCode)
+            dismiss(animated: true, completion: nil)
+        }
+    }
+
+    @MainActor
+    private func createAccount(urlBase: String, user: String, password: String) async {
         if self.controller == nil {
             self.controller = UIApplication.shared.mainAppWindow?.rootViewController as? NCMainTabBarController
         }
@@ -469,9 +503,7 @@ class NCLogin: UIViewController, UITextFieldDelegate, NCLoginQRCodeDelegate {
             NCNetworking.shared.writeCertificate(host: host)
         }
 
-        Task {
-            await NCAccount().createAccount(viewController: self, urlBase: urlBase, user: user, password: password, controller: self.controller)
-        }
+        await NCAccount().createAccount(viewController: self, urlBase: urlBase, user: user, password: password, controller: self.controller)
     }
 }
 
@@ -532,5 +564,7 @@ extension NCLogin: NCLoginProviderDelegate {
     func onBack() {
         loginButton.isEnabled = true
         loginButton.hideSpinnerAndShowButton()
+//        activeLoginProvider?.cancel()
+//        activeLoginProvider = nil
     }
 }

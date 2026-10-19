@@ -52,7 +52,7 @@ class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAud
     var session: NCSession.Session {
         NCSession.shared.getSession(controller: controller)
     }
-    
+
     // MARK: - View Life Cycle
 
     override func viewDidLoad() {
@@ -104,18 +104,6 @@ class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAud
 
     public func setup(serverUrl: String, fileNamePath: String, fileName: String) {
 
-        if serverUrl == utilityFileSystem.getHomeServer(session: session) {
-            titleServerUrl = "/"
-        } else {
-            titleServerUrl = utilityFileSystem.getTextServerUrl(session: session, serverUrl: serverUrl)//(serverUrl as NSString).lastPathComponent
-//        if serverUrl == utilityFileSystem.getHomeServer(session: session) {
-//            titleServerUrl = "/"
-//        } else {
-//            titleServerUrl = utilityFileSystem.getTextServerUrl(session: session, serverUrl: serverUrl)//(serverUrl as NSString).lastPathComponent
-        if serverUrl == utilityFileSystem.getHomeServer(urlBase: appDelegate.urlBase, userId: appDelegate.userId) {
-            titleServerUrl = "/"
-        } else {
-            titleServerUrl = (serverUrl as NSString).lastPathComponent
         if serverUrl == utilityFileSystem.getHomeServer(session: session) {
             titleServerUrl = "/"
         } else {
@@ -174,7 +162,7 @@ class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAud
         // Section: File Name
 
         XLFormViewController.cellClassesForRowDescriptorTypes()["kMyAppCustomCellType"] = TextTableViewCell.self
-        
+
         section = XLFormSectionDescriptor.formSection(withTitle: NSLocalizedString("_filename_", comment: "").uppercased())
         form.addFormSection(section)
 
@@ -199,8 +187,6 @@ class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAud
             self.form.delegate = nil
 
             if let fileNameNew = formRow.value as? String {
-                self.fileName = utility.removeForbiddenCharacters(fileNameNew)
-                self.fileName = FileAutoRenamer.rename(filename: fileNameNew, isFolderPath: true)
                 Task {
                     let capabilities = await NKCapabilities.shared.getCapabilities(for: session.account)
                     self.fileName = FileAutoRenamer.rename(fileNameNew, isFolderPath: true, capabilities: capabilities)
@@ -225,10 +211,10 @@ class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAud
 
     // MARK: - Action
 
-    func dismissSelect(serverUrl: String?, metadata: tableMetadata?, type: String, items: [Any], overwrite: Bool, copy: Bool, move: Bool) {
 
-    func dismissSelect(serverUrl: String?, metadata: tableMetadata?, type: String, items: [Any], overwrite: Bool, copy: Bool, move: Bool, session: NCSession.Session) {
-        
+    func dismissSelect(serverUrl: String?, metadata: tableMetadata?, type: String, items: [Any], overwrite: Bool, copy: Bool, move: Bool, session: NCSession.Session, controller: NCMainTabBarController?) {
+//    func dismissSelect(serverUrl: String?, metadata: tableMetadata?, type: String, items: [Any], overwrite: Bool, copy: Bool, move: Bool, session: NCSession.Session) {
+
         if serverUrl != nil {
 
             self.serverUrl = serverUrl!
@@ -263,30 +249,6 @@ class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAud
             fileNameSave = (name as NSString).deletingPathExtension + ".m4a"
         }
 
-        let metadataForUpload = NCManageDatabase.shared.createMetadata(fileName: fileNameSave, fileNameView: fileNameSave, ocId: UUID().uuidString, serverUrl: serverUrl, url: "", contentType: "", session: session, sceneIdentifier: self.appDelegate.sceneIdentifier)
-
-        metadataForUpload.session = NCNetworking.shared.sessionUploadBackground
-        metadataForUpload.sessionSelector = NCGlobal.shared.selectorUploadFile
-        metadataForUpload.status = NCGlobal.shared.metadataStatusWaitUpload
-        metadataForUpload.size = utilityFileSystem.getFileSize(filePath: fileNamePath)
-
-        if NCManageDatabase.shared.getMetadataConflict(account: session.account, serverUrl: serverUrl, fileNameView: fileNameSave, nativeFormat: false) != nil {
-        if NCManageDatabase.shared.getMetadataConflict(account: appDelegate.account, serverUrl: serverUrl, fileNameView: fileNameSave) != nil {
-        if NCManageDatabase.shared.getMetadataConflict(account: appDelegate.account, serverUrl: serverUrl, fileNameView: fileNameSave) != nil {
-        if NCManageDatabase.shared.getMetadataConflict(account: session.account, serverUrl: serverUrl, fileNameView: fileNameSave, nativeFormat: false) != nil {
-
-            guard let conflict = UIStoryboard(name: "NCCreateFormUploadConflict", bundle: nil).instantiateInitialViewController() as? NCCreateFormUploadConflict else { return }
-
-            conflict.textLabelDetailNewFile = NSLocalizedString("_now_", comment: "")
-            conflict.serverUrl = serverUrl
-            conflict.metadatasUploadInConflict = [metadataForUpload]
-            conflict.delegate = self
-
-            self.present(conflict, animated: true, completion: nil)
-
-        } else {
-
-            dismissAndUpload(metadataForUpload)
         Task {
             let fileNamePath = NSTemporaryDirectory() + fileNameSave
             let metadata = await NCManageDatabaseCreateMetadata().createMetadataAsync(
@@ -332,8 +294,6 @@ class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAud
     func dismissAndUpload(_ metadata: tableMetadata) {
 
         AnalyticsHelper.shared.trackCreateVoiceMemo(size: metadata.size, date: metadata.creationDate as Date)
-
-        utilityFileSystem.copyFile(atPath: self.fileNamePath, toPath: utilityFileSystem.getDirectoryProviderStorageOcId(metadata.ocId, fileNameView: metadata.fileNameView))
 
         NCUtilityFileSystem().copyFile(atPath: fileNamePath, toPath: NCUtilityFileSystem().getDirectoryProviderStorageOcId(metadata.ocId,
                                                                                                                            fileName: metadata.fileNameView,

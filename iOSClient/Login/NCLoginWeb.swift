@@ -25,7 +25,6 @@ import UIKit
 import WebKit
 import NextcloudKit
 //import FloatingPanel
-import FloatingPanel
 
 class NCLoginWeb: UIViewController {
 
@@ -155,8 +154,6 @@ class NCLoginWeb: UIViewController {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
 
-        // Stop timer error network
-        appDelegate.timerErrorNetworking?.invalidate()
         // Re-evaluate in-app messages after viewDidAppear
         MoEngageAnalytics.shared.displayInAppNotificationSafely(reason: "viewDidAppear")
 
@@ -182,7 +179,6 @@ class NCLoginWeb: UIViewController {
         super.viewDidDisappear(animated)
 
         // Start timer error network
-        appDelegate.startTimerErrorNetworking()
 //        appDelegate.startTimerErrorNetworking()
     }
 
@@ -205,7 +201,7 @@ class NCLoginWeb: UIViewController {
     }
 
     func getAppPassword(urlBase: String, user: String, password: String) {
-        
+
         NextcloudKit.shared.getAppPassword(url: urlBase, user: user, password: password) { token, _, error in
             if error == .success, let password = token {
                 self.createAccount(urlBase: urlBase, user: user, password: password)
@@ -286,7 +282,7 @@ extension NCLoginWeb: WKNavigationDelegate {
     func webView(_ webView: WKWebView, decidePolicyFor navigationResponse: WKNavigationResponse, decisionHandler: @escaping (WKNavigationResponsePolicy) -> Void) {
         if let httpResponse = navigationResponse.response as? HTTPURLResponse {
             print("Response status code: \(httpResponse.statusCode)")
-            
+
             if httpResponse.statusCode == 403 {
 //                showAccessDeniedAlert()
                 closeApp()
@@ -310,7 +306,7 @@ extension NCLoginWeb: WKNavigationDelegate {
             self.present(alert, animated: true, completion: nil)
         }
     }
-    
+
     func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
         NCActivityIndicator.shared.startActivity(style: .medium, blurEffect: false)
     }
@@ -337,7 +333,7 @@ extension NCLoginWeb: WKNavigationDelegate {
 
 
     // MARK: -
-    
+
 //    func createAccount(urlBase: String, user: String, password: String) {
 //        let controller = UIApplication.shared.firstWindow?.rootViewController as? NCMainTabBarController
 //        if let host = URL(string: urlBase)?.host {
@@ -355,14 +351,6 @@ extension NCLoginWeb: WKNavigationDelegate {
 //                        controller.account = account
 //                        controller.modalPresentationStyle = .fullScreen
 //                        controller.view.alpha = 0
-//                        
-//                        window?.rootViewController = controller
-//                        window?.makeKeyAndVisible()
-//                        
-//                        if let scene = window?.windowScene {
-//                            SceneManager.shared.register(scene: scene, withRootViewController: controller)
-//                        }
-//                        
 //
 //                        window?.rootViewController = controller
 //                        window?.makeKeyAndVisible()
@@ -428,16 +416,16 @@ extension NCLoginWeb: WKNavigationDelegate {
 //            }
 //        }
 //    }
-    
+
     private func createAccount(urlBase: String, user: String, password: String) {
         if self.controller == nil {
             self.controller = UIApplication.shared.firstWindow?.rootViewController as? NCMainTabBarController
         }
-        
+
         if let host = URL(string: urlBase)?.host {
             NCNetworking.shared.writeCertificate(host: host)
         }
-        
+
         Task {
             await NCAccount().createAccount(viewController: self, urlBase: urlBase, user: user, password: password, controller: self.controller)
         }

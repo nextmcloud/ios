@@ -107,11 +107,8 @@ struct NCTrashSelectTabBarView: View {
                 Button {
                     tabBarSelect.delegate?.recover()
                 } label: {
-//                    Image(systemName: "arrow.counterclockwise")
-//                        .font(.icon())
-                    Image(systemName: "arrow.circlepath")
-                        .font(Font.system(.body).weight(.light))
-                        .imageScale(sizeClass == .compact ? .medium : .large)
+                    Image(systemName: "arrow.counterclockwise")
+                        .font(.icon())
                 }
                 .tint(Color(NCBrandColor.shared.iconImageColor))
                 .frame(maxWidth: .infinity)

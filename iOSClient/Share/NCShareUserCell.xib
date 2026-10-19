@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="23727" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="24765" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina4_7" orientation="portrait" appearance="light"/>
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="23721"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="24743"/>
+        <capability name="Image references" minToolsVersion="12.0"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -16,10 +18,6 @@
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <label opaque="NO" userInteractionEnabled="NO" tag="101" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="shareWith" lineBreakMode="middleTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="GnA-Xt-iJw" userLabel="labelTitle">
-                        <rect key="frame" x="16" y="16" width="534" height="18"/>
-                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                        <constraints>
-                            <constraint firstAttribute="height" constant="18" id="Dzl-BC-kK4"/>
                         <rect key="frame" x="16" y="16" width="534" height="20"/>
                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
@@ -32,63 +30,6 @@
                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="7R3-pU-pRv">
                         <rect key="frame" x="16" y="0.0" width="534" height="90"/>
                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                        <connections>
-                            <action selector="quickStatusClicked:" destination="m7s-zr-1da" eventType="touchUpInside" id="4fV-Kc-QHh"/>
-                        </connections>
-                    </button>
-                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="wrw-TH-O7A">
-                        <rect key="frame" x="16" y="41.5" width="13" height="13"/>
-                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                        <constraints>
-                            <constraint firstAttribute="width" constant="13" id="7Sf-qN-Wth"/>
-                            <constraint firstAttribute="height" constant="13" id="LUO-3r-fkG"/>
-                        </constraints>
-                    </imageView>
-                    <label opaque="NO" userInteractionEnabled="NO" tag="101" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="shareWith" lineBreakMode="middleTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="eBS-7V-Cbu">
-                        <rect key="frame" x="34" y="39" width="69" height="18"/>
-                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                        <constraints>
-                            <constraint firstAttribute="height" constant="18" id="stu-S0-5bE"/>
-                        </constraints>
-                        <fontDescription key="fontDescription" type="system" pointSize="15"/>
-                        <nil key="highlightedColor"/>
-                    </label>
-                    <stackView opaque="NO" contentMode="scaleToFill" distribution="fillEqually" spacing="5" translatesAutoresizingMaskIntoConstraints="NO" id="AhD-Do-qAx">
-                        <rect key="frame" x="108" y="41.5" width="31" height="13"/>
-                        <subviews>
-                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="calenderNew" translatesAutoresizingMaskIntoConstraints="NO" id="9ih-3l-y4Q">
-                                <rect key="frame" x="0.0" y="0.0" width="13" height="13"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="13" id="782-Z7-wd9"/>
-                                    <constraint firstAttribute="width" constant="13" id="uiz-tV-7kR"/>
-                                </constraints>
-                            </imageView>
-                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="lockNew" translatesAutoresizingMaskIntoConstraints="NO" id="bVQ-ff-vyD">
-                                <rect key="frame" x="18" y="0.0" width="13" height="13"/>
-                                <constraints>
-                                    <constraint firstAttribute="width" constant="13" id="ZiB-az-cCU"/>
-                                    <constraint firstAttribute="height" constant="13" id="aAp-d0-59D"/>
-                                </constraints>
-                            </imageView>
-                        </subviews>
-                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                    </stackView>
-                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="rightArrow" translatesAutoresizingMaskIntoConstraints="NO" id="eHc-K1-Uo8">
-                        <rect key="frame" x="144" y="41.5" width="13" height="13"/>
-                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                        <constraints>
-                            <constraint firstAttribute="height" constant="13" id="QHU-ys-0Wv"/>
-                            <constraint firstAttribute="width" constant="13" id="ak4-An-UtZ"/>
-                        </constraints>
-                    </imageView>
-                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="LQG-DC-Jy7" userLabel="ButtonMenu">
-                        <rect key="frame" x="565" y="20" width="24" height="24"/>
-                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                        <constraints>
-                            <constraint firstAttribute="height" constant="24" id="2N6-xS-KG7"/>
-                            <constraint firstAttribute="width" constant="24" id="WKw-sE-9yy"/>
-                        </constraints>
-                        <connections>
                         <connections>
                             <action selector="quickStatusClicked:" destination="m7s-zr-1da" eventType="touchUpInside" id="4fV-Kc-QHh"/>
                         </connections>
@@ -198,8 +139,6 @@
     </objects>
     <resources>
         <image name="calenderNew" width="24" height="24"/>
-        <image name="lockNew" width="24" height="24"/>
-        <image name="rightArrow" width="24" height="24"/>
         <image name="ellipsis" catalog="system" width="128" height="37"/>
         <image name="lockNew" width="24" height="24"/>
         <image name="rightArrow" width="24" height="24"/>

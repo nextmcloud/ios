@@ -439,7 +439,7 @@ class NCListLayout: UICollectionViewFlowLayout {
 
 #if !EXTENSION
 extension NCCollectionViewCommon {
-    func listCell(cell: NCListCell, indexPath: IndexPath, metadata: tableMetadata) -> NCListCell {
+    func listCell(cell: NCListCell, indexPath: IndexPath, metadata: tableMetadata, existsImagePreview: Bool) -> NCListCell {
         defer {
             let capabilities = NCNetworking.shared.capabilities[session.account] ?? NKCapabilities.Capabilities()
             if !metadata.isSharable() || (!capabilities.fileSharingApiEnabled && !capabilities.filesComments && capabilities.activity.isEmpty) {
@@ -449,7 +449,7 @@ extension NCCollectionViewCommon {
         var isShare = false
         var isMounted = false
         var a11yValues: [String] = []
-        let existsImagePreview = utilityFileSystem.fileProviderStorageImageExists(metadata.ocId, etag: metadata.etag, userId: metadata.userId, urlBase: metadata.urlBase)
+//        let existsImagePreview = utilityFileSystem.fileProviderStorageImageExists(metadata.ocId, etag: metadata.etag, userId: metadata.userId, urlBase: metadata.urlBase)
         let shares = NCManageDatabase.shared.getTableShares(metadata: metadata)
         let shareItems = shares.share ?? []
 
@@ -542,17 +542,6 @@ extension NCCollectionViewCommon {
         } else {
             cell.buttonShared.setImage(imageCache.getImageCanShare().withTintColor(.label, renderingMode: .alwaysOriginal), for: .normal)
         }
-
-        if isSharedWithMe {
-            cell.buttonShared.setImage(imageCache.getImageSharedWithMe(), for: .normal)
-        } else if isCrossAccount {
-            cell.buttonShared.setImage(imageCache.getImageShared(), for: .normal)
-        } else if hasAnyShare || isShare {
-            // Shared by me or has link/email shares
-            cell.buttonShared.setImage(imageCache.getImageShared().withTintColor(NCBrandColor.shared.customer, renderingMode: .alwaysOriginal), for: .normal)
-        } else {
-            cell.buttonShared.setImage(imageCache.getImageCanShare().withTintColor(.label, renderingMode: .alwaysOriginal), for: .normal)
-        }
         
         // Button More
         if metadata.lock == true {
@@ -564,31 +553,6 @@ extension NCCollectionViewCommon {
 
         // Status
         cellMainStatus(cell: cell, metadata: metadata, a11yValues: &a11yValues)
-
-        /*
-        // AVATAR
-        if !metadata.ownerId.isEmpty, metadata.ownerId != metadata.userId {
-            let fileName = NCSession.shared.getFileName(urlBase: metadata.urlBase, user: metadata.ownerId)
-            if let image = NCImageCache.shared.getImageCache(key: fileName) {
-                cell.setSharedAvatarImage(image)
-            } else {
-                self.database.getImageAvatarLoaded(fileName: fileName) { image, tblAvatar in
-                    if let image {
-                        cell.setSharedAvatarImage(image)
-                        NCImageCache.shared.addImageCache(image: image, key: fileName)
-                    } else {
-                        let image = self.utility.loadUserImage(for: metadata.ownerId, displayName: metadata.ownerDisplayName, urlBase: metadata.urlBase)
-                        cell.setSharedAvatarImage(image)
-                    }
-
-                    if !(tblAvatar?.loaded ?? false),
-                       self.networking.downloadAvatarQueue.operations.filter({ ($0 as? NCOperationDownloadAvatar)?.fileName == fileName }).isEmpty {
-                        self.networking.downloadAvatarQueue.addOperation(NCOperationDownloadAvatar(user: metadata.ownerId, fileName: fileName, account: metadata.account, view: self.collectionView))
-                    }
-                }
-            }
-        }
-         */
 
         // URL
         if metadata.classFile == NKTypeClassFile.url.rawValue {
@@ -657,6 +621,3 @@ extension NCCollectionViewCommon {
     }
 }
 #endif
-
-
-

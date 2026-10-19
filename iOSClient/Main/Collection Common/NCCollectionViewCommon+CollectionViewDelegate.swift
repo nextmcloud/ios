@@ -10,21 +10,35 @@ import LucidBanner
 
 extension NCCollectionViewCommon: UICollectionViewDelegate {
     @MainActor
-    func didSelectMetadata(_ metadata: tableMetadata, withOcIds: Bool) async {
+    func didSelectMetadata(_ metadata: tableMetadata, withOcIds: Bool, viewerTransitionSource: NCMediaViewerTransitionSource?) async {
         let capabilities = await NKCapabilities.shared.getCapabilities(for: session.account)
 
         if metadata.e2eEncrypted {
             if capabilities.e2EEEnabled {
                 if !NCPreferences().isEndToEndEnabled(account: metadata.account) {
-                    let e2ee = NCEndToEndInitialize()
-                    e2ee.delegate = self
-                    e2ee.initEndToEndEncryption(controller: self.controller, metadata: metadata)
-                    return
+                    do {
+                        let e2ee = NCEndToEndSetup(controller: controller)
+                        try await e2ee.start()
+                    } catch let error as NKError {
+                        if error.errorCode == NSUserCancelledError {
+                            return
+                        }
+                        await showErrorBanner(
+                            windowScene: windowScene,
+                            text: error.errorDescription
+                        )
+                        return
+                    } catch {
+                        // fallback (non NKError)
+                        await showErrorBanner(
+                            windowScene: windowScene,
+                            text: error.localizedDescription
+                        )
+                        return
+                    }
                 }
             } else {
-                Task {
-                    await showInfoBanner(windowScene: windowScene, text: "_e2e_server_disabled_")
-                }
+                await showInfoBanner(windowScene: windowScene, text: "_e2e_server_disabled_")
                 return
             }
         }
@@ -59,11 +73,12 @@ extension NCCollectionViewCommon: UICollectionViewDelegate {
                         for: token)
                 }
             }
+
             if let banner {
                 await banner.dismissAsync()
             }
 
-            if results.nkError == .success || results.afError?.isExplicitlyCancelledError ?? false {
+            if results.nkError == .success || results.nkError == .cancelled {
                 print("ok")
             } else {
                 await showErrorBanner(windowScene: windowScene, text: results.nkError.errorDescription, errorCode: results.nkError.errorCode)
@@ -71,22 +86,19 @@ extension NCCollectionViewCommon: UICollectionViewDelegate {
         }
 
         if metadata.directory {
-            pushMetadata(metadata)
+            await pushMetadata(metadata)
         } else {
-            Task { @MainActor in
-                let image = utility.getImage(ocId: metadata.ocId, etag: metadata.etag, ext: self.global.previewExt1024, userId: metadata.userId, urlBase: metadata.urlBase)
-                let fileExists = utilityFileSystem.fileProviderStorageExists(metadata)
+            let image = utility.getImage(ocId: metadata.ocId, etag: metadata.etag, ext: self.global.previewExt1024, userId: metadata.userId, urlBase: metadata.urlBase)
+            let fileExists = utilityFileSystem.fileProviderStorageExists(metadata)
 
             // --- E2EE -------
             if metadata.isDirectoryE2EE {
                 if fileExists {
-                    if let vc = await NCViewer().getViewerController(metadata: metadata, delegate: self) {
+                    if let vc = await NCViewer().getViewerController(metadata: metadata, delegate: self, viewerTransitionSource: viewerTransitionSource) {
                         self.navigationController?.pushViewController(vc, animated: true)
                     }
                 } else {
-                    Task {
-                        await showErrorBanner(windowScene: windowScene, text: "_go_online_", errorCode: NCGlobal.shared.errorOfflineNotAllowed)
-                    }
+                    await downloadFile()
                 }
                 return
             }
@@ -98,11 +110,11 @@ extension NCCollectionViewCommon: UICollectionViewDelegate {
                     $0.classFile == NKTypeClassFile.video.rawValue ||
                     $0.classFile == NKTypeClassFile.audio.rawValue }.map(\.ocId)
 
-                if let vc = await NCViewer().getViewerController(metadata: metadata, ocIds: withOcIds ? ocIds : nil, image: image, delegate: self) {
+                if let vc = await NCViewer().getViewerController(metadata: metadata, ocIds: withOcIds ? ocIds : nil, image: image, delegate: self, viewerTransitionSource: viewerTransitionSource) {
                     self.navigationController?.pushViewController(vc, animated: true)
                 }
-            } else if !metadata.isDirectoryE2EE, metadata.isAvailableEditorView || utilityFileSystem.fileProviderStorageExists(metadata) || metadata.name == self.global.talkName {
-                if let vc = await NCViewer().getViewerController(metadata: metadata, image: image, delegate: self) {
+            } else if !metadata.isDirectoryE2EE, metadata.isDocumentEditorAvailable || utilityFileSystem.fileProviderStorageExists(metadata) || metadata.name == self.global.talkName {
+                if let vc = await NCViewer().getViewerController(metadata: metadata, image: image, delegate: self, viewerTransitionSource: viewerTransitionSource) {
                     self.navigationController?.pushViewController(vc, animated: true)
                 }
             } else if NextcloudKit.shared.isNetworkReachable() {
@@ -116,7 +128,7 @@ extension NCCollectionViewCommon: UICollectionViewDelegate {
                 if metadata.name == "files" {
                     await downloadFile()
                 } else if !metadata.url.isEmpty,
-                          let vc = await NCViewer().getViewerController(metadata: metadata, delegate: self) {
+                          let vc = await NCViewer().getViewerController(metadata: metadata, delegate: self, viewerTransitionSource: viewerTransitionSource) {
                     self.navigationController?.pushViewController(vc, animated: true)
                 }
             } else {
@@ -129,24 +141,26 @@ extension NCCollectionViewCommon: UICollectionViewDelegate {
         guard let metadata = self.dataSource.getMetadata(indexPath: indexPath) else {
             return
         }
+        var viewerTransitionSource: NCMediaViewerTransitionSource?
 
         if self.isEditMode {
-            if !metadata.e2eEncrypted {
-                if let index = self.fileSelect.firstIndex(of: metadata.ocId) {
-                    self.fileSelect.remove(at: index)
-                } else {
-                    self.fileSelect.append(metadata.ocId)
-                }
-                self.collectionView.reloadItems(at: [indexPath])
-                self.tabBarSelect?.update(fileSelect: self.fileSelect, metadatas: self.getSelectedMetadatas(), userId: metadata.userId)
-                // self.collectionView.reloadSections(IndexSet(integer: indexPath.section))
+            if let index = self.fileSelect.firstIndex(of: metadata.ocId) {
+                self.fileSelect.remove(at: index)
+            } else {
+                self.fileSelect.append(metadata.ocId)
             }
+            self.collectionView.reloadItems(at: [indexPath])
+            self.tabBarSelect?.update(fileSelect: self.fileSelect, metadatas: self.getSelectedMetadatas(), userId: metadata.userId)
             self.collectionView.collectionViewLayout.invalidateLayout()
             return
         }
 
+        if let cell = collectionView.cellForItem(at: indexPath) as? NCCellMainProtocol {
+            viewerTransitionSource = cell.viewerTransitionSource()
+        }
+
         Task {
-            await didSelectMetadata(metadata, withOcIds: true)
+            await didSelectMetadata(metadata, withOcIds: true, viewerTransitionSource: viewerTransitionSource)
         }
     }
 
@@ -174,7 +188,7 @@ extension NCCollectionViewCommon: UICollectionViewDelegate {
         return UIContextMenuConfiguration(identifier: identifier, previewProvider: {
             return nil
         }, actionProvider: { _ in
-            let contextMenu = NCContextMenu(metadata: metadata.detachedCopy(), viewController: self, sceneIdentifier: self.sceneIdentifier, sender: cell)
+            let contextMenu = NCContextMenuMain(metadata: metadata.detachedCopy(), viewController: self, controller: self.controller, sender: cell)
             return contextMenu.viewMenu()
         })
     }

@@ -65,7 +65,7 @@ class NCOffline: NCCollectionViewCommon {
                                                      account: session.account)
         await super.reloadDataSource()
 
-        cachingAsync(metadatas: metadatas)
+//        cachingAsync(metadatas: metadatas)
     }
 
     override func getServerData(forced: Bool = false) async {

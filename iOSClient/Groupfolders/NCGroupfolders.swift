@@ -78,7 +78,6 @@ class NCGroupfolders: NCCollectionViewCommon {
         }
 
         startGUIGetServerData()
-        
 
         let homeServerUrl = utilityFileSystem.getHomeServer(session: session)
         let showHiddenFiles = NCPreferences().getShowHiddenFiles(account: session.account)

@@ -57,7 +57,6 @@
 "_upload_"                  = "Upload";
 "_home_"                    = "Files";
 "_files_"                   = "Files";
-//"_files_"                   = "Files";
 "_home_dir_"                = "Home";
 "_file_to_upload_"          = "File to upload";
 "_destination_"             = "Destination";
@@ -117,21 +116,15 @@
 "_save_to_camera_roll_desc_"   = "When enabled, photos and videos taken with the in-app camera will also be saved to your iOS camera roll.";
 "_start_"                   = "Start";
 "_force_start_"             = "Force the start";
+"_purchase_"                = "Purchase";
 "_account_does_not_exist_"  = "The account %@ does not exist. Please log in again.";
-//"_account_not_available_"   = "The account %@ of %@ does not exist, please add it to be able to read the file %@.";
 "_account_not_available_"   = "The account %@ of %@ does not exist, please add it to be able to read the file %@.";
 "_the_account_"             = "The account";
 "_does_not_exist_"          = "does not exist";
-"_purchase_"                = "Purchase";
 "_account_not_exists_"      = "The account %@ of %@ does not exist";
-"_account_not_available_"   = "The account %@ of %@ does not exist, please add it to be able to read the file %@";
-"_the_account_"             = "The account";
-"_does_not_exist_"          = "does not exist";
 "_error_parameter_schema_"  = "Wrong parameters, impossible to continue";
 "_comments_"                = "Comments";
 "_sharing_"                 = "Sharing";
-"_details_"                 = "Share";
-//"_details_"                 = "Details";
 //"_details_"                 = "Share";
 "_details_"                 = "Details";
 "_sub_details_"             = "Subscription Details";
@@ -145,10 +138,6 @@
 "_no_permission_delete_file_" = "You don't have permission to delete files.";
 "_no_permission_modify_file_" = "You don't have permission to modify files.";
 "_no_permission_favorite_file_" = "You don't have permission to add the file to your favorites.";
-"_no_permission_add_file_"  = "You don't have permission to add files";
-"_no_permission_delete_file_" = "You don't have permission to delete files";
-"_no_permission_modify_file_" = "You don't have permission to modify files";
-"_no_permission_favorite_file_" = "You don't have permission to add the file to your favorites";
 "_request_upload_new_ver_"  = "The file has been modified, do you want to upload the new version?";
 "_add_folder_info_"         = "Add folder info";
 "_back_"                    = "Back";
@@ -227,13 +216,13 @@
 "_automatic_Download_Image_" = "Use images in full resolution";
 "_automatic_Download_Image_footer_" = "When viewing images always download, if not available locally, the images in full resolution";
 "_size_"                    = "Size";
-//"_set_user_status_"         = "Online status";
-"_set_user_status_message_" = "Status message";
 "_file_size_"               = "Exported file size";
 "_dimension_"               = "Dimension";
 "_duration_"                = "Duration";
 "_model_"                   = "Model";
 "_set_user_status_"         = "Set user status";
+//"_set_user_status_"         = "Online status";
+"_set_user_status_message_" = "Status message";
 "_open_settings_"           = "Open settings";
 "_rename_ext_title_"        = "Change file type?";
 "_rename_ext_message_"      = "This file may behave differently if you change it from .%@ to %@";
@@ -243,8 +232,6 @@
 "_settings_account_request_" = "Request account at startup";
 "_print_"                   = "Print";
 "_alias_"                   = "Alias";
-//"_alias_placeholder_"       = "Write alias";
-//"_alias_footer_"            = "Give your accounts a descriptive name such as Home, Office, School…";
 "_alias_placeholder_"       = "Write the alias";
 "_alias_footer_"            = "Give your account names a descriptive name such as Home, Office, School …";
 "_chunk_size_mb_"           = "Chunk size in MB";
@@ -253,7 +240,6 @@
 "_source_code_"             = "Get source code";
 "_account_select_"          = "Select the account";
 "_account_select_to_add_"   = "Select the account to add";
-"_host_insert_"             = "Insert the host name, for example:";
 "_host_insert_"             = "Insert the hostname, for example:";
 "_certificate_not_found_"   = "File %@ in documents directory not found.";
 "_copy_failed_"             = "Copy failed";
@@ -297,7 +283,7 @@
 
 //TOPasscodeSettingsWarningLabel.m
 "_1_failed_passcode_attempt" = "1 Failed Passcode Attempt";
-"_failed_passcode_attempts" = "%ld Failed Passcode Attempts";
+//"_failed_passcode_attempts" = "%ld Failed Passcode Attempts";
 "_failed_passcode_attempts" = "%d Failed Passcode Attempts";
 
 /* Background of the file listing view */
@@ -365,7 +351,6 @@
 "_download_plist_"          = " ";
 "_no_reuploadfile_"         = "Could not find nor resend file. Delete the upload and reload the file to upload it.";
 "_file_already_exists_"     = "Unable to complete the operation, a file with the same name exists.";
-//"_file_already_exists_"     = "Unable to complete the operation, a file with the same name exists.";
 "_read_file_error_"         = "Could not read the file";
 "_write_file_error_"        = "Could not write the file";
 "_files_lock_error_"        = "There was an error changing the lock of this file.";
@@ -376,9 +361,8 @@
 "_quota_space_unknown_"         = "Unknown";
 "_quota_using_"                 = "You are using %@ of %@";
 //"_quota_using_"                 = "%@ ";
-"_quota_using_"                 = "%@ ";
-"_quota_using_of_"              = "of %@";
-"_quota_using_percentage_"      = "Memory to %@ occupied";
+//"_quota_using_of_"              = "of %@";
+//"_quota_using_percentage_"      = "Memory to %@ occupied";
 "_acknowledgements_"            = "Acknowledgements";
 "_settings_"                    = "Settings";
 "_passcode_"                    = "Password";
@@ -403,8 +387,6 @@
 "_username_"                    = "Username";
 "_change_credentials_"          = "Change your credentials";
 "_wifi_only_"                   = "Only use Wi-Fi connection";
-"_settings_autoupload_"         = "Auto upload photos";
-//"_settings_autoupload_"         = "Auto upload";
 //"_settings_autoupload_"         = "Auto upload photos";
 "_settings_autoupload_"         = "Auto upload";
 "_app_version_"                 = "Application version";
@@ -414,8 +396,6 @@
 "_clear_cache_footer_"          = "Clear downloaded and offline files from the app";
 "_exit_"                        = "Logout";
 "_exit_footer_"                 = "Remove all accounts and local data from the app.";
-"_exit_footer_"                 = "Remove all accounts and local data from the app.";
-"_exit_"                        = "Logout";
 "_funct_not_enabled_"           = "Functionality not enabled";
 "_passcode_activate_"           = "Password lock on";
 "_disabling_passcode_"          = "Removing password lock";
@@ -434,17 +414,6 @@
 "_manage_account_"              = "Manage account";
 "_change_password_"             = "Change password";
 "_add_account_"                 = "Add account";
-//"_want_delete_"                 = "You will delete the following: ";
-//"_want_leave_share_"            = "You will leave the following shares: ";
-"_delete_account_"              = "Remove account";
-"_delete_active_account_"       = "Remove active account";
-"_want_delete_"                 = "Do you really want to delete?";
-"_want_leave_share_"            = "You will leave the following shares: ";
-"_delete_account_"              = "Remove account";
-"_delete_active_account_"       = "Remove active account";
-"_want_delete_"                 = "Do you really want to delete?";
-"_want_delete_"                 = "You will delete the following: ";
-"_want_leave_share_"            = "You will leave the following shares: ";
 "_delete_account_"              = "Remove account";
 "_delete_active_account_"       = "Remove active account";
 "_want_delete_"                 = "Do you really want to delete?";
@@ -492,53 +461,6 @@
 "_time_remaining_"              = "%@ remaining";
 "_disableLocalCacheAfterUpload_footer_" = "After uploading the file, do not keep it in the local cache";
 "_disableLocalCacheAfterUpload_"        = "Disable local cache";
-"_autoupload_"                      = "Auto upload photos/videos";
-"_autoupload_select_folder_"        = "Select the \"Auto upload\" folder";
-"_autoupload_error_select_folder_"  = "Select a valid folder for the \"Auto upload\"";
-"_autoupload_background_"           = "Auto upload in the background";
-"_autoupload_photos_"               = "Auto upload photos";
-"_autoupload_videos_"               = "Auto upload videos";
-"_autoupload_favorites_"            = "Auto upload favorites only";
-//"_autoupload_description_"          = "New photos/videos will be automatically uploaded to your MagentaCLOUD";
-"_autoupload_description_"          = "Choose whether new photos or videos will be automatically uploaded to your MagentaCLOUD.";
-
-//"_autoupload_description_"          = "New photos/videos will be automatically uploaded to your MagentaCLOUD";
-"_autoupload_description_"          = "Choose whether new photos or videos will be automatically uploaded to your MagentaCLOUD.";
-
-"_autoupload_description_background_"  = "This option requires the use of GPS to trigger the detection of new photos/videos in the camera roll once the location changes significantly";
-"_autoupload_background_title_"     = "Limitations";
-"_autoupload_background_msg_"       = "Due to iOS restrictions, it is not yet possible to perform background processes, unless GPS services are activated. Once the cell in the cellular network is changed, the system wakes up for a short time and checks for new photos to upload to the cloud.";
-"_autoupload_change_location_"      = "Change folder";
-"_autoupload_location_now_"         = "Folder";
-"_autoupload_location_default_"     = "Restore default folder";
-"_autoupload_change_location_footer_" = "Change folder used for \"Automatic upload of camera photos\" (if the option is enabled)";
-"_autoupload_not_select_home_"      = "Select a folder";
-"_autoupload_save_album_"           = "Copy photo or video into the photo album";
-"_autoupload_description_"          = "Choose whether new photos or videos will be automatically uploaded to your account.";
-
-"_autoupload_description_"          = "Choose whether new photos or videos will be automatically uploaded to your account.";
-//"_autoupload_description_"          = "New photos/videos will be automatically uploaded to your MagentaCLOUD";
-"_autoupload_description_background_"  = "This option requires the use of GPS to trigger the detection of new photos/videos in the camera roll once the location changes significantly";
-"_autoupload_background_title_"     = "Limitations";
-"_autoupload_background_msg_"       = "Due to iOS restrictions, it is not yet possible to perform background processes, unless GPS services are activated. Once the cell in the cellular network is changed, the system wakes up for a short time and checks for new photos to upload to the cloud.";
-"_autoupload_change_location_"      = "Change folder";
-"_autoupload_location_now_"         = "Folder";
-"_autoupload_location_default_"     = "Restore default folder";
-"_autoupload_change_location_footer_" = "Change folder used for \"Automatic upload of camera photos\" (if the option is enabled)";
-"_autoupload_not_select_home_"      = "Select a folder";
-"_autoupload_save_album_"           = "Copy photo or video into the photo album";
-"_autoupload_fullphotos_"           = "Upload the whole camera roll";
-"_start_autoupload_"                = "Turn on auto upload";
-"_stop_autoupload_"                 = "Turn off auto upload";
-"_autoupload_fullphotos_footer_"    = "Adjust the options above before uploading.";
-"_autoupload_create_subfolder_"     = "Use subfolders";
-"_autoupload_create_subfolder_footer_"  = "Store photos in subfolders based on year, month or day.";
-"_autoupload_subfolder_granularity_"    = "Subfolder Granularity";
-"_filenamemask_"                        = "Change filename mask";
-"_filenamemask_footer_"                 = "By default, when a file is uploaded, it automatically gets the following format: yy-mm-dd hh-mm-ss plus a 4-digit counter. If you do not like this format, you can change it here except for the final 4-digit counter, which cannot be omitted.";
-"_autoupload_filenamemask_"         = "Change filename mask";
-"_autoupload_filenamemask_footer_"  = "Change the automatic filename mask";
-"_autoupload_current_folder_"           = "Currently selected folder";
 "_help_tutorial_"               = "Tutorial";
 "_help_intro_"                  = "Introduction to Nextcloud";
 "_help_activity_verbose_"       = "Detailed Activity feed";
@@ -561,7 +483,8 @@
 "_capabilities_footer_"         = "Display the packages used by the app if they are installed and available on the server.";
 "_diagnostics_"                 = "Diagnostics";
 "_diagnostics_footer_"          = "Changing log level requires a restart of the app to take effect";
-"_view_log_"                    = "View log file";
+"_view_log_"                    = "View log files";
+"_no_log_files_"                = "No log files available";
 "_clear_log_"                   = "Clear log file";
 "_level_log_"                   = "Set Log level (disabled, standard, maximum)";
 "_set_log_level_"               = "Set Log level";
@@ -588,14 +511,11 @@
 "_tutorial_favorite_view_"      = "Files and folders you mark as favorites will show up here";
 "_tutorial_offline_view_"       = "Files copied here will be available offline.\n\nThey will be synchronized with your cloud.";
 "_tutorial_groupfolders_view_"  = "No Group folders yet";
-"_tutorial_groupfolders_view_"  = "No team folders yet";
-//"_tutorial_groupfolders_view_"  = "No Group folders yet";
 "_tutorial_local_view_"         = "You'll find the unpacked files from your cloud.\n\nConnect to iTunes to share these files.";
 "_more_"                        = "More";
 "_favorite_no_files_"           = "No favorites yet";
 "_pull_down_"                               = "Pull down to refresh";
 "_no_photo_load_"                           = "No photo or video";
-"_tutorial_autoupload_view_"                = "You can enable auto uploads from \"Settings\"";
 "_no_date_information_"                     = "No date information";
 "_no_camera_information_"                   = "No camera information";
 "_no_lens_information_"                     = "No lens information";
@@ -605,7 +525,6 @@
 "_location_not_enabled_"                    = "Location Services not enabled";
 "_location_not_enabled_msg_"                = "Please go to \"Settings\" and turn on \"Location Services\"";
 "_access_photo_not_enabled_"                = "Access to Photos is not enabled";
-//"_access_photo_not_enabled_msg_"            = "Please go to \"Settings\" and turn on \"Photo Access\"";
 "_access_photo_not_enabled_msg_"            = "Please go to Settings → Apps → MagentaCLOUD → Photos and enable Photo Library Access";
 "_access_background_app_refresh_denied_"    = "\"Background App Refresh\" is denied. Please enable it in \"Settings\" otherwise, new photos or videos will not be detected when the application is in the background";
 "_access_photo_location_not_enabled_"       = "Access to Photos and Location not enabled";
@@ -614,7 +533,6 @@
 "_tutorial_photo_view_"                     = "No photos or videos uploaded yet";
 "_create_full_upload_"                      = "Creating archive … May take a long time. During this process, keep the application active during the transfer as well.";
 "_error_createsubfolders_upload_"           = "Error creating subfolders";
-"_activate_autoupload_"                     = "Enable auto upload";
 "_remove_photo_CameraRoll_"                 = "Remove from camera roll";
 "_remove_photo_CameraRoll_desc_"            = "\"Remove from camera roll\" after uploads, a confirmation message will be displayed to delete the uploaded photos or videos from the camera roll. The deleted photos or videos will still be available in the iOS Photos Trash for 30 days.";
 "_never_"                       = "never";
@@ -655,8 +573,6 @@
 "_order_by_size_largest_"       = "Sort by largest";
 "_sorted_by_size_largest_"      = "Sorted by largest";
 "_delete_selected_files_"       = "Delete files";
-"_remove_favorites_"            = "Unfavorite";
-"_add_favorites_"               = "Favorite";
 "_move_selected_files_"         = "Move files";
 "_move_or_copy_selected_files_" = "Move or copy files";
 "_download_selected_files_"     = "Download files";
@@ -671,18 +587,6 @@
 "_add_offline_"                 = "Add to offline";
 "_remove_passcode_"             = "Remove password protection";
 "_protect_passcode_"            = "Protect with password";
-"_share_"                       = "Share";
-"_reload_"                      = "Reload";
-"_remove_favorites_"            = "Unfavorite";
-"_add_favorites_"               = "Favorite";
-"_share_"                       = "Share";
-"_reload_"                      = "Reload";
-"_open_in_"                     = "Open with..."; //"Open in …";
-"_share_"                       = "Share";
-"_reload_"                      = "Reload";
-"_open_in_"                     = "Open in …";
-"_remove_favorites_"            = "Unfavorite";
-"_add_favorites_"               = "Favorite";
 "_share_"                       = "Share";
 "_reload_"                      = "Reload";
 "_open_in_"                     = "Open with..."; //"Open in …";
@@ -737,8 +641,8 @@
 "_files_no_files_"              = "No files in here";
 "_files_no_folders_"            = "No folders in here";
 "_request_in_progress_"         = "Request to server in progress …";
-
 "_personal_files_only_"         = "Personal files only";
+
 "audio"                         = "AUDIO";
 "compress"                      = "COMPRESS";
 "directory"                     = "FOLDERS";
@@ -792,9 +696,7 @@
 // MARK: Share
 
 "_share_link_"                  = "Share link";
-//"_share_link_"                  = "Share link";
-"_share_link_"                  = "Link";
-//"_share_link_"                  = "Share link";
+//"_share_link_"                  = "Link";
 "_share_link_button_"           = "Send link to …";
 "_share_link_name_"             = "Link name";
 "_password_"                    = "Password";
@@ -820,12 +722,6 @@
 "_enforce_password_protection_" = "Enforce password protection";
 "_password_obligatory_"         = "Enforce password protection enabled, password obligatory";
 "_shared_with_you_by_"          = "Shared with you by";
-//"_shareLinksearch_placeholder_" = "Name, email, or Federated Cloud ID …";
-//"_new_comment_"                 = "New comment …";
-//"_edit_comment_"                = "Edit comment";
-//"_delete_comment_"              = "Delete comment";
-//"_share_read_only_"             = "View only";
-//"_share_editing_"               = "Can edit";
 "_share_reshare_allowed_"       = "Resharing is allowed.";
 "_share_reshare_not_allowed_"   = "Resharing is not allowed.";
 "_sharing_message_"             = "You can create links or send shares by mail. If you invite MagentaCLOUD users, you have more opportunities for collaboration.";
@@ -856,104 +752,19 @@
 "_share_editing_"               = "Can edit";
 "_share_file_drop_"             = "Filedrop only";
 "_share_hide_download_"         = "Prevent download";
-//"_share_note_recipient_"        = "YOUR MESSAGE";
 "_share_note_recipient_"        = "Note to recipient";
 "_shareLinksearch_placeholder_" = "Contact name or email address";
 "_shareLinksearch_mail_placeholder_" = "Type a name or an email and press Enter";
 "_new_comment_"                 = "New comment …";
 "_edit_comment_"                = "Edit comment";
 "_delete_comment_"              = "Delete comment";
-"_new_comment_"                 = "New comment …";
-"_edit_comment_"                = "Edit comment";
-"_delete_comment_"              = "Delete comment";
-"_share_remaining_download_"    = "Downloads:";
-"_share_read_only_"             = "Read only";
-"_share_editing_"               = "Can edit";
-"_share_file_drop_"             = "Filedrop only";
-//"_share_file_drop_"             = "File request";
-"_share_hide_download_"         = "Prevent download";
-"_share_note_recipient_"        = "YOUR MESSAGE";
-"_shareLinksearch_placeholder_" = "Contact name or email address";
-"_shareLinksearch_placeholder_" = "Type a name and press Search";
-"_shareLinksearch_mail_placeholder_" = "Type a name or an email and press Enter";
-"_new_comment_"                 = "New comment …";
-"_edit_comment_"                = "Edit comment";
-"_delete_comment_"              = "Delete comment";
-"_share_read_only_"             = "View only";
-"_share_reshare_allowed_"       = "Resharing is allowed.";
-"_share_reshare_not_allowed_"   = "Resharing is not allowed.";
-"_sharing_message_"             = "You can create links or send shares by mail. If you invite MagentaCLOUD users, you have more opportunities for collaboration.";
-"_create_link_"                 = "Create Link";
-"personal_share_by_mail"        = "Personal share by mail";
-"_your_shares_"                 = "Your Shares";
-"_share_linklabel_"             = "Link '%@'";
-"_share_link_folder_"           = "Link to folder";
-"_share_link_file_"             = "Link to file";
-"no_shares_created"             = "No shares created yet.";
-"_advance_permissions_"         = "Advanced permissions";
-"_send_new_email_"              = "Send new email";
-"_apply_changes_"               = "Apply changes";
-"_send_share_"                  = "Send share";
-"_PERMISSIONS_"                 = "PERMISSIONS";
-"share_editing_message"         = "There are no editing functions for files unless you share them with MagentaCLOUD users.";
-"_file_drop_message_"           = "With File drop, only uploading is allowed. Only you can see files and folders that have been uploaded.";
-"_custom_link_label"            = "Your custom link label";
-"_set_password_"                = "Set password";
-"_share_expiration_date_placeholder_"= "Expiration date for this share";
-"_share_download_limit_"             = "Download Limit";
-"_share_download_limit_placeholder_" = "Enter download limit";
-"_share_download_limit_alert_empty_" = "Download limit cannot be empty.";
-"_share_download_limit_alert_zero_"  = "Download limit should be greater than 0.";
-"_share_download_limit_alert_invalid_" = "Please enter a valid number for the download limit.";
-"_share_remaining_download_"    = "Downloads:";
-"_share_read_only_"             = "View only";
-"_share_remaining_download_"    = "Downloads:";
-"_share_editing_"               = "Can edit";
-"_share_file_drop_"             = "Filedrop only";
-"_share_hide_download_"         = "Prevent download";
-//"_share_note_recipient_"        = "YOUR MESSAGE";
-"_share_note_recipient_"        = "Note to recipient";
-"_shareLinksearch_placeholder_" = "Contact name or email address";
-"_shareLinksearch_mail_placeholder_" = "Type a name or an email and press Enter";
-"_new_comment_"                 = "New comment …";
-"_edit_comment_"                = "Edit comment";
-"_delete_comment_"              = "Delete comment";
-"_share_reshare_allowed_"       = "Resharing is allowed.";
-"_share_reshare_not_allowed_"   = "Resharing is not allowed.";
-"_sharing_message_"             = "You can create links or send shares by mail. If you invite MagentaCLOUD users, you have more opportunities for collaboration.";
-"_create_link_"                 = "Create Link";
-"personal_share_by_mail"        = "Personal share by mail";
-"_your_shares_"                 = "Your Shares";
-"_share_linklabel_"             = "Link '%@'";
-"_share_link_folder_"           = "Link to folder";
-"_share_link_file_"             = "Link to file";
-"no_shares_created"             = "No shares created yet.";
-"_advance_permissions_"         = "Advanced permissions";
-"_send_new_email_"              = "Send new email";
-"_apply_changes_"               = "Apply changes";
-"_send_share_"                  = "Send share";
-"_PERMISSIONS_"                 = "PERMISSIONS";
-"share_editing_message"         = "There are no editing functions for files unless you share them with MagentaCLOUD users.";
-"_file_drop_message_"           = "With File drop, only uploading is allowed. Only you can see files and folders that have been uploaded.";
-"_custom_link_label"            = "Your custom link label";
-"_set_password_"                = "Set password";
-"_share_download_limit_"             = "Download Limit";
-"_share_download_limit_placeholder_" = "Enter download limit";
-"_share_download_limit_alert_empty_" = "Download limit cannot be empty.";
-"_share_download_limit_alert_zero_"  = "Download limit should be greater than 0.";
 "_share_allow_editing_"         = "Allow editing";
 "_share_allow_upload_"          = "Allow upload and editing";
 "_share_secure_file_drop_"      = "Secure file drop (upload only)";
-"_share_file_drop_"             = "File request";
-"_share_allow_editing_"         = "Allow editing";
-"_share_allow_upload_"          = "Allow upload and editing";
-"_share_secure_file_drop_"      = "Secure file drop (upload only)";
-//"_share_hide_download_"         = "Hide download";
 "_share_allowed_downloads_"     = "Allowed downloads";
 "_share_limit_download_"        = "Limit downloads";
 "_remaining_"                   = "%d remaining";
 "_share_password_protect_"      = "Password protection";
-//"_share_password_protect_"      = "Password protect";
 "_share_expiration_date_"       = "Set expiration date";
 "_share_delete_sharelink_"      = "Delete link";
 "_share_add_sharelink_"         = "Add another link";
@@ -965,13 +776,10 @@
 "_share_can_download_"          = "Allow download";
 "_share_unshare_"               = "Unshare";
 "_share_internal_link_"         = "Internal link";
-"_share_internal_link_des_"     = "Only works for users with access to this file/folder";
-"_share_reshare_disabled_"      = "You are not allowed to reshare this file/folder";
-"_share_reshare_restricted_"    = "Note: You only have limited permission to reshare this file/folder";
-"_share_can_download_"          = "Allow download";
 "_share_internal_link_des_"     = "Only works for users with access to this file/folder.";
 "_share_reshare_disabled_"      = "You are not allowed to reshare this file/folder.";
 "_share_reshare_restricted_"    = "Note: You only have limited permission to reshare this file/folder.";
+"_share_can_download_"          = "Allow download";
 "_create_new_link_"             = "Create new link";
 "_share_send_link_by_mail_"      = "Send link by mail";
 "_share_or_"                     = "or";
@@ -997,15 +805,7 @@
 "_remote_"                      = "Remote";
 "_remote_group_"                = "Remote group";
 "_conversation_"                = "Conversation";
-//"_share_can_reshare_"           = "Allow resharing";
-//"_share_can_create_"            = "Allow creating";
-//"_share_can_change_"            = "Allow editing";
-//"_share_can_delete_"            = "Allow deleting";
-//"_share_unshare_"               = "Unshare";
-//"_share_can_download_"          = "Allow download";
 
-"_no_transfer_"                     = "No transfers yet";
-"_no_transfer_sub_"                 = "Uploads and downloads from this device will show up here";
 "_no_transfer_"                 = "No transfers yet";
 "_no_transfer_sub_"             = "Uploads and downloads from this device will show up here";
 "_no_transfer_in_progress_"     = "No transfers in progress";
@@ -1047,61 +847,11 @@
 "_modify_photo_"                    = "Modify photo";
 "_notifications_"                   = "Notifications";
 "_no_notification_"                 = "No notifications yet";
-"_autoupload_filename_title_"       = "Auto upload filename";
 "_untitled_"                        = "Untitled";
 "_untitled_txt_"                    = "Untitled.txt";
 "_text_upload_title_"               = "Upload text file";
-"_e2e_settings_title_"              = "Encryption";
-"_e2e_settings_"                    = "End-to-end encryption";
-"_e2e_settings_start_"              = "Start end-to-end encryption";
-"_e2e_settings_not_available_"      = "End-to-end encryption not available";
-"_e2e_settings_activated_"          = "End-to-end encryption activated";
-"_e2e_server_disabled_"             = "End-to-end encryption app disabled on server";
-"_e2e_settings_view_passphrase_"    = "All 12 words together make a very strong password, letting only you view and make use of your encrypted files. Please write it down and keep it somewhere safe.";
-"_e2e_settings_read_passphrase_"    = "Read passphrase";
-"_e2e_settings_lock_not_active_"    = "Lock not active. Go to \"Settings\" and activate it.";
-"_e2e_settings_the_passphrase_is_"  = "The passphrase is:";
-"_e2e_passphrase_request_title_"    = "Enter passphrase"; //"Request passphrase";
-"_e2e_passphrase_request_message_"  = "Insert the 12 words";
-"_e2e_settings_remove_"             = "Remove the encryption locally";
-"_e2e_settings_remove_message_"     = "Confirm removal of encryption along with the passphrase.";
-"_e2e_set_folder_encrypted_"        = "Encrypt";
-"_e2e_remove_folder_encrypted_"     = "Decrypt";
-"_e2e_file_encrypted_"              = "File encrypted";
-"_e2e_goto_settings_for_enable_"    = "This is an encrypted directory, go to \"Settings\" and enable end-to-end encryption";
-"_e2e_error_"                       = "An internal end-to-end encryption error occurred.";
-"_e2e_in_upload_"                   = "Upload in progress, please wait for all files to be transferred.";
-"_e2e_error_"                       = "An internal end-to-end encryption error occurred";
-"_e2e_in_upload_"                   = "Upload in progress, please wait for all files to be transferred";
-"_e2e_delete_folder_not_permitted_" = "Deletion of the directory marked as \"encrypted\" is not allowed";
-"_e2e_error_encode_metadata_"       = "Serious internal error in encoding metadata";
-"_e2e_error_decode_metadata_"       = "Serious internal error in decoding metadata";
-"_e2e_error_create_encrypted_"      = "Could not create encrypted file";
-"_e2e_error_update_metadata_"       = "Update metadata error";
-"_e2e_error_store_metadata_"        = "Could not save metadata";
-"_e2e_error_send_metadata_"         = "Could not send metadata";
-"_e2e_error_delete_metadata_"       = "Could not delete metadata";
-"_e2e_error_get_metadata_"          = "Could not fetch metadata";
-"_e2e_error_not_enabled_"           = "Serious internal error. End-to-end encryption not enabled";
-"_e2e_error_record_not_found_"      = "Serious internal error. Records not found";
-"_e2e_error_unlock_"                = "Could not unlock folder";
-"_e2e_error_lock_"                  = "Could not lock folder";
-"_e2e_error_delete_mark_folder_"    = "Decrypt marked folder";
-"_e2e_error_mark_folder_"           = "Encrypt folder";
-"_e2e_error_directory_not_empty_"   = "The directory is not empty";
-"_e2e_error_not_move_"              = "It is not possible move files to encrypted directory";
-"_e2e_error_not_versionwriteable_"  = "The E2EE version of the server is not compatible with this client";
-"_start_e2e_encryption_1_"          = "To set up end-to-end encryption, they must first set up the PIN lock to prevent unauthorised people from accessing your key.";
-"_start_e2e_encryption_2_"          = "After starting the encryption, a randomly generated word sequence (passphrase) of 12 words is displayed. This remains in this app and can be displayed again. Nevertheless, we recommend that you write down the passphrase.";
-"_start_e2e_encryption_3_"          = "The passphrase is your personal password with which you can access encrypted data in your MagentaCLOUD or enable access to these files on other devices such as your PC.";
-"_read_passphrase_description_"     = "Here you can display the passphrase again and also copy it. You need the passphrase if you want to decrypt the data on another device with access to MagentaCLOUD, for example your PC or another smartphone or tablet.";
-"_remove_passphrase_desc_1_"        = "You can remove the passphrase on this device. This will not affect the encrypted content, but this device will no longer be able to decrypt your data.";
-"_remove_passphrase_desc_2_"        = "You can re-enter the passphrase here at any time to ensure access to your encrypted content from this device.";
-"_e2e_error_incorrect_passphrase_"  = "Wrong password?";
-"_e2e_error_passphrase_title"       = "Error while decrypting.";
 
 "_scans_document_"                  = "Scan document";
-//"_scanned_images_"                  = "Scanned images";
 "_scanned_images_"                  = "Scanned documents";
 "_scan_document_pdf_page_"          = "Page";
 "_scan_label_document_zone_"        = "Tap or drag images down for document creation";
@@ -1136,12 +886,8 @@
 "_trash_restore_all_"               = "Restore all files";
 "_trash_delete_all_"                = "Empty trash";
 "_trash_delete_permanently_"        = "Delete permanently";
-"_trash_delete_all_description_"    = "Do you want to empty the trash bin?";"_trash_no_trash_"                  = "No files deleted";
-"_empty_trash_"                     = "Empty trash";
-"_trash_restore_all_"               = "Restore all files";
-"_trash_delete_all_"                = "Empty trash";
-"_trash_delete_permanently_"        = "Delete permanently";
 "_trash_delete_all_description_"    = "Do you want to empty the trash bin?";
+"_empty_trash_"                     = "Empty trash";
 "_trash_no_trash_"                  = "No files deleted";
 "_trash_no_trash_description_"      = "You can restore deleted files from here";
 "_trash_restore_selected_"          = "Restore selected files";
@@ -1227,13 +973,6 @@
 "_internal_generic_error_"              = "internal error.";
 "_err_permission_microphone_"           = "Please allow Microphone usage from Settings.";
 "_err_permission_photolibrary_"         = "Please allow Photos from Settings.";
-//"_ssl_certificate_untrusted_"           = "The certificate for this server is invalid.";
-//"_ssl_certificate_changed_"             = "The certificate for this server seems to have changed.";
-//"_file_already_exists_"                 = "Could not complete the operation, a file with the same name exists.";
-//"_error_files_upload_"                  = "Error uploading files.";
-//"_internal_generic_error_"              = "internal error.";
-//"_err_permission_microphone_"           = "Please allow Microphone usage from Settings.";
-//"_err_permission_photolibrary_"         = "Please allow Photos from Settings.";
 "_qrcode_not_authorized_"   = "This app is not authorized to use the Back Camera.";
 "_qrcode_not_supported_"    = "QR code not supported by the current device.";
 "_create_voice_memo_"       = "Create voice memo";
@@ -1241,11 +980,7 @@
 "_voice_memo_stop_"         = "Tap to stop";
 "_voice_memo_filename_"     = "Voice memo";
 "_voice_memo_title_"        = "Upload voice memo";
-"Enter Passcode"            = "Enter Passcode";
-"Enter a new passcode"      = "Enter a new passcode";
-"Confirm new passcode"      = "Confirm new passcode";
 "_too_many_failed_passcode_attempts_error_" = "Too many failed passcode attempts. Please try again.";
-//"Passcodes didn't match. Try again." = "Passcodes didn't match. Try again.";
 "Delete"                    = "Delete";
 "Cancel"                    = "Cancel";
 "_certificate_details_"     = "Certificate Server details";
@@ -1292,11 +1027,8 @@
 "_copy_path_"               = "Copy path";
 "_certificates_"            = "Certificates";
 "_privacy_screen_"          = "Splash screen when app inactive";
-"_privacy_screen_"          = "Hide content when app is inactive";
+//"_privacy_screen_"          = "Hide content when app is inactive";
 "_privacy_screen_footer_"   = "Hide the content in the app and show a splash screen when the app is inactive.";
-"_copy_path_"               = "Copy path";
-"_certificates_"            = "Certificates";
-//"_privacy_screen_"          = "Splash screen when app inactive";
 "_saving_"                  = "Saving …";
 "_video_not_streamed_"      = "The server does not allow video streaming, do you want to download it?";
 "_video_not_streamed_e2ee_" = "The server does not allow video streaming because it is encrypted, do you want to download it?";
@@ -1327,7 +1059,6 @@
 "_check_back_later_"        = "Check back later";
 "_exporting_video_"         = "Exporting video … Tap to cancel.";
 "_keep_running_"            = "Keep the app running for a better user experience.";
-//"_keep_running_"            = "Keep the app running for a better user experience.";
 "_apps_nextcloud_detect_"   = "Detected %@ apps";
 "_add_existing_account_"    = "Other %@ Apps has been detected, do you want to add an existing account?";
 "_status_in_progress_"      = "Status reading in progress …";
@@ -1346,8 +1077,6 @@
 "_crop_"                    = "Crop";
 "_modify_image_desc_"       = "Tap on a file to modify or rename.";
 "_message_disable_livephoto_" = "This image is a Live Photo, changing it will lose the Live Photo effect.";
-//"_modify_image_desc_"       = "Tap the image for modify";
-//"_message_disable_livephoto_" = "This image is a Live Photo, changing it will lose the Live effect";
 "_enable_livephoto_"        = "Enable Live Photo";
 "_disable_livephoto_"       = "Disable Live Photo";
 "_undo_modify_"             = "Undo modifying";
@@ -1361,17 +1090,8 @@
 "_creation_"                = "Creation";
 "_modified_"                = "Modified";
 "_group_folders_"           = "Group folders";
-"_group_folders_"           = "Team folders";
 "_play_from_files_"         = "Play video from a file";
 "_play_from_url_"           = "Play video from a link";
-"_created_"                 = "Created";
-"_recipients_"              = "Recipients";
-"_are_sure_"                = "Are you sure?";
-"_creation_"                = "Creation";
-"_modified_"                = "Modified";
-//"_group_folders_"           = "Group folders";
-"_play_from_files_"         = "Play movie from a file";
-"_play_from_url_"           = "Play movie from URL";
 "_valid_video_url_"         = "Insert a valid URL";
 "_deletion_progess_"        = "Deletion in progress";
 "_copying_progess_"         = "Copying in progress";
@@ -1397,7 +1117,6 @@
 "_delete_selected_photos_"  = "Delete selected photos";
 "_media_square_"            = "Square grid";
 "_media_ratio_"             = "Aspect ratio grid";
-"_autoupload_notice_"       = "To ensure the proper functioning of this feature, it is necessary to enable Background App Refresh. Otherwise, new photos or videos will not be detected when the application is in the background.\n\nAdditionally, please note that the app will not be able to detect new photos and videos if it is manually terminated. When the app is in the background, data transfer may be slower, and new photos and/or videos will generally be detected every 10 minutes, depending on the device’s battery level.\n\nTo verify that the app is functioning correctly, you can use the log file available in Advanced settings.";
 "_display_"                 = "Display";
 "_appearance_"              = "Appearance";
 "_light_"                   = "Light";
@@ -1406,8 +1125,7 @@
 "_account_settings_"        = "Account settings";
 "_users_"                   = "Users";
 "_users_footer_"            = "Every time the app is reactivated, the account will be requested.";
-"_users_footer_"            = "Allows you to select an account every time you open the app.";
-//"_users_footer_"            = "Every time the app is reactivated, the account will be requested.";
+//"_users_footer_"            = "Allows you to select an account every time you open the app.";
 "_additional_view_options_" = "Additional view options";
 "_while_charging_"          = "While charging";
 "_downloading_"             = "Downloading";
@@ -1506,8 +1224,6 @@
 "_select_date_" = "Select date";
 "_always_play_with_vlc_" = "Always play with VLC";
 "_account_not_available_" = "Account not available";
-"_autoupload_active_other_account_title_" = "Auto upload is already active";
-"_autoupload_active_other_account_message_" = "Auto upload is already enabled for “%@”. Disable it for that account before enabling it here.";
 
 // Tip
 "_tip_pdf_thumbnails_"      = "Swipe left from the right edge of the screen to show the thumbnails";
@@ -1616,22 +1332,11 @@ You can stop it at any time, adjust the settings, and enable it again.";
 "_new_photos_only_" = "New photos only";
 "_all_photos_" = "All photos";
 "_back_up_new_photos_only_" = "Back up new photos/videos only";
-"_auto_upload_all_photos_warning_title_" = "Are you sure you want to upload all photos?";
-"_auto_upload_all_photos_warning_message_" = "This can take some time to process depending on the amount of photos.";
-"_auto_upload_no_new_items_to_upload_" = "No new items to upload";
-"_focused_auto_upload_" = "Focused Auto Upload";
-"_focused_auto_upload_settings_footer_" = "Keep the app open and darken the screen while auto upload is backing up at higher speed.";
-"_focused_auto_upload_intro_heading_" = "Keep backing up with the screen darkened.";
-"_focused_auto_upload_intro_message_" = "Photos and videos will continue backing up at higher speed while the screen is darkened. During the process:";
-"_focused_auto_upload_wifi_" = "Connect to Wi-Fi";
-"_focused_auto_upload_charger_" = "Connect to charger";
-"_focused_auto_upload_do_not_exit_" = "Do not exit the app";
-"_enable_focused_auto_upload_" = "Enable Focused Auto Upload";
-"_focused_auto_upload_backing_up_" = "Backing up";
-"_focused_auto_upload_completed_" = "Upload completed!";
-"_focused_auto_upload_countdown_" = "Do not lock the screen or exit the app. The screen will turn dark in %d seconds.";
-"_stop_focused_auto_upload_" = "Stop Focused Auto Upload";
-"_finish_" = "Finish";
+"_background_upload_extension_" = "PhotoKit background upload extension";
+"_experimental_" = "Experimental";
+"_background_upload_extension_footer_" = "Experimental: delegate automatic photo uploads to PhotoKit in the background. The compatibility setting (HEIC to JPG) is ignored, so HEIC images are uploaded in their original format.";
+"_background_upload_extension_apache_title_" = "Apache configuration required";
+"_background_upload_extension_apache_warning_" = "Servers without resumable upload support must return 501 for PhotoKit OPTIONS requests. With mod_rewrite enabled, add these rules to the Nextcloud VirtualHost before its existing rewrite rules, then reload Apache:";
 "_item_with_same_name_already_exists_" = "An item with the same name already exists.";
 
 // MARK: Privacy Policy
@@ -1668,8 +1373,6 @@ You can stop it at any time, adjust the settings, and enable it again.";
 "_no_file_type_selection_error_"    = "Please select at least one filetype";
 "_no_internet_alert_message_"       = "A data connection is not currently allowed.";
 "_no_internet_alert_title_"         = "Connection error";
-"_auto_upload_help_text_"           = "With this option, you upload your photos or videos to the same folder that you selected for \"Automatic upload.\"";
-"_item_with_same_name_already_exists_" = "An item with the same name already exists.";
 
 // MARK: Dashboard
 "_shared_"                          = "Shared";
@@ -1736,54 +1439,52 @@ You can stop it at any time, adjust the settings, and enable it again.";
 "_certificate_valid_until_" = "Valid until";
 "_certificate_" = "Certificate";
 "_certificate_renew_" = "Renew certificate";
-
-// MARK: Privacy Policy
-"_privacy_settings_title_"      = "Privacy Settings";
-"_privacy_help_text_after_login_"   = "This app uses Cookies and similiar technolgies (tools). By clicking Accept, you accept the processing and also the Transfer of your data to third parties. The data will be used for Analysis, retargeting and to Display personalized Content and Advertising on  sites and third-party sites. You can find further informatin, including Information on data processing by third-party Providers, in the settings and in our Privacy Policy.You can reject the use of the Tools or customize them at any time in the Settings.";
-"_key_privacy_help_"            = "Privacy Policy";
-"_key_reject_help_"             = "reject";
-"_key_settings_help_"           = "Settings";
-"_accept_button_title_"         = "Accept";
-"_privacy_settings_help_text_"  = "To optimize your app, we collect anonymous data. For this we use software solutions of different partners. We would like to give you full transparency and decision-making power over the processin and collection of your anonymized usage data. You can also change your settings at any time later in the app settings under data protection. Please note, however, that data collection makes a considerable contribution to the optimization of this app and you prevent this optimization by preventing data transmission.";
-"_required_data_collection_"    = "Required data collection";
-"_required_data_collection_help_text_" = "The collection of this data is necessary to be able to use essential functions of the app.";
-"_analysis_data_acqusition_"    = "Analysis-data acqusition for the design";
-"_analysis_data_acqusition_help_text_" = "This data helps us to optimize the app usage for you and to identify system crashes and errors more quickly.";
-
-// MARK: Collabora
-"_prefix_upload_path_"          = "MagentaCLOUD/";
-"_please_enter_file_name_"      = "Please enter the file name";
-
-// MARK: Scan
-"_location_"                        = "Location";
-"_prefix_upload_path_"              = "MagentaCLOUD/";
-
-"_save_with_text_recognition_"      = "SAVE WITH TEXT RECOGNITION (OCR)";
-"_pdf_with_ocr_"                    = "PDF (OCR)";
-"_text_file_ocr_"                   = "Textfile (txt)";
-"_save_without_text_recognition_"   = "SAVE WITHOUT TEXT RECOGNITION";
-"_pdf_"                             = "PDF";
-"_jpg_"                             = "JPG";
-"_png_"                             = "PNG";
-"_set_password_"                    = "Set password";
-"_no_password_warn_"                = "Please enter a password for the PDF you want to create or disable the function.";
-"_saved_info_alert_"                = "Saving will take some time, especially if you have selected several pages and file formats.";
-"_no_file_type_selection_error_"    = "Please select at least one filetype";
-"_no_internet_alert_message_"       = "A data connection is not currently allowed.";
-"_no_internet_alert_title_"         = "Connection error";
-"_auto_upload_help_text_"           = "With this option, you upload your photos or videos to the same folder that you selected for \"Automatic upload.\"";
-
-// MARK: Dashboard
-"_shared_"                          = "Shared";
-"_recieved_"                        = "Received";
-
-// MARK: App Updater
-"update_available"              = "Update available";
-"update_description"            = "MagentaCLOUD version %@ is now available";
-"update"                        = "Update";
-"not_now"                       = "Not Now";
-
-"_prompt_insert_file_name"      = "Please enter filename";
+"_e2e_settings_title_"              = "Encryption";
+"_e2e_settings_"                    = "End-to-end encryption";
+"_e2e_settings_start_"              = "Start end-to-end encryption";
+"_e2e_settings_not_available_"      = "End-to-end encryption not available";
+"_e2e_settings_activated_"          = "End-to-end encryption activated";
+"_e2e_server_disabled_"             = "End-to-end encryption app disabled on server";
+"_e2e_settings_view_passphrase_"    = "All 12 words together make a very strong password, letting only you view and make use of your encrypted files. Please write it down and keep it somewhere safe.";
+"_e2e_settings_read_passphrase_"    = "Read passphrase";
+"_e2e_settings_lock_not_active_"    = "Lock not active. Go to \"Settings\" and activate it.";
+"_e2e_settings_the_passphrase_is_"  = "The passphrase is:";
+"_e2e_passphrase_request_title_"    = "Enter passphrase";
+"_e2e_passphrase_request_message_"  = "Insert the 12 words";
+"_e2e_settings_remove_"             = "Remove the encryption locally";
+"_e2e_settings_remove_message_"     = "Confirm removal of encryption along with the passphrase.";
+"_e2e_set_folder_encrypted_"        = "Encrypt";
+"_e2e_remove_folder_encrypted_"     = "Decrypt";
+"_e2e_file_encrypted_"              = "File encrypted";
+"_e2e_goto_settings_for_enable_"    = "This is an encrypted directory, go to \"Settings\" and enable end-to-end encryption";
+"_e2e_error_"                       = "An internal end-to-end encryption error occurred.";
+"_e2e_in_upload_"                   = "Upload in progress, please wait for all files to be transferred.";
+"_e2e_delete_folder_not_permitted_" = "Deletion of the directory marked as \"encrypted\" is not allowed";
+"_e2e_error_encode_metadata_"       = "Serious internal error in encoding metadata";
+"_e2e_error_decode_metadata_"       = "Serious internal error in decoding metadata";
+"_e2e_error_create_encrypted_"      = "Could not create encrypted file";
+"_e2e_error_update_metadata_"       = "Update metadata error";
+"_e2e_error_store_metadata_"        = "Could not save metadata";
+"_e2e_error_send_metadata_"         = "Could not send metadata";
+"_e2e_error_delete_metadata_"       = "Could not delete metadata";
+"_e2e_error_get_metadata_"          = "Could not fetch metadata";
+"_e2e_error_not_enabled_"           = "Serious internal error. End-to-end encryption not enabled";
+"_e2e_error_record_not_found_"      = "Serious internal error. Records not found";
+"_e2e_error_unlock_"                = "Could not unlock folder";
+"_e2e_error_lock_"                  = "Could not lock folder";
+"_e2e_error_delete_mark_folder_"    = "Decrypt marked folder";
+"_e2e_error_mark_folder_"           = "Encrypt folder";
+"_e2e_error_directory_not_empty_"   = "The directory is not empty";
+"_e2e_error_not_move_"              = "It is not possible move files to encrypted directory";
+"_e2e_error_not_versionwriteable_"  = "The E2EE version of the server is not compatible with this client";
+"_start_e2e_encryption_1_"          = "To set up end-to-end encryption, they must first set up the PIN lock to prevent unauthorised people from accessing your key.";
+"_start_e2e_encryption_2_"          = "After starting the encryption, a randomly generated word sequence (passphrase) of 12 words is displayed. This remains in this app and can be displayed again. Nevertheless, we recommend that you write down the passphrase.";
+"_start_e2e_encryption_3_"          = "The passphrase is your personal password with which you can access encrypted data in your MagentaCLOUD or enable access to these files on other devices such as your PC.";
+"_read_passphrase_description_"     = "Here you can display the passphrase again and also copy it. You need the passphrase if you want to decrypt the data on another device with access to MagentaCLOUD, for example your PC or another smartphone or tablet.";
+"_remove_passphrase_desc_1_"        = "You can remove the passphrase on this device. This will not affect the encrypted content, but this device will no longer be able to decrypt your data.";
+"_remove_passphrase_desc_2_"        = "You can re-enter the passphrase here at any time to ensure access to your encrypted content from this device.";
+"_e2e_error_incorrect_passphrase_"  = "Wrong password?";
+"_e2e_error_passphrase_title"       = "Error while decrypting.";
 
 // MARK: Share details — Governance
 "_governance_"                      = "Governance";
@@ -1809,6 +1510,7 @@ You can stop it at any time, adjust the settings, and enable it again.";
 "_albums_list_empty_new_album_btn_"                 = "Create album";
 "_albums_list_own_albums_heading_"                  = "My albums";
 "_albums_list_entities_"                            = "Items";
+"_albums_list_date_range_"                          = "%@ to %@";
 "_albums_list_new_album_popup_title_"               = "Create new Album";
 "_albums_list_new_album_popup_desc_"                = "Please enter an album name between 3 and 30 characters.";
 "_albums_list_new_album_popup_hint_"                = "Album's name";
@@ -1819,10 +1521,11 @@ You can stop it at any time, adjust the settings, and enable it again.";
 "_albums_list_rename_album_popup_hint_"             = "Album's new name";
 "_albums_list_rename_album_popup_positive_btn_"     = "Rename";
 "_albums_list_rename_album_popup_negative_btn_"     = "Cancel";
-"_albums_photo_selection_sheet_title_"              = "Select items";
 "_albums_photo_selection_sheet_back_btn_"           = "Back";
 "_albums_photo_selection_sheet_done_btn_"           = "Done";
-"_albums_photos_loading_msg_"                       = "Loading photos...";
+//"_albums_photo_selection_sheet_title_"              = "Select items";
+"_albums_photo_selection_sheet_title_"              = "Select photos";
+"_albums_photos_loading_msg_"                       = "Loading photos …";
 "_albums_photos_error_msg_"                         = "Unable to load photos. Please try again later!";
 "_albums_photos_empty_heading_"                     = "All that's\nmissing are\nyour photos";
 "_albums_photos_empty_subheading_"                  = "You can add as many photos as you like. A photo can also belong to more than one album.";
@@ -1836,60 +1539,80 @@ You can stop it at any time, adjust the settings, and enable it again.";
 "_albums_delete_album_popup_negative_btn_"          = "Cancel";
 "_add_to_album"                                     = "Add to Album";
 "_remove_from_album_"                               = "Remove from Album";
-// MARK: Privacy Policy
-"_privacy_settings_title_"      = "Privacy Settings";
-"_privacy_help_text_after_login_"   = "This app uses Cookies and similiar technolgies (tools). By clicking Accept, you accept the processing and also the Transfer of your data to third parties. The data will be used for Analysis, retargeting and to Display personalized Content and Advertising on  sites and third-party sites. You can find further informatin, including Information on data processing by third-party Providers, in the settings and in our Privacy Policy.You can reject the use of the Tools or customize them at any time in the Settings.";
-"_key_privacy_help_"            = "Privacy Policy";
-"_key_reject_help_"             = "reject";
-"_key_settings_help_"           = "Settings";
-"_accept_button_title_"         = "Accept";
-"_privacy_settings_help_text_"  = "To optimize your app, we collect anonymous data. For this we use software solutions of different partners. We would like to give you full transparency and decision-making power over the processin and collection of your anonymized usage data. You can also change your settings at any time later in the app settings under data protection. Please note, however, that data collection makes a considerable contribution to the optimization of this app and you prevent this optimization by preventing data transmission.";
-"_required_data_collection_"    = "Required data collection";
-"_required_data_collection_help_text_" = "The collection of this data is necessary to be able to use essential functions of the app.";
-"_analysis_data_acqusition_"    = "Analysis-data acqusition for the design";
-"_analysis_data_acqusition_help_text_" = "This data helps us to optimize the app usage for you and to identify system crashes and errors more quickly.";
-
-// MARK: Collabora
-"_prefix_upload_path_"          = "MagentaCLOUD/";
-"_please_enter_file_name_"      = "Please enter the file name";
-
-// MARK: Scan
-"_location_"                        = "Location";
-"_prefix_upload_path_"              = "MagentaCLOUD/";
-
-"_save_with_text_recognition_"      = "SAVE WITH TEXT RECOGNITION (OCR)";
-"_pdf_with_ocr_"                    = "PDF (OCR)";
-"_text_file_ocr_"                   = "Textfile (txt)";
-"_save_without_text_recognition_"   = "SAVE WITHOUT TEXT RECOGNITION";
-"_pdf_"                             = "PDF";
-"_jpg_"                             = "JPG";
-"_png_"                             = "PNG";
-"_set_password_"                    = "Set password";
-"_no_password_warn_"                = "Please enter a password for the PDF you want to create or disable the function.";
-"_saved_info_alert_"                = "Saving will take some time, especially if you have selected several pages and file formats.";
-"_no_file_type_selection_error_"    = "Please select at least one filetype";
-"_no_internet_alert_message_"       = "A data connection is not currently allowed.";
-"_no_internet_alert_title_"         = "Connection error";
-"_auto_upload_help_text_"           = "With this option, you upload your photos or videos to the same folder that you selected for \"Automatic upload.\"";
-"_item_with_same_name_already_exists_" = "An item with the same name already exists.";
-
-// MARK: Dashboard
-"_shared_"                          = "Shared";
-"_recieved_"                        = "Received";
-
-// MARK: App Updater
-"update_available"              = "Update available";
-"update_description"            = "MagentaCLOUD version %@ is now available";
-"update"                        = "Update";
-"not_now"                       = "Not Now";
-
-"_prompt_insert_file_name"      = "Please enter filename";
-
-// MARK: Migration Multi Domains
-
-"_preparing_migration_" = "Preparing migration …";
-"_scanning_files_" = "Scanning files …";
-"_moving_items_to_domain_" = "Moving items to correct domain …";
-"_finishing_up_" = "Finishing up …";
 "_album_already_exists_"                            = "Could not complete the operation, album with the same name exists";
 "_want_remove_from_album_"                          = "Do you really want to remove from Album?";
+
+// MARK: Autoupload
+"_autoupload_"                      = "Auto upload photos/videos";
+"_autoupload_select_folder_"        = "Select the \"Auto upload\" folder";
+"_autoupload_error_select_folder_"  = "Select a valid folder for the \"Auto upload\"";
+"_autoupload_background_"           = "Auto upload in the background";
+"_autoupload_photos_"               = "Auto upload photos";
+"_autoupload_videos_"               = "Auto upload videos";
+"_autoupload_favorites_"            = "Auto upload favorites only";
+"_autoupload_description_"          = "Choose whether new photos or videos will be automatically uploaded to your MagentaCLOUD.";
+//"_autoupload_description_"          = "New photos/videos will be automatically uploaded to your MagentaCLOUD";
+"_autoupload_description_background_"  = "This option requires the use of GPS to trigger the detection of new photos/videos in the camera roll once the location changes significantly";
+"_autoupload_background_title_"     = "Limitations";
+"_autoupload_background_msg_"       = "Due to iOS restrictions, it is not yet possible to perform background processes, unless GPS services are activated. Once the cell in the cellular network is changed, the system wakes up for a short time and checks for new photos to upload to the cloud.";
+"_autoupload_change_location_"      = "Change folder";
+"_autoupload_location_now_"         = "Folder";
+"_autoupload_location_default_"     = "Restore default folder";
+"_autoupload_change_location_footer_" = "Change folder used for \"Automatic upload of camera photos\" (if the option is enabled)";
+"_autoupload_not_select_home_"      = "Select a folder";
+"_autoupload_save_album_"           = "Copy photo or video into the photo album";
+"_autoupload_fullphotos_"           = "Upload the whole camera roll";
+"_start_autoupload_"                = "Turn on auto upload";
+"_stop_autoupload_"                 = "Turn off auto upload";
+"_autoupload_fullphotos_footer_"    = "Adjust the options above before uploading.";
+"_autoupload_create_subfolder_"     = "Use subfolders";
+"_autoupload_create_subfolder_footer_"  = "Store photos in subfolders based on year, month or day.";
+"_autoupload_subfolder_granularity_"    = "Subfolder Granularity";
+"_filenamemask_"                        = "Change filename mask";
+"_filenamemask_footer_"                 = "By default, when a file is uploaded, it automatically gets the following format: yy-mm-dd hh-mm-ss plus a 4-digit counter. If you do not like this format, you can change it here except for the final 4-digit counter, which cannot be omitted.";
+"_autoupload_filenamemask_"         = "Change filename mask";
+"_autoupload_filenamemask_footer_"  = "Change the automatic filename mask";
+"_autoupload_current_folder_"           = "Currently selected folder";
+"_tutorial_autoupload_view_"                = "You can enable auto uploads from \"Settings\"";
+"_activate_autoupload_"                     = "Enable auto upload";
+"_autoupload_filename_title_"       = "Auto upload filename";
+"_autoupload_notice_"       = "To ensure the proper functioning of this feature, it is necessary to enable Background App Refresh. Otherwise, new photos or videos will not be detected when the application is in the background.\n\nAdditionally, please note that the app will not be able to detect new photos and videos if it is manually terminated. When the app is in the background, data transfer may be slower, and new photos and/or videos will generally be detected every 10 minutes, depending on the device’s battery level.\n\nTo verify that the app is functioning correctly, you can use the log file available in Advanced settings.";
+"_auto_upload_suspended_" = "Automatic upload paused due to an error";
+"_auto_upload_suspended_error_" = "Automatic upload paused: %@";
+
+"_focused_auto_upload_" = "Focused Auto Upload";
+"_focused_auto_upload_settings_footer_" = "Keep the app open and darken the screen while auto upload is backing up at higher speed.";
+"_focused_auto_upload_intro_heading_" = "Keep backing up with the screen darkened.";
+"_focused_auto_upload_intro_message_" = "Photos and videos will continue backing up at higher speed while the screen is darkened. During the process:";
+"_focused_auto_upload_wifi_" = "Connect to Wi-Fi";
+"_focused_auto_upload_charger_" = "Connect to charger";
+"_focused_auto_upload_do_not_exit_" = "Do not exit the app";
+"_enable_focused_auto_upload_" = "Enable Focused Auto Upload";
+"_focused_auto_upload_backing_up_" = "Backing up";
+"_focused_auto_upload_completed_" = "Upload completed!";
+"_focused_auto_upload_countdown_" = "Do not lock the screen or exit the app. The screen will turn dark in %d seconds.";
+"_stop_focused_auto_upload_" = "Stop Focused Auto Upload";
+"_finish_" = "Finish";
+
+"_autoupload_active_other_account_title_" = "Auto upload is already active";
+"_autoupload_active_other_account_message_" = "Auto upload is already enabled for “%@”. Disable it for that account before enabling it here.";
+"_autoupload_cleanup_pending_" = "Previous uploads are still being stopped. Try starting the backup again to retry cleanup.";
+"_auto_upload_help_text_"           = "With this option, you upload your photos or videos to the same folder that you selected for \"Automatic upload.\"";
+"_auto_upload_all_photos_warning_title_" = "Are you sure you want to upload all photos?";
+"_auto_upload_all_photos_warning_message_" = "This can take some time to process depending on the amount of photos.";
+"_auto_upload_no_new_items_to_upload_" = "No new items to upload";
+
+"_autoupload_whole_library_" = "All photos and videos";
+"_autoupload_whole_library_description_" = "Checks all photos and videos in the selected library. Photos and videos already uploaded to %@ are skipped.";
+"_autoupload_from_date_" = "From a date";
+"_autoupload_start_date_" = "Upload starting from";
+"_autoupload_completed_until_" = "Photos and videos uploaded up to";
+"_autoupload_waiting_for_uploads_" = "Waiting for the first photos and videos to upload";
+"_autoupload_set_to_now_" = "Set to now";
+"_autoupload_date_range_footer_" = "Photos and videos already uploaded to %@ are skipped. The date advances as uploads are confirmed and is preserved when automatic upload is stopped.";
+
+"_autoupload_ignore_history_" = "Upload previously uploaded photos and videos again";
+"_autoupload_ignore_history_description_" = "The app keeps a local record of uploaded photos and videos, without checking whether they are still on the server. Enable this option to upload them again, for example if you deleted them from the server. Existing photos and videos may be overwritten.";
+"_autoupload_force_reupload_footer_" = "Previous upload records are ignored for photos and videos in the selected library or date range. New completed uploads are still recorded. This option stays enabled until you turn it off.";
+
+"_auto_upload_active_" = "Automatic photo and video upload active";

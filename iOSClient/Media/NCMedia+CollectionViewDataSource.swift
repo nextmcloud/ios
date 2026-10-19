@@ -241,11 +241,6 @@ extension NCMedia: UICollectionViewDataSource {
         cell.identifier = ocId
         cell.imageStatus.image = nil
 
-        if cell.imageItem.frame.width > 60 {
-            if metadata.isLivePhoto {
-                cell.imageStatus?.image = utility.loadImage(named: "livephoto", colors: [NCBrandColor.shared.iconImageColor2])
-            } else if metadata.isVideo {
-                cell.imageStatus?.image = utility.loadImage(named: "play.circle.fill", colors: [.systemBackgroundInverted, .systemGray5])
         if cell.image.frame.width > 60 {
             if compactMetadata.isVideo {
                 cell.imageStatus.image = playImage
@@ -253,7 +248,6 @@ extension NCMedia: UICollectionViewDataSource {
                 cell.imageStatus.image = livePhotoImage
             }
         }
-        cell.imageSelect.isHidden = !isEditMode ? true : false
 
         let selectionColor = NCBrandColor.shared.getElement(
             account: session.account

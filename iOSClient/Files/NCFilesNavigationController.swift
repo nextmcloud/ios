@@ -21,9 +21,9 @@ class NCFilesNavigationController: NCMainNavigationController {
                 return
             }
 
-            Task {
+//            Task {
 //                await self.setNavigationLeftItems()
-            }
+//            }
         }
     }
 

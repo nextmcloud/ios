@@ -10,51 +10,43 @@ import Foundation
 import MoEngageSDK
 import MoEngageInApps
 import StoreKit
-
-class MoEngageAnalytics: NSObject {
 import OSLog
 
 class MoEngageAnalytics: NSObject {
     static let shared = MoEngageAnalytics()
     private let log = Logger(subsystem: Bundle.main.bundleIdentifier ?? "MoEngage", category: "MoEngageAnalytics")
-    
+
     // Initializer for the MoEngageAnalytics class
     override init() {
         super.init()
-        
+
         log.debug("Initializing MoEngage SDK…")
 
         // Create a configuration object for MoEngage SDK with the given App ID and Data Center
         let sdkConfig = MoEngageSDKConfig(appId: "7KWWUKA6OKXGP8Q6DMCXLDX5", dataCenter: MoEngageDataCenter.data_center_02)
-        
+
         // Disable periodic flushing of analytics data
         sdkConfig.analyticsDisablePeriodicFlush = true
-        
+
         // Initialize the MoEngage SDK
         // Use different initialization methods for Debug and Production environments
-        
+
 #if DEBUG
         MoEngage.sharedInstance.initializeDefaultTestInstance(sdkConfig)
 #else
         MoEngage.sharedInstance.initializeDefaultLiveInstance(sdkConfig)
 #endif
-        setupMoEngageInAppMessaging()
-        
-        // Register delegate for In-App Native callbacks
-        MoEngageSDKInApp.sharedInstance.setInAppDelegate(self)
-    }
-    
         log.debug("MoEngage SDK initializeDefault instance set (debug: \( self._isDebugBuild() ))")
 
         Task { @MainActor in
             setupMoEngageInAppMessaging()
         }
-        
+
         // Register delegate for In-App Native callbacks
         MoEngageSDKInApp.sharedInstance.setInAppDelegate(self)
         log.debug("MoEngage In-App delegate set")
     }
-    
+
     // MARK: - Setup Helper
     /// Call this early in app lifecycle (e.g., AppDelegate didFinishLaunching or SceneDelegate willConnect)
     static func setupIfNeeded() {
@@ -82,19 +74,19 @@ class MoEngageAnalytics: NSObject {
         let activeScene = UIApplication.shared.connectedScenes
             .compactMap { $0 as? UIWindowScene }
             .first { $0.activationState == .foregroundActive }
-        
+
         // 2. Get the key window from that specific scene
         let keyWindow = activeScene?.windows.first { $0.isKeyWindow }
                         ?? activeScene?.windows.first
-        
+
         // 3. Start from the rootViewController
         var topController = keyWindow?.rootViewController
-        
+
         // 4. Drill down through navigation, tabs, and presented controllers
         while let presentedController = topController?.presentedViewController {
             topController = presentedController
         }
-        
+
         return topController
     }
 
@@ -102,26 +94,26 @@ class MoEngageAnalytics: NSObject {
     @MainActor
     func displayInAppNotificationSafely(reason: String? = nil) {
         let reasonText = reason ?? "unspecified"
-        
+
         // 1. Get all connected window scenes
         let scenes = UIApplication.shared.connectedScenes
             .compactMap { $0 as? UIWindowScene }
-        
+
         // 2. Prioritize the scene that actually has the "Key Window" (Works best for iPad Split View)
         let activeScene = scenes.first { $0.windows.contains(where: { $0.isKeyWindow }) }
                           ?? scenes.first { $0.activationState == .foregroundActive }
-        
+
         guard let scene = activeScene else {
             print("In-App not shown: No foreground window scene (reason: \(reasonText))")
             return
         }
-        
+
         // 3. Ensure we have a valid top controller
         guard let topVC = currentTopViewController() else {
             print("In-App not shown: No top view controller available (reason: \(reasonText))")
             return
         }
-        
+
         // 4. Trigger MoEngage
         // iPad Tip: MoEngage uses the key window to determine where to draw the UI
         if UIDevice.current.userInterfaceIdiom != .pad{
@@ -132,29 +124,18 @@ class MoEngageAnalytics: NSObject {
 //            // Simulator: Always show fallback alert
 //            print("In-App  shown: showInApp)")
 //            let appID = "312838242"
-//            
+//
 //            // Correct URLs with /app/id/ prefix
 //            let webURLString = "https://apps.apple.com\(appID)?action=write-review"
-//            
+//
 //            self.showSimulatorAlert(link: webURLString)
 //#else
-#if targetEnvironment(simulator)
-            // Simulator: Always show fallback alert
-            print("In-App  shown: showInApp)")
-            let appID = "312838242"
-            
-            // Correct URLs with /app/id/ prefix
-            let webURLString = "https://apps.apple.com\(appID)?action=write-review"
-            
-            self.showSimulatorAlert(link: webURLString)
-#else
             // iPad Fallback: Scene might be transitioning. Retry once.
             print("iPad Scene transition detected. Retrying...")
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                 self.triggerMoEngage()
             }
 //#endif
-#endif
         }
     }
 
@@ -176,48 +157,6 @@ class MoEngageAnalytics: NSObject {
     func trackAppId() {
         MoEngageSDKAnalytics.sharedInstance.trackLocale(forAppID: "312838242")
     }
-    
-    func setupMoEngageInAppMessaging() {
-        //MARK: MoEngage In-App messages
-        MoEngageSDKInApp.sharedInstance.showInApp()
-        MoEngageSDKInApp.sharedInstance.showNudge()
-    }
-    
-    // Handles triggering Apple's native review popup
-//    private func requestAppStoreReview() {
-//        DispatchQueue.main.async {
-//            if let scene = UIApplication.shared.connectedScenes
-//                .first(where: { $0.activationState == .foregroundActive }) as? UIWindowScene {
-//                SKStoreReviewController.requestReview(in: scene)
-//            }
-//        }
-//    }
-    
-    private func requestAppStoreReview() {
-        DispatchQueue.main.async {
-            guard
-                let windowScene = UIApplication.shared.connectedScenes
-                    .compactMap({ $0 as? UIWindowScene })
-                    .first(where: { $0.activationState == .foregroundActive })
-            else {
-                return
-            }
-            
-            #if targetEnvironment(simulator)
-            // Simulator fallback for testing
-            let alert = UIAlertController(
-                title: "Review Prompt (Simulator)",
-                message: "This simulates the App Store review dialog.",
-                preferredStyle: .alert
-            )
-            alert.addAction(UIAlertAction(title: "OK", style: .default))
-            windowScene.keyWindow?.rootViewController?.present(alert, animated: true)
-            #else
-            // Real request on device
-            SKStoreReviewController.requestReview(in: windowScene)
-            #endif
-        }
-    }
 
     @MainActor func setupMoEngageInAppMessaging() {
         // MARK: MoEngage In-App messages
@@ -235,13 +174,13 @@ class MoEngageAnalytics: NSObject {
             preferredStyle: .alert
         )
         alert.addAction(UIAlertAction(title: "OK", style: .default))
-        
+
         // Finds the current active window to present the alert
         let keyWindow = UIApplication.shared.connectedScenes
             .compactMap { $0 as? UIWindowScene }
             .flatMap { $0.windows }
             .first { $0.isKeyWindow }
-        
+
         keyWindow?.rootViewController?.present(alert, animated: true)
     }
 
@@ -259,42 +198,42 @@ extension MoEngageAnalytics: AnalyticsService {
         }
 
     }
-    
+
     // Method to track user data
     func trackUserData() {
         // Get the active user account from the database
         guard let user = NCManageDatabase.shared.getActiveTableAccount() else { return }
-        
+
         // Set user attributes in the MoEngage SDK
         MoEngageSDKAnalytics.sharedInstance.setUniqueID(user.userId)
         MoEngageSDKAnalytics.sharedInstance.setName(user.displayName)
         MoEngageSDKAnalytics.sharedInstance.setEmailID(user.email)
-        
+
         // Convert the user's total storage quota to a readable format and set it as a user attribute
         let storageCapacity = NCUtilityFileSystem().transformedSize(user.quotaTotal)
         MoEngageSDKAnalytics.sharedInstance.setUserAttribute(storageCapacity, withAttributeName: AnalyticEvents.USER_PROPERTIES_STORAGE_CAPACITY.rawValue)
-        
+
         // Track whether auto-upload is enabled for the user
         trackAutoUpload(isEnable: user.autoUploadStart)
     }
-    
+
     // Method to track the used storage data
     func trackUsedStorageData(quotaUsed: Int64) {
         MoEngageSDKAnalytics.sharedInstance.setUserAttribute(quotaUsed, withAttributeName: AnalyticEvents.USER_PROPERTIES_STORAGE_USED.rawValue)
     }
-    
+
     // Method to track the auto-upload setting
     func trackAutoUpload(isEnable: Bool) {
         if isEnable {
             MoEngageSDKAnalytics.sharedInstance.setUserAttribute(isEnable, withAttributeName: AnalyticEvents.USER_PROPERTIES_AUTO_UPLOAD.rawValue)
         }
     }
-    
+
     // Method to track the app version
     func trackAppVersion(oldVersion: String?) {
         // Get the app version and set it as a user attribute
         let version = NCUtility().getVersionBuild() as String
-        
+
         // Check if a build version key is present in UserDefaults
         if let oldVersion {
             if version != oldVersion {
@@ -308,15 +247,15 @@ extension MoEngageAnalytics: AnalyticsService {
         } else {
             MoEngageSDKAnalytics.sharedInstance.appStatus(.install)
         }
-        
+
         MoEngageSDKAnalytics.sharedInstance.setUserAttribute(version, withAttributeName: AnalyticEvents.USER_PROPERTIES_APP_VERSION.rawValue)
     }
-    
+
     //Method to track user logout
     func trackLogout() {
         MoEngageSDKAnalytics.sharedInstance.resetUser()
     }
-    
+
     //Method to track create file
     func trackCreateFile(metadata: tableMetadata) {
         let properties = MoEngageProperties()
@@ -325,7 +264,7 @@ extension MoEngageAnalytics: AnalyticsService {
         properties.addAttribute(getDate(date: metadata.creationDate as Date), withName: AnalyticPropertyAttributes.PROPERTIES__CREATION_DATE.rawValue)
         MoEngageSDKAnalytics.sharedInstance.trackEvent(AnalyticEvents.EVENT__CREATE_FILE.rawValue, withProperties: properties)
     }
-    
+
     //Method to track upload file
     func trackEventWithMetadata(eventName: AnalyticEvents, metadata: tableMetadata) {
         let properties = MoEngageProperties()
@@ -335,7 +274,7 @@ extension MoEngageAnalytics: AnalyticsService {
         properties.addAttribute(getDate(date: metadata.uploadDate as Date), withName: AnalyticPropertyAttributes.PROPERTIES__UPLOAD_DATE.rawValue)
         MoEngageSDKAnalytics.sharedInstance.trackEvent(eventName.rawValue, withProperties: properties)
     }
-    
+
     //Method to track create folder
     func trackCreateFolder(isEncrypted: Bool, creationDate: Date) {
         let properties = MoEngageProperties()
@@ -343,7 +282,7 @@ extension MoEngageAnalytics: AnalyticsService {
         properties.addAttribute(getDate(date: creationDate), withName: AnalyticPropertyAttributes.PROPERTIES__CREATION_DATE.rawValue)
         MoEngageSDKAnalytics.sharedInstance.trackEvent(AnalyticEvents.EVENT__CREATE_FOLDER.rawValue, withProperties: properties)
     }
-    
+
     //Method to track create voice memo
     func trackCreateVoiceMemo(size: Int64, date: Date) {
         let properties = MoEngageProperties()
@@ -351,12 +290,6 @@ extension MoEngageAnalytics: AnalyticsService {
         properties.addAttribute(String(getFileSizeInMB(bytes: Int(size))), withName: AnalyticPropertyAttributes.PROPERTIES__FILE_SIZE.rawValue)
         properties.addAttribute(getDate(date: date), withName: AnalyticPropertyAttributes.PROPERTIES__CREATION_DATE.rawValue)
         MoEngageSDKAnalytics.sharedInstance.trackEvent(AnalyticEvents.EVENT__CREATE_VOICE_MEMO.rawValue, withProperties: properties)
-    }
-    
-    func displayInAppNotification() {
-        MoEngageSDKInApp.sharedInstance.showInApp()
-        //For showing nudges at any mentioned position
-        MoEngageSDKInApp.sharedInstance.showNudge()
     }
 }
 
@@ -384,13 +317,13 @@ extension MoEngageAnalytics {
             return FileType.OTHER.rawValue
         }
     }
-    
+
     private func getDate(date: Date) -> String {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy-MM-dd"
         return dateFormatter.string(from: date)
     }
-    
+
     private func getFileSizeInMB(bytes: Int) -> Float {
         return round((Float(bytes) / Float(Size.MEGABYTE)) * 10) / 10
     }
@@ -413,16 +346,12 @@ extension MoEngageAnalytics: MoEngageInAppNativeDelegate {
                       forAccountMeta accountMeta: MoEngageAccountMeta) {
 
         let kv = customAction.keyValuePairs
-
-        if let showRating = kv["show-native-rating"] as? String,
-           showRating.lowercased() == "true" {
-            requestAppStoreReview()
         log.debug("In-App custom action received: keyValues=\(kv)")
 
         if let showRating = kv["show-native-rating"] as? String,
            showRating.lowercased() == "true" {
             log.debug("User clicked Rating - Opening App Store directly")
-            
+
             // Use the reliable direct link instead of the restricted native prompt
             ReviewManager.shared.requestReviewIfAppropriate()
         }
@@ -431,37 +360,34 @@ extension MoEngageAnalytics: MoEngageInAppNativeDelegate {
     // Called when a "self-handled" in-app is triggered
     func selfHandledInAppTriggered(withInfo inAppCampaign: MoEngageInAppSelfHandledCampaign,
                                    forAccountMeta accountMeta: MoEngageAccountMeta) {
-        // no-op unless you use self-handled campaigns
         log.debug("Self-handled in-app triggered: \(String(describing: inAppCampaign))")
     }
 
     // Optional — track impression
     func inAppShown(withCampaignInfo inappCampaign: MoEngageInAppCampaign,
                     forAccountMeta accountMeta: MoEngageAccountMeta) {
-        // no-op
         log.debug("In-App shown: \(String(describing: inappCampaign))")
     }
 
     // Optional — track dismissal
     func inAppDismissed(withCampaignInfo inappCampaign: MoEngageInAppCampaign,
                         forAccountMeta accountMeta: MoEngageAccountMeta) {
-        // no-op
         log.debug("In-App dismissed: \(String(describing: inappCampaign))")
     }
 }
 
 @MainActor // Ensures this is only called on the Main Thread
 class UIHelper {
-    
+
     static func getTopViewController() -> UIViewController? {
         // 1. Get the active scene
         let activeScene = UIApplication.shared.connectedScenes
             .first { $0.activationState == .foregroundActive } as? UIWindowScene
-        
+
         // 2. Get the root view controller from the key window
         let rootVC = activeScene?.windows
             .first { $0.isKeyWindow }?.rootViewController
-            
+
         return findTopViewController(from: rootVC)
     }
 
@@ -482,7 +408,7 @@ class UIHelper {
 class ReviewManager {
     static let shared = ReviewManager()
     private let appID = "312838242"
-    
+
     /// Requests the native system rating sheet if an active foreground scene is available.
     func requestReviewIfAppropriate() {
         // 1. Find the active, foreground UIWindowScene required by StoreKit
@@ -493,17 +419,17 @@ class ReviewManager {
 //            self.forceOpenAppStore()
             return
         }
-        
+
         // 2. Trigger the native system prompt overlay
         // Note: Apple will throttle this to 3 times per year maximum per user.
         SKStoreReviewController.requestReview(in: scene)
     }
-    
+
     /// Call this function ONLY when a user explicitly taps a manual "Rate Us" button.
     func forceOpenAppStore() {
         let appStoreURLString = "itms-apps://://apple.com\(appID)?action=write-review"
         let webURLString = "https://apple.com\(appID)?action=write-review"
-        
+
         if let url = URL(string: appStoreURLString), UIApplication.shared.canOpenURL(url) {
             // Opens the native iOS App Store app directly to your review composition page
             UIApplication.shared.open(url, options: [:], completionHandler: nil)

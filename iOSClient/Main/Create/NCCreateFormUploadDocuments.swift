@@ -28,10 +28,6 @@ import XLForm
 // MARK: -
 
 @objc class NCCreateFormUploadDocuments: XLFormViewController, NCSelectDelegate, UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout, NCCreateFormUploadConflictDelegate {
-    func dismissSelect(serverUrl: String?, metadata: tableMetadata?, type: String, items: [Any], overwrite: Bool, copy: Bool, move: Bool, session: NCSession.Session) {
-        
-    }
-    
 
     @IBOutlet weak var indicator: UIActivityIndicatorView!
     @IBOutlet weak var collectionView: UICollectionView!
@@ -61,7 +57,7 @@ import XLForm
     var session: NCSession.Session {
         NCSession.shared.getSession(controller: controller)
     }
-    
+
     // MARK: - View Life Cycle
 
     override func viewDidLoad() {
@@ -90,7 +86,7 @@ import XLForm
 
         // title
         self.title = titleForm
-        
+
         fileName = NCUtilityFileSystem().createFileNameDate("Text", ext: getFileExtension())
 
         initializeForm()
@@ -117,7 +113,6 @@ import XLForm
         row = XLFormRowDescriptor(tag: "ButtonDestinationFolder", rowType: "kNMCFolderCustomCellType", title: "")
         row.action.formSelector = #selector(changeDestinationFolder(_:))
         row.cellConfig["folderImage.image"] =  NCImageCache.shared.getFolder().withTintColor(NCBrandColor.shared.customer)
-        row.cellConfig["folderImage.image"] =  UIImage(named: "folder")!.withTintColor(NCBrandColor.shared.customer)
         row.cellConfig["photoLabel.textAlignment"] = NSTextAlignment.left.rawValue
         row.cellConfig["photoLabel.font"] = UIFont.systemFont(ofSize: 15.0)
         row.cellConfig["photoLabel.textColor"] = UIColor.label //photos
@@ -136,10 +131,10 @@ import XLForm
         form.addFormSection(section)
 
         XLFormViewController.cellClassesForRowDescriptorTypes()["kMyAppCustomCellType"] = NCCreateDocumentCustomTextField.self
-        
+
         row = XLFormRowDescriptor(tag: "fileName", rowType: "kMyAppCustomCellType", title: NSLocalizedString("_filename_", comment: ""))
         row.cellClass = NCCreateDocumentCustomTextField.self
-        
+
         row.cellConfigAtConfigure["backgroundColor"] =  UIColor.secondarySystemGroupedBackground;
         row.cellConfig["fileNameTextField.textAlignment"] = NSTextAlignment.left.rawValue
         row.cellConfig["fileNameTextField.font"] = UIFont.systemFont(ofSize: 15.0)
@@ -159,7 +154,7 @@ import XLForm
         header?.textLabel?.textColor = .gray
         header?.tintColor = tableView.backgroundColor
     }
-    
+
     override func tableView(_ tableView: UITableView, willDisplayFooterView view: UIView, forSection section: Int) {
         let header = view as? UITableViewHeaderFooterView
         header?.textLabel?.font = UIFont.systemFont(ofSize: 13.0)
@@ -234,9 +229,7 @@ import XLForm
 
     // MARK: - Action
 
-    func dismissSelect(serverUrl: String?, metadata: tableMetadata?, type: String, items: [Any], overwrite: Bool, copy: Bool, move: Bool) {
     func dismissSelect(serverUrl: String?, metadata: tableMetadata?, type: String, items: [Any], overwrite: Bool, copy: Bool, move: Bool, session: NCSession.Session, controller: NCMainTabBarController?) {
-    func dismissSelect(serverUrl: String?, metadata: tableMetadata?, type: String, items: [Any], overwrite: Bool, copy: Bool, move: Bool, session: NCSession.Session) {
 
         guard let serverUrl = serverUrl else { return }
 
@@ -285,7 +278,7 @@ import XLForm
         Task {
             guard let selectTemplate = self.selectTemplate else { return }
             templateIdentifier = selectTemplate.identifier
-            
+
             let rowFileName: XLFormRowDescriptor = self.form.formRow(withTag: "fileName")!
             var fileName = rowFileName.value as? String
             if fileName?.isEmpty ?? false || fileName == nil {
@@ -296,27 +289,24 @@ import XLForm
                 self.present(alert, animated: true)
                 return
             }
-            
+
             // Ensure fileName is not nil or empty
             guard var fileNameForm: String = fileName, !fileNameForm.isEmpty else { return }
-            
+
             // Trim whitespaces and newlines
             fileNameForm = fileNameForm.trimmingCharacters(in: .whitespacesAndNewlines)
-            
-            let fileAutoRenamer = FileAutoRenamer()
-            fileName = fileAutoRenamer.rename(filename: fileNameForm, isFolderPath: true)
+
 //            let fileAutoRenamer = FileAutoRenamer()
             let session = NCSession.shared.getSession(controller: self.controller)
             let capabilities = await NKCapabilities.shared.getCapabilities(for: session.account)
             fileName = FileAutoRenamer.rename(fileNameForm, isFolderPath: true, capabilities: capabilities)
-            fileName = FileAutoRenamer.rename(fileNameForm, isFolderPath: true, capabilities: capabilities) 
 
             let result = await NKTypeIdentifiers.shared.getInternalType(fileName: fileNameForm, mimeType: "", directory: false, account: session.account)
-            
+
             if utility.editorsDirectEditing(account: session.account, contentType: result.mimeType).isEmpty {
                 fileNameForm = (fileNameForm as NSString).deletingPathExtension + "." + fileNameExtension
             }
-            
+
             // verify if already exists
             if NCManageDatabase.shared.getMetadata(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@ AND fileNameView == %@", session.account, self.serverUrl, fileNameForm)) != nil {
                 NCContentPresenter().showError(error: NKError(errorCode: 0, errorDescription: "_rename_already_exists_"))
@@ -336,13 +326,12 @@ import XLForm
                 //            conflict.delegate = self
                 //
                 //            self.present(conflict, animated: true, completion: nil)
-                
+
             } else {
-                
-                let fileNamePath = utilityFileSystem.getFileNamePath(String(describing: fileNameForm), serverUrl: serverUrl, session: session)
+
                 let fileNamePath = utilityFileSystem.getRelativeFilePath(String(describing: fileNameForm), serverUrl: serverUrl, session: session)
                 await NCCreateDocument().createDocument(controller: controller, fileNamePath: fileNamePath, fileName: String(describing: fileNameForm), fileNameExtension: self.fileNameExtension, editorId: editorId, creatorId: creatorId, templateId: templateIdentifier, account: session.account)
-                
+
             }
         }
     }
@@ -351,7 +340,6 @@ import XLForm
 
         if let metadatas, metadatas.count > 0 {
             let fileName = metadatas[0].fileName
-            let fileNamePath = utilityFileSystem.getFileNamePath(fileName, serverUrl: serverUrl, session: session)
             let fileNamePath = utilityFileSystem.getRelativeFilePath(fileName, serverUrl: serverUrl, session: session)
 //            createDocument(fileNamePath: fileNamePath, fileName: fileName)
             Task {
@@ -380,7 +368,7 @@ import XLForm
                 } else if editorId == NCGlobal.shared.editorText {
                     options = NKRequestOptions(customUserAgent: utility.getCustomUserAgentNCText())
                 }
-                
+
                 let results = await NextcloudKit.shared.textCreateFileAsync(fileNamePath: fileNamePath, editorId: editorId, creatorId: creatorId, templateId: templateIdentifier, account: session.account, options: options) { task in
                     Task {
                         let identifier = await NCNetworking.shared.networkingTasks.createIdentifier(account: self.session.account,
@@ -392,12 +380,6 @@ import XLForm
                 guard results.error == .success, let url = results.url else {
                     return NCContentPresenter().showError(error: results.error)
                 }
-                let metadata = await NCManageDatabase.shared.createMetadataAsync(fileName: fileName,
-                                                                                 ocId: UUID,
-                                                                                 serverUrl: serverUrl,
-                                                                                 url: url,
-                                                                                 session: session,
-                                                                                 sceneIdentifier: controller.sceneIdentifier)
                 let metadata = await NCManageDatabaseCreateMetadata().createMetadataAsync(
                     fileName: fileName,
                     ocId: UUID,
@@ -415,7 +397,7 @@ import XLForm
 
         if self.editorId == NCGlobal.shared.editorCollabora {
             Task {
-                
+
                 let results = await NextcloudKit.shared.createRichdocumentsAsync(path: fileNamePath, templateId: templateIdentifier, account: session.account) { task in
                     Task {
                         let identifier = await NCNetworking.shared.networkingTasks.createIdentifier(account: self.session.account,
@@ -427,14 +409,7 @@ import XLForm
                 guard results.error == .success, let url = results.url else {
                     return NCContentPresenter().showError(error: results.error)
                 }
-                
-                let metadata = await NCManageDatabase.shared.createMetadataAsync(fileName: fileName,
-                                                                                 ocId: UUID,
-                                                                                 serverUrl: serverUrl,
-                                                                                 url: url,
-                                                                                 session: session,
-                                                                                 sceneIdentifier: controller.sceneIdentifier)
-                
+
                 let metadata = await NCManageDatabaseCreateMetadata().createMetadataAsync(
                     fileName: fileName,
                     ocId: UUID,
@@ -594,8 +569,6 @@ import XLForm
         }, progressHandler: { _ in
 
         }, completionHandler: { account, response, error in
-        }) { account, _, _, _, _, _, error in
-
             if error == .success && account == self.session.account {
                 self.collectionView.reloadItems(at: [indexPath])
             } else if error != .success {
@@ -604,9 +577,8 @@ import XLForm
                 print("[ERROR] It has been changed user during networking process, error.")
             }
         })
-        }
     }
-    
+
     func getFileExtension() -> String {
         switch typeTemplate {
         case NCGlobal.shared.editorText:

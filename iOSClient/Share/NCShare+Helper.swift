@@ -78,7 +78,6 @@ class NCTableShareOptions: NCTableShareable {
     var attributes: String?
 
     private init(shareType: Int, metadata: tableMetadata, password: String?) async {
-        if metadata.e2eEncrypted, await NKCapabilities.shared.getCapabilities(for: metadata.account).e2EEApiVersion == NCGlobal.shared.e2eeVersionV12 {
         if metadata.e2eEncrypted, await NKCapabilities.shared.getCapabilities(for: metadata.account).e2EEApiVersion == "1.2" {
             self.permissions = NCPermissions().permissionCreateShare
         } else {

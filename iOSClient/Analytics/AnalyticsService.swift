@@ -19,7 +19,6 @@ protocol AnalyticsService {
     func trackCreateVoiceMemo(size: Int64, date: Date)
     func trackCreateFolder(isEncrypted: Bool, creationDate: Date)
     func trackEventWithMetadata(eventName: AnalyticEvents, metadata: tableMetadata)
-    func displayInAppNotification()
 //    func displayInAppNotification()
 }
 
@@ -38,7 +37,7 @@ enum AnalyticEvents: String {
     case EVENT__SHARE_FILE = "share_file" // when user share any file using link
     case EVENT__OFFLINE_AVAILABLE = "offline_available"
     case EVENT__ONLINE_OFFICE_USED = "online_office_used" // when user opens any office files
-    
+
     // screen view events when user open specific screen
     case SCREEN_EVENT__FAVOURITES = "favorites"
     case SCREEN_EVENT__MEDIA = "medien"
@@ -53,11 +52,11 @@ enum AnalyticEvents: String {
             return self.rawValue
         }
     }
-    
+
     var teliumEvent: String {
         return self.rawValue
     }
-    
+
     var adjustEvent: String {
         return self.rawValue
     }

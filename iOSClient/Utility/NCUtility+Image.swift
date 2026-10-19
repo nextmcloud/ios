@@ -11,7 +11,7 @@ import CoreMedia
 import Photos
 
 extension NCUtility {
-    
+
     // MARK: - MIME-based icon convenience
     /// Returns an icon image for the provided MIME type or filename, using MimeTypeUtil mappings.
     /// - Parameters:
@@ -36,7 +36,7 @@ extension NCUtility {
         // Fallback to existing generic file image
         return UIImage(named: "file")! //?? UIImage(systemName: "doc")!
     }
-    
+
     /// Returns a preview icon for a given metadata using office-first mapping and MIME/filename convention.
     /// - Parameter metadata: The tableMetadata describing the file.
     /// - Returns: A UIImage representing the file type icon.
@@ -72,7 +72,7 @@ extension NCUtility {
             return loadImage(named: metadata.iconName, useTypeIconFile: true, account: metadata.account)
         }
     }
-    
+
     func previewTrashIcon(for metadata: tableTrash) -> UIImage {
         // Office file extensions first
         let ext = (metadata.fileName as NSString).pathExtension.lowercased()
@@ -105,7 +105,7 @@ extension NCUtility {
             return loadImage(named: metadata.iconName, useTypeIconFile: true, account: metadata.account)
         }
     }
-    
+
     func loadImage(named imageName: String,
                    colors: [UIColor]? = nil,
                    size: CGFloat? = nil,
@@ -152,7 +152,7 @@ extension NCUtility {
                 image = UIImage(systemName: imageName, withConfiguration: UIImage.SymbolConfiguration(pointSize: symbolPointSize, weight: systemNameWeight))
             }
         }
-        
+
         if let image { return image }//.withTintColor(NCBrandColor.shared.iconImageColor) }
 
         // IMAGES
@@ -165,7 +165,7 @@ extension NCUtility {
         } else if colors == nil, let size {
             image = UIImage(named: imageName)?.resizeImage(size: CGSize(width: size, height: size))
         }
-        
+
         if let image { return image }//.withTintColor(NCBrandColor.shared.iconImageColor) }
 
         // NO IMAGES FOUND
@@ -175,7 +175,7 @@ extension NCUtility {
             return UIImage(named: "file")!
         }
     }
-    
+
     func loadImage1(named imageName: String,
                    colors: [UIColor]? = nil,
                    size: CGFloat? = nil,
@@ -236,9 +236,9 @@ extension NCUtility {
 
     func loadUserImage(for user: String, displayName: String?, urlBase: String) -> UIImage {
         let fileName = NCSession.shared.getFileName(urlBase: urlBase, user: user)
-        let fileNameLocalPath = utilityFileSystem.createServerUrl(serverUrl: utilityFileSystem.directoryUserData, fileName: fileName)
+        let localFilePath = utilityFileSystem.createServerUrl(serverUrl: utilityFileSystem.directoryUserData, fileName: fileName)
 
-        if var localImage = UIImage(contentsOfFile: fileNameLocalPath) {
+        if var localImage = UIImage(contentsOfFile: localFilePath) {
             let rect = CGRect(x: 0, y: 0, width: 30, height: 30)
             UIGraphicsBeginImageContextWithOptions(rect.size, false, 3.0)
             UIBezierPath(roundedRect: rect, cornerRadius: rect.size.height).addClip()
@@ -246,6 +246,8 @@ extension NCUtility {
             localImage = UIGraphicsGetImageFromCurrentImageContext() ?? localImage
             UIGraphicsEndImageContext()
             return localImage
+        } else if let image = NCManageDatabase.shared.getImageAvatarLoaded(fileName: fileName).image {
+            return image
         } else if let displayName, !displayName.isEmpty, let avatarImg = createAvatar(displayName: displayName, size: 30) {
             return avatarImg
         } else {
@@ -295,6 +297,76 @@ extension NCUtility {
         createImageStandard(ocId: metadata.ocId, etag: metadata.etag, image: image, userId: metadata.userId, urlBase: metadata.urlBase)
     }
 
+//    func createImageFileFrom(data: Data, metadata: tableMetadata) {
+//        createImageFileFrom(data: data, ocId: metadata.ocId, etag: metadata.etag, userId: metadata.userId, urlBase: metadata.urlBase)
+//    }
+//
+//    func createImageFileFrom(data: Data, ocId: String, etag: String, userId: String, urlBase: String) {
+//        guard let image = UIImage(data: data) else {
+//            return
+//        }
+//        let fileNamePath1024 = self.utilityFileSystem.getDirectoryProviderStorageImageOcId(ocId,
+//                                                                                           etag: etag,
+//                                                                                           ext: global.previewExt1024,
+//                                                                                           userId: userId,
+//                                                                                           urlBase: urlBase)
+//
+//        do {
+//            try data.write(to: URL(fileURLWithPath: fileNamePath1024), options: .atomic)
+//        } catch { }
+//
+//        createImageStandard(ocId: ocId, etag: etag, image: image, userId: userId, urlBase: urlBase)
+//    }
+//
+//    func createImageFileFrom(data: Data, ocId: String, etag: String) {
+//        guard let image = UIImage(data: data) else { return }
+//        let fileNamePath1024 = self.utilityFileSystem.getDirectoryProviderStorageImageOcId(ocId, etag: etag, ext: global.previewExt1024)
+//
+//        do {
+//            try data.write(to: URL(fileURLWithPath: fileNamePath1024), options: .atomic)
+//        } catch { }
+//
+//        createImageStandard(ocId: ocId, etag: etag, image: image)
+//    }
+//
+//    private func createImageStandard(ocId: String, etag: String, image: UIImage) {
+//        let ext = [global.previewExt1024, global.previewExt512, global.previewExt256]
+//        let size = [global.size1024, global.size512, global.size256]
+//        let compressionQuality = [0.5, 0.6, 0.7]
+//
+//        for i in 0..<ext.count {
+//            if !utilityFileSystem.fileProviderStorageImageExists(ocId, etag: etag, ext: ext[i]),
+//               let image = image.resizeImage(size: size[i]),
+//               let data = image.jpegData(compressionQuality: compressionQuality[i]) {
+//                do {
+//                    let fileNamePath = utilityFileSystem.getDirectoryProviderStorageImageOcId(ocId, etag: etag, ext: ext[i])
+//                    try data.write(to: URL(fileURLWithPath: fileNamePath))
+//                } catch { }
+//            }
+//        }
+//    }
+//
+//    private func createImageStandard(ocId: String, etag: String, image: UIImage, userId: String, urlBase: String) {
+//        let ext = [global.previewExt1024, global.previewExt512, global.previewExt256]
+//        let size = [global.size1024, global.size512, global.size256]
+//        let compressionQuality = [0.5, 0.6, 0.7]
+//
+//        for i in 0..<ext.count {
+//            if !utilityFileSystem.fileProviderStorageImageExists(ocId, etag: etag, ext: ext[i], userId: userId, urlBase: urlBase),
+//               let image = image.resizeImage(size: size[i]),
+//               let data = image.jpegData(compressionQuality: compressionQuality[i]) {
+//                do {
+//                    let fileNamePath = utilityFileSystem.getDirectoryProviderStorageImageOcId(ocId, etag: etag, ext: ext[i], userId: userId, urlBase: urlBase)
+//                    try data.write(to: URL(fileURLWithPath: fileNamePath))
+//                } catch { }
+//            }
+//        }
+//    }
+//
+//    func getImage(ocId: String, etag: String, ext: String) -> UIImage? {
+//        return UIImage(contentsOfFile: self.utilityFileSystem.getDirectoryProviderStorageImageOcId(ocId, etag: etag, ext: ext))
+//    }
+
     @discardableResult
     func createImageFileFrom(data: Data, metadata: tableMetadata, ext: String? = nil) -> UIImage? {
         return createImageFileFrom(data: data, ocId: metadata.ocId, etag: metadata.etag, ext: ext, userId: metadata.userId, urlBase: metadata.urlBase)
@@ -323,34 +395,6 @@ extension NCUtility {
         return createImageStandard(ocId: ocId, etag: etag, image: image, ext: ext, userId: userId, urlBase: urlBase)
     }
 
-    func createImageFileFrom(data: Data, ocId: String, etag: String) {
-        guard let image = UIImage(data: data) else { return }
-        let fileNamePath1024 = self.utilityFileSystem.getDirectoryProviderStorageImageOcId(ocId, etag: etag, ext: global.previewExt1024)
-
-        do {
-            try data.write(to: URL(fileURLWithPath: fileNamePath1024), options: .atomic)
-        } catch { }
-
-        createImageStandard(ocId: ocId, etag: etag, image: image)
-    }
-    
-    private func createImageStandard(ocId: String, etag: String, image: UIImage) {
-        let ext = [global.previewExt1024, global.previewExt512, global.previewExt256]
-        let size = [global.size1024, global.size512, global.size256]
-        let compressionQuality = [0.5, 0.6, 0.7]
-
-        for i in 0..<ext.count {
-            if !utilityFileSystem.fileProviderStorageImageExists(ocId, etag: etag, ext: ext[i]),
-               let image = image.resizeImage(size: size[i]),
-               let data = image.jpegData(compressionQuality: compressionQuality[i]) {
-                do {
-                    let fileNamePath = utilityFileSystem.getDirectoryProviderStorageImageOcId(ocId, etag: etag, ext: ext[i])
-                    try data.write(to: URL(fileURLWithPath: fileNamePath))
-                } catch { }
-            }
-        }
-    }
-    
     @discardableResult
     private func createImageStandard(ocId: String,
                                      etag: String,
@@ -385,77 +429,7 @@ extension NCUtility {
 
         return imageExt
     }
-    
-    func getImage(ocId: String, etag: String, ext: String) -> UIImage? {
-        return UIImage(contentsOfFile: self.utilityFileSystem.getDirectoryProviderStorageImageOcId(ocId, etag: etag, ext: ext))
-    }
 
-    func createImageFileFrom(data: Data, ocId: String, etag: String, userId: String, urlBase: String) {
-        guard let image = UIImage(data: data) else {
-            return
-        }
-        let fileNamePath1024 = self.utilityFileSystem.getDirectoryProviderStorageImageOcId(ocId,
-                                                                                           etag: etag,
-                                                                                           ext: global.previewExt1024,
-                                                                                           userId: userId,
-                                                                                           urlBase: urlBase)
-
-        do {
-            try data.write(to: URL(fileURLWithPath: fileNamePath1024), options: .atomic)
-        } catch { }
-
-        createImageStandard(ocId: ocId, etag: etag, image: image, userId: userId, urlBase: urlBase)
-    }
-
-    func createImageFileFrom(data: Data, ocId: String, etag: String) {
-        guard let image = UIImage(data: data) else { return }
-        let fileNamePath1024 = self.utilityFileSystem.getDirectoryProviderStorageImageOcId(ocId, etag: etag, ext: global.previewExt1024)
-
-        do {
-            try data.write(to: URL(fileURLWithPath: fileNamePath1024), options: .atomic)
-        } catch { }
-
-        createImageStandard(ocId: ocId, etag: etag, image: image)
-    }
-    
-    private func createImageStandard(ocId: String, etag: String, image: UIImage) {
-        let ext = [global.previewExt1024, global.previewExt512, global.previewExt256]
-        let size = [global.size1024, global.size512, global.size256]
-        let compressionQuality = [0.5, 0.6, 0.7]
-
-        for i in 0..<ext.count {
-            if !utilityFileSystem.fileProviderStorageImageExists(ocId, etag: etag, ext: ext[i]),
-               let image = image.resizeImage(size: size[i]),
-               let data = image.jpegData(compressionQuality: compressionQuality[i]) {
-                do {
-                    let fileNamePath = utilityFileSystem.getDirectoryProviderStorageImageOcId(ocId, etag: etag, ext: ext[i])
-                    try data.write(to: URL(fileURLWithPath: fileNamePath))
-                } catch { }
-            }
-        }
-    }
-    
-    private func createImageStandard(ocId: String, etag: String, image: UIImage, userId: String, urlBase: String) {
-        let ext = [global.previewExt1024, global.previewExt512, global.previewExt256]
-        let size = [global.size1024, global.size512, global.size256]
-        let compressionQuality = [0.5, 0.6, 0.7]
-
-        for i in 0..<ext.count {
-            if !utilityFileSystem.fileProviderStorageImageExists(ocId, etag: etag, ext: ext[i], userId: userId, urlBase: urlBase),
-               let image = image.resizeImage(size: size[i]),
-               let data = image.jpegData(compressionQuality: compressionQuality[i]) {
-                do {
-                    let fileNamePath = utilityFileSystem.getDirectoryProviderStorageImageOcId(ocId, etag: etag, ext: ext[i], userId: userId, urlBase: urlBase)
-                    try data.write(to: URL(fileURLWithPath: fileNamePath))
-                } catch { }
-            }
-        }
-    }
-    
-    func getImage(ocId: String, etag: String, ext: String) -> UIImage? {
-        return UIImage(contentsOfFile: self.utilityFileSystem.getDirectoryProviderStorageImageOcId(ocId, etag: etag, ext: ext))
-    }
-    
     func getImage(ocId: String, etag: String, ext: String, userId: String, urlBase: String) -> UIImage? {
         return UIImage(contentsOfFile: self.utilityFileSystem.getDirectoryProviderStorageImageOcId(ocId, etag: etag, ext: ext, userId: userId, urlBase: urlBase))
     }
@@ -569,8 +543,14 @@ extension NCUtility {
         let pathPNG = utilityFileSystem.createServerUrl(serverUrl: utilityFileSystem.directoryUserData, fileName: fileNamePNG)
 
         if !FileManager.default.fileExists(atPath: pathPNG) || rewrite {
-            let results = await NextcloudKit.shared.downloadContentAsync(serverUrl: serverUrl, account: account)
-
+            let results = await NextcloudKit.shared.downloadContentAsync(serverUrl: serverUrl, account: account) { task in
+//                Task {
+//                    let identifier = await NCNetworking.shared.networkingTasks.createIdentifier(account: account,
+//                                                                                                path: serverUrl,
+//                                                                                                name: "downloadContent")
+//                    await NCNetworking.shared.networkingTasks.track(identifier: identifier, task: task)
+//                }
+            }
             guard results.error == .success,
                   let data = results.responseData?.data else {
                 return(nil, id)

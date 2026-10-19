@@ -22,7 +22,6 @@ class NCCollectionViewDataSource: NSObject {
     private var directoryOnTop: Bool = true
     private var favoriteOnTop: Bool = true
     private var hasGetServerData: Bool = true
-    
 
     override init() { super.init() }
 

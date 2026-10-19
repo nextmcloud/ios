@@ -33,10 +33,6 @@ class NCAutoUploadModel: ObservableObject, ViewOnAppearHandling {
     @Published var autoUploadCreateSubfolder: Bool = false
     /// The granularity of the subfolders, either daily, monthly, or yearly
     @Published var autoUploadSubfolderGranularity: Granularity = .monthly
-    /// The date from when new photos/videos will be uploaded.
-    @Published var autoUploadSinceDate: Date?
-    /// Whether a warning should be shown if all photos must be uploaded.
-    @Published var showUploadAllPhotosWarning = false
     /// The incremental restart date, editable while Auto Upload is stopped.
     @Published var autoUploadSinceDate: Date?
     @Published var autoUploadForceReupload = false
@@ -46,7 +42,6 @@ class NCAutoUploadModel: ObservableObject, ViewOnAppearHandling {
     @Published var photosPermissionsGranted = true
     /// Whether `Always` location authorization has been granted, enabling background location-based auto upload.
     @Published var locationAutoUploadPermissionGranted: Bool = false
-
     /// Whether the experimental PhotoKit background upload extension is enabled.
     @Published var backgroundUploadExtensionEnabled: Bool = false
 
@@ -161,13 +156,6 @@ class NCAutoUploadModel: ObservableObject, ViewOnAppearHandling {
         }
     }
 
-    /// Sets the cut-off date so only photos/videos created after it are uploaded.
-    func handleAutoUploadOnlyNew(newValue: Bool) {
-        if newValue {
-            autoUploadSinceDate = Date.now
-        } else {
-            autoUploadSinceDate = nil
-        }
     /// Changes the selection without discarding progress before Start is pressed.
     @MainActor
     func handleAutoUploadTimespan(_ timespan: AutoUploadTimespan) {
@@ -397,20 +385,6 @@ class NCAutoUploadModel: ObservableObject, ViewOnAppearHandling {
             return (album?.assetCollectionSubtype == .smartAlbumUserLibrary) ? NSLocalizedString("_camera_roll_", comment: "") : (album?.localizedTitle ?? "")
         } else {
             return NSLocalizedString("_multiple_albums_", comment: "")
-        }
-    }
-
-    /// Whether any auto-upload entry exists for the current account.
-    func existsAutoUpload() -> Bool {
-        let autoUploadServerUrlBase = NCManageDatabase.shared.getAccountAutoUploadServerUrlBase(session: session)
-        return NCManageDatabase.shared.existsAutoUpload(account: session.account, autoUploadServerUrlBase: autoUploadServerUrlBase)
-    }
-
-    /// Deletes pending auto-upload transfers for the current account.
-    func deleteAutoUploadTransfer() {
-        Task {
-            let autoUploadServerUrlBase = await NCManageDatabase.shared.getAccountAutoUploadServerUrlBaseAsync(session: session)
-            await NCManageDatabase.shared.deleteAutoUploadTransferAsync(account: session.account, autoUploadServerUrlBase: autoUploadServerUrlBase)
         }
     }
 

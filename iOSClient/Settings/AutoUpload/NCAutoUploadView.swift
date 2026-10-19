@@ -6,7 +6,6 @@
 import SwiftUI
 import UIKit
 
-/// A view that allows the user to configure the `auto upload settings for Nextcloud`
 /// A view that allows the user to configure the auto upload settings for Nextcloud.
 @MainActor
 struct NCAutoUploadView: View {
@@ -15,12 +14,10 @@ struct NCAutoUploadView: View {
     @StateObject var albumModel: AlbumModel
     @State private var showUploadFolder = false
     @State private var showSelectAlbums = false
-    @State private var showUploadAllPhotosWarning = false
     @State private var showFocusedAutoUploadIntro = false
     @State private var showFocusedAutoUploadProgress = false
     @State private var openFocusedAutoUploadFinish = false
     @State private var startAutoUpload = false
-    @Environment(NCAutoUploadCounter.self) private var autoUploadCounter
     @State private var isCheckingOtherAutoUploadAccount = true
     @State private var otherAutoUploadAccountName: String?
     @Environment(NCAutoUploadCounter.self) private var autoUploadCounter
@@ -128,41 +125,11 @@ struct NCAutoUploadView: View {
 
             updateAutoUploadCounterSubscription()
         }
-        .sheet(isPresented: $showFocusedAutoUploadIntro, onDismiss: {
-            guard openFocusedAutoUploadFinish else { return }
-
-            openFocusedAutoUploadFinish = false
-            guard autoUploadCounter.hasItemsToUpload else { return }
-
-            showFocusedAutoUploadProgress = true
-        }) {
-            NCFocusedAutoUploadIntroView {
-                openFocusedAutoUploadFinish = true
-                showFocusedAutoUploadIntro = false
-            }
-            .presentationDetents([.large])
-        }
-        .fullScreenCover(isPresented: $showFocusedAutoUploadProgress) {
-            NCFocusedAutoUploadProgressView(isPresented: $showFocusedAutoUploadProgress,
-                                            account: model.session.account,
-                                            urlBase: model.session.urlBase,
-                                            userId: model.session.userId)
-                .environment(autoUploadCounter)
-        }
-        .onChange(of: model.autoUploadStart) { _, newValue in
-            if !newValue {
-                showFocusedAutoUploadIntro = false
-                showFocusedAutoUploadProgress = false
-                openFocusedAutoUploadFinish = false
-            }
-            updateAutoUploadCounterSubscription()
-        }
     }
 
     @ViewBuilder
     var autoUploadOnView: some View {
         Form {
-            if model.autoUploadStart && autoUploadCounter.hasItemsToUpload {
             if let otherAutoUploadAccountName {
                 Section {
                     Label(
@@ -426,13 +393,6 @@ struct NCAutoUploadView: View {
                     .font(.footnote)
                 })
 
-                // Location
-                Section(content: {
-                    Toggle(NSLocalizedString("_enable_background_location_title_", comment: ""), isOn: $model.locationAutoUploadPermissionGranted)
-                        .font(.body)
-                        .tint(Color(NCBrandColor.shared.getElement(account: model.session.account)))
-                        .opacity(model.autoUploadStart ? 0.15 : 1)
-                        .onChange(of: model.locationAutoUploadPermissionGranted) { _, newValue in
                 if !model.usesPhotoKitAutoUpload {
                     Section(content: {
                         Toggle(
@@ -724,17 +684,6 @@ struct NCAutoUploadView: View {
     private func stopAutoUploadCounterSubscription() {
         autoUploadCounter.stop()
     }
-
-    private func updateAutoUploadCounterSubscription() {
-        autoUploadCounter.start(account: model.session.account,
-                                urlBase: model.session.urlBase,
-                                userId: model.session.userId,
-                                autoUploadStart: model.autoUploadStart)
-    }
-
-    private func stopAutoUploadCounterSubscription() {
-        autoUploadCounter.stop()
-    }
 }
 
 @ViewBuilder
@@ -813,8 +762,6 @@ private struct AutoUploadProminentButtonStyle: ToggleStyle {
 }
 
 #Preview {
-    NCAutoUploadView(model: NCAutoUploadModel(controller: nil), albumModel: AlbumModel(controller: nil))
-        .environment(NCAutoUploadCounter())
     NCAutoUploadView(
         model: NCAutoUploadModel(controller: nil),
         albumModel: AlbumModel(controller: nil)

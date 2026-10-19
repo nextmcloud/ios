@@ -62,9 +62,9 @@ class NCIntroViewController: UIViewController, UICollectionViewDataSource, UICol
         self.navigationController?.navigationBar.tintColor = textColor
 
         if !NCManageDatabase.shared.getAllTableAccount().isEmpty {
-            let navigationItemCancel = UIBarButtonItem(image: UIImage(systemName: "xmark"), style: .done, target: self, action: #selector(self.actionCancel))
+            let navigationItemCancel = UIBarButtonItem(image: UIImage(systemName: "xmark"), style: .plain, target: self, action: #selector(actionCancel(_:)))
             navigationItemCancel.tintColor = textColor
-            navigationItem.rightBarButtonItem = navigationItemCancel
+            navigationItem.leftBarButtonItem = navigationItemCancel
         }
 
         pageControl.currentPageIndicatorTintColor = textColor
@@ -75,13 +75,10 @@ class NCIntroViewController: UIViewController, UICollectionViewDataSource, UICol
         buttonLogin.backgroundColor = textColor
         buttonLogin.setTitle(NSLocalizedString("_log_in_", comment: ""), for: .normal)
 
-        buttonSignUp.layer.cornerRadius = 20
-        buttonSignUp.layer.borderColor = textColor.cgColor
-        buttonSignUp.layer.borderWidth = 1.0
+        buttonSignUp.layer.cornerRadius = 8
         buttonSignUp.setTitleColor(textColor, for: .normal)
-        buttonSignUp.backgroundColor = NCBrandColor.shared.customer
+        buttonSignUp.backgroundColor = textColor.withAlphaComponent(0.2)
         buttonSignUp.titleLabel?.adjustsFontSizeToFitWidth = true
-        buttonSignUp.titleEdgeInsets = UIEdgeInsets(top: 0, left: 10, bottom: 0, right: 10)
         buttonSignUp.setTitle(NSLocalizedString("_sign_up_", comment: ""), for: .normal)
 
         buttonHost.layer.cornerRadius = 20
@@ -141,7 +138,7 @@ class NCIntroViewController: UIViewController, UICollectionViewDataSource, UICol
         }
     }
 
-    @objc func autoScroll() {
+    @objc func autoScroll(_ sender: Any?) {
         if pageControl.currentPage + 1 >= titles.count {
             pageControl.currentPage = 0
         } else {
@@ -179,21 +176,17 @@ class NCIntroViewController: UIViewController, UICollectionViewDataSource, UICol
     }
 
     func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
-        timerAutoScroll?.invalidate()
-        timerAutoScroll = nil
+        timer?.invalidate()
+        timer = nil
     }
 
     // MARK: - Action
 
-    @objc func actionCancel() {
+    @objc func actionCancel(_ sender: Any?) {
         dismiss(animated: true) { }
     }
 
     @IBAction func login(_ sender: Any) {
-//        if let viewController = UIStoryboard(name: "NCLogin", bundle: nil).instantiateViewController(withIdentifier: "NCLogin") as? NCLogin {
-//            viewController.controller = self.controller
-//            self.navigationController?.pushViewController(viewController, animated: true)
-//        }
         if NCBrandOptions.shared.use_AppConfig {
             if let viewController = UIStoryboard(name: "NCLogin", bundle: nil).instantiateViewController(withIdentifier: "NCLogin") as? NCLogin {
                 viewController.controller = self.controller
@@ -215,16 +208,6 @@ class NCIntroViewController: UIViewController, UICollectionViewDataSource, UICol
         loginProvider.presentingViewController = self
         loginProvider.startAuthentication()
         self.activeLoginProvider = loginProvider
-//        if let viewController = UIStoryboard(name: "NCLogin", bundle: nil).instantiateViewController(withIdentifier: "NCLoginProvider") as? NCLoginProvider {
-//            viewController.controller = self.controller
-//            viewController.initialURLString = NCBrandOptions.shared.linkloginPreferredProviders
-//            self.navigationController?.pushViewController(viewController, animated: true)
-//        }
-        if let viewController = UIStoryboard(name: "NCLogin", bundle: nil).instantiateViewController(withIdentifier: "NCLoginProvider") as? NCLoginProvider {
-            viewController.controller = self.controller
-            viewController.initialURLString = NCBrandOptions.shared.linkloginPreferredProviders
-            self.navigationController?.pushViewController(viewController, animated: true)
-        }
     }
 
     @IBAction func host(_ sender: Any) {

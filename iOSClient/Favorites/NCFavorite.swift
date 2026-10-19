@@ -34,6 +34,9 @@ class NCFavorite: NCCollectionViewCommon {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
 
+        // Re-evaluate in-app messages after viewDidAppear
+        MoEngageAnalytics.shared.displayInAppNotificationSafely(reason: "viewDidAppear")
+
         Task {
             await getServerData()
         }
@@ -83,7 +86,6 @@ class NCFavorite: NCCollectionViewCommon {
         }
 
         startGUIGetServerData()
-        
 
         let showHiddenFiles = NCPreferences().getShowHiddenFiles(account: session.account)
         let resultsListingFavorites = await NextcloudKit.shared.listingFavoritesAsync(showHiddenFiles: showHiddenFiles, account: session.account) { task in

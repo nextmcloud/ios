@@ -39,11 +39,6 @@ extension DateFormatter {
 //
 //        return String(format: "%02d.%@.%d", day, month, year)
 //    }
-    
-    /// Formats a given Date object into the specific string format "dd. MMM. yyyy"
-    /// required for the expiry date display (e.g., "01. Dez. 2026").
-    static func formattedExpiryDate(_ date: Date) -> String {
-        
 
     /// Formats a given Date object into the specific string format "dd. MMM. yyyy"
     /// required for the expiry date display (e.g., "01. Dez. 2026").
@@ -54,11 +49,6 @@ extension DateFormatter {
         // Use a standard locale identifier for consistency across devices
         let localeIdentifier = (appLanguageCode == "de" || appLanguageCode == "en") ? appLanguageCode : "en"
         let locale = Locale(identifier: String(localeIdentifier))
-        
-        let calendar = Calendar.current
-        let day = calendar.component(.day, from: date)
-        let year = calendar.component(.year, from: date)
-        
 
         let calendar = Calendar.current
         let day = calendar.component(.day, from: date)
@@ -69,18 +59,6 @@ extension DateFormatter {
         monthFormatter.locale = locale
         monthFormatter.dateFormat = "MMM" // e.g., "Dez." (German locale adds a period) or "Dec" (English locale adds no period)
         var month = monthFormatter.string(from: date)
-        
-        // 3. CRITICAL FIXES:
-        // A. Remove any trailing period the locale might have added
-        month = month.replacingOccurrences(of: ".", with: "")
-        
-        // B. Capitalize the first letter (German defaults to lowercase 'dez')
-        month = month.prefix(1).uppercased() + month.dropFirst()
-        
-        // 4. Use the String(format:) with correct spacing to guarantee the output structure
-        // This line guarantees a SINGLE period after the day and a SINGLE period after the month abbreviation.
-        let formattedDateString = String(format: "%02d. %@. %d", day, month, year)
-        
 
         // 3. CRITICAL FIXES:
         // A. Remove any trailing period the locale might have added

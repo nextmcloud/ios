@@ -73,7 +73,7 @@ class NCContextMenuPlus: NSObject {
         let isNetworkReachable = NextcloudKit.shared.isNetworkReachable()
         let isEndToEndEnabled = NCPreferences().isEndToEndEnabled(account: session.account)
         let titleCreateFolder = isDirectoryE2EE ? NSLocalizedString("_create_folder_e2ee_", comment: "") : NSLocalizedString("_create_folder_", comment: "")
-        let imageCreateFolder = isDirectoryE2EE ? NCImageCache.shared.getFolderEncrypted(account: session.account) : NCImageCache.shared.getFolder(account: session.account)
+        let imageCreateFolder = isDirectoryE2EE ? NCImageCache.shared.getFolderEncrypted() : NCImageCache.shared.getFolder()
         let creatorsByEditor = Dictionary(grouping: capabilities.directEditingCreators, by: \.editor)
         let currentMenuSignature = makeMenuSignature(capabilities: capabilities, account: session.account,
                                                      serverUrl: serverUrl, isEndToEndEnabled: isEndToEndEnabled)
@@ -157,7 +157,7 @@ class NCContextMenuPlus: NSObject {
            isEndToEndEnabled,
            isNetworkReachable {
             menuFolderElements.append(UIAction(title: NSLocalizedString("_create_folder_e2ee_", comment: ""),
-                                               image: NCImageCache.shared.getFolderEncrypted(account: session.account)) { _ in
+                                               image: NCImageCache.shared.getFolderEncrypted()) { _ in
                 DispatchQueue.main.async {
                     let alertController = UIAlertController.createFolderWith(
                         serverUrl: serverUrl,

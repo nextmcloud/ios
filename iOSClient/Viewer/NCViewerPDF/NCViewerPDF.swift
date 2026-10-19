@@ -243,9 +243,6 @@ class NCViewerPDF: UIViewController, NCViewerPDFSearchDelegate {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
 
-        // Re-evaluate in-app messages after viewDidAppear
-        MoEngageAnalytics.shared.displayInAppNotificationSafely(reason: "viewDidAppear")
-
         Task {
             await NCNetworking.shared.transferDispatcher.addDelegate(self)
         }
@@ -431,7 +428,7 @@ class NCViewerPDF: UIViewController, NCViewerPDFSearchDelegate {
         pdfSelection.pages.forEach { page in
             let highlight = PDFAnnotation(bounds: pdfSelection.bounds(for: page), forType: .highlight, withProperties: nil)
             highlight.endLineStyle = .square
-            highlight.color = NCBrandColor.shared.customer
+            highlight.color = .systemBlue
             page.addAnnotation(highlight)
         }
         if let page = pdfSelection.pages.first {

@@ -54,7 +54,6 @@ class NCSectionFooter: UICollectionReusableView {
         //
         buttonSection.titleLabel?.font = .footnote()
         buttonIsHidden(true)
-        buttonSection.setTitleColor(NCBrandColor.shared.brand, for: .normal)
 
         activityIndicatorSection.isHidden = true
         activityIndicatorSection.color = NCBrandColor.shared.textColor

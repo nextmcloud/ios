@@ -11,7 +11,6 @@ protocol NCTrashCellProtocol {
     var labelInfo: UILabel! { get set }
     var image: UIImageView! { get set }
     var statusImg: UIImageView? { get set }
-    var account: String { get set }
 
     func selected(_ status: Bool, isEditMode: Bool, color: UIColor)
 }
@@ -22,7 +21,6 @@ extension NCTrashCellProtocol where Self: UICollectionViewCell {
 
         setBidiSafeFilename(tableTrash.trashbinFileName, isDirectory: tableTrash.directory, titleLabel: labelTitle, extensionLabel: labelExtension)
 
-//        self.labelTitle.text = tableTrash.trashbinFileName
         self.labelTitle.textColor = NCBrandColor.shared.textColor
         self.labelExtension?.textColor = NCBrandColor.shared.textColor
         if self is NCTrashListCell {

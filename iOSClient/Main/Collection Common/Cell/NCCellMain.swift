@@ -7,7 +7,7 @@ import UIKit
 import NextcloudKit
 import RealmSwift
 
-protocol NCCellMainProtocol {
+protocol NCCellMainProtocol: AnyObject {
     var metadata: tableMetadata? {get set }
     var previewImg: UIImageView? { get set }
     var localImg: UIImageView? { get set }
@@ -15,6 +15,7 @@ protocol NCCellMainProtocol {
     var infoLbl: UILabel? { get set }
 
     func selected(_ status: Bool, isEditMode: Bool, color: UIColor)
+    func viewerTransitionSource() -> NCMediaViewerTransitionSource?
 }
 
 extension NCCellMainProtocol {
@@ -37,6 +38,17 @@ extension NCCellMainProtocol {
     var infoLbl: UILabel? {
         get { return nil }
         set {}
+    }
+
+    func viewerTransitionSource() -> NCMediaViewerTransitionSource? {
+        guard let imageView = previewImg,
+              let image = imageView.image,
+              let window = imageView.window else {
+            return nil
+        }
+        let sourceFrame = imageView.convert(imageView.bounds, to: window)
+
+        return NCMediaViewerTransitionSource(image: image, sourceFrame: sourceFrame, cornerRadius: imageView.layer.cornerRadius)
     }
 }
 
@@ -86,23 +98,23 @@ extension NCCollectionViewCommon {
         let tblDirectory = database.getTableDirectory(ocId: metadata.ocId)
 
         if metadata.e2eEncrypted {
-            cell.previewImg?.image = imageCache.getFolderEncrypted(account: metadata.account)
+            cell.previewImg?.image = imageCache.getFolderEncrypted()
         } else if isShare {
-            cell.previewImg?.image = imageCache.getFolderSharedWithMe(account: metadata.account)
+            cell.previewImg?.image = imageCache.getFolderSharedWithMe()
         } else if !metadata.shareType.isEmpty {
             metadata.shareType.contains(NKShare.ShareType.publicLink.rawValue) ?
-            (cell.previewImg?.image = imageCache.getFolderPublic(account: metadata.account)) :
-            (cell.previewImg?.image = imageCache.getFolderSharedWithMe(account: metadata.account))
+            (cell.previewImg?.image = imageCache.getFolderPublic()) :
+            (cell.previewImg?.image = imageCache.getFolderSharedWithMe())
         } else if !metadata.shareType.isEmpty && metadata.shareType.contains(NKShare.ShareType.publicLink.rawValue) {
-            cell.previewImg?.image = imageCache.getFolderPublic(account: metadata.account)
+            cell.previewImg?.image = imageCache.getFolderPublic()
         } else if metadata.mountType == "group" {
-            cell.previewImg?.image = imageCache.getFolderGroup(account: metadata.account)
+            cell.previewImg?.image = imageCache.getFolderGroup()
         } else if isMounted {
-            cell.previewImg?.image = imageCache.getFolderExternal(account: metadata.account)
+            cell.previewImg?.image = imageCache.getFolderExternal()
         } else if metadata.fileName == autoUploadFileName && metadata.serverUrl == autoUploadDirectory {
-            cell.previewImg?.image = imageCache.getFolderAutomaticUpload(account: metadata.account)
+            cell.previewImg?.image = imageCache.getFolderAutomaticUpload()
         } else {
-            cell.previewImg?.image = imageCache.getFolder(account: metadata.account)
+            cell.previewImg?.image = imageCache.getFolder()
         }
 
         // Local image: offline
@@ -127,16 +139,15 @@ extension NCCollectionViewCommon {
         }
 
         if metadata.name == global.appName {
-            let ext = global.getSizeExtension(column: self.numberOfColumns)
-            if let image = NCImageCache.shared.getImageCache(ocId: metadata.ocId, etag: metadata.etag, ext: ext) {
+            let ext = global.getSizeExtension(column: self.numberOfColumns, viewWidth: self.collectionView.bounds.width)
+            if let image = imageCache.getImageCache(ocId: metadata.ocId, etag: metadata.etag, ext: ext) {
                 cell.previewImg?.image = image
             } else if let image = utility.getImage(ocId: metadata.ocId, etag: metadata.etag, ext: ext, userId: metadata.userId, urlBase: metadata.urlBase) {
+                imageCache.addImageCache(ocId: metadata.ocId, etag: metadata.etag, image: image, ext: ext)
                 cell.previewImg?.image = image
-            }
-
-            if cell.previewImg?.image == nil {
+            } else if cell.previewImg?.image == nil {
                 if metadata.iconName.isEmpty {
-                    cell.previewImg?.image = NCImageCache.shared.getImageFile()
+                    cell.previewImg?.image = imageCache.getImageFile()
                 } else {
                     cell.previewImg?.image = utility.loadImage(named: metadata.iconName, useTypeIconFile: true, account: metadata.account)
                 }
@@ -163,28 +174,21 @@ extension NCCollectionViewCommon {
             default:
                 cell.previewImg?.image = utility.loadImage(named: "doc", colors: [NCBrandColor.shared.iconImageColor])
             }
-            if !metadata.iconUrl.isEmpty {
-                if let ownerId = getAvatarFromIconUrl(metadata: metadata) {
-                    let fileName = NCSession.shared.getFileName(urlBase: metadata.urlBase, user: ownerId)
-                    if let image = NCImageCache.shared.getImageCache(key: fileName) {
-                        cell.previewImg?.image = image
-                    } else {
-                        self.database.getImageAvatarLoaded(fileName: fileName) { image, tblAvatar in
-                            if let image {
-                                cell.previewImg?.image = image
-                                NCImageCache.shared.addImageCache(image: image, key: fileName)
-                            } else {
-                                cell.previewImg?.image = self.utility.loadUserImage(for: ownerId, displayName: nil, urlBase: metadata.urlBase)
-                            }
-
-                            if !(tblAvatar?.loaded ?? false),
-                               self.networking.downloadAvatarQueue.operations.filter({ ($0 as? NCOperationDownloadAvatar)?.fileName == fileName }).isEmpty {
-                                self.networking.downloadAvatarQueue.addOperation(NCOperationDownloadAvatar(user: ownerId, fileName: fileName, account: metadata.account, view: self.collectionView, isPreviewImage: true))
-                            }
-                        }
-                    }
-                }
-            }
+//            if !metadata.iconUrl.isEmpty {
+//                if let user = getAvatarFromIconUrl(metadata: metadata) {
+//                    let fileName = NCSession.shared.getFileName(urlBase: metadata.urlBase, user: user)
+//
+//                    if let image = NCImageCache.shared.getImageCache(key: fileName) {
+//                        cell.previewImg?.image = image
+//                    } else {
+//                        let fileNameLocalPath = self.utilityFileSystem.createServerUrl(serverUrl: utilityFileSystem.directoryUserData, fileName: fileName)
+//                        if let image = UIImage(contentsOfFile: fileNameLocalPath) {
+//                            cell.previewImg?.image = image
+//                            imageCache.addImageCache(image: image, key: fileName)
+//                        }
+//                    }
+//                }
+//            }
         }
 
         // Local image: offline

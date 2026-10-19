@@ -3,6 +3,7 @@
 // SPDX-FileCopyrightText: 2022 Henrik Storch
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+
 import UIKit
 import Parchment
 import DropDown
@@ -18,26 +19,12 @@ enum ShareSection: Int, CaseIterable {
 }
 
 class NCShare: UIViewController, NCSharePagingContent {
-//    @IBOutlet weak var viewContainerConstraint: NSLayoutConstraint!
-//    @IBOutlet weak var sharedWithYouByView: UIView!
-//    @IBOutlet weak var sharedWithYouByImage: UIImageView!
-//    @IBOutlet weak var sharedWithYouByLabel: UILabel!
-//    @IBOutlet weak var searchFieldTopConstraint: NSLayoutConstraint!
-    @IBOutlet weak var searchField: UISearchBar!
-//    var textField: UIView? { searchField }
-    var textField: UITextField? { self.view.viewWithTag(Tag.searchField) as? UITextField }
 
-class NCShare: UIViewController, NCSharePagingContent {
-//    @IBOutlet weak var viewContainerConstraint: NSLayoutConstraint!
-//    @IBOutlet weak var sharedWithYouByView: UIView!
-//    @IBOutlet weak var sharedWithYouByImage: UIImageView!
-//    @IBOutlet weak var sharedWithYouByLabel: UILabel!
-//    @IBOutlet weak var searchFieldTopConstraint: NSLayoutConstraint!
-//    @IBOutlet weak var searchField: UISearchBar!
-//    var textField: UIView? { searchField }
     var textField: UITextField? { self.view.viewWithTag(Tag.searchField) as? UITextField }
 
     @IBOutlet weak var searchField: UISearchBar!
+//    var textField: UIView? { searchField }
+
     @IBOutlet weak var tableView: UITableView!
 //    @IBOutlet weak var btnContact: UIButton!
 
@@ -134,14 +121,8 @@ class NCShare: UIViewController, NCSharePagingContent {
             }
 
 //            reloadData()
-            self.metadata = await NCNetworking.shared.updateMetadataPlaceholder(metadata)
 
-            reloadData()
-        }
-        
-        networking = NCShareNetworking(metadata: metadata, view: self.view, delegate: self, session: session, controller: controller)
-//            networking = NCShareNetworking(metadata: metadata, view: self.view, delegate: self, session: session)
-        if sharingEnabled {
+            networking = NCShareNetworking(metadata: metadata, view: self.view, delegate: self, session: session, controller: controller)
             let isVisible = (self.navigationController?.topViewController as? NCSharePaging)?.page == .sharing
             networking?.readShare(showLoadingIndicator: isVisible)
 //            searchField.searchTextField.font = .systemFont(ofSize: 14)
@@ -173,38 +154,6 @@ class NCShare: UIViewController, NCSharePagingContent {
     }
 
     // MARK: - Notification Center
-
-    @objc func openShareProfile(_ sender: UITapGestureRecognizer) {
-//        self.showProfileMenu(userId: metadata.ownerId, session: session, sender: sender.view)
-    }
-
-    private func scrollToTopIfNeeded() {
-        if tableView.numberOfSections > 0 && tableView.numberOfRows(inSection: 0) > 0 {
-            self.tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: false)
-        }
-    }
-
-    @objc func keyboardWillShow(notification: Notification) {
-        if UIDevice.current.userInterfaceIdiom == .phone {
-            if UIScreen.main.bounds.width < 374 || UIDevice.current.orientation.isLandscape {
-                if let keyboardSize = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue {
-                    if view.frame.origin.y == 0 {
-                        scrollToTopIfNeeded()
-                        self.view.frame.origin.y -= keyboardSize.height
-                    }
-                }
-            } else if UIScreen.main.bounds.height < 850 {
-                if view.frame.origin.y == 0 {
-                    scrollToTopIfNeeded()
-                    self.view.frame.origin.y -= 70
-                }
-            } else {
-                if view.frame.origin.y == 0 {
-                    scrollToTopIfNeeded()
-                    self.view.frame.origin.y -= 40
-                }
-            }
-        }
 
 //    @objc func openShareProfile(_ sender: UITapGestureRecognizer) {
 //        self.showProfileMenu(userId: metadata.ownerId, session: session, sender: sender.view)
@@ -250,82 +199,6 @@ class NCShare: UIViewController, NCSharePagingContent {
         textField?.layer.borderColor = NCBrandColor.shared.brand.cgColor
     }
 
-    
-    @objc func keyboardWillHide(notification: Notification) {
-        if view.frame.origin.y != 0 {
-            self.view.frame.origin.y = 0
-        }
-        textField?.layer.borderColor = NCBrandColor.shared.label.cgColor
-    }
-    
-    @objc func keyboardWillShow(notification: Notification) {
-        if UIDevice.current.userInterfaceIdiom == .phone {
-           if (UIScreen.main.bounds.width < 374 || UIDevice.current.orientation.isLandscape) {
-                if let keyboardSize = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue {
-                    if view.frame.origin.y == 0 {
-                        self.tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: false)
-                        self.view.frame.origin.y -= keyboardSize.height
-                    }
-                }
-            } else if UIScreen.main.bounds.height < 850 {
-                if view.frame.origin.y == 0 {
-                    self.tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: false)
-                    self.view.frame.origin.y -= 70
-                }
-            } else {
-                if view.frame.origin.y == 0 {
-                    self.tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: false)
-                    self.view.frame.origin.y -= 40
-                }
-            }
-        }
-        
-        if UIDevice.current.userInterfaceIdiom == .pad, UIDevice.current.orientation.isLandscape {
-            if view.frame.origin.y == 0 {
-                self.tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: false)
-                self.view.frame.origin.y -= 230
-            }
-        }
-        textField?.layer.borderColor = NCBrandColor.shared.brand.cgColor
-    }
-    
-    @objc func keyboardWillHide(notification: Notification) {
-        if view.frame.origin.y != 0 {
-            self.view.frame.origin.y = 0
-        }
-        textField?.layer.borderColor = NCBrandColor.shared.label.cgColor
-    }
-    
-    @objc func keyboardWillShow(notification: Notification) {
-        if UIDevice.current.userInterfaceIdiom == .phone {
-           if (UIScreen.main.bounds.width < 374 || UIDevice.current.orientation.isLandscape) {
-                if let keyboardSize = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue {
-                    if view.frame.origin.y == 0 {
-                        self.tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: false)
-                        self.view.frame.origin.y -= keyboardSize.height
-                    }
-                }
-            } else if UIScreen.main.bounds.height < 850 {
-                if view.frame.origin.y == 0 {
-                    self.tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: false)
-                    self.view.frame.origin.y -= 70
-                }
-            } else {
-                if view.frame.origin.y == 0 {
-                    self.tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: false)
-                    self.view.frame.origin.y -= 40
-                }
-            }
-        }
-        
-        if UIDevice.current.userInterfaceIdiom == .pad, UIDevice.current.orientation.isLandscape {
-            if view.frame.origin.y == 0 {
-                self.tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: false)
-                self.view.frame.origin.y -= 230
-            }
-        }
-        textField?.layer.borderColor = NCBrandColor.shared.brand.cgColor
-    }
     
     @objc func keyboardWillHide(notification: Notification) {
         if view.frame.origin.y != 0 {
@@ -460,12 +333,6 @@ class NCShare: UIViewController, NCSharePagingContent {
         }
     }
 
-        } else {
-            networking?.createShareLink(password: "")
-        }
-        
-    }
-    
     func presentQuickStatusActionSheet(for share: tableShare, sender: Any?) {
         guard let metadata = metadata else { return }
 
@@ -550,7 +417,6 @@ class NCShare: UIViewController, NCSharePagingContent {
 
         networking?.updateShare(updatedShare, downloadLimit: downloadLimit)
     }
-
 }
 
 // MARK: - NCShareNetworkingDelegate
@@ -627,8 +493,8 @@ extension NCShare: NCShareNetworkingDelegate {
         }
 
         dropDown.selectionAction = { index, _ in
-            self.textField?.text = ""
-            self.textField?.resignFirstResponder()
+//            self.textField?.text = ""
+//            self.textField?.resignFirstResponder()
             let sharee = sharees[index]
             guard
                 let advancePermission = UIStoryboard(name: "NCShare", bundle: nil).instantiateViewController(withIdentifier: "NCShareAdvancePermission") as? NCShareAdvancePermission,
@@ -731,8 +597,6 @@ extension NCShare: UITableViewDataSource {
                 let linkNumber = " \(indexPath.row + 1)"
                 cell.configure(with: tableShare, at: indexPath, isDirectory: metadata.directory, title: linkNumber)
             }
-            return cell
-
 //            self.sendMail = (tableShare.shareType != NKShare.ShareType.publicLink.rawValue)
             cell.buttonDetail.menu = NCContextMenuShare(share: tableShare, isDirectory: metadata.isDirectory, canReshare: canReshare, shareController: self, controller: controller).viewMenu()
             cell.buttonDetail.showsMenuAsPrimaryAction = true
@@ -853,7 +717,8 @@ extension NCShare: CNContactPickerDelegate {
         if  contact.emailAddresses.count > 1 {
             showEmailList(arrEmail: contact.emailAddresses.map({$0.value as String}), sender: picker)
         } else if let email = contact.emailAddresses.first?.value as? String {
-            textField?.text = email
+//            textField?.text = email
+            searchField?.text = email
             networking?.getSharees(searchString: email)
         }
     }
@@ -897,16 +762,7 @@ extension NCShare: UISearchBarDelegate {
     }
 
     @objc private func searchSharees(_ sender: Any?) {
-//        // https://stackoverflow.com/questions/25471114/how-to-validate-an-e-mail-address-in-swift
-//        func isValidEmail(_ email: String) -> Bool {
-//
-//            let emailRegEx = "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,64}"
-//            let emailPred = NSPredicate(format: "SELF MATCHES %@", emailRegEx)
-//            return emailPred.evaluate(with: email)
-//        }
-//        guard let searchString = textField?.text, !searchString.isEmpty else { return }
         guard let searchString = textField?.text?.trimmingCharacters(in: .whitespacesAndNewlines), !searchString.isEmpty else { return }
-//        guard let searchString = searchField.text?.trimmingCharacters(in: .whitespacesAndNewlines), !searchString.isEmpty else { return }
         if searchString.contains("@"), !isValidEmail(searchString) { return }
         networking?.getSharees(searchString: searchString)
     }

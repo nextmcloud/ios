@@ -37,6 +37,9 @@ class NCShares: NCCollectionViewCommon {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
 
+        // Re-evaluate in-app messages after viewDidAppear
+        MoEngageAnalytics.shared.displayInAppNotificationSafely(reason: "viewDidAppear")
+
         Task {
             await getServerData()
         }
@@ -53,6 +56,8 @@ class NCShares: NCCollectionViewCommon {
 
         Task {
             await stopSyncMetadata()
+//            await NCNetworking.shared.networkingTasks.cancel(identifier: "NCShares")
+            backgroundTask?.cancel()
         }
     }
 

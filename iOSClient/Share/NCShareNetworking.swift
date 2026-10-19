@@ -10,15 +10,15 @@ class NCShareNetworking: NSObject {
     let database = NCManageDatabase.shared
     weak var delegate: NCShareNetworkingDelegate?
     var view: UIView
-    var metadata: tableMetadata
-    var session: NCSession.Session
+    let metadata: tableMetadata
+    let session: NCSession.Session
     let controller: NCMainTabBarController?
 
     @MainActor
     internal var windowScene: UIWindowScene? {
         SceneManager.shared.getWindowScene(controller: controller)
     }
-    
+
     init(metadata: tableMetadata,
          view: UIView,
          delegate: NCShareNetworkingDelegate?,
@@ -32,7 +32,6 @@ class NCShareNetworking: NSObject {
 
         super.init()
     }
-
 
     private func readDownloadLimit(account: String, token: String) async throws -> NKDownloadLimit? {
         return try await withCheckedThrowingContinuation { continuation in
@@ -103,7 +102,7 @@ class NCShareNetworking: NSObject {
     func createShareLink(password: String?) {
         NCActivityIndicator.shared.start(backgroundView: view)
         let filenamePath = utilityFileSystem.getRelativeFilePath(metadata.fileName, serverUrl: metadata.serverUrl, session: session)
-        
+
         let readOnlyPermissions = NCSharePermissions.getPermissionValue(
             canCreate: false,
             canEdit: false,
@@ -132,7 +131,6 @@ class NCShareNetworking: NSObject {
                 // 🔄 ensure we sync DB + UI with server
                 self.readShare(showLoadingIndicator: false)
             } else {
-                NCContentPresenter().showError(error: error)
                 Task {
                     await showErrorBanner(windowScene: self.windowScene, error: error)
                 }
@@ -176,15 +174,14 @@ class NCShareNetworking: NSObject {
                         self.setShareDownloadLimit(limit, token: share.token)
                     }
                 }
-                
-                if !self.metadata.contentType.contains("directory") {
-                    AnalyticsHelper.shared.trackEventWithMetadata(eventName: .EVENT__SHARE_FILE, metadata: self.metadata)
-                }
 
                 Task {
                     await NCNetworking.shared.transferDispatcher.notifyAllDelegates { delegate in
                         delegate.transferReloadDataSource(serverUrl: self.metadata.serverUrl, requestData: true, status: nil)
                     }
+                }
+                if !self.metadata.contentType.contains("directory") {
+                    AnalyticsHelper.shared.trackEventWithMetadata(eventName: .EVENT__SHARE_FILE, metadata: self.metadata)
                 }
             } else {
                 Task {
@@ -267,7 +264,8 @@ class NCShareNetworking: NSObject {
                 self.delegate?.getSharees(sharees: sharees)
             } else {
                 Task {
-                    await showErrorBanner(windowScene: self.windowScene, error: error)
+                    let windowScene = await SceneManager.shared.getWindowScene(controller: self.controller)
+                    await showErrorBanner(windowScene: windowScene, error: error)
                 }
                 self.delegate?.getSharees(sharees: nil)
             }
@@ -329,4 +327,3 @@ class NCShareNetworking: NSObject {
         }
     }
 }
-

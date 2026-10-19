@@ -8,8 +8,7 @@ import NextcloudKit
 import LocalAuthentication
 
 @MainActor
-class NCManageE2EE: NSObject, ObservableObject, ViewOnAppearHandling, NCEndToEndInitializeDelegate, TOPasscodeViewControllerDelegate {
-    let endToEndInitialize = NCEndToEndInitialize()
+class NCManageE2EE: NSObject, ObservableObject, ViewOnAppearHandling, TOPasscodeViewControllerDelegate {
     var passcodeType = ""
 
     let preference = NCPreferences()
@@ -37,13 +36,11 @@ class NCManageE2EE: NSObject, ObservableObject, ViewOnAppearHandling, NCEndToEnd
     init(controller: NCMainTabBarController?) {
         super.init()
         self.controller = controller
-        endToEndInitialize.delegate = self
         onViewAppear()
     }
 
     /// Triggered when the view appears.
     func onViewAppear() {
-//        if capabilities.e2EEEnabled && NCGlobal.shared.e2eeCompatibleVersions.contains(capabilities.e2EEApiVersion) {
         if capabilities.e2EEEnabled {
             isEndToEndEnabled = preference.isEndToEndEnabled(account: session.account)
             if isEndToEndEnabled {
@@ -116,7 +113,6 @@ class NCManageE2EE: NSObject, ObservableObject, ViewOnAppearHandling, NCEndToEnd
             self.correctPasscode()
             return
         }
-
         let laContext = LAContext()
         var error: NSError?
         let passcodeViewController = TOPasscodeViewController(passcodeType: .sixDigits, allowCancel: true)
@@ -144,7 +140,27 @@ class NCManageE2EE: NSObject, ObservableObject, ViewOnAppearHandling, NCEndToEnd
     @objc func correctPasscode() {
         switch self.passcodeType {
         case "startE2E":
-            endToEndInitialize.initEndToEndEncryption(controller: controller, metadata: nil)
+            Task {
+                do {
+                    let e2ee = NCEndToEndSetup(controller: controller)
+                    try await e2ee.start()
+                    isEndToEndEnabled = true
+                } catch let error as NKError {
+                    if error.errorCode == NSUserCancelledError {
+                        return
+                    }
+                    await showErrorBanner(
+                        windowScene: windowScene,
+                        text: error.errorDescription
+                    )
+                } catch {
+                    // fallback (non NKError)
+                    await showErrorBanner(
+                        windowScene: windowScene,
+                        text: error.localizedDescription
+                    )
+                }
+            }
         case "readPassphrase":
             if let e2ePassphrase = NCPreferences().getEndToEndPassphrase(account: session.account) {
                 let message = "\n" + NSLocalizedString("_e2e_settings_the_passphrase_is_", comment: "") + "\n\n\n" + e2ePassphrase

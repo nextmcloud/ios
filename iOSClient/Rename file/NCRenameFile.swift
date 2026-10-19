@@ -97,7 +97,6 @@ class NCRenameFile: UIViewController, UITextFieldDelegate {
             if metadata.directory {
 
                 if imagePreview == nil {
-                    previewFile.image = imageCache.getFolder(account: metadata.account)
                     previewFile.image = imageCache.getFolder()
                 }
 
@@ -260,7 +259,8 @@ class NCRenameFile: UIViewController, UITextFieldDelegate {
         NCActivityIndicator.shared.start()
 
 //        NCNetworking.shared.renameMetadata(metadata, fileNameNew: fileNameNew)
-        NCNetworking.shared.renameMetadata(metadata, fileNameNew: fileNameNew, indexPath: indexPath, viewController: self) { error in
+        let windowScene = self.view.window?.windowScene
+        NCNetworking.shared.renameMetadata(metadata, fileNameNew: fileNameNew, indexPath: indexPath, viewController: self, windowScene: windowScene) { error in
 
             NCActivityIndicator.shared.stop()
 

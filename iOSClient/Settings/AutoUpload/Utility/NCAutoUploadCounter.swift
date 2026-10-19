@@ -9,8 +9,6 @@ import Photos
 @MainActor
 @Observable
 final class NCAutoUploadCounter {
-    private(set) var count = 0
-    private(set) var failedCount = 0
     private(set) var sinceDate: Date?
     private(set) var count = 0
     private(set) var failedCount = 0
@@ -33,10 +31,6 @@ final class NCAutoUploadCounter {
 
     private var itemsLeftMessage: String {
         if count == 0 {
-            return NSLocalizedString("_auto_upload_no_new_items_to_upload_", comment: "")
-        }
-
-        return String.localizedStringWithFormat(NSLocalizedString("_focused_auto_upload_items_left_", comment: ""), count)
             let key = usesPhotoKitAutoUpload ? "_auto_upload_active_" : "_auto_upload_no_new_items_to_upload_"
             return NSLocalizedString(key, comment: "")
         }
@@ -121,7 +115,6 @@ final class NCAutoUploadCounter {
             self.account = account
             self.autoUploadServerUrlBase = base
 
-            await refresh()
             // PhotoKit can replace completed jobs without changing the queue count.
             // Refresh while the view is subscribed so the incremental date stays current too.
             while !Task.isCancelled {
@@ -146,8 +139,6 @@ final class NCAutoUploadCounter {
 
         account = nil
         autoUploadServerUrlBase = nil
-        count = 0
-        failedCount = 0
         sinceDate = nil
         count = 0
         failedCount = 0
@@ -164,8 +155,6 @@ final class NCAutoUploadCounter {
         let counts = await NCManageDatabase.shared.countAutoUploadMetadatasAsync(account: account,
                                                                                  autoUploadServerUrlBase: autoUploadServerUrlBase)
 
-        count = counts.pending
-        failedCount = counts.failed
         let currentSinceDate = await NCManageDatabase.shared.getTableAccountAsync(predicate: NSPredicate(format: "account == %@", account))?.autoUploadSinceDate
         guard self.account == account, self.autoUploadServerUrlBase == autoUploadServerUrlBase else { return }
         sinceDate = currentSinceDate
