@@ -151,7 +151,8 @@ extension NCShareExtension: UICollectionViewDataSource {
 
         // Local image: offline
         if tableDirectory != nil && tableDirectory!.offline {
-            cell.imageLocal?.image = NCImageCache.shared.getImageOfflineFlag()
+//            cell.imageLocal?.image = NCImageCache.shared.getImageOfflineFlag()
+            cell.imageLocal.image = NCImageCache.shared.getImageOfflineFlag(colors: [.systemBackground, .systemGreen])
         }
     }
 }

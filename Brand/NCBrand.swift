@@ -58,11 +58,14 @@ struct NextcloudVersion: Comparable {
     }
 }
 
-@objc class NCBrandOptions: NSObject, @unchecked Sendable {
-    @objc static let shared: NCBrandOptions = {
-        let instance = NCBrandOptions()
-        return instance
-    }()
+final class NCBrandOptions: @unchecked Sendable {
+    static let shared = NCBrandOptions()
+
+//@objc class NCBrandOptions: NSObject, @unchecked Sendable {
+//    @objc static let shared: NCBrandOptions = {
+//        let instance = NCBrandOptions()
+//        return instance
+//    }()
 
     var brand:                           String = "MagentaCLOUD"
     var brandUserAgent:             String = "MagentaCLOUD"
@@ -76,7 +79,9 @@ struct NextcloudVersion: Comparable {
     var privacy: String = "https://static.magentacloud.de/privacy/datenschutzhinweise_app.htm"
     var sourceCode: String = "https://github.com/nextcloud/ios"
     var mobileconfig: String = "/remote.php/dav/provisioning/apple-provisioning.mobileconfig"
-    var appStoreUrl: String = "https://apps.apple.com/de/app/magentacloud-cloud-speicher/id312838242"
+//    var appStoreUrl: String = "https://apps.apple.com/de/app/magentacloud-cloud-speicher/id312838242"
+    var appStoreUrlNC: String = "https://apps.apple.com/in/app/nextcloud/id1125420102"
+    var appStoreUrl: String = "https://apps.apple.com/de/app/id312838242"
 
     // Personalized
     @objc public var webCloseViewProtocolPersonalized: String = ""                                                  // example "abc://change/plan"      Don't touch me !!
@@ -97,8 +102,6 @@ struct NextcloudVersion: Comparable {
 //    @objc public var capabilitiesGroupApps:              String = "group.de.telekom.Mediencenter"
 //#endif
     
-//#endif
-    
     // BRAND ONLY
     // Set use_login_web_personalized to true for prod and false for configurable path
     var use_login_web_personalized: Bool = false                               // Don't touch me !!
@@ -110,9 +113,9 @@ struct NextcloudVersion: Comparable {
     var use_themingColor: Bool = true
 
     // MDM settings
-    var disable_intro:       Bool = true
-    var disable_request_login_url:       Bool = true
-    var disable_multiaccount:            Bool = true
+    var disable_intro: Bool = false
+    var disable_request_login_url: Bool = false
+    var disable_multiaccount: Bool = false
     var disable_more_external_site: Bool = false
     var disable_openin_file: Bool = false                                                       // Don't touch me !!
     var disable_crash_service: Bool = false
@@ -147,7 +150,7 @@ struct NextcloudVersion: Comparable {
         case activity, sharing, details
     }
 
-    override init() {
+    init() {
         // wrapper AppConfig
         if let configurationManaged = UserDefaults.standard.dictionary(forKey: "com.apple.configuration.managed"), use_AppConfig {
             if let str = configurationManaged[NCGlobal.shared.configuration_brand] as? String {
@@ -177,7 +180,7 @@ struct NextcloudVersion: Comparable {
         }
 
         if pushNotificationServerProxy.isEmpty,
-            brand == "Nextcloud" {
+           brand == "Nextcloud" ||  brand == "MagentaCLOUD" {
             pushNotificationServerProxy = "https://push-notifications.nextcloud.com"
             // DEBUG SERVER PUSH
             // pushNotificationServerProxy = "https://c0004.customerpush.nextcloud.com"

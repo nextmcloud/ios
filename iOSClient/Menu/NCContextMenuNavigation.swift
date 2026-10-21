@@ -31,7 +31,7 @@ class NCContextMenuNavigation: NSObject {
         var showRecommendedFiles: UIAction?
         let layoutForView = NCManageDatabase.shared.getLayoutForView(account: session.account, key: collectionViewCommon.layoutKey, serverUrl: collectionViewCommon.serverUrl)
         let select = UIAction(title: NSLocalizedString("_select_", comment: ""),
-                              image: utility.loadImage(named: "checkmark.circle")) { _ in
+                              image: utility.loadImage(named: "checkmark.circle", colors: [NCBrandColor.shared.iconImageColor], size: 24).withTintColor(NCBrandColor.shared.iconImageColor)) { _ in
             Task {
                 if !collectionViewCommon.dataSource.isEmpty() {
                     await collectionViewCommon.setEditMode(true)
@@ -41,7 +41,7 @@ class NCContextMenuNavigation: NSObject {
         }
 
         let list = UIAction(title: NSLocalizedString("_list_", comment: ""),
-                            image: utility.loadImage(named: "list.bullet"),
+                            image: UIImage(named: "Changelog")?.image(color: NCBrandColor.shared.iconImageColor, size: 24).withTintColor(NCBrandColor.shared.iconImageColor), //utility.loadImage(named: "list.bullet"),
                             state: layoutForView.layout == global.layoutList ? .on : .off) { _ in
             Task {
                 layoutForView.layout = global.layoutList
@@ -51,7 +51,7 @@ class NCContextMenuNavigation: NSObject {
         }
 
         let grid = UIAction(title: NSLocalizedString("_icons_", comment: ""),
-                            image: utility.loadImage(named: "square.grid.2x2"),
+                            image: UIImage(named: "Applications")?.image(color: NCBrandColor.shared.iconImageColor, size: 24).withTintColor(NCBrandColor.shared.iconImageColor), //utility.loadImage(named: "square.grid.2x2"),
                             state: layoutForView.layout == global.layoutGrid ? .on : .off) { _ in
             Task {
                 layoutForView.layout = global.layoutGrid
@@ -61,7 +61,7 @@ class NCContextMenuNavigation: NSObject {
         }
 
         let mediaSquare = UIAction(title: NSLocalizedString("_media_square_", comment: ""),
-                                   image: utility.loadImage(named: "square.grid.3x3"),
+                                   image: utility.loadImage(named: "square-grid", colors: [NCBrandColor.shared.iconImageColor], size: 24).withTintColor(NCBrandColor.shared.iconImageColor),
                                    state: layoutForView.layout == global.layoutPhotoSquare ? .on : .off) { _ in
             Task {
                 layoutForView.layout = global.layoutPhotoSquare
@@ -71,7 +71,7 @@ class NCContextMenuNavigation: NSObject {
         }
 
         let mediaRatio = UIAction(title: NSLocalizedString("_media_ratio_", comment: ""),
-                                  image: utility.loadImage(named: "rectangle.grid.3x2"),
+                                  image: utility.loadImage(named: "ratio-grid", colors: [NCBrandColor.shared.iconImageColor], size: 24).withTintColor(NCBrandColor.shared.iconImageColor),
                                   state: layoutForView.layout == global.layoutPhotoRatio ? .on : .off) { _ in
             Task {
                 layoutForView.layout = global.layoutPhotoRatio
@@ -83,7 +83,7 @@ class NCContextMenuNavigation: NSObject {
         let viewStyleSubmenu = UIMenu(title: "", options: .displayInline, children: [list, grid, mediaSquare, mediaRatio])
 
         let ascending = layoutForView.ascending
-        let ascendingChevronImage = utility.loadImage(named: ascending ? "chevron.up" : "chevron.down")
+        let ascendingChevronImage = utility.loadImage(named: ascending ? "chevron.up" : "chevron.down").withTintColor(NCBrandColor.shared.iconImageColor)
         let isName = layoutForView.sort == "fileName"
         let isDate = layoutForView.sort == "date"
         let isSize = layoutForView.sort == "size"
@@ -230,7 +230,7 @@ class NCContextMenuNavigation: NSObject {
             }
         }
         let list = UIAction(title: NSLocalizedString("_list_", comment: ""),
-                            image: utility.loadImage(named: "list.bullet", colors: [NCBrandColor.shared.iconImageColor]),
+                            image: UIImage(named: "Changelog")?.image(color: NCBrandColor.shared.iconImageColor, size: 24).withTintColor(NCBrandColor.shared.iconImageColor), //utility.loadImage(named: "list.bullet", colors: [NCBrandColor.shared.iconImageColor]),
                             state: layoutForView.layout == global.layoutList ? .on : .off) { _ in
             Task {
                 trashViewController.onListSelected()
@@ -238,7 +238,7 @@ class NCContextMenuNavigation: NSObject {
             }
         }
         let grid = UIAction(title: NSLocalizedString("_icons_", comment: ""),
-                            image: utility.loadImage(named: "square.grid.2x2", colors: [NCBrandColor.shared.iconImageColor]),
+                            image: UIImage(named: "Applications")?.image(color: NCBrandColor.shared.iconImageColor, size: 24).withTintColor(NCBrandColor.shared.iconImageColor), //utility.loadImage(named: "square.grid.2x2", colors: [NCBrandColor.shared.iconImageColor]),
                             state: layoutForView.layout == global.layoutGrid ? .on : .off) { _ in
             Task {
                 trashViewController.onGridSelected()

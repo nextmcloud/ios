@@ -68,16 +68,25 @@ class NCSelect: UIViewController, UIGestureRecognizerDelegate, UIAdaptivePresent
         SceneManager.shared.getWindowScene(controller: controller)
     }
 
+    private var activeAccount: tableAccount!
+
     // MARK: - View Life Cycle
 
     override func viewDidLoad() {
         super.viewDidLoad()
+
+        navigationController?.setNavigationBarAppearance()
+        navigationController?.navigationBar.prefersLargeTitles = true
+        navigationController?.presentationController?.delegate = self
 
         view.backgroundColor = .systemBackground
         collectionView.backgroundColor = .systemBackground
         collectionView.hideTopScrollEdgeEffect()
 
         selectCommandViewSelect?.separatorView.backgroundColor = .separator
+
+        activeAccount = NCManageDatabase.shared.getActiveTableAccount()
+        session = NCSession.shared.getSession(account: activeAccount.account)
 
         // Cell
         collectionView.register(UINib(nibName: "NCListCell", bundle: nil), forCellWithReuseIdentifier: "listCell")
@@ -95,6 +104,8 @@ class NCSelect: UIViewController, UIGestureRecognizerDelegate, UIAdaptivePresent
         buttonCancel.title = nil
         buttonCancel.image = UIImage(systemName: "xmark")
         buttonCancel.accessibilityLabel = NSLocalizedString("_cancel_", comment: "")
+//        buttonCancel.title = NSLocalizedString("_cancel_", comment: "")
+
         bottomContraint?.constant = UIApplication.shared.mainAppWindow?.rootViewController?.view.safeAreaInsets.bottom ?? 0
 
         // Type of command view
@@ -106,7 +117,7 @@ class NCSelect: UIViewController, UIGestureRecognizerDelegate, UIAdaptivePresent
             }
             self.view.addSubview(selectCommandViewSelect!)
 
-            selectCommandViewSelect?.setColor(account: session.account)
+//            selectCommandViewSelect?.setColor(account: session.account)
             selectCommandViewSelect?.selectView = self
             selectCommandViewSelect?.translatesAutoresizingMaskIntoConstraints = false
 
@@ -136,6 +147,11 @@ class NCSelect: UIViewController, UIGestureRecognizerDelegate, UIAdaptivePresent
 
             bottomContraint?.constant = 150
         }
+
+
+        // Initial state based on current destination
+        updateMoveButtonState()
+
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -155,12 +171,17 @@ class NCSelect: UIViewController, UIGestureRecognizerDelegate, UIAdaptivePresent
 
             self.navigationItem.title = titleCurrentFolder
 
+            self.updateMoveButtonState()
+
             await reloadDataSource()
         }
     }
 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+
+        // Re-evaluate in-app messages after viewDidAppear
+        MoEngageAnalytics.shared.displayInAppNotificationSafely(reason: "viewDidAppear")
 
         Task {
             await NCNetworking.shared.transferDispatcher.addDelegate(self)
@@ -306,6 +327,8 @@ class NCSelect: UIViewController, UIGestureRecognizerDelegate, UIAdaptivePresent
             viewController.serverUrl = serverUrlPush
             viewController.session = session
             viewController.controller = controller
+            // Ensure the next view controller updates Move availability
+            viewController.items = items
 
             if let fileNameError = FileNameValidator.checkFileName(metadata.fileNameView, account: session.account, capabilities: capabilities) {
                 let message = "\(fileNameError.errorDescription) \(NSLocalizedString("_please_rename_file_", comment: ""))"
@@ -368,15 +391,13 @@ extension NCSelect: UICollectionViewDataSource {
         cell.setButtonsHidden(true)
         cell.writeInfoDateSize(date: metadata.date, size: metadata.size)
 
+        cell.imageSelect.image = nil
+
         if metadata.directory {
             if metadata.e2eEncrypted {
                 cell.imageItem.image = NCImageCache.shared.getFolderEncrypted()
-            } else if isShare {
-                cell.imageItem.image = NCImageCache.shared.getFolderSharedWithMe()
-            } else if !metadata.shareType.isEmpty {
-                metadata.shareType.contains(3) ?
-                (cell.imageItem.image = NCImageCache.shared.getFolderPublic()) :
-                (cell.imageItem.image = NCImageCache.shared.getFolderSharedWithMe())
+            } else if isShare || !metadata.shareType.isEmpty {
+                cell.imageItem.image = NCImageCache.shared.getFolderPublic()
             } else if metadata.mountType == "group" {
                 cell.imageItem.image = NCImageCache.shared.getFolderGroup()
             } else if isMounted {
@@ -406,6 +427,11 @@ extension NCSelect: UICollectionViewDataSource {
         if metadata.favorite {
             cell.imageFavorite.image = NCImageCache.shared.getImageFavorite()
         }
+
+        cell.imageSelect.isHidden = true
+        cell.backgroundView = nil
+        cell.hideButtonShare(true)
+        cell.selected(false, isEditMode: false, color: NCBrandColor.shared.brand)
 
         // Live Photo
         if metadata.isLivePhoto {
@@ -519,6 +545,8 @@ extension NCSelect {
         self.dataSource = NCCollectionViewDataSource(metadatas: metadatas,
                                                      account: session.account)
         self.collectionView.reloadData()
+
+        self.updateMoveButtonState()
     }
 
     func getServerData() async {
@@ -534,6 +562,34 @@ extension NCSelect {
         }
         if resultsReadFolder.error == .success {
             await reloadDataSource()
+        }
+    }
+
+    // MARK: - Move availability
+    private func isMovingToSameDestination() -> Bool {
+        // If there are no items or we are not in copy/move mode, moving is allowed
+        guard typeOfCommandView == .copyMove, !items.isEmpty else { return false }
+        // Determine the source serverUrl for all items; if any item has a different source, moving is allowed
+        // tableMetadata has `serverUrl` and `account` that denote its current folder
+        let uniqueSources: Set<String> = Set(items.map { $0.serverUrl })
+        // If all items come from the same folder and that folder equals current destination, moving should be disabled
+        if uniqueSources.count == 1, let source = uniqueSources.first {
+            return source == serverUrl
+        }
+        return false
+    }
+
+    private func updateMoveButtonState() {
+        let shouldDisableMove = isMovingToSameDestination()
+        guard let cmd = selectCommandViewSelect, let button = cmd.moveButton else { return }
+
+        button.isEnabled = !shouldDisableMove
+
+        // Swap background color to communicate disabled state clearly
+        if shouldDisableMove {
+            button.backgroundColor = .secondarySystemFill
+        } else {
+            button.backgroundColor = NCBrandColor.shared.getElement(account: session.account)
         }
     }
 }
@@ -591,9 +647,20 @@ class NCSelectCommandView: UIView {
         copyButton?.setTitleColor(UIColor(white: 1, alpha: 0.3), for: .highlighted)
         copyButton?.setTitleColor(NCBrandColor.shared.getText(account: account), for: .normal)
 
-        moveButton?.backgroundColor = NCBrandColor.shared.getElement(account: account)
+        // Move button normal/disabled colors
+        let normalBG = NCBrandColor.shared.getElement(account: account)
+        let normalTitle = NCBrandColor.shared.getText(account: account)
+        let disabledBG = UIColor.secondarySystemFill
+        let disabledTitle = UIColor.secondaryLabel
+
         moveButton?.setTitleColor(UIColor(white: 1, alpha: 0.3), for: .highlighted)
-        moveButton?.setTitleColor(NCBrandColor.shared.getText(account: account), for: .normal)
+        moveButton?.setTitleColor(normalTitle, for: .normal)
+        moveButton?.setTitleColor(disabledTitle, for: .disabled)
+
+        // Apply background according to current enabled state
+        if let moveButton = moveButton {
+            moveButton.backgroundColor = moveButton.isEnabled ? normalBG : disabledBG
+        }
     }
 
     @IBAction func createFolderButtonPressed(_ sender: UIButton) {

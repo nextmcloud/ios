@@ -27,7 +27,7 @@ enum NCContextMenuActions {
     ) -> UIAction {
         UIAction(
             title: NSLocalizedString("_details_", comment: ""),
-            image: NCUtility().loadImage(named: "info.circle.fill")
+            image: UIImage(named: "share")!.withTintColor(NCBrandColor.shared.iconImageColor)
         ) { _ in
             NCCreate().createShare(
                 controller: controller,
@@ -47,7 +47,7 @@ enum NCContextMenuActions {
                 ? NSLocalizedString("_remove_favorites_", comment: "")
                 : NSLocalizedString("_add_favorites_", comment: ""),
             image: NCUtility().loadImage(
-                named: metadata.favorite ? "star.slash.fill" : "star.fill",
+                named: metadata.favorite ? "star" : "star.fill",
                 colors: [NCBrandColor.shared.yellowFavorite]
             )
         ) { _ in
@@ -66,8 +66,8 @@ enum NCContextMenuActions {
         completion: (() -> Void)? = nil
     ) -> UIAction {
         UIAction(
-            title: NSLocalizedString("_share_", comment: ""),
-            image: NCUtility().loadImage(named: "square.and.arrow.up.fill")
+            title: NSLocalizedString("_open_in_", comment: ""),
+            image:  NCUtility().loadImage(named: "open_file",colors: [NCBrandColor.shared.iconImageColor]).withTintColor(NCBrandColor.shared.iconImageColor)
         ) { _ in
             Task { @MainActor in
                 await NCCreate().createActivityViewController(
@@ -127,7 +127,7 @@ enum NCContextMenuActions {
             title: isAnyOffline
                 ? NSLocalizedString("_remove_available_offline_", comment: "")
                 : NSLocalizedString("_set_available_offline_", comment: ""),
-            image: UIImage(systemName: "icloud.and.arrow.down")
+            image: UIImage(named: "cloudDownload")?.withTintColor(NCBrandColor.shared.iconImageColor)
         ) { _ in
             if !isAnyOffline, metadatas.count > 3 {
                 let alert = UIAlertController(
@@ -162,7 +162,7 @@ enum NCContextMenuActions {
     ) -> UIAction {
         UIAction(
             title: NSLocalizedString("_save_as_scan_", comment: ""),
-            image: NCUtility().loadImage(named: "doc.viewfinder", colors: [NCBrandColor.shared.iconImageColor])
+            image: NCUtility().loadImage(named: "doc.viewfinder", colors: [NCBrandColor.shared.iconImageColor], size: 24).withTintColor(NCBrandColor.shared.iconImageColor)
         ) { _ in
             Task {
                 if NCUtilityFileSystem().fileProviderStorageExists(metadata) {
@@ -198,7 +198,7 @@ enum NCContextMenuActions {
     ) -> UIAction {
         UIAction(
             title: NSLocalizedString("_rename_", comment: ""),
-            image: NCUtility().loadImage(named: "text.cursor", colors: [NCBrandColor.shared.iconImageColor])
+            image: NCUtility().loadImage(named: "rename", colors: [NCBrandColor.shared.iconImageColor]).withTintColor(NCBrandColor.shared.iconImageColor),
         ) { _ in
             Task { @MainActor in
                 let capabilities = await NKCapabilities.shared.getCapabilities(for: metadata.account)
@@ -248,7 +248,7 @@ enum NCContextMenuActions {
     ) -> UIAction {
         UIAction(
             title: NSLocalizedString("_move_or_copy_", comment: ""),
-            image: UIImage(systemName: "rectangle.portrait.and.arrow.right")
+            image: NCUtility().loadImage(named: "move", colors: [NCBrandColor.shared.iconImageColor]).withTintColor(NCBrandColor.shared.iconImageColor)
         ) { _ in
             Task { @MainActor in
                 guard let controller else {
@@ -318,6 +318,40 @@ enum NCContextMenuActions {
                 }
                 completion?()
             }
+        }
+    }
+
+    /// Save selected files to user's photo library
+    static func saveMediaAction(selectedMediaMetadatas: [tableMetadata], controller: NCMainTabBarController?, completion: (() -> Void)? = nil) -> UIAction {
+        return UIAction(
+            title: NSLocalizedString("_save_selected_files_", comment: ""),
+            image: NCUtility().loadImage(named: "save_files",colors: [NCBrandColor.shared.iconImageColor]).withTintColor(NCBrandColor.shared.iconImageColor),
+        ) { _ in
+
+            for metadata in selectedMediaMetadatas {
+                Task {
+                    if NCUtilityFileSystem().fileProviderStorageExists(metadata) {
+                        await NCNetworking.shared.transferDispatcher.notifyAllDelegates { delegate in
+                            delegate.transferChange(networkingStatus: NCGlobal.shared.networkingStatusDownloaded,
+                                                    account: metadata.account,
+                                                    fileName: metadata.fileName,
+                                                    serverUrl: metadata.serverUrl,
+                                                    selector: NCGlobal.shared.selectorSaveAlbum,
+                                                    ocId: metadata.ocId,
+                                                    destination: nil,
+                                                    error: .success)
+                        }
+                    } else {
+                        if let metadata = await NCManageDatabase.shared.setMetadataSessionInWaitDownloadAsync(ocId: metadata.ocId,
+                                                                                                    session: NCNetworking.shared.sessionDownload,
+                                                                                                    selector: NCGlobal.shared.selectorSaveAlbum,
+                                                                                                              sceneIdentifier: controller?.sceneIdentifier) {
+                            await NCNetworking.shared.downloadFile(metadata: metadata)
+                        }
+                    }
+                }
+            }
+            completion?()
         }
     }
 }

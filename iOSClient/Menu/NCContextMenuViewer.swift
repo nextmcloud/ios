@@ -45,18 +45,6 @@ class NCContextMenuViewer: NSObject {
         let localFile = database.getTableLocalFile(predicate: NSPredicate(format: "ocId == %@", metadata.ocId))
         let isOffline = localFile?.offline == true
 
-        if !webView,
-           metadata.canShare {
-            topMenuItems.append(
-                NCContextMenuActions.share(
-                    metadatas: [metadata],
-                    controller: controller,
-                    presentViewController: viewController,
-                    sender: sender
-                )
-            )
-        }
-
         if shouldShowDetails(for: capabilities) {
             topMenuItems.append(
                 NCContextMenuActions.detail(
@@ -67,8 +55,20 @@ class NCContextMenuViewer: NSObject {
             )
         }
 
-        if !metadata.lock {
+        if !metadata.lock, !metadata.isDirectoryE2EE, !metadata.e2eEncrypted {
             topMenuItems.append(NCContextMenuActions.favorite(metadata: metadata))
+        }
+
+        if !webView,
+           metadata.canShare {
+            menuElements.append(
+                NCContextMenuActions.share(
+                    metadatas: [metadata],
+                    controller: controller,
+                    presentViewController: viewController,
+                    sender: sender
+                )
+            )
         }
 
         if !webView {
@@ -86,6 +86,13 @@ class NCContextMenuViewer: NSObject {
             menuElements.append(NCContextMenuActions.saveAsScan(metadata: metadata, sceneIdentifier: controller.sceneIdentifier))
         }
 
+        //
+        // SAVE CAMERA ROLL
+        //
+        if !webView, metadata.isSavebleInCameraRoll {
+            menuElements.append(NCContextMenuActions.saveMediaAction(selectedMediaMetadatas: [metadata], controller: controller))
+        }
+
         if !webView,
            metadata.isRenameable {
             menuElements.append(NCContextMenuActions.rename(
@@ -98,6 +105,21 @@ class NCContextMenuViewer: NSObject {
             })
         }
 
+        //
+        // ADD TO ALBUM
+        //
+        // Check if file is image or video and add "Add to Album" action
+        if metadata.isImage || metadata.isVideo {
+            menuElements.append(UIAction(
+                title: NSLocalizedString("_add_to_album", comment: ""),
+                image: NCUtility().loadImage(named: "plus", colors: [NCBrandColor.shared.iconImageColor], size: 24).withTintColor(NCBrandColor.shared.iconImageColor),
+                handler: { _ in
+                    // Present existing albums UI to add this media item
+                    NCMediaNavigationController.presentExistingAlbums(controller: controller, selectedPhotos: [self.metadata.ocId])
+                }
+            ))
+        }
+        
         if !webView,
            metadata.isCopyableMovable {
             menuElements.append(NCContextMenuActions.moveOrCopy(metadatas: [metadata], account: metadata.account, controller: controller))
@@ -240,13 +262,13 @@ class NCContextMenuViewer: NSObject {
     // MARK: - Private Action Makers
 
     private func shouldShowDetails(for capabilities: NKCapabilities.Capabilities) -> Bool {
-        capabilities.fileSharingApiEnabled || capabilities.filesComments || !capabilities.activity.isEmpty
+        capabilities.fileSharingApiEnabled || capabilities.filesComments || !capabilities.activity.isEmpty // !metadata.isDirectoryE2EE, !metadata.e2eEncrypted
     }
 
     private func makeViewInFolderAction(metadata: tableMetadata, controller: NCMainTabBarController, viewController: UIViewController?) -> UIAction {
         UIAction(
             title: NSLocalizedString("_view_in_folder_", comment: ""),
-            image: UIImage(systemName: "questionmark.folder")
+            image: NCUtility().loadImage(named: "arrow.forward.square", colors: [NCBrandColor.shared.iconImageColor]).withTintColor(NCBrandColor.shared.iconImageColor)
         ) { _ in
             Task {
                 if let files = await NCNetworking.shared.moveInFolder(serverUrl: metadata.serverUrl,
@@ -275,7 +297,7 @@ class NCContextMenuViewer: NSObject {
         [
             UIAction(
                 title: NSLocalizedString("_search_", comment: ""),
-                image: UIImage(systemName: "magnifyingglass")
+                image: UIImage(named: "search")?.withTintColor(NCBrandColor.shared.iconImageColor)
             ) { _ in
                 NotificationCenter.default.postOnMainThread(
                     name: NCGlobal.shared.notificationCenterMenuSearchTextPDF
@@ -283,7 +305,7 @@ class NCContextMenuViewer: NSObject {
             },
             UIAction(
                 title: NSLocalizedString("_go_to_page_", comment: ""),
-                image: UIImage(systemName: "number.circle")
+                image: UIImage(named: "go-to-page")?.image(color: NCBrandColor.shared.iconImageColor, size: 24).withTintColor(NCBrandColor.shared.iconImageColor)
             ) { _ in
                 NotificationCenter.default.postOnMainThread(
                     name: NCGlobal.shared.notificationCenterMenuGotToPageInPDF
@@ -295,7 +317,7 @@ class NCContextMenuViewer: NSObject {
     private func makeModifyPhoto() -> UIAction {
         return UIAction(
             title: NSLocalizedString("_modify_", comment: ""),
-            image: utility.loadImage(named: "pencil.tip.crop.circle", colors: [NCBrandColor.shared.iconImageColor])
+            image: utility.loadImage(named: "pencil.tip.crop.circle", colors: [NCBrandColor.shared.iconImageColor], size: 24).withTintColor(NCBrandColor.shared.iconImageColor)
         ) { _ in
             Task {
                 await NCNetworking.shared.transferDispatcher.notifyAllDelegates { delegate in

@@ -71,7 +71,8 @@ class NCMediaNavigationController: NCMainNavigationController {
         }
 
         let cancel = UIAction(title: NSLocalizedString("_cancel_", comment: ""),
-                              image: utility.loadImage(named: "xmark", colors: [NCBrandColor.shared.iconImageColor], size: 24).withTintColor(NCBrandColor.shared.iconImageColor)) { _ in
+                              image: utility.loadImage(named: "xmark")) { _ in
+//                              image: utility.loadImage(named: "xmark", colors: [NCBrandColor.shared.iconImageColor], size: 24).withTintColor(NCBrandColor.shared.iconImageColor)) { _ in
             media.setEditMode(false)
             Task {
                 await media.loadDataSource()
@@ -86,30 +87,33 @@ class NCMediaNavigationController: NCMainNavigationController {
                     return
                 }
                 let actions = [
-                    UIAction(title: NSLocalizedString("_media_viewimage_show_", comment: ""), image: self.utility.loadImage(named: "photo"), state: media.showOnlyImages ? .on : .off) { _ in
+                    UIAction(title: NSLocalizedString("_media_viewimage_show_", comment: ""), image: UIImage(named: "photo"), state: media.showOnlyImages ? .on : .off) { _ in
                         media.showOnlyImages = true
                         media.showOnlyVideos = false
                         Task {
                             await media.loadDataSource()
                             await media.networkRemoveAll()
+                            await self.updateMenuOption()
                         }
                     },
 
-                    UIAction(title: NSLocalizedString("_media_viewvideo_show_", comment: ""), image: self.utility.loadImage(named: "video"), state: media.showOnlyVideos ? .on : .off) { _ in
+                    UIAction(title: NSLocalizedString("_media_viewvideo_show_", comment: ""), image: UIImage(named: "video"), state: media.showOnlyVideos ? .on : .off) { _ in
                         media.showOnlyImages = false
                         media.showOnlyVideos = true
                         Task {
                             await media.loadDataSource()
                             await media.networkRemoveAll()
+                            await self.updateMenuOption()
                         }
                     },
 
-                    UIAction(title: NSLocalizedString("_media_show_all_", comment: ""), image: self.utility.loadImage(named: "photo.on.rectangle"), state: (!media.showOnlyImages && !media.showOnlyVideos) ? .on : .off) { _ in
+                    UIAction(title: NSLocalizedString("_media_show_all_", comment: ""), image: UIImage(named: "media"), state: (!media.showOnlyImages && !media.showOnlyVideos) ? .on : .off) { _ in
                         media.showOnlyImages = false
                         media.showOnlyVideos = false
                         Task {
                             await media.loadDataSource()
                             await media.networkRemoveAll()
+                            await self.updateMenuOption()
                         }
                     }
                 ]
@@ -145,7 +149,7 @@ class NCMediaNavigationController: NCMainNavigationController {
                             self.database.setLayoutForView(account: self.session.account, key: self.global.layoutViewMedia, serverUrl: "", layout: self.global.mediaLayoutRatio)
                             media.layoutType = self.global.mediaLayoutRatio
                         }
-
+                        await self.updateMenuOption()
                         media.collectionViewReloadData()
                     }
                 }
@@ -162,7 +166,10 @@ class NCMediaNavigationController: NCMainNavigationController {
 
                 let mediaPath = self.database.getTableAccount(account: self.session.account)?.mediaPath.replacingOccurrences(of: "/", with: "") ?? ""
 
-                let selectMediaFolderAction = UIAction(title: NSLocalizedString("_select_media_folder_", comment: ""), subtitle: mediaPath, image: self.utility.loadImage(named: "folder"), handler: { _ in
+//                let selectMediaFolderAction = UIAction(title: NSLocalizedString("_select_media_folder_", comment: ""), subtitle: mediaPath,
+//                    image: UIImage(named: "mediaFolder")?.image(color: NCBrandColor.shared.iconImageColor, size: 24).withTintColor(NCBrandColor.shared.iconImageColor), handler: { _ in
+
+                let selectMediaFolderAction = UIAction(title: NSLocalizedString("_select_media_folder_", comment: ""), subtitle: mediaPath, image: UIImage(named: "mediaFolder"), handler: { _ in
                     guard let navigationController = UIStoryboard(name: "NCSelect", bundle: nil).instantiateInitialViewController() as? UINavigationController,
                           let viewController = navigationController.topViewController as? NCSelect else { return }
                     viewController.delegate = media as! any NCSelectDelegate
@@ -211,10 +218,54 @@ class NCMediaNavigationController: NCMainNavigationController {
             self.present(alert, animated: true)
         }
 
+        let actionsInSortMenu: [UIAction] = [
+            UIAction(
+                title: NSLocalizedString("_media_by_modified_date_", comment: ""),
+                image: utility.loadImage(named: "sortFileNameAZ"),//, colors: [NCBrandColor.shared.iconImageColor], size: 24).withTintColor(NCBrandColor.shared.iconImageColor),//, colors: [NCBrandColor.shared.iconImageColor]),
+                state: NCPreferences().mediaSortDate == "date" ? .on : .off,
+                handler: { _ in
+                    NCPreferences().mediaSortDate = "date"
+                    Task {
+                        await media.loadDataSource()
+                        await media.networkRemoveAll()
+                        await self.updateMenuOption()
+                    }
+                }
+            ),
+
+            UIAction(
+                title: NSLocalizedString("_media_by_created_date_", comment: ""),
+                image: utility.loadImage(named: "sortFileNameAZ"),//, colors: [NCBrandColor.shared.iconImageColor], size: 24).withTintColor(NCBrandColor.shared.iconImageColor),//, colors: [NCBrandColor.shared.iconImageColor]),
+                state: NCPreferences().mediaSortDate == "creationDate" ? .on : .off,
+                handler: { _ in
+                    NCPreferences().mediaSortDate = "creationDate"
+                    Task {
+                        await media.loadDataSource()
+                        await media.networkRemoveAll()
+                        await self.updateMenuOption()
+                    }
+                }
+            ),
+
+            UIAction(
+                title: NSLocalizedString("_media_by_upload_date_", comment: ""),
+                image: utility.loadImage(named: "sortFileNameAZ"),//, colors: [NCBrandColor.shared.iconImageColor], size: 24).withTintColor(NCBrandColor.shared.iconImageColor),//, colors: [NCBrandColor.shared.iconImageColor]),
+                state: NCPreferences().mediaSortDate == "uploadDate" ? .on : .off,
+                handler: { _ in
+                    NCPreferences().mediaSortDate = "uploadDate"
+                    Task {
+                        await media.loadDataSource()
+                        await media.networkRemoveAll()
+                        await self.updateMenuOption()
+                    }
+                }
+            )
+        ]
+
         let selectAll = UIMenu(title: "", options: .displayInline, children: [
             UIAction(
                 title: NSLocalizedString("_select_all_", comment: ""),
-                image: utility.loadImage(named: "checkmark.circle.fill"),
+                image: utility.loadImage(named: "checkmark.circle.fill"),//, colors: [NCBrandColor.shared.iconImageColor], size: 24).withTintColor(NCBrandColor.shared.iconImageColor),
                 handler: { _ in
                     // Ensure edit mode is enabled so selection is visible
                     if !media.isEditMode {
@@ -247,7 +298,8 @@ class NCMediaNavigationController: NCMainNavigationController {
 
             UIAction(
                 title: NSLocalizedString("_albums_list_new_album_popup_title_", comment: ""),
-                image: utility.loadImage(named: "photo.stack.fill"),
+//                image: utility.loadImage(named: "photo.stack.fill"),
+                image: utility.loadImage(named: "album"),//, colors: [NCBrandColor.shared.iconImageColor]).withTintColor(NCBrandColor.shared.iconImageColor),
                 handler: { _ in
                     guard let controller = self.controller else { return }
                     NCMediaNavigationController.presentInputAlbumNameAlert(on: controller) { albumName in
@@ -257,12 +309,19 @@ class NCMediaNavigationController: NCMainNavigationController {
             )
         ]
 
+        let mediaSortMenu = UIMenu(
+            title: "",
+            options: .displayInline,
+            children: actionsInSortMenu
+        )
+
         let editModeMenu = UIMenu(
             title: "",
             options: .displayInline,
             children: actionsInEditMode
         )
         return UIMenu(title: "", children: !media.isEditMode ? [select, viewFilterMenu, viewLayoutMenu, viewFolderMedia, playFile, playURL] : [cancel, selectAll, editModeMenu])
+//        return UIMenu(title: "", children: !media.isEditMode ? [select, viewFilterMenu, viewLayoutMenu, viewFolderMedia, mediaSortMenu] : [cancel, selectAll, editModeMenu])//, playFile, playURL])
     }
 
     // MARK: - Album related handling
@@ -338,7 +397,22 @@ class NCMediaNavigationController: NCMainNavigationController {
 
              case .failure(let error):
                  Task {
-                     await showErrorBanner(windowScene: controller.viewIfLoaded?.window?.windowScene, error: error)
+//                     await showErrorBanner(windowScene: controller.viewIfLoaded?.window?.windowScene, error: error)
+                     let nkError = NKError(error: error)
+                     // Prefer friendly info alert for duplicate album names (409)
+                     if let inner = nkError.error as? NKError, inner.errorCode == NCGlobal.shared.errorConflict {
+                         let message = NSLocalizedString("_album_already_exists_", comment: "Album already exists")
+                         let conflict = NKError(errorCode: NCGlobal.shared.errorConflict, errorDescription: message)
+                         await showErrorBanner(windowScene: controller.viewIfLoaded?.window?.windowScene, error: conflict)
+                     } else if nkError.errorCode == NCGlobal.shared.errorConflict {
+                         // Top-level conflict
+                         let message = NSLocalizedString("_album_already_exists_", comment: "Album already exists")
+                         let conflict = NKError(errorCode: NCGlobal.shared.errorConflict, errorDescription: message)
+                         await showErrorBanner(windowScene: controller.viewIfLoaded?.window?.windowScene, error: conflict)
+                     } else {
+                         // Other errors
+                         await showErrorBanner(windowScene: controller.viewIfLoaded?.window?.windowScene, error: error)
+                     }
                  }
              }
          }

@@ -51,6 +51,7 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
         let iconName = metadata.iconName
         let account = metadata.account
 
+        /*
         // AVATAR
         //
         if !metadata.ownerId.isEmpty, metadata.ownerId != metadata.userId {
@@ -90,6 +91,7 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
                 }
             }
         }
+        */
 
         // PREVIEW IMAGE
         //

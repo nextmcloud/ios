@@ -66,26 +66,34 @@ class NCContextMenuMain: NSObject {
     private func buildTopMenuItems(metadata: tableMetadata) -> [UIMenuElement] {
         var topActionsMenu: [UIMenuElement] = []
 
-        if metadata.canShare {
+        guard let capabilities = NCNetworking.shared.capabilities[metadata.account] else {
+            return topActionsMenu
+        }
+
+//        if metadata.canShare {
+//            topActionsMenu.append(
+//                NCContextMenuActions.share(
+//                    metadatas: [metadata],
+//                    controller: controller,
+//                    presentViewController: controller,
+//                    sender: sender
+//                )
+//            )
+//        }
+
+        if NCNetworking.shared.isOnline,
+           !(!capabilities.fileSharingApiEnabled && !capabilities.filesComments && capabilities.activity.isEmpty), !metadata.isDirectoryE2EE, !metadata.e2eEncrypted {
+
             topActionsMenu.append(
-                NCContextMenuActions.share(
-                    metadatas: [metadata],
+                NCContextMenuActions.detail(
+                    metadata: metadata,
                     controller: controller,
-                    presentViewController: controller,
-                    sender: sender
+                    presentViewController: controller
                 )
             )
         }
 
-        topActionsMenu.append(
-            NCContextMenuActions.detail(
-                metadata: metadata,
-                controller: controller,
-                presentViewController: controller
-            )
-        )
-
-        if !metadata.lock {
+        if !metadata.lock, !metadata.isDirectoryE2EE, !metadata.e2eEncrypted {
             topActionsMenu.append(NCContextMenuActions.favorite(metadata: metadata))
         }
 
@@ -96,6 +104,17 @@ class NCContextMenuMain: NSObject {
 
     private func buildMainActionsMenu(metadata: tableMetadata, capabilities: NKCapabilities.Capabilities) -> [UIMenuElement] {
         var menuElements: [UIMenuElement] = []
+
+        if !metadata.directory {
+            menuElements.append(
+                NCContextMenuActions.share(
+                    metadatas: [metadata],
+                    controller: controller,
+                    presentViewController: controller,
+                    sender: sender
+                )
+            )
+        }
 
         if NCNetworking.shared.isOnline,
            !metadata.directory,
@@ -161,6 +180,52 @@ class NCContextMenuMain: NSObject {
             menuElements.append(NCContextMenuActions.saveAsScan(metadata: metadata, sceneIdentifier: sceneIdentifier))
         }
 
+        //
+        // SAVE CAMERA ROLL
+        //
+        if metadata.isSavebleInCameraRoll {
+            let controller = self.viewController.tabBarController as? NCMainTabBarController
+
+            // 1. Add the standard action from your helper
+            let saveAction = NCContextMenuActions.saveMediaAction(selectedMediaMetadatas: [metadata], controller: controller)
+            menuElements.append(saveAction)
+
+            // 2. Define your localized title for checking
+            let saveTitle = NSLocalizedString("_save_selected_files_", comment: "")
+
+            // 3. Only append the fallback if an action with that title doesn't exist yet
+            if !menuElements.contains(where: { $0.title == saveTitle }) {
+                let fallbackSave = UIAction(
+                    title: saveTitle,
+                    image: UIImage(named: "save_files")?.withTintColor(NCBrandColor.shared.iconImageColor)
+                ) { _ in
+                    // Your action logic
+                    let _ = NCContextMenuActions.saveMediaAction(selectedMediaMetadatas: [metadata], controller: controller)
+                }
+                menuElements.append(fallbackSave)
+            }
+        }
+
+        //
+        // ADD TO ALBUM
+        //
+        // Check if file is image or video and add "Add to Album" action
+        if metadata.isImage || metadata.isVideo {
+            menuElements.append(UIAction(
+                title: NSLocalizedString("_add_to_album", comment: ""),
+                image: utility.loadImage(named: "plus", colors: [NCBrandColor.shared.iconImageColor], size: 24).withTintColor(NCBrandColor.shared.iconImageColor),
+                handler: { _ in
+                    // Present existing albums UI to add this media item
+//                    if let controller = self.viewController as? NCMainTabBarController {
+//                        NCMediaNavigationController.presentExistingAlbums(controller: controller, selectedPhotos: [self.metadata.ocId])
+//                    } else {
+//                        NCMediaNavigationController.presentExistingAlbums(controller: self.viewController, selectedPhotos: [self.metadata.ocId])
+//                    }
+                    NCMediaNavigationController.presentExistingAlbums(controller: self.controller!, selectedPhotos: [self.metadata.ocId])
+                }
+            ))
+        }
+
         if metadata.isRenameable {
             menuElements.append(NCContextMenuActions.rename(metadata: metadata, presenter: viewController, windowScene: windowScene))
         }
@@ -180,10 +245,10 @@ class NCContextMenuMain: NSObject {
             menuElements.append(makeModifyWithQuickLookAction(metadata: metadata))
         }
 
-        if viewController is NCFiles,
-           metadata.directory {
-            menuElements.append(makeColorFolderAction(metadata: metadata))
-        }
+//        if viewController is NCFiles,
+//           metadata.directory {
+//            menuElements.append(makeColorFolderAction(metadata: metadata))
+//        }
 
         return menuElements
     }
@@ -205,7 +270,21 @@ class NCContextMenuMain: NSObject {
            !metadata.e2eEncrypted,
            NCPreferences().isEndToEndEnabled(account: metadata.account),
            metadata.serverUrl == self.utilityFileSystem.getHomeServer(urlBase: metadata.urlBase, userId: metadata.userId) {
-            mainActionsMenu.append(makeSetFolderE2EEAction(metadata: metadata))
+
+            // Query all children files/folders for this account and serverUrl except the root.
+            let children = NCManageDatabase.shared.getMetadatas(
+                predicate: NSPredicate(
+                    format: "account == %@ AND serverUrl == %@ AND fileName != %@",
+                    metadata.account,
+                    metadata.serverUrlFileName,
+                    NextcloudKit.shared.nkCommonInstance.rootFileName
+                )
+            )
+
+            // Only add the "Set folder E2EE" action if the folder is truly empty
+            if children.isEmpty {
+                mainActionsMenu.append(makeSetFolderE2EEAction(metadata: metadata))
+            }
         }
 
         // Unset folder E2EE
@@ -219,7 +298,7 @@ class NCContextMenuMain: NSObject {
     private func makeSetFolderE2EEAction(metadata: tableMetadata) -> UIAction {
         return UIAction(
             title: NSLocalizedString("_e2e_set_folder_encrypted_", comment: ""),
-            image: utility.loadImage(named: "lock", colors: [NCBrandColor.shared.iconImageColor])
+            image: utility.loadImage(named: "lock", colors: [NCBrandColor.shared.iconImageColor], size: 24).withTintColor(NCBrandColor.shared.iconImageColor)
         ) { _ in
             Task {
                 let error = await NCNetworkingE2EEMarkFolder().markFolderE2ee(
@@ -238,7 +317,7 @@ class NCContextMenuMain: NSObject {
     private func makeUnsetFolderE2EEAction(metadata: tableMetadata) -> UIAction {
         return UIAction(
             title: NSLocalizedString("_e2e_remove_folder_encrypted_", comment: ""),
-            image: utility.loadImage(named: "lock", colors: [NCBrandColor.shared.iconImageColor])
+            image: utility.loadImage(named: "lock.open", colors: [NCBrandColor.shared.iconImageColor], size: 24).withTintColor(NCBrandColor.shared.iconImageColor)
         ) { _ in
             Task {
                 let accessError = await NCNetworkingE2EE().validateFolderWriteAccess(
@@ -280,7 +359,7 @@ class NCContextMenuMain: NSObject {
     private func makeModifyWithQuickLookAction(metadata: tableMetadata) -> UIAction {
         return UIAction(
             title: NSLocalizedString("_modify_", comment: ""),
-            image: utility.loadImage(named: "pencil.tip.crop.circle", colors: [NCBrandColor.shared.iconImageColor])
+            image: utility.loadImage(named: "pencil.tip.crop.circle", colors: [NCBrandColor.shared.iconImageColor], size: 24).withTintColor(NCBrandColor.shared.iconImageColor)
         ) { _ in
             Task {
                 if self.utilityFileSystem.fileProviderStorageExists(metadata) {
@@ -356,7 +435,7 @@ class NCContextMenuMain: NSObject {
     private func buildDeleteMenu(metadata: tableMetadata) -> [UIMenuElement] {
         var deleteMenu: [UIMenuElement] = []
 
-        deleteMenu.append(makeDeleteLocalAction(metadata: metadata))
+//        deleteMenu.append(makeDeleteLocalAction(metadata: metadata))
 
         if metadata.isDeletable {
             deleteMenu.append(makeDeleteFileAction(metadata: metadata))
@@ -366,9 +445,18 @@ class NCContextMenuMain: NSObject {
     }
 
     private func makeDeleteFileAction(metadata: tableMetadata) -> UIAction {
+        var titleDelete = NSLocalizedString("_delete_", comment: "")
+
+        // Only when opened from Albums context, show "Remove from album" (no file deletion)
+        if controller?.getSelectedTabIndex() == NCGlobal.shared.selectedTabIndexAlbum {
+            titleDelete = NSLocalizedString("_remove_from_album_", comment: "")
+        } else {
+            titleDelete = NSLocalizedString("_delete_file_", comment: "")
+        }
+
         return UIAction(
             title: NSLocalizedString(
-                metadata.directory ? "_delete_folder_" : "_delete_file_",
+                metadata.directory ? "_delete_folder_" : titleDelete,
                 comment: ""
             ),
             image: utility.loadImage(named: "trash"),
@@ -449,6 +537,24 @@ class NCContextMenuMain: NSObject {
         var clientIntegrationMenu: [UIMenuElement] = []
         guard let apps = capabilities.clientIntegration?.apps else { return [] }
 
+        let isE2EEFolder = metadata.isDirectoryE2EE || metadata.e2eEncrypted
+
+        // Heuristic to detect ZIP actions from client integration by name or URL
+        let isZipAction: (String, String?) -> Bool = { title, url in
+            let lower = title.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+            let zipKeywords = [
+                "zip",                    // en
+                "zip-datei",              // de
+                "cré", "compresser",     // fr (partial to catch variants)
+                "comprimir",              // es/pt
+                "archiv",                 // de (archivieren)
+                "archive"                 // en
+            ]
+            let titleMatches = zipKeywords.contains(where: { lower.contains($0) })
+            let urlMatches = (url ?? "").lowercased().contains("zip") || (url ?? "").lowercased().contains("archive")
+            return titleMatches || urlMatches
+        }
+
         for (_, context) in apps {
             for item in context.contextMenu {
                 var shouldShowMenu = false
@@ -467,28 +573,117 @@ class NCContextMenuMain: NSObject {
                     shouldShowMenu = true // if app has no mimetypes, then menu should be shown for every file/folder
                 }
 
+                // Hide ZIP-related actions for an E2EE folder
+//                 Hide ZIP-related actions when passphrase is missing for an E2EE folder
+                if shouldShowMenu, isE2EEFolder {//}, !isE2EEPassphraseAvailable(for: metadata.account) {
+                    if isZipAction(item.name, item.url) {
+                        shouldShowMenu = false
+                    }
+                }
+
                 if shouldShowMenu {
                     let deferredElement = UIDeferredMenuElement { completion in
                         Task {
-                            var iconImage = UIImage(systemName: "exclamationmark.triangle.fill")
+                            var iconImage: UIImage? = {
+                                let base = UIImage(systemName: "archivebox") ?? UIImage(systemName: "tray.and.arrow.down")
+                                let config = UIImage.SymbolConfiguration(pointSize: 24, weight: .regular)
+                                return base?.applyingSymbolConfiguration(config)?.withRenderingMode(.alwaysTemplate) ?? UIImage(systemName: "square")
+                            }()
 
                             if let iconUrl = item.icon {
-                                let results = await NextcloudKit.shared.downloadContentAsync(serverUrl: metadata.urlBase + iconUrl, account: metadata.account)
-                                if results.error == .success, let data = results.responseData?.data,
-                                   let image = try? await NCSVGRenderer().renderSVGToUIImage(
-                                    svgData: data,
-                                    size: CGSize(width: UIScreen.main.scale * 20,
-                                                 height: UIScreen.main.scale * 20),
-                                    tintColor: NCBrandColor.shared.iconImageColor,
-                                    trimTransparentPixels: false) {
-                                    iconImage = image
+                                // Normalize base and path to avoid double slashes and wrong bases
+                                let rawBase = metadata.urlBase
+                                // If urlBase points to remote.php or ocs, try to derive the server root by stripping those components
+                                let serverRoot: String = {
+                                    if let url = URL(string: rawBase) {
+                                        var comps = URLComponents(url: url, resolvingAgainstBaseURL: false)
+                                        var path = comps?.path ?? ""
+                                        // Remove known service prefixes to get to the site root
+                                        if let range = path.range(of: "/remote.php") {
+                                            path.removeSubrange(range.lowerBound..<path.endIndex)
+                                        } else if let range = path.range(of: "/ocs/") {
+                                            path.removeSubrange(range.lowerBound..<path.endIndex)
+                                        }
+                                        comps?.path = path
+                                        return comps?.url?.absoluteString ?? rawBase
+                                    }
+                                    return rawBase
+                                }()
+
+                                // Build the icon URL using URL resolution to avoid path issues
+                                var fullURLString: String = iconUrl
+                                if let baseURL = URL(string: serverRoot) {
+                                    if let resolved = URL(string: iconUrl, relativeTo: baseURL)?.absoluteURL {
+                                        fullURLString = resolved.absoluteString
+                                    }
+                                }
+
+                                let results = await NextcloudKit.shared.downloadContentAsync(serverUrl: fullURLString, account: metadata.account)
+                                if results.error == .success, let data = results.responseData?.data {
+                                    // Try SVG render first
+                                    if let svgImage = try? await NCSVGRenderer().renderSVGToUIImage(
+                                        svgData: data,
+                                        size: CGSize(width: 50, height: 50),
+                                        tintColor: NCBrandColor.shared.iconImageColor,
+                                        trimTransparentPixels: true
+                                    ) {
+                                        iconImage = svgImage.withRenderingMode(.alwaysTemplate)
+                                    } else if let rasterImage = UIImage(data: data) {
+                                        // Fallback for non-SVG icons (PNG/JPEG)
+                                        iconImage = rasterImage.withRenderingMode(.alwaysTemplate)
+                                    }
                                 }
                             }
 
+                            // Normalize icon size to a fixed 24x24pt canvas to avoid misalignment
+                            if let img = iconImage {
+                                let targetSize = CGSize(width: 24, height: 24)
+                                let format = UIGraphicsImageRendererFormat.default()
+                                format.opaque = false
+                                format.scale = UIScreen.main.scale
+                                let renderer = UIGraphicsImageRenderer(size: targetSize, format: format)
+                                let rendered = renderer.image { _ in
+                                    // Compute aspect-fit rect
+                                    let aspect = min(targetSize.width / max(img.size.width, 1), targetSize.height / max(img.size.height, 1))
+                                    let fittedSize = CGSize(width: img.size.width * aspect, height: img.size.height * aspect)
+                                    // Apply a conservative visual up-scale but avoid touching canvas edges to prevent perceived distortion
+                                    var visualScale: CGFloat = 1.10
+                                    // Compute the maximum scale that still fits entirely within the canvas for both axes
+                                    let maxScaleX = targetSize.width / max(fittedSize.width, 0.0001)
+                                    let maxScaleY = targetSize.height / max(fittedSize.height, 0.0001)
+                                    let maxSafeScale = min(maxScaleX, maxScaleY)
+                                    visualScale = min(visualScale, maxSafeScale * 0.98) // keep a tiny inset to avoid edge clamp
+                                    let scaledSize = CGSize(width: fittedSize.width * visualScale, height: fittedSize.height * visualScale)
+                                    let origin = CGPoint(x: (targetSize.width - scaledSize.width) / 2.0,
+                                                         y: (targetSize.height - scaledSize.height) / 2.0)
+                                    img.withRenderingMode(.alwaysTemplate).draw(in: CGRect(origin: origin, size: scaledSize))
+                                }
+                                iconImage = rendered.withRenderingMode(.alwaysTemplate)
+                            }
+
+                            // Normalize title to app language for known actions (e.g., Compress to Zip)
+                            let rawTitle = item.name.trimmingCharacters(in: .whitespacesAndNewlines)
+                            let normalizedTitle: String = {
+                                if isZipAction(rawTitle, item.url) {
+                                    // Use app-localized string key for compress to zip
+                                    return NSLocalizedString("_compress_to_zip_", comment: "Compress to Zip")
+                                }
+                                return rawTitle
+                            }()
+
                             let action = UIAction(
-                                title: item.name,
-                                image: iconImage
+                                title: normalizedTitle,
+                                image: iconImage ?? UIImage(systemName: "square")
                             ) { _ in
+//                                // Defensive guard: prevent ZIP actions when E2EE passphrase is missing
+//                                if isE2EEFolder, !self.isE2EEPassphraseAvailable(for: metadata.account), isZipAction(normalizedTitle, item.url) {
+//                                    Task { @MainActor in
+//                                        await showErrorBanner(windowScene: self.windowScene,
+//                                                              text: "_offline_not_allowed_",
+//                                                              errorCode: NCGlobal.shared.errorOfflineNotAllowed)
+//                                    }
+//                                    return
+//                                }
                                 Task {
                                     let results = await NextcloudKit.shared.sendRequestAsync(
                                         account: metadata.account,
@@ -536,5 +731,15 @@ class NCContextMenuMain: NSObject {
         }
 
         return clientIntegrationMenu
+    }
+
+    // MARK: - Helpers
+    /// Returns true if an E2EE passphrase is available for the given account, false otherwise.
+    private func isE2EEPassphraseAvailable(for account: String) -> Bool {
+        // Prefer NCPreferences API if available
+        if let passphrase = NCPreferences().getEndToEndPassphrase(account: account) {
+            return !passphrase.isEmpty
+        }
+        return false
     }
 }

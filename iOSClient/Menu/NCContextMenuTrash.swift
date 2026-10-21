@@ -22,7 +22,7 @@ class NCContextMenuTrash: NSObject {
 
         let restoreAction = UIAction(
             title: NSLocalizedString("_restore_", comment: ""),
-            image: utility.loadImage(named: "arrow.counterclockwise", colors: [NCBrandColor.shared.iconImageColor])
+            image: utility.loadImage(named: "restore", colors: [NCBrandColor.shared.iconImageColor])
         ) { [self] _ in
             Task {
                 await trashController.restoreItem(with: objectId)

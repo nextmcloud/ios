@@ -193,6 +193,7 @@
 "_enable_background_location_title_"    = "Enable Background Location";
 "_enable_background_location_message_"  = "To allow automatic file uploads in the background, please enable 'Always' for location access in Settings.";
 "_enable_background_location_footer_"   = "To keep your photo library up to date automatically, this app can use background location access.\nThis allows it to detect when you’re in a new area and check for new photos to upload.\nGPS is not used, and your location is never stored or tracked.";
+"_compress_to_zip_" = "Compress to Zip";
 
 /* MARK: Files lock */
 

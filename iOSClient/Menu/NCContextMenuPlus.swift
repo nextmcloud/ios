@@ -91,7 +91,7 @@ class NCContextMenuPlus: NSObject {
         // ACTION
         //
         menuUploadElements.append(UIAction(title: NSLocalizedString("_upload_photos_videos_", comment: ""),
-                                           image: utility.loadImage(named: "photo", colors: [NCBrandColor.shared.iconImageColor])) { _ in
+                                           image: UIImage(named: "file_photo_menu")!.image(color: NCBrandColor.shared.iconImageColor, size: 24).withTintColor(NCBrandColor.shared.iconImageColor)) { _ in
             NCAskAuthorization().askAuthorizationPhotoLibrary(controller: controller) { hasPermission in
                 if hasPermission {
                     DispatchQueue.main.async {
@@ -102,21 +102,21 @@ class NCContextMenuPlus: NSObject {
         })
 
         menuUploadElements.append(UIAction(title: NSLocalizedString("_upload_file_", comment: ""),
-                                           image: utility.loadImage(named: "doc", colors: [NCBrandColor.shared.iconImageColor])) { _ in
+                                           image: UIImage(named: "uploadFile")!.image(color: NCBrandColor.shared.iconImageColor, size: 24).withTintColor(NCBrandColor.shared.iconImageColor)) { _ in
             DispatchQueue.main.async {
                 controller.documentPickerViewController = NCDocumentPickerViewController(controller: controller, isViewerMedia: false, allowsMultipleSelection: true)
             }
         })
 
         menuCaptureElements.append(UIAction(title: NSLocalizedString("_scans_document_", comment: ""),
-                                           image: utility.loadImage(named: "doc.text.viewfinder", colors: [NCBrandColor.shared.iconImageColor])) { _ in
+                                            image: utility.loadImage(named: "scan", colors: [NCBrandColor.shared.iconImageColor], size: 24).withTintColor(NCBrandColor.shared.iconImageColor)) { _ in
             DispatchQueue.main.async {
                 NCDocumentCamera.shared.openScannerDocument(viewController: controller)
             }
         })
 
         menuCaptureElements.append(UIAction(title: NSLocalizedString("_create_voice_memo_", comment: ""),
-                                           image: utility.loadImage(named: "mic", colors: [NCBrandColor.shared.iconImageColor])) { _ in
+                                            image: UIImage(named: "microphoneMenu")!.image(color: NCBrandColor.shared.iconImageColor, size: 24).withTintColor(NCBrandColor.shared.iconImageColor)) { _ in
             NCAskAuthorization().askAuthorizationAudioRecord(controller: controller) { hasPermission in
                 if hasPermission {
                     DispatchQueue.main.async {
@@ -190,7 +190,7 @@ class NCContextMenuPlus: NSObject {
                 menuTextElements.append(
                     UIAction(
                         title: NSLocalizedString("_add_folder_info_", comment: ""),
-                        image: utility.loadImage(named: "list.dash.header.rectangle", colors: [NCBrandColor.shared.iconImageColor])) { _ in
+                        image: UIImage(named: "addFolderInfo")!.image(color: NCBrandColor.shared.iconImageColor, size: 24).withTintColor(NCBrandColor.shared.iconImageColor)) { _ in
                             Task { @MainActor in
                                 let createDocument = NCCreate()
                                 let fileName = await NCNetworking.shared.createFileName(
@@ -217,7 +217,7 @@ class NCContextMenuPlus: NSObject {
                !isDirectoryE2EE,
                isNetworkReachable {
                 menuTextElements.append(UIAction(title: NSLocalizedString("_add_folder_info_", comment: ""),
-                                                       image: utility.loadImage(named: "list.dash.header.rectangle", colors: [NCBrandColor.shared.iconImageColor])) { _ in
+                                                 image: UIImage(named: "addFolderInfo")!.image(color: NCBrandColor.shared.iconImageColor, size: 24).withTintColor(NCBrandColor.shared.iconImageColor)) { _ in
                     Task { @MainActor in
                         let coordinator = NCRichWorkspaceCoordinator()
                         if let viewController = controller.currentViewController() {
@@ -235,9 +235,9 @@ class NCContextMenuPlus: NSObject {
             // COLLABORA: prefer Direct Editing and fall back to legacy Richdocuments.
             let collaboraCreators = creatorsByEditor[global.editorCollabora] ?? []
             let collaboraDocumentTypes: [(templateType: String, titleKey: String, icon: String, color: UIColor)] = [
-                ("document", "_create_new_document_", "doc.richtext", NCBrandColor.shared.documentIconColor),
-                ("spreadsheet", "_create_new_spreadsheet_", "tablecells", NCBrandColor.shared.spreadsheetIconColor),
-                ("presentation", "_create_new_presentation_", "play.rectangle", NCBrandColor.shared.presentationIconColor),
+                ("document", "_create_new_document_", "create_file_document", NCBrandColor.shared.documentIconColor),
+                ("spreadsheet", "_create_new_spreadsheet_", "create_file_xls", NCBrandColor.shared.spreadsheetIconColor),
+                ("presentation", "_create_new_presentation_", "create_file_ppt", NCBrandColor.shared.presentationIconColor),
                 ("drawing", "_create_new_diagram_", "pencil.and.outline", NCBrandColor.shared.documentIconColor)
             ]
             var collaboraStandardActions: [UIMenuElement] = []
@@ -378,7 +378,7 @@ class NCContextMenuPlus: NSObject {
                 let image: UIImage?
                 switch creator.ext {
                 case "md":
-                    image = UIImage(systemName: "text.document")
+                    image = UIImage(systemName: "file_txt_menu")
                 case "whiteboard":
                     image = UIImage(systemName: "pencil.and.scribble")
                 default:

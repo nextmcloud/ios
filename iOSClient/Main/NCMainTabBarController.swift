@@ -39,6 +39,8 @@ class NCMainTabBarController: UITabBarController {
         return tabBar.frame.height - tabBar.safeAreaInsets.top
     }
 
+    private var isSelectionModeActive: Bool = false
+
     override func viewDidLoad() {
         super.viewDidLoad()
         delegate = self
@@ -80,11 +82,18 @@ class NCMainTabBarController: UITabBarController {
                 }
             }
         }
+
+        // Observe selection mode changes to manage tab bar visibility and avoid overlap with action bar
+        NotificationCenter.default.addObserver(self, selector: #selector(handleSelectionModeDidBegin(_:)), name: Notification.Name("NCSelectionModeDidBegin"), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(handleSelectionModeDidEnd(_:)), name: Notification.Name("NCSelectionModeDidEnd"), object: nil)
     }
 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         previousIndex = selectedIndex
+
+        // Re-evaluate in-app messages after viewDidAppear
+        MoEngageAnalytics.shared.displayInAppNotificationSafely(reason: "viewDidAppear")
 
         if NCBrandOptions.shared.enforce_passcode_lock && NCPreferences().passcode.isEmptyOrNil {
             let vc = UIHostingController(rootView: SetupPasscodeView(isLockActive: .constant(false), controller: self))
@@ -119,8 +128,8 @@ class NCMainTabBarController: UITabBarController {
 
         navigationController.tabBarItem = UITabBarItem(
             title: NSLocalizedString("_more_", comment: ""),
-            image: UIImage(systemName: "ellipsis.circle.fill"),
-            selectedImage: UIImage(systemName: "ellipsis.circle.fill")
+            image: UIImage(named: "more"),
+            selectedImage: UIImage(named: "more")
         )
         navigationController.tabBarItem.tag = 104
 
@@ -131,28 +140,29 @@ class NCMainTabBarController: UITabBarController {
         configureTabBarItem(
             at: 0,
             title: "_home_",
-            imageName: "folder.fill",
+            imageName: "home",
             tag: 100
         )
 
         configureTabBarItem(
             at: 1,
             title: "_favorites_",
-            imageName: "star.fill",
+            imageName: "star",
             tag: 101
         )
 
         configureTabBarItem(
             at: 2,
             title: "_media_",
-            imageName: "photo.fill",
+            imageName: "media",
             tag: 102
         )
 
         configureTabBarItem(
             at: 3,
             title: "_albums_",
-            imageName: "photo.stack.fill",
+//            imageName: "photo.stack.fill",
+            imageName: "album",
             tag: 103
         )
     }
@@ -162,8 +172,41 @@ class NCMainTabBarController: UITabBarController {
 
         let item = items[index]
         item.title = NSLocalizedString(title, comment: "")
-        item.image = UIImage(systemName: imageName)
-        item.selectedImage = item.image
+
+        // Determine base image
+        var baseImage: UIImage?
+        if title == "_albums_" {
+            // Albums keeps the custom colored asset
+            baseImage = UIImage(named: "album")?.image(color: NCBrandColor.shared.textColor, size: 25)
+        } else {
+            baseImage = UIImage(named: imageName)
+        }
+
+        // Fallbacks if asset is missing
+        if baseImage == nil {
+            // Provide sensible SF Symbol fallbacks by title/imageName
+            switch (title, imageName) {
+            case ("_favorites_", _):
+                baseImage = UIImage(systemName: "star")
+            case ("_home_", _):
+                baseImage = UIImage(systemName: "house")
+            case ("_media_", _):
+                baseImage = UIImage(systemName: "photo.on.rectangle")
+            case ("_albums_", _):
+                baseImage = UIImage(systemName: "rectangle.stack")
+            default:
+                baseImage = UIImage(systemName: imageName)
+            }
+        }
+
+        // Ensure the image renders with tab bar tint (template)
+        if let baseImage {
+            item.image = baseImage.withRenderingMode(.alwaysTemplate)
+            item.selectedImage = item.image
+        }
+
+//        item.image = UIImage(systemName: imageName)
+//        item.selectedImage = item.image
         item.tag = tag
     }
 
@@ -225,6 +268,16 @@ class NCMainTabBarController: UITabBarController {
             tabBar.isHidden = false
         }
     }
+
+    @objc private func handleSelectionModeDidBegin(_ notification: Notification) {
+        isSelectionModeActive = true
+        hide()
+    }
+
+    @objc private func handleSelectionModeDidEnd(_ notification: Notification) {
+        isSelectionModeActive = false
+        show()
+    }
 }
 
 extension NCMainTabBarController: UITabBarControllerDelegate {
@@ -233,6 +286,10 @@ extension NCMainTabBarController: UITabBarControllerDelegate {
             scrollToTop(viewController: viewController)
         }
         previousIndex = tabBarController.selectedIndex
+        // Always ensure the tab bar is visible when switching tabs
+        if let main = tabBarController as? NCMainTabBarController, !main.isSelectionModeActive {
+            main.show()
+        }
     }
 
     private func scrollToTop(viewController: UIViewController) {
