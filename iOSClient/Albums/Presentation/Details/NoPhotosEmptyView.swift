@@ -15,7 +15,8 @@ struct NoPhotosEmptyView: View {
                 VStack(spacing: 0) {
                     Spacer(minLength: 0)
 
-                    Image(systemName: "photo.on.rectangle.angled.fill")
+                    Image("EmptyAlbum")
+//                    Image(systemName: "photo.on.rectangle.angled.fill")
                         .resizable()
                         .scaledToFit()
                         .foregroundStyle(

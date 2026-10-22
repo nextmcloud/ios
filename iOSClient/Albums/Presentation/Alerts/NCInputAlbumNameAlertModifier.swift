@@ -38,7 +38,7 @@ private struct NCInputAlbumNameAlertModifier: ViewModifier {
     let onCancel: () -> Void
 
     private let title: String
-    private let description: String
+//    private let description: String
     private let textFieldHint: String
     private let positiveButtonText: String
     private let negativeButtonText: String
@@ -60,13 +60,13 @@ private struct NCInputAlbumNameAlertModifier: ViewModifier {
 
         if isForRenamingAlbum {
             title = NSLocalizedString("_albums_list_rename_album_popup_title_", comment: "")
-            description = NSLocalizedString("_albums_list_rename_album_popup_desc_", comment: "")
+//            description = NSLocalizedString("_albums_list_rename_album_popup_desc_", comment: "")
             textFieldHint = NSLocalizedString("_albums_list_rename_album_popup_hint_", comment: "")
             positiveButtonText = NSLocalizedString("_albums_list_rename_album_popup_positive_btn_", comment: "")
             negativeButtonText = NSLocalizedString("_albums_list_rename_album_popup_negative_btn_", comment: "")
         } else {
             title = NSLocalizedString("_albums_list_new_album_popup_title_", comment: "")
-            description = NSLocalizedString("_albums_list_new_album_popup_desc_", comment: "")
+//            description = NSLocalizedString("_albums_list_new_album_popup_desc_", comment: "")
             textFieldHint = NSLocalizedString("_albums_list_new_album_popup_hint_", comment: "")
             positiveButtonText = NSLocalizedString("_albums_list_new_album_popup_positive_btn_", comment: "")
             negativeButtonText = NSLocalizedString("_albums_list_new_album_popup_negative_btn_", comment: "")
@@ -89,8 +89,8 @@ private struct NCInputAlbumNameAlertModifier: ViewModifier {
                     albumName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || error != nil
                 )
             } message: {
-                Text(description)
-                    .foregroundColor(.secondary)
+//                Text(description)
+//                    .foregroundColor(.secondary)
             }
     }
 }

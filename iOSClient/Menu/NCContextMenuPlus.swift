@@ -32,11 +32,11 @@ class NCContextMenuPlus: NSObject {
     nonisolated static func menuInfo(for ext: String) -> CreatorMenuInfo? {
         switch ext.lowercased() {
         case "docx":
-            return CreatorMenuInfo(titleKey: "_create_new_document_", documentType: "document", icon: "doc.text", sortOrder: 0)
+            return CreatorMenuInfo(titleKey: "_create_new_document_", documentType: "document", icon: "create_file_document", sortOrder: 0)
         case "xlsx":
-            return CreatorMenuInfo(titleKey: "_create_new_spreadsheet_", documentType: "spreadsheet", icon: "tablecells", sortOrder: 1)
+            return CreatorMenuInfo(titleKey: "_create_new_spreadsheet_", documentType: "spreadsheet", icon: "create_file_xls", sortOrder: 1)
         case "pptx":
-            return CreatorMenuInfo(titleKey: "_create_new_presentation_", documentType: "presentation", icon: "play.rectangle", sortOrder: 2)
+            return CreatorMenuInfo(titleKey: "_create_new_presentation_", documentType: "presentation", icon: "create_file_ppt", sortOrder: 2)
         default:
             return nil
         }
@@ -253,7 +253,7 @@ class NCContextMenuPlus: NSObject {
 
                 let action = UIAction(
                     title: NSLocalizedString(documentType.titleKey, comment: ""),
-                    image: utility.loadImage(named: documentType.icon, colors: [documentType.color])
+                    image: utility.loadImage(named: documentType.icon)//, colors: [documentType.color])
                 ) { _ in
                     Task { @MainActor in
                         if let directEditingCreator {
@@ -338,8 +338,8 @@ class NCContextMenuPlus: NSObject {
                         creator: creator,
                         title: info.map { NSLocalizedString($0.titleKey, comment: "") } ?? creator.name,
                         image: info.map {
-                            utility.loadImage(named: $0.icon, colors: [$0.iconColor])
-                        } ?? UIImage(systemName: "doc"),
+                            utility.loadImage(named: $0.icon)//, colors: [$0.iconColor])
+                        } ?? NCImageCache.shared.getImageFile(),
                         controller: controller,
                         serverUrl: serverUrl,
                         session: session
@@ -402,7 +402,7 @@ class NCContextMenuPlus: NSObject {
             //
             if creatorsByEditor.keys.contains(global.editorText), let creator = creatorsByEditor[global.editorText]?.first {
                 menuNextcloudTextAction = UIAction(title: NSLocalizedString("_create_nextcloudtext_document_", comment: ""),
-                                                   image: utility.loadImage(named: "text.document", colors: [NCBrandColor.shared.iconImageColor])) { _ in
+                                                   image: UIImage(named: "file_txt_menu")!.image(color: NCBrandColor.shared.iconImageColor, size: 24).withTintColor(NCBrandColor.shared.iconImageColor)) { _ in
                     Task { @MainActor in
                         let fileName = await NCNetworking.shared.createFileName(
                             fileNameBase: NSLocalizedString("_untitled_", comment: "") + "." + creator.ext,

@@ -30,8 +30,8 @@ struct NCFocusedAutoUploadProgressView: View {
                 Spacer()
 
                 VStack(spacing: 24) {
-                    NCFocusedAutoUploadCloudAnimation()
-                        .padding(.bottom, 4)
+//                    NCFocusedAutoUploadCloudAnimation()
+//                        .padding(.bottom, 4)
                     if isUploadCompleted {
                         NCFocusedAutoUploadCloudAnimation(cloudColor: Color(NCBrandColor.shared.iconImageColor),
                                                           arrowColor: Color(NCBrandColor.shared.iconImageColor),

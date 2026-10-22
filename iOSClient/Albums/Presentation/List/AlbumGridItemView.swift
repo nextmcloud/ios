@@ -26,12 +26,13 @@ struct AlbumGridItemView: View {
                                 .progressViewStyle(CircularProgressViewStyle(tint: .gray))
                         )
                 case .empty:
-                    Image(systemName: "photo.on.rectangle.angled.fill")
+                    Image("EmptyAlbum")
+//                    Image(systemName: "photo.on.rectangle.angled.fill")
                         .resizable()
                         .scaledToFit()
-                        .foregroundStyle(
-                            Color(NCBrandColor.shared.getElement(account: localAccount))
-                        )
+//                        .foregroundStyle(
+//                            Color(NCBrandColor.shared.getElement(account: localAccount))
+//                        )
                         .padding()
                 case .thumbnail(let img):
                     Image(uiImage: img)

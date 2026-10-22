@@ -20,6 +20,13 @@ struct AddToAlbumsListView: View {
         controller.account
     }
 
+    // Sorted view of albums by localized, case-insensitive name
+    private var sortedAlbums: [Album] {
+        viewModel.albums.sorted { lhs, rhs in
+            lhs.name.localizedCaseInsensitiveCompare(rhs.name) == .orderedAscending
+        }
+    }
+
     init(viewModel: AlbumsListViewModel, controller: NCMainTabBarController, onFinish: @escaping (Album) -> Void, onDismiss: @escaping () -> Void, onCreateAlbum: @escaping () -> Void) {
         self.controller = controller
         self._viewModel = StateObject(wrappedValue: viewModel)
@@ -38,10 +45,10 @@ struct AddToAlbumsListView: View {
                         }) {
                             HStack(spacing: 8) {
                                 Image(systemName: "plus.circle.fill")
-                                    .foregroundColor(Color(NCBrandColor.shared.getElement(account: localAccount)))
+                                    .foregroundColor(Color(NCBrandColor.shared.customer))
                                 Text(NSLocalizedString("_albums_list_new_album_popup_title_", comment: "Create new album"))
                                     .font(.system(size: 16, weight: .semibold))
-                                    .foregroundColor(Color(NCBrandColor.shared.getElement(account: localAccount)))
+                                    .foregroundColor(Color(NCBrandColor.shared.customer))
                             }
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .padding(.vertical, 10)
@@ -62,7 +69,7 @@ struct AddToAlbumsListView: View {
                         .foregroundColor(.primary)
                         .padding(.horizontal, 16)
                         .frame(maxWidth: .infinity, alignment: .leading)) {
-                            ForEach(viewModel.albums) { album in
+                            ForEach(sortedAlbums) { album in
                                 AlbumRow(album: album, localAccount: localAccount)
                                     .padding(.vertical, 8)
                                     .onTapGesture {
@@ -180,4 +187,6 @@ struct AlbumRow: View {
         }
         return parts.joined(separator: " - ")
     }
+
+    
 }
