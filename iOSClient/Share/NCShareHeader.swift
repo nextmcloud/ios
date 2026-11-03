@@ -33,7 +33,8 @@ class NCShareHeader: UIView {
             if metadata.directory {
                 imageView.image = metadata.e2eEncrypted ? NCImageCache.shared.getFolderEncrypted() : NCImageCache.shared.getFolder()
             } else if !metadata.iconName.isEmpty {
-                imageView.image = NCUtility().loadImage(named: metadata.iconName, useTypeIconFile: true, account: metadata.account)
+//                imageView.image = NCUtility().loadImage(named: metadata.iconName, useTypeIconFile: true, account: metadata.account)
+                imageView.image = NCUtility().previewIcon(for: metadata)
             } else {
                 imageView.image = NCImageCache.shared.getImageFile()
             }

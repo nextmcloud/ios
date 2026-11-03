@@ -36,7 +36,8 @@ class NCViewerProviderContextMenu: UIViewController {
             imageView.frame = resize(CGSize(width: sizeIcon, height: sizeIcon))
         } else {
             // ICON
-            let image = NCUtility().loadImage(named: metadata.iconName, useTypeIconFile: true, account: metadata.account)
+//            let image = NCUtility().loadImage(named: metadata.iconName, useTypeIconFile: true, account: metadata.account)
+            let image = NCUtility().previewIcon(for: metadata)
             imageView.image = image
             imageView.frame = resize(CGSize(width: sizeIcon, height: sizeIcon))
             // PREVIEW

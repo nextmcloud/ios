@@ -216,6 +216,7 @@ extension NCMedia {
 
         navigationItem.leftBarButtonItems = items.isEmpty ? nil : items
         if items.isEmpty {
+            self.navigationItem.title = NSLocalizedString("_media_", comment: "")
             collectionViewReloadData()
         }
     }

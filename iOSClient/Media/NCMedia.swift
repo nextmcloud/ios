@@ -184,6 +184,7 @@ class NCMedia: UIViewController {
 
         navigationItem.leftItemsSupplementBackButton = true
         navigationItem.leftBarButtonItem = nil
+//        navigationController?.title = "Media"
 
         pinchGesture = UIPinchGestureRecognizer(target: self, action: #selector(handlePinchGesture(_:)))
         collectionView.addGestureRecognizer(pinchGesture)
