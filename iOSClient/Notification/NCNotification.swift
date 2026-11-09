@@ -34,6 +34,9 @@ class NCNotification: UITableViewController, NCNotificationCellDelegate {
 
         navigationController?.setNavigationBarAppearance()
 
+        // Register header view for empty data state (New/Modified)
+        tableView.register(UINib(nibName: "NCSectionFirstHeaderEmptyDataTableHeader", bundle: nil), forHeaderFooterViewReuseIdentifier: "sectionFirstHeaderEmptyData")
+
         tableView.tableFooterView = UIView()
         tableView.rowHeight = UITableView.automaticDimension
         tableView.estimatedRowHeight = 50.0
@@ -85,6 +88,33 @@ class NCNotification: UITableViewController, NCNotificationCellDelegate {
     }
 
     // MARK: - Table
+    
+    // Header view for empty notifications
+    override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        if notifications.isEmpty {
+            guard let header = tableView.dequeueReusableHeaderFooterView(withIdentifier: "sectionFirstHeaderEmptyData") as? NCSectionFirstHeaderEmptyDataTableHeader else { return nil }
+
+            if dataSourceTask?.state == .running {
+                header.emptyImage.image = utility.loadImage(named: "wifi", colors: [NCBrandColor.shared.getElement(account: session.account)])
+                header.emptyTitle.text = NSLocalizedString("_request_in_progress_", comment: "")
+                header.emptyDescription.text = ""
+            } else {
+                header.emptyImage.image = utility.loadImage(named: "bell", colors: [.gray], size: UIScreen.main.bounds.width)
+                header.emptyTitle.text = NSLocalizedString("_no_notification_", comment: "")
+                header.emptyDescription.text = ""
+            }
+            return header
+        }
+        return nil
+    }
+
+    // New/Modified: Provide height for header view when notifications array is empty
+    override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        if notifications.isEmpty {
+            return 250
+        }
+        return 0
+    }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return notifications.count

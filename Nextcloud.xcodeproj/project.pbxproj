@@ -84,6 +84,8 @@
 		AFCE353927E5DE0500FEA6C2 /* Shareable.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFCE353827E5DE0400FEA6C2 /* Shareable.swift */; };
 		B514D2073010F22A00E9CF05 /* NCRenameFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = B514D2053010F22A00E9CF05 /* NCRenameFile.swift */; };
 		B514D2083010F22A00E9CF05 /* NCRenameFile.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B514D2043010F22A00E9CF05 /* NCRenameFile.storyboard */; };
+		B51A5EC930A1B51200B817D1 /* NCSectionFirstHeaderEmptyDataTableHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = B51A5EC830A1B51200B817D1 /* NCSectionFirstHeaderEmptyDataTableHeader.swift */; };
+		B51A5ECB30A1B72200B817D1 /* NCSectionFirstHeaderEmptyDataTableHeader.xib in Resources */ = {isa = PBXBuildFile; fileRef = B51A5ECA30A1B72200B817D1 /* NCSectionFirstHeaderEmptyDataTableHeader.xib */; };
 		B52D917A307F410900FF4ECD /* GRDB in Frameworks */ = {isa = PBXBuildFile; productRef = B52D9179307F410900FF4ECD /* GRDB */; };
 		B52D917D307F418F00FF4ECD /* NCLocalDatabaseMigrator.swift in Sources */ = {isa = PBXBuildFile; fileRef = B52D917C307F418F00FF4ECD /* NCLocalDatabaseMigrator.swift */; };
 		B52D917E307F418F00FF4ECD /* NCLocalDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = B52D917B307F418F00FF4ECD /* NCLocalDatabase.swift */; };
@@ -1206,6 +1208,9 @@
 		AFCE353827E5DE0400FEA6C2 /* Shareable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Shareable.swift; sourceTree = "<group>"; };
 		B514D2043010F22A00E9CF05 /* NCRenameFile.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = NCRenameFile.storyboard; sourceTree = "<group>"; };
 		B514D2053010F22A00E9CF05 /* NCRenameFile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCRenameFile.swift; sourceTree = "<group>"; };
+		B51A5E7430A19EC000B817D1 /* ReplayKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ReplayKit.framework; path = System/Library/Frameworks/ReplayKit.framework; sourceTree = SDKROOT; };
+		B51A5EC830A1B51200B817D1 /* NCSectionFirstHeaderEmptyDataTableHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCSectionFirstHeaderEmptyDataTableHeader.swift; sourceTree = "<group>"; };
+		B51A5ECA30A1B72200B817D1 /* NCSectionFirstHeaderEmptyDataTableHeader.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = NCSectionFirstHeaderEmptyDataTableHeader.xib; sourceTree = "<group>"; };
 		B52D917B307F418F00FF4ECD /* NCLocalDatabase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCLocalDatabase.swift; sourceTree = "<group>"; };
 		B52D917C307F418F00FF4ECD /* NCLocalDatabaseMigrator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCLocalDatabaseMigrator.swift; sourceTree = "<group>"; };
 		B52D917F307F45EB00FF4ECD /* NCTransferCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCTransferCoordinator.swift; sourceTree = "<group>"; };
@@ -3734,6 +3739,8 @@
 			children = (
 				F7EF2AE82E43157B0081B2C9 /* NCNotification.storyboard */,
 				F7EF2AE92E43157B0081B2C9 /* NCNotification.swift */,
+				B51A5EC830A1B51200B817D1 /* NCSectionFirstHeaderEmptyDataTableHeader.swift */,
+				B51A5ECA30A1B72200B817D1 /* NCSectionFirstHeaderEmptyDataTableHeader.xib */,
 			);
 			path = Notification;
 			sourceTree = "<group>";
@@ -4162,7 +4169,7 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
-				LastSwiftUpdateCheck = 2640;
+				LastSwiftUpdateCheck = 2700;
 				LastUpgradeCheck = 2640;
 				ORGANIZATIONNAME = "Marino Faggiana";
 				TargetAttributes = {
@@ -4426,6 +4433,7 @@
 				F7CBC1232BAC8B0000EC1D55 /* NCSectionFirstHeaderEmptyData.xib in Resources */,
 				B592CE743077AE8F00582F3A /* NCViewerPDFSearchCell.xib in Resources */,
 				B592CE753077AE8F00582F3A /* NCViewerDirectEditing.storyboard in Resources */,
+				B51A5ECB30A1B72200B817D1 /* NCSectionFirstHeaderEmptyDataTableHeader.xib in Resources */,
 				B592CE763077AE8F00582F3A /* NCViewerPDF.storyboard in Resources */,
 				B592CE773077AE8F00582F3A /* NCViewerRichdocuments.storyboard in Resources */,
 				F700510122DF63AC003A3356 /* NCShare.storyboard in Resources */,
@@ -5053,6 +5061,7 @@
 				AF2D7C7C2742556F00ADF566 /* NCShareLinkCell.swift in Sources */,
 				F7C55C512FB4A658004A974F /* NCAssistantInputModel.swift in Sources */,
 				F7E41316294A19B300839300 /* UIView+Extension.swift in Sources */,
+				B51A5EC930A1B51200B817D1 /* NCSectionFirstHeaderEmptyDataTableHeader.swift in Sources */,
 				F7C30E00291BD2610017149B /* NCNetworkingE2EERename.swift in Sources */,
 				F74AF3A4247FB6AE00AC767B /* NCUtilityFileSystem.swift in Sources */,
 				B597789A2FDC23E300C3262A /* NCShare+Helper.swift in Sources */,
@@ -5884,7 +5893,7 @@
 					EXTENSION_SHARE,
 				);
 				INFOPLIST_FILE = "$(SRCROOT)/Brand/Share.plist";
-				MARKETING_VERSION = 12.0.0;
+				MARKETING_VERSION = 13.0.0;
 				OTHER_LDFLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.t-systems.pu-ds.magentacloud.qa.Share";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -5917,7 +5926,7 @@
 					EXTENSION_SHARE,
 				);
 				INFOPLIST_FILE = "$(SRCROOT)/Brand/Share.plist";
-				MARKETING_VERSION = 12.0.0;
+				MARKETING_VERSION = 13.0.0;
 				OTHER_LDFLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.t-systems.pu-ds.magentacloud.qa.Share";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -5950,7 +5959,7 @@
 					EXTENSION_FILE_PROVIDER_EXTENSION,
 				);
 				INFOPLIST_FILE = "$(SRCROOT)/Brand/File_Provider_Extension.plist";
-				MARKETING_VERSION = 12.0.0;
+				MARKETING_VERSION = 13.0.0;
 				OTHER_LDFLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.t-systems.pu-ds.magentacloud.qa.FileProviderExtension";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -5982,7 +5991,7 @@
 					EXTENSION_FILE_PROVIDER_EXTENSION,
 				);
 				INFOPLIST_FILE = "$(SRCROOT)/Brand/File_Provider_Extension.plist";
-				MARKETING_VERSION = 12.0.0;
+				MARKETING_VERSION = 13.0.0;
 				OTHER_LDFLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.t-systems.pu-ds.magentacloud.qa.FileProviderExtension";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -6012,7 +6021,7 @@
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 9FH6TNGWF2;
 				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
 				INFOPLIST_FILE = "$(SRCROOT)/Brand/iOSClient.plist";
-				MARKETING_VERSION = 12.0.0;
+				MARKETING_VERSION = 13.0.0;
 				OTHER_LDFLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.t-systems.pu-ds.magentacloud.qa";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -6042,7 +6051,7 @@
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 9FH6TNGWF2;
 				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
 				INFOPLIST_FILE = "$(SRCROOT)/Brand/iOSClient.plist";
-				MARKETING_VERSION = 12.0.0;
+				MARKETING_VERSION = 13.0.0;
 				OTHER_LDFLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.t-systems.pu-ds.magentacloud.qa";
 				PRODUCT_NAME = "$(TARGET_NAME)";

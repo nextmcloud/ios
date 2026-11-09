@@ -15,9 +15,16 @@ struct NCLogFilesView: View {
                 Button {
                     Task { await model.clearLogFile() }
                 } label: {
-                    Label(NSLocalizedString("_clear_log_", comment: ""), systemImage: "trash")
+                    HStack {
+                        Image(systemName: "trash")
+                            .font(.icon())
+                            .foregroundColor(Color(NCBrandColor.shared.iconImageColor))
+                            .frame(width: 39)
+
+                        Text(NSLocalizedString("_clear_log_", comment: ""))
+                            .foregroundStyle(Color(UIColor.label))
+                    }
                 }
-                .tint(Color(UIColor.label))
                 .disabled(model.logFiles.isEmpty)
             }
 
