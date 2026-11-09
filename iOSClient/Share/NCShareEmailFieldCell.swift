@@ -103,7 +103,7 @@ class NCShareEmailFieldCell: UITableViewCell {
         guard let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId) else { return }
 
         let isCurrentUser = NCShareCommon.isCurrentUserIsFileOwner(fileOwnerId: metadata.ownerId)
-        let canReshare = (metadata.sharePermissionsCollaborationServices & NCPermissions().permissionShareShare) != 0
+        let canReshare = (metadata.sharePermissionsCollaborationServices & NKShare.Permission.share.rawValue) != 0
 
         labelSharedWithBy.isHidden = isCurrentUser
         labelResharingAllowed.isHidden = isCurrentUser
