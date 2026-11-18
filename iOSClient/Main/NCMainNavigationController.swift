@@ -186,6 +186,8 @@ class NCMainNavigationController: UINavigationController, UINavigationController
                 await self.collectionViewCommonTrailingItemGroups()
                 // (+)
                 await self.menuPlus?.create(session: session)
+
+                AnalyticsHelper.shared.trackEvent(eventName: .EVENT__ACTION_BUTTON)
             }
         }
 
@@ -197,6 +199,8 @@ class NCMainNavigationController: UINavigationController, UINavigationController
 
                 // (+)
                 await self.menuPlus?.create(session: session)
+
+                AnalyticsHelper.shared.trackEvent(eventName: .EVENT__ACTION_BUTTON)
             }
         }
     }

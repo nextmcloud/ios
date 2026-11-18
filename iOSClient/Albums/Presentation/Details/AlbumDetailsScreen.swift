@@ -32,7 +32,6 @@ struct AlbumDetailsScreen: View {
                     Button(action: handleAddPhotosIntent) {
                         HStack(spacing: 6) {
                             Image(systemName: "plus")
-                            Text(NSLocalizedString("_albums_photos_add_photos_btn_", comment: ""))
                         }
                         .fixedSize()
                     }

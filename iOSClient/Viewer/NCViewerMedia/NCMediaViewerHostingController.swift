@@ -33,12 +33,52 @@ final class NCMediaViewerHostingController: UIHostingController<NCMediaViewerVie
         return formatter
     }()
 
-    private lazy var moreNavigationItem = NCContextMenuViewer.mediaNavigationItem(
-        viewController: self,
-        metadataProvider: { [weak self] in self?.model.selectedMetadata },
-        controllerProvider: { [weak self] in self?.contextMenuController }
-    )
+    private func resolvedContextMenuController() -> NCMainTabBarController? {
+        // Prefer the injected one
+        if let injected = contextMenuController { return injected }
 
+        // Try from our navigation controller’s tabBarController
+        if let tab = self.tabBarController as? NCMainTabBarController { return tab }
+
+        // Walk up the presenting hierarchy
+        var parentVC = self.presentingViewController
+        while let parent = parentVC {
+            if let tab = parent as? NCMainTabBarController { return tab }
+            parentVC = parent.presentingViewController
+        }
+
+        // Or from the window’s root
+        if let root = view.window?.rootViewController as? NCMainTabBarController {
+            return root
+        }
+
+        return nil
+    }
+
+    private lazy var moreNavigationItem = UIBarButtonItem(
+        image: NCImageCache.shared.getImageButtonMore(),
+        primaryAction: nil,
+        menu: UIMenu(title: "", children: [
+            UIDeferredMenuElement.uncached { [self] completion in
+                guard let metadata = self.model.selectedMetadata,
+                      let controller = self.resolvedContextMenuController()
+                else {
+                    completion([])
+                    return
+                }
+                if let menu = NCContextMenuViewer(
+                    metadata: metadata,
+                    controller: controller,
+                    viewController: self,
+                    webView: false,
+                    sender: self
+                ).viewMenu() {
+                    completion(menu.children)
+                }
+            }
+        ])
+    )
+    
     private lazy var mediaDetailNavigationItem = UIBarButtonItem(
         image: NCUtility().loadImage(
             named: "info.circle",

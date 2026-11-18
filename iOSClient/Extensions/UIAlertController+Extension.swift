@@ -191,14 +191,14 @@ extension UIAlertController {
             })
         }
 
-        alertController.addAction(UIAlertAction(title: NSLocalizedString("_remove_local_file_", comment: ""), style: .default) { (_: UIAlertAction) in
-            Task {
-                for metadata in metadatas {
-                    await NCNetworking.shared.deleteCache(metadata)
-                }
-            }
-            completion(false)
-        })
+//        alertController.addAction(UIAlertAction(title: NSLocalizedString("_remove_local_file_", comment: ""), style: .default) { (_: UIAlertAction) in
+//            Task {
+//                for metadata in metadatas {
+//                    await NCNetworking.shared.deleteCache(metadata)
+//                }
+//            }
+//            completion(false)
+//        })
 
         alertController.addAction(UIAlertAction(title: NSLocalizedString("_cancel_", comment: ""), style: .cancel) { (_: UIAlertAction) in
             completion(true)

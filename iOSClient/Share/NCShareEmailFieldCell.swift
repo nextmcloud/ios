@@ -100,22 +100,41 @@ class NCShareEmailFieldCell: UITableViewCell {
     }
 
     func updateCanReshareUI() {
+        
         guard let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId) else { return }
 
-        let isCurrentUser = NCShareCommon.isCurrentUserIsFileOwner(fileOwnerId: metadata.ownerId)
-        let canReshare = (metadata.sharePermissionsCollaborationServices & NKShare.Permission.share.rawValue) != 0
+        guard !metadata.ownerId.isEmpty, metadata.ownerId != metadata.userId else {
 
-        labelSharedWithBy.isHidden = isCurrentUser
-        labelResharingAllowed.isHidden = isCurrentUser
+            labelSharedWithBy.isHidden = true
+            labelResharingAllowed.isHidden = true
+            topConstraintResharingView.constant = 0
+
+            return
+        }
+
+//        let isCurrentUser = NCShareCommon.isCurrentUserIsFileOwner(fileOwnerId: metadata.ownerId)
+        let canReshare = (metadata.sharePermissionsCollaborationServices & NKShare.Permission.share.rawValue) != 0
 
         if !canReshare {
             searchField.isUserInteractionEnabled = false
             searchField.alpha = 0.5
+            searchField.placeholder = NSLocalizedString("_share_reshare_disabled_", comment: "")
             btnContact.isEnabled = false
             btnContact.alpha = 0.5
         }
 
-        if !isCurrentUser {
+        labelSharedWithBy.isHidden = false //isCurrentUser
+        labelResharingAllowed.isHidden = false //isCurrentUser
+
+//        if !canReshare {
+//            searchField.isUserInteractionEnabled = false
+//            searchField.alpha = 0.5
+//            searchField.placeholder = NSLocalizedString("_share_reshare_disabled_", comment: "")
+//            btnContact.isEnabled = false
+//            btnContact.alpha = 0.5
+//        }
+
+//        if !isCurrentUser {
             let ownerName = metadata.ownerDisplayName
             let fullText = NSLocalizedString("_share_received_shares_text_", comment: "") + " " + ownerName
             let attributed = NSMutableAttributedString(string: fullText)
@@ -133,27 +152,27 @@ class NCShareEmailFieldCell: UITableViewCell {
                 : NSLocalizedString("_share_reshare_not_allowed_", comment: "")
 
             topConstraintResharingView.constant = 15
-        } else {
-            topConstraintResharingView.constant = 0
-        }
+//        } else {
+//            topConstraintResharingView.constant = 0
+//        }
 
         viewOrLinkSeparator.isHidden = !canReshare
     }
 
-    func updateShareUI(ocId: String, count: Int) {
-        guard let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId) else { return }
-
-        let isCurrentUser = NCShareCommon.isCurrentUserIsFileOwner(fileOwnerId: metadata.ownerId)
-        let canReshare = (metadata.sharePermissionsCollaborationServices & NCPermissions().permissionShareShare) != 0
-
-        if !isCurrentUser {
-            if canReshare {
-                labelOrLink.isHidden = true
-                labelSeparator1.isHidden = true
-                labelSeparator2.isHidden = true
-            }
-        }
-    }
+//    func updateShareUI(ocId: String, count: Int) {
+//        guard let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId) else { return }
+//
+//        let isCurrentUser = NCShareCommon.isCurrentUserIsFileOwner(fileOwnerId: metadata.ownerId)
+//        let canReshare = (metadata.sharePermissionsCollaborationServices & NKShare.Permission.share.rawValue) != 0
+//
+//        if !isCurrentUser {
+//            if canReshare {
+//                labelOrLink.isHidden = true
+//                labelSeparator1.isHidden = true
+//                labelSeparator2.isHidden = true
+//            }
+//        }
+//    }
 
     @objc func cancelDatePicker() {
         self.searchField.endEditing(true)

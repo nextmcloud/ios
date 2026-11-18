@@ -35,7 +35,8 @@ class NCContextMenuViewer: NSObject {
     }
 
     func viewMenu() -> UIMenu? {
-        guard let controller,
+        guard let metadata = database.getMetadataFromOcId(metadata.ocId),
+              let controller,
               let capabilities = NCNetworking.shared.capabilities[metadata.account] else {
             return nil
         }

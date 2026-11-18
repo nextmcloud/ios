@@ -37,83 +37,83 @@ struct AddToAlbumsListView: View {
 
     var body: some View {
         NavigationStack {
-            ZStack {
-                List {
-                    Section {
-                        Button(action: {
-                            onCreateAlbum()
-                        }) {
-                            HStack(spacing: 8) {
-                                Image(systemName: "plus.circle.fill")
-                                    .foregroundColor(Color(NCBrandColor.shared.customer))
-                                Text(NSLocalizedString("_albums_list_new_album_popup_title_", comment: "Create new album"))
-                                    .font(.system(size: 16, weight: .semibold))
-                                    .foregroundColor(Color(NCBrandColor.shared.customer))
-                            }
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .padding(.vertical, 10)
-                            .padding(.horizontal, 16)
-                            .background(
-                                RoundedRectangle(cornerRadius: 10)
-                                    .fill(Color(.secondarySystemGroupedBackground).opacity(0.08))
-                            )
-                        }
-                        .buttonStyle(PlainButtonStyle())
-                        .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
-                        .listRowSeparator(.hidden)
-                    }
-
-                    Section(header: Text(NSLocalizedString("_albums_list_own_albums_heading_", comment: ""))
-                        .listRowInsets(EdgeInsets())
-                        .font(.system(size: 17, weight: .bold))
-                        .foregroundColor(.primary)
-                        .padding(.horizontal, 16)
-                        .frame(maxWidth: .infinity, alignment: .leading)) {
-                            ForEach(sortedAlbums) { album in
-                                AlbumRow(album: album, localAccount: localAccount)
-                                    .padding(.vertical, 8)
-                                    .onTapGesture {
-                                        selectedAlbum = album
-                                    }
-                                    .listRowBackground(
-                                        selectedAlbum?.id == album.id
-                                        ? Color.accentColor.opacity(0.2)  // light blue highlight (default iOS tint)
-                                        : Color.clear
-                                    )
-                                    .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0)) // Match header padding
-                                    .listRowSeparator(.hidden)
-                            }
-                        }
-                }
-                .listStyle(.plain)
-                .scrollContentBackground(.hidden)
+            contentView()
                 .navigationTitle(NSLocalizedString("_add_to_album", comment: ""))
                 .navigationBarTitleDisplayMode(.inline)
                 .toolbar {
                     ToolbarItem(placement: .cancellationAction) {
-                        Button(action: onDismiss) {
-                            Image(systemName: "xmark")
-                        }
-                        .accessibilityLabel(NSLocalizedString("_cancel_", comment: ""))
+                        Button(action: onDismiss) { Image(systemName: "xmark") }
+                            .accessibilityLabel(NSLocalizedString("_cancel_", comment: ""))
                     }
-
                     ToolbarItem(placement: .confirmationAction) {
-                        Button {
-                            if let selected = selectedAlbum {
-                                onFinish(selected)
-                            }
-                        } label: {
-                            Image(systemName: "checkmark")
-                        }
-                        .accessibilityLabel(NSLocalizedString("_done_", comment: ""))
-                        .disabled(selectedAlbum == nil)
+                        Button { if let selected = selectedAlbum { onFinish(selected) } } label: { Image(systemName: "checkmark") }
+                            .accessibilityLabel(NSLocalizedString("_done_", comment: ""))
+                            .disabled(selectedAlbum == nil)
                     }
                 }
-                content()
+                .onAppear { AlbumsManager.shared.syncAlbums(for: localAccount) }
+        }
+    }
+
+    @ViewBuilder
+    private func contentView() -> some View {
+        if viewModel.isLoading {
+            ProgressView(NSLocalizedString("_albums_list_loading_msg_", comment: ""))
+        } else if let error = viewModel.errorMessage {
+            ScrollView(.vertical) {
+                VStack {
+                    Spacer(); Text(error); Spacer()
+                }
             }
-            .onAppear {
-                AlbumsManager.shared.syncAlbums(for: localAccount)
+            .refreshable { viewModel.onPulledToRefresh() }
+        } else if viewModel.albums.isEmpty {
+            NoAlbumsEmptyView(onNewAlbumCreationIntent: onCreateAlbum)
+                .refreshable { viewModel.onPulledToRefresh() }
+        } else {
+            List {
+                Section {
+                    Button(action: { onCreateAlbum() }) {
+                        HStack(spacing: 8) {
+                            Image(systemName: "plus.circle.fill")
+                                .foregroundColor(Color(NCBrandColor.shared.customer))
+                            Text(NSLocalizedString("_albums_list_new_album_popup_title_", comment: "Create new album"))
+                                .font(.system(size: 16, weight: .semibold))
+                                .foregroundColor(Color(NCBrandColor.shared.customer))
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.vertical, 10)
+                        .padding(.horizontal, 16)
+                        .background(
+                            RoundedRectangle(cornerRadius: 10)
+                                .fill(Color(.secondarySystemGroupedBackground).opacity(0.08))
+                        )
+                    }
+                    .buttonStyle(PlainButtonStyle())
+                    .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
+                    .listRowSeparator(.hidden)
+                }
+
+                Section(header: Text(NSLocalizedString("_albums_list_own_albums_heading_", comment: ""))
+                    .listRowInsets(EdgeInsets())
+                    .font(.system(size: 17, weight: .bold))
+                    .foregroundColor(.primary)
+                    .padding(.horizontal, 16)
+                    .frame(maxWidth: .infinity, alignment: .leading)) {
+                        ForEach(sortedAlbums) { album in
+                            AlbumRow(album: album, localAccount: localAccount)
+                                .padding(.vertical, 8)
+                                .onTapGesture { selectedAlbum = album }
+                                .listRowBackground(
+                                    selectedAlbum?.id == album.id ? Color.accentColor.opacity(0.2) : Color.clear
+                                )
+                                .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
+                                .listRowSeparator(.hidden)
+                        }
+                    }
             }
+            .listStyle(.plain)
+            .scrollContentBackground(.hidden)
+            .refreshable { viewModel.onPulledToRefresh() }
         }
     }
 
