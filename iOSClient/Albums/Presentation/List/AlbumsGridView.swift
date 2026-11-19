@@ -85,8 +85,9 @@ struct AlbumsGridView: View {
 
         parts.append(
             String.localizedStringWithFormat(
-                NSLocalizedString("_albums_list_photos_and_videos_count_", comment: ""),
-                count
+//                NSLocalizedString("_albums_list_photos_and_videos_count_", comment: ""),
+                NSLocalizedString("_albums_elements_count_", comment: ""),
+                count//, count
             )
         )
         return parts.joined(separator: " · ")

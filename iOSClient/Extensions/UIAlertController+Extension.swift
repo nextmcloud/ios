@@ -49,6 +49,9 @@ extension UIAlertController {
                                 completeHudIndeterminateBannerSuccess(token: token, banner: banner)
                             } else {
                                 banner.dismiss()
+#if !EXTENSION
+                            AnalyticsHelper.shared.trackCreateFolder(isEncrypted: true, creationDate: Date())
+#endif
                             }
                         }
                         completion?(error)
@@ -128,7 +131,7 @@ extension UIAlertController {
                 let textCheck = FileNameValidator.checkFileName(folderName, account: session.account, capabilities: capabilities)
                 let alreadyExists = NCManageDatabase.shared.getMetadata(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@ AND fileNameView == %@", session.account, serverUrl, folderName)) != nil
 
-                okAction.isEnabled = !text.isEmpty && textCheck?.error == nil && alreadyExists == false
+                okAction.isEnabled = !folderName.isEmpty && textCheck?.error == nil && alreadyExists == false
 
                 var message = ""
                 var messageColor = UIColor.label
@@ -185,7 +188,13 @@ extension UIAlertController {
         if canDeleteServer {
             alertController.addAction(UIAlertAction(title: NSLocalizedString("_yes_", comment: ""), style: .destructive) { (_: UIAlertAction) in
                 Task {
-                    await NCNetworking.shared.setStatusWaitDelete(metadatas: metadatas)
+//                    if controller?.selectedIndex == NCGlobal.shared.selectedTabIndexAlbum {
+////                        await deletePhotosFromCurrentAlbum(selectedMetadatas: selectedMetadatas, controller: controller)
+//                        NotificationCenter.default.post(name: NSNotification.Name("deletePhotosFromAlbum"), object: nil, userInfo: ["metadatas": metadatas])
+//
+//                    } else {
+                        await NCNetworking.shared.setStatusWaitDelete(metadatas: metadatas)
+//                    }
                 }
                 completion(false)
             })
@@ -231,6 +240,7 @@ extension UIAlertController {
         let oldExtension = fileName.fileExtension
 
         let text = alertController.textFields?.first?.text?.trimmingCharacters(in: .whitespaces) ?? ""
+        let trimmedInitial = text.trimmingCharacters(in: .whitespaces)
         let textCheck = FileNameValidator.checkFileName(text, account: account, capabilities: capabilities)
         var message = textCheck?.error.localizedDescription ?? ""
         var messageColor = UIColor.red
@@ -261,10 +271,12 @@ extension UIAlertController {
                 guard let text = alertController.textFields?.first?.text else { return }
                 let newExtension = text.fileExtension
 
+                let trimmedText = text.trimmingCharacters(in: .whitespaces)
+
                 let textCheck = FileNameValidator.checkFileName(text, account: account, capabilities: capabilities)
                 let isFileHidden = FileNameValidator.isFileHidden(text)
 
-                okAction.isEnabled = !text.isEmpty && textCheck?.error == nil
+                okAction.isEnabled = !trimmedText.isEmpty && textCheck?.error == nil
 
                 message = ""
                 messageColor = UIColor.label

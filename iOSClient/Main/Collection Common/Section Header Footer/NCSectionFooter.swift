@@ -85,6 +85,36 @@ class NCSectionFooter: UICollectionReusableView {
         }
     }
 
+    func setMediaTitleLabel(images: Int, videos: Int) {//}, size: Int64?) {
+        var imagesText = ""
+        var videosText = ""
+
+        if images > 1 {
+            imagesText = "\(images) " + NSLocalizedString("_images_", comment: "")
+        } else if images == 1 {
+            imagesText = "1 " + NSLocalizedString("_image_", comment: "")
+        }
+
+        if videos > 1 {
+            videosText = "\(videos) " + NSLocalizedString("_videos_", comment: "")
+        } else if videos == 1 {
+            videosText = "1 " + NSLocalizedString("_video_", comment: "")
+        }
+
+//        // Attach size only to the "videos" segment if size is provided
+//        if let size = size, !videosText.isEmpty {
+//            videosText += " • " + utilityFileSystem.transformedSize(size)
+//        }
+
+        if imagesText.isEmpty {
+            labelSection.text = videosText
+        } else if videosText.isEmpty {
+            labelSection.text = imagesText
+        } else {
+            labelSection.text = imagesText + " • " + videosText
+        }
+    }
+
     func setTitleLabel(_ text: String) {
         labelSection.text = text
     }

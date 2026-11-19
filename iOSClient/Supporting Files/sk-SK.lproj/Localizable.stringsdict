@@ -82,6 +82,26 @@
 			<string>%d zlyhaní</string>
 		</dict>
 	</dict>
+    <key>_albums_elements_count_</key>
+    <dict>
+        <key>NSStringLocalizedFormatKey</key>
+        <string>%#@elements@</string>
+        <key>elements</key>
+        <dict>
+            <key>NSStringFormatSpecTypeKey</key>
+            <string>NSStringPluralRuleType</string>
+            <key>NSStringFormatValueTypeKey</key>
+            <string>d</string>
+            <key>one</key>
+            <string>%d prvok</string>
+            <key>few</key>
+            <string>%d prvky</string>
+            <key>many</key>
+            <string>%d prvkov</string>
+            <key>other</key>
+            <string>%d prvkov</string>
+        </dict>
+    </dict>
 	<key>_albums_photos_count_</key>
 	<dict>
 		<key>NSStringLocalizedFormatKey</key>
@@ -113,13 +133,13 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>%d fotka alebo video</string>
+			<string>%d fotka alebo %d video</string>
 			<key>few</key>
-			<string>%d fotky alebo videá</string>
+			<string>%d fotky alebo %d videá</string>
 			<key>many</key>
-			<string>%d fotiek alebo videí</string>
+			<string>%d fotiek alebo %d videí</string>
 			<key>other</key>
-			<string>%d fotiek alebo videí</string>
+			<string>%d fotiek alebo %d videí</string>
 		</dict>
 	</dict>
 </dict>

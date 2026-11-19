@@ -74,13 +74,16 @@ struct PhotosGridView: View {
                                     Text(albumTitle)
                                         .font(.title2.bold())
 
-                                    Text(
-                                        String.localizedStringWithFormat(
-                                            NSLocalizedString("_albums_photos_count_", comment: ""),
-                                            photos.count
+                                    Text({
+                                        let imageCount = photos.filter { !$0.metadata.isVideo }.count
+                                        let videoCount = photos.filter { $0.metadata.isVideo }.count
+                                        return String.localizedStringWithFormat(
+                                            NSLocalizedString("_albums_list_photos_and_videos_count_", comment: ""),
+                                            imageCount,
+                                            videoCount
                                         )
-                                    )
-                                        .font(.subheadline)
+                                    }())
+                                    .font(.subheadline)
                                 }
                                 .foregroundStyle(.white)
                                 .padding()

@@ -184,88 +184,88 @@ class NCMediaNavigationController: NCMainNavigationController {
             }
         ])
 
-        let playFile = UIAction(title: NSLocalizedString("_play_from_files_", comment: ""), image: utility.loadImage(named: "play.circle")) { _ in
-            guard let controller = self.controller else { return }
-            media.documentPickerViewController = NCDocumentPickerViewController(controller: controller, isViewerMedia: true, allowsMultipleSelection: false, viewController: media)
-        }
+//        let playFile = UIAction(title: NSLocalizedString("_play_from_files_", comment: ""), image: utility.loadImage(named: "play.circle")) { _ in
+//            guard let controller = self.controller else { return }
+//            media.documentPickerViewController = NCDocumentPickerViewController(controller: controller, isViewerMedia: true, allowsMultipleSelection: false, viewController: media)
+//        }
+//
+//        let playURL = UIAction(title: NSLocalizedString("_play_from_url_", comment: ""), image: utility.loadImage(named: "link")) { _ in
+//            let alert = UIAlertController(title: NSLocalizedString("_valid_video_url_", comment: ""), message: nil, preferredStyle: .alert)
+//            alert.addAction(UIAlertAction(title: NSLocalizedString("_cancel_", comment: ""), style: .cancel, handler: nil))
+//            alert.addTextField(configurationHandler: { textField in
+//                textField.placeholder = "http://myserver.com/movie.mkv"
+//            })
+//            alert.addAction(UIAlertAction(title: NSLocalizedString("_ok_", comment: ""), style: .default, handler: { _ in
+//                guard let stringUrl = alert.textFields?.first?.text, !stringUrl.isEmpty, let url = URL(string: stringUrl) else {
+//                    return
+//                }
+//                let fileName = url.lastPathComponent
+//                Task {
+//                    let metadata = await NCManageDatabaseCreateMetadata().createMetadataAsync(
+//                        fileName: fileName,
+//                        ocId: NSUUID().uuidString,
+//                        serverUrl: "",
+//                        url: stringUrl,
+//                        session: self.session,
+//                        sceneIdentifier: self.controller?.sceneIdentifier)
+//                    await self.database.addMetadataAsync(metadata)
+//
+//                    if let vc = await NCViewer().getViewerController(metadata: metadata, delegate: self, viewerTransitionSource: nil) {
+//                        self.navigationController?.pushViewController(vc, animated: true)
+//                    }
+//                }
+//            }))
+//            self.present(alert, animated: true)
+//        }
 
-        let playURL = UIAction(title: NSLocalizedString("_play_from_url_", comment: ""), image: utility.loadImage(named: "link")) { _ in
-            let alert = UIAlertController(title: NSLocalizedString("_valid_video_url_", comment: ""), message: nil, preferredStyle: .alert)
-            alert.addAction(UIAlertAction(title: NSLocalizedString("_cancel_", comment: ""), style: .cancel, handler: nil))
-            alert.addTextField(configurationHandler: { textField in
-                textField.placeholder = "http://myserver.com/movie.mkv"
-            })
-            alert.addAction(UIAlertAction(title: NSLocalizedString("_ok_", comment: ""), style: .default, handler: { _ in
-                guard let stringUrl = alert.textFields?.first?.text, !stringUrl.isEmpty, let url = URL(string: stringUrl) else {
-                    return
-                }
-                let fileName = url.lastPathComponent
-                Task {
-                    let metadata = await NCManageDatabaseCreateMetadata().createMetadataAsync(
-                        fileName: fileName,
-                        ocId: NSUUID().uuidString,
-                        serverUrl: "",
-                        url: stringUrl,
-                        session: self.session,
-                        sceneIdentifier: self.controller?.sceneIdentifier)
-                    await self.database.addMetadataAsync(metadata)
-
-                    if let vc = await NCViewer().getViewerController(metadata: metadata, delegate: self, viewerTransitionSource: nil) {
-                        self.navigationController?.pushViewController(vc, animated: true)
-                    }
-                }
-            }))
-            self.present(alert, animated: true)
-        }
-
-        let actionsInSortMenu: [UIAction] = [
-            UIAction(
-                title: NSLocalizedString("_media_by_modified_date_", comment: ""),
-                image: utility.loadImage(named: "sortFileNameAZ"),//, colors: [NCBrandColor.shared.iconImageColor], size: 24).withTintColor(NCBrandColor.shared.iconImageColor),//, colors: [NCBrandColor.shared.iconImageColor]),
-                state: NCPreferences().mediaSortDate == "date" ? .on : .off,
-                handler: { _ in
-                    NCPreferences().mediaSortDate = "date"
-                    Task {
-                        await media.loadDataSource()
-                        await media.networkRemoveAll()
-                        await self.updateMenuOption()
-                    }
-                }
-            ),
-
-            UIAction(
-                title: NSLocalizedString("_media_by_created_date_", comment: ""),
-                image: utility.loadImage(named: "sortFileNameAZ"),//, colors: [NCBrandColor.shared.iconImageColor], size: 24).withTintColor(NCBrandColor.shared.iconImageColor),//, colors: [NCBrandColor.shared.iconImageColor]),
-                state: NCPreferences().mediaSortDate == "creationDate" ? .on : .off,
-                handler: { _ in
-                    NCPreferences().mediaSortDate = "creationDate"
-                    Task {
-                        await media.loadDataSource()
-                        await media.networkRemoveAll()
-                        await self.updateMenuOption()
-                    }
-                }
-            ),
-
-            UIAction(
-                title: NSLocalizedString("_media_by_upload_date_", comment: ""),
-                image: utility.loadImage(named: "sortFileNameAZ"),//, colors: [NCBrandColor.shared.iconImageColor], size: 24).withTintColor(NCBrandColor.shared.iconImageColor),//, colors: [NCBrandColor.shared.iconImageColor]),
-                state: NCPreferences().mediaSortDate == "uploadDate" ? .on : .off,
-                handler: { _ in
-                    NCPreferences().mediaSortDate = "uploadDate"
-                    Task {
-                        await media.loadDataSource()
-                        await media.networkRemoveAll()
-                        await self.updateMenuOption()
-                    }
-                }
-            )
-        ]
+//        let actionsInSortMenu: [UIAction] = [
+//            UIAction(
+//                title: NSLocalizedString("_media_by_modified_date_", comment: ""),
+//                image: utility.loadImage(named: "sortFileNameAZ"),//, colors: [NCBrandColor.shared.iconImageColor], size: 24).withTintColor(NCBrandColor.shared.iconImageColor),//, colors: [NCBrandColor.shared.iconImageColor]),
+//                state: NCPreferences().mediaSortDate == "date" ? .on : .off,
+//                handler: { _ in
+//                    NCPreferences().mediaSortDate = "date"
+//                    Task {
+//                        await media.loadDataSource()
+//                        await media.networkRemoveAll()
+//                        await self.updateMenuOption()
+//                    }
+//                }
+//            ),
+//
+//            UIAction(
+//                title: NSLocalizedString("_media_by_created_date_", comment: ""),
+//                image: utility.loadImage(named: "sortFileNameAZ"),//, colors: [NCBrandColor.shared.iconImageColor], size: 24).withTintColor(NCBrandColor.shared.iconImageColor),//, colors: [NCBrandColor.shared.iconImageColor]),
+//                state: NCPreferences().mediaSortDate == "creationDate" ? .on : .off,
+//                handler: { _ in
+//                    NCPreferences().mediaSortDate = "creationDate"
+//                    Task {
+//                        await media.loadDataSource()
+//                        await media.networkRemoveAll()
+//                        await self.updateMenuOption()
+//                    }
+//                }
+//            ),
+//
+//            UIAction(
+//                title: NSLocalizedString("_media_by_upload_date_", comment: ""),
+//                image: utility.loadImage(named: "sortFileNameAZ"),//, colors: [NCBrandColor.shared.iconImageColor], size: 24).withTintColor(NCBrandColor.shared.iconImageColor),//, colors: [NCBrandColor.shared.iconImageColor]),
+//                state: NCPreferences().mediaSortDate == "uploadDate" ? .on : .off,
+//                handler: { _ in
+//                    NCPreferences().mediaSortDate = "uploadDate"
+//                    Task {
+//                        await media.loadDataSource()
+//                        await media.networkRemoveAll()
+//                        await self.updateMenuOption()
+//                    }
+//                }
+//            )
+//        ]
 
         let selectAll = UIMenu(title: "", options: .displayInline, children: [
             UIAction(
                 title: NSLocalizedString("_select_all_", comment: ""),
-                image: utility.loadImage(named: "checkmark.circle.fill"),//, colors: [NCBrandColor.shared.iconImageColor], size: 24).withTintColor(NCBrandColor.shared.iconImageColor),
+                image: utility.loadImage(named: "checkmark.circle.fill", colors: [NCBrandColor.shared.iconImageColor], size: 24).withTintColor(NCBrandColor.shared.iconImageColor),
                 handler: { _ in
                     // Ensure edit mode is enabled so selection is visible
                     if !media.isEditMode {
@@ -289,7 +289,7 @@ class NCMediaNavigationController: NCMainNavigationController {
         let actionsInEditMode: [UIAction] = [
             UIAction(
                 title: NSLocalizedString("_add_to_album", comment: ""),
-                image: utility.loadImage(named: "photo.badge.plus.fill"),
+                image: utility.loadImage(named: "plus", colors: [NCBrandColor.shared.iconImageColor], size: 24).withTintColor(NCBrandColor.shared.iconImageColor),
                 handler: { _ in
                     guard let controller = self.controller else { return }
                     NCMediaNavigationController.presentExistingAlbums(controller: controller, selectedPhotos: media.fileSelect)
@@ -299,7 +299,7 @@ class NCMediaNavigationController: NCMainNavigationController {
             UIAction(
                 title: NSLocalizedString("_albums_list_new_album_popup_title_", comment: ""),
 //                image: utility.loadImage(named: "photo.stack.fill"),
-                image: utility.loadImage(named: "album"),//, colors: [NCBrandColor.shared.iconImageColor]).withTintColor(NCBrandColor.shared.iconImageColor),
+                image: utility.loadImage(named: "album", colors: [NCBrandColor.shared.iconImageColor]).withTintColor(NCBrandColor.shared.iconImageColor),
                 handler: { _ in
                     guard let controller = self.controller else { return }
                     NCMediaNavigationController.presentInputAlbumNameAlert(on: controller) { albumName in
@@ -309,18 +309,18 @@ class NCMediaNavigationController: NCMainNavigationController {
             )
         ]
 
-        let mediaSortMenu = UIMenu(
-            title: "",
-            options: .displayInline,
-            children: actionsInSortMenu
-        )
+//        let mediaSortMenu = UIMenu(
+//            title: "",
+//            options: .displayInline,
+//            children: actionsInSortMenu
+//        )
 
         let editModeMenu = UIMenu(
             title: "",
             options: .displayInline,
             children: actionsInEditMode
         )
-        return UIMenu(title: "", children: !media.isEditMode ? [select, viewFilterMenu, viewLayoutMenu, viewFolderMedia, playFile, playURL] : [cancel, selectAll, editModeMenu])
+        return UIMenu(title: "", children: !media.isEditMode ? [select, viewFilterMenu, viewLayoutMenu, viewFolderMedia] : [cancel, selectAll, editModeMenu])
 //        return UIMenu(title: "", children: !media.isEditMode ? [select, viewFilterMenu, viewLayoutMenu, viewFolderMedia, mediaSortMenu] : [cancel, selectAll, editModeMenu])//, playFile, playURL])
     }
 

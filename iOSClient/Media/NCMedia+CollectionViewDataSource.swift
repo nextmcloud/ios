@@ -95,13 +95,7 @@ extension NCMedia: UICollectionViewDataSource {
         let images = dataSource.compactMetadatas.filter(\.isImage).count
         let videos = dataSource.compactMetadatas.count - images
 
-        footer.setTitleLabel(
-            "\(images) "
-            + NSLocalizedString("_images_", comment: "")
-            + " • "
-            + "\(videos) "
-            + NSLocalizedString("_video_", comment: "")
-        )
+        footer.setMediaTitleLabel(images: images, videos: videos)
 
         return footer
     }

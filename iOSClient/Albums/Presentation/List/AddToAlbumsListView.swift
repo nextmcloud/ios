@@ -173,8 +173,9 @@ struct AlbumRow: View {
         guard let count = album.itemCount else { return nil }
         var parts: [String] = [
             String.localizedStringWithFormat(
-                NSLocalizedString("_albums_list_photos_and_videos_count_", comment: ""),
-                count
+//                NSLocalizedString("_albums_list_photos_and_videos_count_", comment: ""),
+                NSLocalizedString("_albums_elements_count_", comment: ""),
+                count//, count
             )
         ]
         let formatter = DateFormatter()

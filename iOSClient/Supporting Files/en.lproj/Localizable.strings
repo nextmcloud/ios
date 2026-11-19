@@ -74,7 +74,7 @@
 "_warning_"                 = "Warning";
 "_email_"                   = "Email";
 "_save_exit_"               = "Do you want to exit without saving?";
-"_video_"                   = "Video";
+//"_video_"                   = "Video";
 "_overwrite_"               = "Overwrite";
 "_transfers_in_queue_"      = "Transfers in progress, please wait …";
 "_too_errors_upload_"       = "Too many errors, please verify the problem";
@@ -185,6 +185,9 @@
 "_error_occurred_"          = "An error occurred, please try again.";
 "_retry_"                   = "Retry";
 "_images_"                  = "Images";
+"_image_"                   = "Image";
+"_videos_"                  = "Videos";
+"_video_"                   = "Video";
 "_confirm_"                 = "Confirm";
 "_confirm_continue_"        = "Confirm by continuing the previous uploading";
 "_confirm_resetting_"       = "Confirm ignoring previous uploading";
