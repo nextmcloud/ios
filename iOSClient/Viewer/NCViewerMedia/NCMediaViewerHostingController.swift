@@ -60,14 +60,13 @@ final class NCMediaViewerHostingController: UIHostingController<NCMediaViewerVie
         primaryAction: nil,
         menu: UIMenu(title: "", children: [
             UIDeferredMenuElement.uncached { [self] completion in
-                guard let metadata = self.model.selectedMetadata,
-                      let controller = self.resolvedContextMenuController()
-                else {
+                let metadata = self.model.selectedMetadata
+                guard let controller = self.resolvedContextMenuController(self.contextMenuController) else {
                     completion([])
                     return
                 }
                 if let menu = NCContextMenuViewer(
-                    metadata: metadata,
+                    metadata: metadata!,
                     controller: controller,
                     viewController: self,
                     webView: false,

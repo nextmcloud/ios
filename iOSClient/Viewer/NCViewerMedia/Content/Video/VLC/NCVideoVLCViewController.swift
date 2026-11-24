@@ -41,10 +41,27 @@ final class NCVideoVLCViewController: UIViewController {
 
     private let floatingTitleView = NCMediaViewerFloatingTitleView()
 
-    private lazy var moreNavigationItem = NCContextMenuViewer.mediaNavigationItem(
-        viewController: self,
-        metadataProvider: { [weak self] in self?.metadata },
-        controllerProvider: { [weak self] in self?.contextMenuController }
+    private lazy var moreNavigationItem = UIBarButtonItem(
+        image: NCImageCache.shared.getImageButtonMore(),
+        primaryAction: nil,
+        menu: UIMenu(title: "", children: [
+            UIDeferredMenuElement.uncached { [self] completion in
+                let metadata = self.metadata
+                guard let controller = self.resolvedContextMenuController(self.contextMenuController) else {
+                    completion([])
+                    return
+                }
+                if let menu = NCContextMenuViewer(
+                    metadata: metadata,
+                    controller: controller,
+                    viewController: self,
+                    webView: false,
+                    sender: self
+                ).viewMenu() {
+                    completion(menu.children)
+                }
+            }
+        ])
     )
 
     private lazy var floatingTitleDateFormatter: DateFormatter = {

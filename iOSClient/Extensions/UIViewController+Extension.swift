@@ -72,6 +72,28 @@ extension UIViewController {
         loader.removeFromParent()
         Holder.loader = nil
     }
+
+    func resolvedContextMenuController(_ contextMenuController: NCMainTabBarController?) -> NCMainTabBarController? {
+        // Prefer the injected one
+        if let injected = contextMenuController { return injected }
+
+        // Try from our navigation controller’s tabBarController
+        if let tab = self.tabBarController as? NCMainTabBarController { return tab }
+
+        // Walk up the presenting hierarchy
+        var parentVC = self.presentingViewController
+        while let parent = parentVC {
+            if let tab = parent as? NCMainTabBarController { return tab }
+            parentVC = parent.presentingViewController
+        }
+
+        // Or from the window’s root
+        if let root = view.window?.rootViewController as? NCMainTabBarController {
+            return root
+        }
+
+        return nil
+    }
 }
 
 extension UIViewController: @retroactive MFMailComposeViewControllerDelegate {

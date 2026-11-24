@@ -160,7 +160,22 @@ class AlbumsListViewModel: ObservableObject {
                 }
             case .failure(let error):
                 Task {
-                    await showErrorBanner(windowScene: self?.windowScene, text: error.errorDescription)
+                    let nkError = NKError(error: error)
+                    // Prefer friendly info alert for duplicate album names (conflict-like codes)
+                    let conflictCode = NCGlobal.shared.errorConflict
+                    let duplicateHTTPCode = 405 // As observed in nested NKError
+
+                    // Extract possible nested NKError code if present
+                    let nestedCode: Int? = (nkError.error as? NKError)?.errorCode
+
+                    if nestedCode == duplicateHTTPCode || nestedCode == conflictCode || nkError.errorCode == conflictCode || nkError.errorCode == duplicateHTTPCode {
+                        let message = NSLocalizedString("_album_already_exists_", comment: "Album already exists")
+                        let conflict = NKError(errorCode: conflictCode, errorDescription: message)
+                        await showErrorBanner(windowScene: self?.windowScene, error: conflict)
+                    } else {
+                        // Other errors
+                        await showErrorBanner(windowScene: self?.windowScene, error: error)
+                    }
                 }
             }
         }
@@ -202,7 +217,17 @@ class AlbumsListViewModel: ObservableObject {
                     hadAnySuccess = true
                 case .failure(let error):
                     Task {
-                        await showErrorBanner(windowScene: self.windowScene, text: error.errorDescription)
+                        // Handle duplicate-in-album gracefully: NKError with code 409
+                        let nkErr = NKError(error: error)
+                        let conflictCode = NCGlobal.shared.errorConflict
+
+                        if nkErr.errorCode == conflictCode || (nkErr.error as? NKError)?.errorCode == conflictCode {
+                            let message = NSLocalizedString("_album_file_already_exists_", comment: "Photo already in the album")
+                            let conflict = NKError(errorCode: conflictCode, errorDescription: message)
+                            await showErrorBanner(windowScene: self.windowScene, error: conflict)
+                        } else {
+                            await showErrorBanner(windowScene: self.windowScene, text: nkErr.errorDescription)
+                        }
                     }
                 }
                 group.leave()
@@ -224,3 +249,4 @@ class AlbumsListViewModel: ObservableObject {
         }
     }
 }
+

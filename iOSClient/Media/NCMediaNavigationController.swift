@@ -344,7 +344,7 @@ class NCMediaNavigationController: NCMainNavigationController {
     ) {
         let alert = UIAlertController(
          title: NSLocalizedString("_albums_list_new_album_popup_title_", comment: ""),
-         message: NSLocalizedString("_albums_list_new_album_popup_desc_", comment: ""),
+         message: "",
          preferredStyle: .alert
         )
 
@@ -498,7 +498,17 @@ class NCMediaNavigationController: NCMainNavigationController {
                     finishIfDone()
                 case .failure(let error):
                     Task {
-                        await showErrorBanner(windowScene: controller.viewIfLoaded?.window?.windowScene, error: error)
+                        // Handle duplicate-in-album gracefully: NKError with code 409
+                        let nkErr = NKError(error: error)
+                        let conflictCode = NCGlobal.shared.errorConflict
+
+                        if nkErr.errorCode == conflictCode || (nkErr.error as? NKError)?.errorCode == conflictCode {
+                            let message = NSLocalizedString("_album_file_already_exists_", comment: "Photo already in the album")
+                            let conflict = NKError(errorCode: conflictCode, errorDescription: message)
+                            await showErrorBanner(windowScene: controller.viewIfLoaded?.window?.windowScene, error: conflict)
+                        } else {
+                            await showErrorBanner(windowScene: controller.viewIfLoaded?.window?.windowScene, text: nkErr.errorDescription)
+                        }
                     }
                     finishIfDone()
                 }

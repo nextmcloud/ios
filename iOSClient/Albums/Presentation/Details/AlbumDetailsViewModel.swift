@@ -271,9 +271,34 @@ class AlbumDetailsViewModel: ObservableObject {
                 self.loadAlbumPhotos()
             } catch {
                 self.isLoadingPopupVisible = false
-                let error = (error as? NKError) ?? NKError(error: error)
-                // Report every failed rename, even after another offline operation.
-                await showErrorBanner(windowScene: self.windowScene, text: error.errorDescription)
+                // Normalize to NKError
+                let nkError: NKError = (error as? NKError) ?? NKError(error: error)
+
+                // Prefer friendly info alert for duplicate album names
+                let conflictCode = NCGlobal.shared.errorConflict // e.g., 409
+                let duplicateHTTPCode = 405 // as observed in nested NKError in some cases
+                let preconditionFailedCode = 412 // The destination already exists
+
+                // Extract possible nested NKError code if present
+                let nestedCode: Int? = (nkError.error as? NKError)?.errorCode
+
+                let isDuplicate = (
+                    nkError.errorCode == conflictCode ||
+                    nkError.errorCode == duplicateHTTPCode ||
+                    nkError.errorCode == preconditionFailedCode ||
+                    nestedCode == conflictCode ||
+                    nestedCode == duplicateHTTPCode ||
+                    nestedCode == preconditionFailedCode
+                )
+
+                if isDuplicate {
+                    let message = NSLocalizedString("_album_already_exists_", comment: "Album already exists")
+                    let conflict = NKError(errorCode: conflictCode, errorDescription: message)
+                    await showErrorBanner(windowScene: self.windowScene, error: conflict)
+                } else {
+                    // Other errors: show original normalized error
+                    await showErrorBanner(windowScene: self.windowScene, error: nkError)
+                }
             }
         }
     }
@@ -317,7 +342,19 @@ class AlbumDetailsViewModel: ObservableObject {
                     case .success:
                         hadAnySuccess = true
                     case .failure(let error):
-                        await showErrorBanner(windowScene: self?.windowScene, text: error.errorDescription)
+                        Task {
+                            // Handle duplicate-in-album gracefully: NKError with code 409
+                            let nkErr = NKError(error: error)
+                            let conflictCode = NCGlobal.shared.errorConflict
+
+                            if nkErr.errorCode == conflictCode || (nkErr.error as? NKError)?.errorCode == conflictCode {
+                                let message = NSLocalizedString("_album_file_already_exists_", comment: "Photo already in the album")
+                                let conflict = NKError(errorCode: conflictCode, errorDescription: message)
+                                await showErrorBanner(windowScene: self?.windowScene, error: conflict)
+                            } else {
+                                await showErrorBanner(windowScene: self?.windowScene, text: nkErr.errorDescription)
+                            }
+                        }
                     }
                 }
             }
@@ -343,3 +380,4 @@ extension AlbumDetailsViewModel: AlbumActionHandler {
         }
     }
 }
+

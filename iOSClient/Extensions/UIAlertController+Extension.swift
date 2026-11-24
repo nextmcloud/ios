@@ -180,7 +180,7 @@ extension UIAlertController {
         }, completion: completion)
     }
 
-    static func alertDeleteFileOrFolder(titleString: String, message: String?, canDeleteServer: Bool, metadatas: [tableMetadata], completion: @escaping (_ cancelled: Bool) -> Void) -> UIAlertController {
+    static func alertDeleteFileOrFolder(titleString: String, message: String?, canDeleteServer: Bool, metadatas: [tableMetadata], isAlbumTabSelected: Bool = false, completion: @escaping (_ cancelled: Bool) -> Void) -> UIAlertController {
         let alertController = UIAlertController(
             title: titleString,
             message: message,
@@ -188,13 +188,11 @@ extension UIAlertController {
         if canDeleteServer {
             alertController.addAction(UIAlertAction(title: NSLocalizedString("_yes_", comment: ""), style: .destructive) { (_: UIAlertAction) in
                 Task {
-//                    if controller?.selectedIndex == NCGlobal.shared.selectedTabIndexAlbum {
-////                        await deletePhotosFromCurrentAlbum(selectedMetadatas: selectedMetadatas, controller: controller)
-//                        NotificationCenter.default.post(name: NSNotification.Name("deletePhotosFromAlbum"), object: nil, userInfo: ["metadatas": metadatas])
-//
-//                    } else {
+                    if isAlbumTabSelected {
+                        NotificationCenter.default.post(name: NSNotification.Name("deletePhotosFromAlbum"), object: nil, userInfo: ["metadatas": metadatas])
+                    } else {
                         await NCNetworking.shared.setStatusWaitDelete(metadatas: metadatas)
-//                    }
+                    }
                 }
                 completion(false)
             })
