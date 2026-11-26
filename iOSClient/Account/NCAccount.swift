@@ -58,6 +58,9 @@ class NCAccount: NSObject {
         await changeAccount(account, userProfile: userProfile, controller: controller)
         nkLog(debug: "NCAccount changed user profile to \(userProfile.userId).")
 
+        // Register the new user in analytics (MoEngage unique ID = userId)
+        AnalyticsHelper.shared.trackUserData()
+
         NCPreferences().setClientCertificate(account: account, p12Data: NCNetworking.shared.p12Data, p12Password: NCNetworking.shared.p12Password)
 
         if let controller {
@@ -122,6 +125,11 @@ class NCAccount: NSObject {
     func deleteAccount(_ account: String, wipe: Bool = true) async {
         UIApplication.shared.allSceneSessionDestructionExceptFirst()
         let tblAccount = await database.getTableAccountAsync(predicate: NSPredicate(format: "account == %@", account))
+
+        // Reset the analytics user only when the active account is removed
+        if tblAccount?.active == true {
+            AnalyticsHelper.shared.trackLogout()
+        }
 
         // Unsubscribing Push Notification & Domain
         if let tblAccount {

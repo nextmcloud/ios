@@ -14,6 +14,8 @@ import EasyTipView
 import SwiftUI
 import RealmSwift
 import MoEngageInApps
+import MoEngageSDK
+import MoEngageMessaging
 
 class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterDelegate {
     var backgroundSessionCompletionHandler: (() -> Void)?
@@ -180,200 +182,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         // Use this method to release any resources that were specific to the discarded scenes, as they will not return.
     }
 
-    /*
-    // MARK: - Background Task
-
-    /*
-    @discussion Schedule a refresh task request to ask that the system launch your app briefly so that you can download data and keep your app's contents up-to-date. The system will fulfill this request intelligently based on system conditions and app usage.
-     */
-    func scheduleAppRefresh() {
-        let request = BGAppRefreshTaskRequest(identifier: global.refreshTask)
-
-        request.earliestBeginDate = Date(timeIntervalSinceNow: 60) // Refresh after 60 seconds.
-
-        do {
-            try BGTaskScheduler.shared.submit(request)
-        } catch {
-            nkLog(tag: self.global.logTagTask, emoji: .error, message: "Refresh task failed to submit request: \(error)")
-        }
-    }
-
-    /*
-     @discussion Schedule a processing task request to ask that the system launch your app when conditions are favorable for battery life to handle deferrable, longer-running processing, such as syncing, database maintenance, or similar tasks. The system will attempt to fulfill this request to the best of its ability within the next two days as long as the user has used your app within the past week.
-     */
-    func scheduleAppProcessing() {
-        let request = BGProcessingTaskRequest(identifier: global.processingTask)
-
-        request.earliestBeginDate = Date(timeIntervalSinceNow: 5 * 60) // Refresh after 5 minutes.
-        request.requiresNetworkConnectivity = false
-        request.requiresExternalPower = false
-
-        do {
-            try BGTaskScheduler.shared.submit(request)
-        } catch {
-            nkLog(tag: self.global.logTagTask, emoji: .error, message: "Processing task failed to submit request: \(error)")
-        }
-    }
-
-    func handleAppRefresh(_ task: BGAppRefreshTask) {
-        nkLog(tag: self.global.logTagTask, emoji: .start, message: "Start refresh task")
-        guard NCManageDatabase.shared.openRealmBackground() else {
-            nkLog(tag: self.global.logTagTask, emoji: .error, message: "Failed to open Realm in background")
-            task.setTaskCompleted(success: false)
-            return
-        }
-
-        // Schedule next refresh
-        scheduleAppRefresh()
-
-        Task {
-            defer {
-                task.setTaskCompleted(success: true)
-            }
-
-            await backgroundSync(task: task)
-        }
-    }
-
-    func handleProcessingTask(_ task: BGProcessingTask) {
-        nkLog(tag: self.global.logTagTask, emoji: .start, message: "Start processing task")
-        guard NCManageDatabase.shared.openRealmBackground() else {
-            nkLog(tag: self.global.logTagTask, emoji: .error, message: "Failed to open Realm in background")
-            task.setTaskCompleted(success: false)
-            return
-        }
-        var expired = false
-        task.expirationHandler = {
-            expired = true
-        }
-
-        // Schedule next processing task
-        scheduleAppProcessing()
-
-       Task {
-           defer {
-               task.setTaskCompleted(success: true)
-           }
-
-           // If possible, cleaning every week
-           if NCPreferences().cleaningWeek() {
-               // BGTask expiration flag
-               nkLog(tag: self.global.logTagBgSync, emoji: .start, message: "Start cleaning week")
-               let tblAccounts = await NCManageDatabase.shared.getAllTableAccountAsync()
-               for tblAccount in tblAccounts {
-                   await NCManageDatabase.shared.cleanTablesOcIds(account: tblAccount.account, userId: tblAccount.userId, urlBase: tblAccount.urlBase)
-                   guard !expired else { return }
-               }
-               await NCUtilityFileSystem().cleanUpAsync()
-
-               NCPreferences().setDoneCleaningWeek()
-               nkLog(tag: self.global.logTagBgSync, emoji: .stop, message: "Stop cleaning week")
-           } else {
-               await backgroundSync(task: task)
-           }
-       }
-    }
-
-    func backgroundSync(task: BGTask? = nil) async {
-        defer {
-            // Update badge safely at the end of the background sync
-            Task { @MainActor in
-                do {
-                    let count = await NCManageDatabase.shared.getMetadatasInWaitingCountAsync()
-                    try await UNUserNotificationCenter.current().setBadgeCount(count)
-                } catch { }
-            }
-        }
-
-        // BGTask expiration flag
-        var expired = false
-        task?.expirationHandler = {
-            expired = true
-        }
-
-        // Discover new items for Auto Upload
-        let numAutoUpload = await NCAutoUpload.shared.initAutoUpload()
-        nkLog(tag: self.global.logTagBgSync, emoji: .start, message: "Auto upload found \(numAutoUpload) new items")
-        guard !expired else { return }
-
-        // Fetch METADATAS
-        let metadatas = await NCManageDatabase.shared.getMetadataProcess()
-        guard !metadatas.isEmpty, !expired else {
-            return
-        }
-
-        // Create all pending Auto Upload folders (fail-fast)
-        let pendingCreateFolders = metadatas.lazy.filter {
-            $0.status == self.global.metadataStatusWaitCreateFolder &&
-            $0.sessionSelector == self.global.selectorUploadAutoUpload
-        }
-
-        for metadata in pendingCreateFolders {
-            guard !expired else { return }
-
-            let err = await NCNetworking.shared.createFolderForAutoUpload(
-                serverUrlFileName: metadata.serverUrlFileName,
-                account: metadata.account
-            )
-            // Fail-fast: abort the whole sync on first failure
-            if err != .success {
-                nkLog(tag: self.global.logTagBgSync, emoji: .error, message: "Create folder '\(metadata.serverUrlFileName)' failed: \(err.errorCode) – aborting sync")
-                return
-            }
-        }
-
-        // Capacity computation
-        let downloading = metadatas.lazy.filter { $0.status == self.global.metadataStatusDownloading }.count
-        let uploading = metadatas.lazy.filter { $0.status == self.global.metadataStatusUploading }.count
-        let availableProcess = max(0, NCBrandOptions.shared.numMaximumProcess - (downloading + uploading))
-
-        // Start Auto Uploads
-        let metadatasToUpload = Array(
-            metadatas.lazy.filter {
-                $0.status == self.global.metadataStatusWaitUpload &&
-                $0.sessionSelector == self.global.selectorUploadAutoUpload &&
-                $0.chunk == 0
-            }
-            .prefix(availableProcess)
-        )
-
-        let cameraRoll = NCCameraRoll()
-
-        for metadata in metadatasToUpload {
-            guard !expired else { return }
-
-            // File exists? skip it
-            let existsResult = await NCNetworking.shared.fileExists(serverUrlFileName: metadata.serverUrlFileName, account: metadata.account)
-            if existsResult == .success {
-                // File exists → delete from local metadata and skip
-                await NCManageDatabase.shared.deleteMetadataAsync(id: metadata.ocId)
-                continue
-            } else if existsResult.errorCode == 404 {
-                // 404 Not Found → directory does not exist
-                // Proceed
-            } else {
-                // Any other error (423 locked, 401 auth, 403 forbidden, 5xx, etc.)
-                continue
-            }
-
-            // Expand seed into concrete metadatas (e.g., Live Photo pair)
-            let extracted = await cameraRoll.extractCameraRoll(from: metadata)
-            guard !expired else { return }
-
-            for metadata in extracted {
-                // Sequential await keeps ordering and simplifies backpressure
-                let err = await NCNetworking.shared.uploadFileInBackground(metadata: metadata.detachedCopy())
-                if err == .success {
-                    nkLog(tag: self.global.logTagBgSync, message: "In queued upload \(metadata.fileName) -> \(metadata.serverUrl)")
-                } else {
-                    nkLog(tag: self.global.logTagBgSync, emoji: .error, message: "Upload failed \(metadata.fileName) -> \(metadata.serverUrl) [\(err.errorDescription)]")
-                }
-                guard !expired else { return }
-            }
-        }
-    }
-*/
-
     // MARK: - Background Networking Session
 
     func application(_ application: UIApplication, handleEventsForBackgroundURLSession identifier: String, completionHandler: @escaping () -> Void) {
@@ -387,10 +195,18 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     // MARK: - Push Notifications
 
     func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
+        if MoEngageMessagingUtils.fetchAppIdFromPushPayload(payload: notification.request.content.userInfo) != nil {
+            MoEngagePushCallBackHandler.sharedInstance.userNotificationCenter(center, willPresent: notification, withCompletionHandler: completionHandler)
+            return
+        }
         completionHandler([.list, .banner, .sound])
     }
 
     func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
+        if MoEngageMessagingUtils.fetchAppIdFromPushPayload(payload: response.notification.request.content.userInfo) != nil {
+            MoEngagePushCallBackHandler.sharedInstance.userNotificationCenter(center, didReceive: response, withCompletionHandler: completionHandler)
+            return
+        }
         if let pref = UserDefaults(suiteName: NCBrandOptions.shared.capabilitiesGroup),
            let data = pref.object(forKey: "NOTIFICATION_DATA") as? [String: AnyObject] {
             nextcloudPushNotificationAction(data: data)
@@ -401,6 +217,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     }
 
     func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
+        // Hand the APNs token to MoEngage so the user can be reached by MoEngage push
+        MoEngageSDKMessaging.sharedInstance.setPushToken(deviceToken)
+
         if let deviceToken = NCPushNotificationEncryption.shared().string(withDeviceToken: deviceToken) {
             NCPreferences().deviceTokenPushNotification = deviceToken
             pushSubscriptionTask = Task.detached {
@@ -537,37 +356,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
 
     // MARK: - Login
 
-//    func openLogin(selector: Int, window: UIWindow? = nil) {
-//        UIApplication.shared.allSceneSessionDestructionExceptFirst()
-//
-//        // Nextcloud standard login
-//        if selector == NCGlobal.shared.introSignup {
-//            if activeLogin?.view.window == nil {
-//                if selector == NCGlobal.shared.introSignup {
-//                    let web = UIStoryboard(name: "NCLogin", bundle: nil).instantiateViewController(withIdentifier: "NCLoginProvider") as? NCLoginProvider
-//                    web?.initialURLString = NCBrandOptions.shared.linkloginPreferredProviders
-//                    showLoginViewController(web)
-//                    
-//                } else {
-//                    activeLogin = UIStoryboard(name: "NCLogin", bundle: nil).instantiateViewController(withIdentifier: "NCLogin") as? NCLogin
-//                    if let controller = UIApplication.shared.firstWindow?.rootViewController as? NCMainTabBarController, !controller.account.isEmpty {
-//                        let session = NCSession.shared.getSession(account: controller.account)
-//                        activeLogin?.urlBase = session.urlBase
-//                    }
-//                    showLoginViewController(activeLogin)
-//                }
-//            }
-//        } else {
-//            if activeLogin?.view.window == nil {
-//                activeLogin = UIStoryboard(name: "NCLogin", bundle: nil).instantiateViewController(withIdentifier: "NCLogin") as? NCLogin
-//                activeLogin?.urlBase = NCBrandOptions.shared.disable_request_login_url ? NCBrandOptions.shared.loginBaseUrl : ""
-//                showLoginViewController(activeLogin)
-//            }
-//        }
-//    }
-
     func openLogin(viewController: UIViewController?, selector: Int, openLoginWeb: Bool) {
-//        openLogin(selector: NCGlobal.shared.introLogin)
         // [WEBPersonalized] [AppConfig]
         if NCBrandOptions.shared.use_login_web_personalized || NCBrandOptions.shared.use_AppConfig {
 

@@ -239,6 +239,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         AnalyticsHelper.shared.trackAppVersion(oldVersion: oldVersion)
         if let userAccount = NCManageDatabase.shared.getActiveTableAccount() {
             AnalyticsHelper.shared.trackUsedStorageData(quotaUsed: userAccount.quotaUsed)
+            // Keep the MoEngage identity in sync for accounts created before the identity was set
+            AnalyticsHelper.shared.trackUserData()
         }
 
         NCSettingsBundleHelper.setVersionAndBuildNumber()
