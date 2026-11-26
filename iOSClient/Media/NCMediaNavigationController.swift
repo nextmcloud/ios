@@ -397,17 +397,17 @@ class NCMediaNavigationController: NCMainNavigationController {
 
              case .failure(let error):
                  Task {
-//                     await showErrorBanner(windowScene: controller.viewIfLoaded?.window?.windowScene, error: error)
                      let nkError = NKError(error: error)
-                     // Prefer friendly info alert for duplicate album names (409)
-                     if let inner = nkError.error as? NKError, inner.errorCode == NCGlobal.shared.errorConflict {
+                     // Prefer friendly info alert for duplicate album names (conflict-like codes)
+                     let conflictCode = NCGlobal.shared.errorConflict
+                     let duplicateHTTPCode = 405 // As observed in nested NKError
+
+                     // Extract possible nested NKError code if present
+                     let nestedCode: Int? = (nkError.error as? NKError)?.errorCode
+
+                     if nestedCode == duplicateHTTPCode || nestedCode == conflictCode || nkError.errorCode == conflictCode || nkError.errorCode == duplicateHTTPCode {
                          let message = NSLocalizedString("_album_already_exists_", comment: "Album already exists")
-                         let conflict = NKError(errorCode: NCGlobal.shared.errorConflict, errorDescription: message)
-                         await showErrorBanner(windowScene: controller.viewIfLoaded?.window?.windowScene, error: conflict)
-                     } else if nkError.errorCode == NCGlobal.shared.errorConflict {
-                         // Top-level conflict
-                         let message = NSLocalizedString("_album_already_exists_", comment: "Album already exists")
-                         let conflict = NKError(errorCode: NCGlobal.shared.errorConflict, errorDescription: message)
+                         let conflict = NKError(errorCode: conflictCode, errorDescription: message)
                          await showErrorBanner(windowScene: controller.viewIfLoaded?.window?.windowScene, error: conflict)
                      } else {
                          // Other errors

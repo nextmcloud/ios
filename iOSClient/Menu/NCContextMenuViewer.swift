@@ -9,7 +9,7 @@ import NextcloudKit
 /// See ``NCViewerImage``, ``NCViewerMedia``, ``NCViewerPDF`` for usage details.
 @MainActor
 class NCContextMenuViewer: NSObject {
-    let metadata: tableMetadata
+    var metadata: tableMetadata
     let controller: NCMainTabBarController?
     let viewController: UIViewController?
     let webView: Bool
@@ -35,8 +35,12 @@ class NCContextMenuViewer: NSObject {
     }
 
     func viewMenu() -> UIMenu? {
-        guard let metadata = database.getMetadataFromOcId(metadata.ocId),
-              let controller,
+        if let metadata = database.getMetadataFromOcId(metadata.ocId) {
+            self.metadata = metadata
+        } else {
+            // Optionally: fetch metadata, show spinner or delay menu, then reload
+        }
+        guard let controller,
               let capabilities = NCNetworking.shared.capabilities[metadata.account] else {
             return nil
         }
