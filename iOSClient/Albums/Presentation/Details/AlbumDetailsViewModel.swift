@@ -212,6 +212,8 @@ class AlbumDetailsViewModel: ObservableObject {
             }
             photos.removeAll { $0.id == photo.id }
             persistPhotosAfterRemoval()
+            // Removal comes from the media viewer: close it to return to the album.
+            NCMediaViewerPresenter.shared.dismiss()
         }
     }
 
