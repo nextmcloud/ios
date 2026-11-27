@@ -370,21 +370,22 @@ struct NCMediaViewerDetailView: View {
     // MARK: - Formatters
 
     private func dayString(from date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "EEEE"
-        return formatter.string(from: date)
+        dateFormatter(template: "EEEE").string(from: date)
     }
 
     private func dateString(from date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "d MMM yyyy"
-        return formatter.string(from: date)
+        dateFormatter(template: "d MMM yyyy").string(from: date)
     }
 
     private func timeString(from date: Date) -> String {
+        dateFormatter(template: "HHmm").string(from: date)
+    }
+
+    private func dateFormatter(template: String) -> DateFormatter {
         let formatter = DateFormatter()
-        formatter.dateFormat = "HH:mm"
-        return formatter.string(from: date)
+        formatter.locale = Locale(identifier: Locale.preferredLanguages.first ?? Locale.current.identifier)
+        formatter.setLocalizedDateFormatFromTemplate(template)
+        return formatter
     }
 
     // MARK: - Actions
