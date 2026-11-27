@@ -150,6 +150,8 @@
 		B55F81D12FF4E91F0053242A /* FolderPathCustomCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = B55F81CC2FF4E91F0053242A /* FolderPathCustomCell.xib */; };
 		B55F81D22FF4E91F0053242A /* FolderPathCustomCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = B55F81CB2FF4E91F0053242A /* FolderPathCustomCell.swift */; };
 		B55F81D32FF4E91F0053242A /* NCCreateDocumentCustomTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = B55F81CD2FF4E91F0053242A /* NCCreateDocumentCustomTextField.swift */; };
+		B567618330B96E7600F503EC /* NCCreateFormUploadDocuments.swift in Sources */ = {isa = PBXBuildFile; fileRef = B567618230B96E7600F503EC /* NCCreateFormUploadDocuments.swift */; };
+		B567618430B96E7600F503EC /* NCCreateFormUploadDocuments.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B567618130B96E7600F503EC /* NCCreateFormUploadDocuments.storyboard */; };
 		B58644AF307D112B000BDA19 /* NCManageDatabase+Albums.swift in Sources */ = {isa = PBXBuildFile; fileRef = B58644A9307D112B000BDA19 /* NCManageDatabase+Albums.swift */; };
 		B58644B0307D112B000BDA19 /* NCManageDatabase+MediaMetadataBackfill.swift in Sources */ = {isa = PBXBuildFile; fileRef = B58644AB307D112B000BDA19 /* NCManageDatabase+MediaMetadataBackfill.swift */; };
 		B58644B3307D112B000BDA19 /* NCManageDatabase+MediaPreviewBackfill.swift in Sources */ = {isa = PBXBuildFile; fileRef = B58644AC307D112B000BDA19 /* NCManageDatabase+MediaPreviewBackfill.swift */; };
@@ -1272,6 +1274,8 @@
 		B55F81CC2FF4E91F0053242A /* FolderPathCustomCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = FolderPathCustomCell.xib; sourceTree = "<group>"; };
 		B55F81CD2FF4E91F0053242A /* NCCreateDocumentCustomTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCCreateDocumentCustomTextField.swift; sourceTree = "<group>"; };
 		B55F81CE2FF4E91F0053242A /* NCCreateDocumentCustomTextField.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = NCCreateDocumentCustomTextField.xib; sourceTree = "<group>"; };
+		B567618130B96E7600F503EC /* NCCreateFormUploadDocuments.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = NCCreateFormUploadDocuments.storyboard; sourceTree = "<group>"; };
+		B567618230B96E7600F503EC /* NCCreateFormUploadDocuments.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCCreateFormUploadDocuments.swift; sourceTree = "<group>"; };
 		B58644A9307D112B000BDA19 /* NCManageDatabase+Albums.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NCManageDatabase+Albums.swift"; sourceTree = "<group>"; };
 		B58644AB307D112B000BDA19 /* NCManageDatabase+MediaMetadataBackfill.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NCManageDatabase+MediaMetadataBackfill.swift"; sourceTree = "<group>"; };
 		B58644AC307D112B000BDA19 /* NCManageDatabase+MediaPreviewBackfill.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NCManageDatabase+MediaPreviewBackfill.swift"; sourceTree = "<group>"; };
@@ -3683,6 +3687,8 @@
 		F7DFB7E9219C5A0500680748 /* Create */ = {
 			isa = PBXGroup;
 			children = (
+				B567618130B96E7600F503EC /* NCCreateFormUploadDocuments.storyboard */,
+				B567618230B96E7600F503EC /* NCCreateFormUploadDocuments.swift */,
 				B55F81B22FF4E0AA0053242A /* NCCreateFormUploadVoiceNote.storyboard */,
 				B55F81B32FF4E0AA0053242A /* NCCreateFormUploadVoiceNote.swift */,
 				B55F81B52FF4E0AA0053242A /* TextTableViewCell.swift */,
@@ -4434,6 +4440,7 @@
 				B592CE753077AE8F00582F3A /* NCViewerDirectEditing.storyboard in Resources */,
 				B51A5ECB30A1B72200B817D1 /* NCSectionFirstHeaderEmptyDataTableHeader.xib in Resources */,
 				B592CE763077AE8F00582F3A /* NCViewerPDF.storyboard in Resources */,
+				B567618430B96E7600F503EC /* NCCreateFormUploadDocuments.storyboard in Resources */,
 				B592CE773077AE8F00582F3A /* NCViewerRichdocuments.storyboard in Resources */,
 				F700510122DF63AC003A3356 /* NCShare.storyboard in Resources */,
 				F787704F22E7019900F287A9 /* NCShareLinkCell.xib in Resources */,
@@ -4984,6 +4991,7 @@
 				B5DD10902FEBF0BB00F41FBD /* PrivacySettingsView.swift in Sources */,
 				AF7E504E27A2D8FF00B5E4AF /* UIBarButton+Extension.swift in Sources */,
 				AA8D31682D41224800FE2775 /* NCShareToggleCell.swift in Sources */,
+				B567618330B96E7600F503EC /* NCCreateFormUploadDocuments.swift in Sources */,
 				F7A846DE2BB01ACB0024816F /* NCTrashCellProtocol.swift in Sources */,
 				F7236DDF2F7C00E600F9D722 /* HudIndeterminateBannerView.swift in Sources */,
 				F799DF852C4B7E56003410B5 /* NCSectionHeader.swift in Sources */,

@@ -28,6 +28,12 @@ import XLForm
 // MARK: -
 
 @objc class NCCreateFormUploadDocuments: XLFormViewController, NCSelectDelegate, UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout, NCCreateFormUploadConflictDelegate {
+    private struct TemplateOption {
+        let identifier: String
+        let ext: String
+        let name: String
+        let preview: String
+    }
 
     @IBOutlet weak var indicator: UIActivityIndicatorView!
     @IBOutlet weak var collectionView: UICollectionView!
@@ -38,13 +44,15 @@ import XLForm
     var creatorId = ""
     var typeTemplate = ""
     var templateIdentifier = ""
+    var usesDirectEditingAPI = false
+    var directEditingUsesTemplates = false
     var serverUrl = ""
     var fileNameFolder = ""
     var fileName = ""
     var fileNameExtension = ""
     var titleForm = ""
-    var listOfTemplate: [NKEditorTemplate] = []
-    var selectTemplate: NKEditorTemplate?
+    private var listOfTemplate: [TemplateOption] = []
+    private var selectTemplate: TemplateOption?
     let utilityFileSystem = NCUtilityFileSystem()
     let utility = NCUtility()
 
@@ -282,7 +290,7 @@ import XLForm
             let rowFileName: XLFormRowDescriptor = self.form.formRow(withTag: "fileName")!
             var fileName = rowFileName.value as? String
             if fileName?.isEmpty ?? false || fileName == nil {
-                fileName = NCUtilityFileSystem().createFileNameDate("Text", ext: getFileExtension())
+                fileName = NCUtilityFileSystem().createFileNameDate("Text", ext: fileNameExtension)
             } else if fileName?.trimmingCharacters(in: .whitespaces).isEmpty ?? false {
                 let alert = UIAlertController(title: "", message: NSLocalizedString("_please_enter_file_name_", comment: ""), preferredStyle: .alert)
                 alert.addAction(UIAlertAction(title: NSLocalizedString("_ok_", comment: ""), style: .cancel, handler: nil))
@@ -295,6 +303,12 @@ import XLForm
 
             // Trim whitespaces and newlines
             fileNameForm = fileNameForm.trimmingCharacters(in: .whitespacesAndNewlines)
+
+            if usesDirectEditingAPI,
+               (fileNameForm as NSString).pathExtension.isEmpty,
+               !fileNameExtension.isEmpty {
+                fileNameForm += "." + fileNameExtension
+            }
 
 //            let fileAutoRenamer = FileAutoRenamer()
             let session = NCSession.shared.getSession(controller: self.controller)
@@ -328,10 +342,7 @@ import XLForm
                 //            self.present(conflict, animated: true, completion: nil)
 
             } else {
-
-                let fileNamePath = utilityFileSystem.getRelativeFilePath(String(describing: fileNameForm), serverUrl: serverUrl, session: session)
-                await NCCreateDocument().createDocument(controller: controller, fileNamePath: fileNamePath, fileName: String(describing: fileNameForm), fileNameExtension: self.fileNameExtension, editorId: editorId, creatorId: creatorId, templateId: templateIdentifier, account: session.account)
-
+                await createDocument(fileName: fileNameForm)
             }
         }
     }
@@ -340,10 +351,8 @@ import XLForm
 
         if let metadatas, metadatas.count > 0 {
             let fileName = metadatas[0].fileName
-            let fileNamePath = utilityFileSystem.getRelativeFilePath(fileName, serverUrl: serverUrl, session: session)
-//            createDocument(fileNamePath: fileNamePath, fileName: fileName)
             Task {
-                await NCCreateDocument().createDocument(controller: controller, fileNamePath: fileNamePath, fileName: String(describing: fileName), editorId: editorId, creatorId: creatorId, templateId: templateIdentifier, account: session.account)
+                await createDocument(fileName: fileName)
             }
 
         } else {
@@ -353,75 +362,28 @@ import XLForm
         }
     }
 
-    func createDocument(fileNamePath: String, fileName: String) {
-
-        self.navigationItem.rightBarButtonItem?.isEnabled = false
-        var UUID = NSUUID().uuidString
-        UUID = "TEMP" + UUID.replacingOccurrences(of: "-", with: "")
-
-        if self.editorId == NCGlobal.shared.editorText || self.editorId == NCGlobal.shared.editorOnlyoffice {
-
-            Task {
-                var options = NKRequestOptions()
-                if self.editorId == NCGlobal.shared.editorOnlyoffice {
-                    options = NKRequestOptions(customUserAgent: utility.getCustomUserAgentOnlyOffice())
-                } else if editorId == NCGlobal.shared.editorText {
-                    options = NKRequestOptions(customUserAgent: utility.getCustomUserAgentNCText())
-                }
-
-                let results = await NextcloudKit.shared.textCreateFileAsync(fileNamePath: fileNamePath, editorId: editorId, creatorId: creatorId, templateId: templateIdentifier, account: session.account, options: options) { task in
-                    Task {
-                        let identifier = await NCNetworking.shared.networkingTasks.createIdentifier(account: self.session.account,
-                                                                                                    path: fileNamePath,
-                                                                                                    name: "textCreateFile")
-                        await NCNetworking.shared.networkingTasks.track(identifier: identifier, task: task)
-                    }
-                }
-                guard results.error == .success, let url = results.url else {
-                    return NCContentPresenter().showError(error: results.error)
-                }
-                let metadata = await NCManageDatabaseCreateMetadata().createMetadataAsync(
-                    fileName: fileName,
-                    ocId: UUID,
-                    serverUrl: serverUrl,
-                    url: url,
-                    session: session,
-                    sceneIdentifier: controller.sceneIdentifier)
-
-                AnalyticsHelper.shared.trackCreateFile(metadata: metadata)
-                if let vc = await NCViewer().getViewerController(metadata: metadata, delegate: controller) {
-                    controller.navigationController?.pushViewController(vc, animated: true)
-                }
-            }
-        }
-
-        if self.editorId == NCGlobal.shared.editorCollabora {
-            Task {
-
-                let results = await NextcloudKit.shared.createRichdocumentsAsync(path: fileNamePath, templateId: templateIdentifier, account: session.account) { task in
-                    Task {
-                        let identifier = await NCNetworking.shared.networkingTasks.createIdentifier(account: self.session.account,
-                                                                                                    path: fileNamePath,
-                                                                                                    name: "CreateRichdocuments")
-                        await NCNetworking.shared.networkingTasks.track(identifier: identifier, task: task)
-                    }
-                }
-                guard results.error == .success, let url = results.url else {
-                    return NCContentPresenter().showError(error: results.error)
-                }
-
-                let metadata = await NCManageDatabaseCreateMetadata().createMetadataAsync(
-                    fileName: fileName,
-                    ocId: UUID,
-                    serverUrl: serverUrl,
-                    url: url,
-                    session: session,
-                    sceneIdentifier: controller.sceneIdentifier)
-
-                if let vc = await NCViewer().getViewerController(metadata: metadata, delegate: controller) {
-                    controller.navigationController?.pushViewController(vc, animated: true)
-                }
-            }
+    @MainActor
+    private func createDocument(fileName: String) async {
+        if usesDirectEditingAPI {
+            await NCCreate().createFileForDirectEditing(
+                controller: controller,
+                serverUrl: serverUrl,
+                fileName: fileName,
+                editorId: editorId,
+                creatorId: creatorId,
+                templateId: templateIdentifier,
+                session: session,
+                setupViewController: self
+            )
+        } else {
+            await NCCreate().createLegacyRichdocumentsFile(
+                controller: controller,
+                serverUrl: serverUrl,
+                fileName: fileName,
+                templateId: templateIdentifier,
+                session: session,
+                setupViewController: self
+            )
         }
     }
 
@@ -437,124 +399,84 @@ import XLForm
         indicator.color = NCBrandColor.shared.brandElement
         indicator.startAnimating()
 
-        if self.editorId == NCGlobal.shared.editorText || self.editorId == NCGlobal.shared.editorOnlyoffice {
+        if usesDirectEditingAPI {
+            Task { @MainActor in
+                let createDocument = NCCreate()
+                let templates: [TemplateOption]
+                let selectedTemplate: TemplateOption
+                let ext: String
 
-            var options = NKRequestOptions()
-            if self.editorId == NCGlobal.shared.editorOnlyoffice {
-                options = NKRequestOptions(customUserAgent: utility.getCustomUserAgentOnlyOffice())
-            } else if editorId == NCGlobal.shared.editorText {
-                options = NKRequestOptions(customUserAgent: utility.getCustomUserAgentNCText())
-            }
-
-            NextcloudKit.shared.textGetListOfTemplates(account: session.account, options: options) { account, templates, _, error in
-
-                self.indicator.stopAnimating()
-
-                if error == .success && account == self.session.account, let templates = templates {
-
-                    for template in templates {
-
-                        var temp = NKEditorTemplate()
-
-                        temp.identifier = template.identifier
-                        temp.ext = template.ext
-                        temp.name = template.name
-                        temp.preview = template.preview
-
-                        self.listOfTemplate.append(temp)
-
-                        // default: template empty
-                        if temp.preview.isEmpty {
-                            self.selectTemplate = temp
-                            self.fileNameExtension = template.ext
-                            self.navigationItem.rightBarButtonItem?.isEnabled = true
-                        }
+                if directEditingUsesTemplates {
+                    let result = await createDocument.getDirectEditingTemplates(
+                        editorId: editorId,
+                        creatorId: creatorId,
+                        fallbackExtension: fileNameExtension,
+                        account: session.account
+                    )
+                    templates = result.templates.map {
+                        TemplateOption(
+                            identifier: $0.identifier,
+                            ext: $0.ext,
+                            name: $0.name,
+                            preview: $0.preview ?? ""
+                        )
                     }
+                    selectedTemplate = TemplateOption(
+                        identifier: result.selectedTemplate.identifier,
+                        ext: result.selectedTemplate.ext,
+                        name: result.selectedTemplate.name,
+                        preview: result.selectedTemplate.preview ?? ""
+                    )
+                    ext = result.ext
+                } else {
+                    let template = TemplateOption(
+                        identifier: "",
+                        ext: fileNameExtension,
+                        name: "Empty",
+                        preview: ""
+                    )
+                    templates = [template]
+                    selectedTemplate = template
+                    ext = fileNameExtension
                 }
 
-                if self.listOfTemplate.isEmpty {
-
-                    var temp = NKEditorTemplate()
-
-                    temp.identifier = ""
-                    if self.editorId == NCGlobal.shared.editorText {
-                        temp.ext = "md"
-                    } else if self.editorId == NCGlobal.shared.editorOnlyoffice && self.typeTemplate == NCGlobal.shared.templateDocument {
-                        temp.ext = "docx"
-                    } else if self.editorId == NCGlobal.shared.editorOnlyoffice && self.typeTemplate == NCGlobal.shared.templateSpreadsheet {
-                        temp.ext = "xlsx"
-                    } else if self.editorId == NCGlobal.shared.editorOnlyoffice && self.typeTemplate == NCGlobal.shared.templatePresentation {
-                        temp.ext = "pptx"
-                    }
-                    temp.name = "Empty"
-                    temp.preview = ""
-
-                    self.listOfTemplate.append(temp)
-
-                    self.selectTemplate = temp
-                    self.fileNameExtension = temp.ext
-                    self.navigationItem.rightBarButtonItem?.isEnabled = true
-                }
-
-                self.collectionView.reloadData()
+                listOfTemplate = templates
+                selectTemplate = listOfTemplate.first { $0.identifier == selectedTemplate.identifier }
+                fileNameExtension = ext
+                indicator.stopAnimating()
+                navigationItem.rightBarButtonItem?.isEnabled = selectTemplate != nil
+                collectionView.reloadData()
             }
-
+            return
         }
 
-        if self.editorId == NCGlobal.shared.editorCollabora {
+        Task { @MainActor in
+            let result = await NCCreate().getLegacyRichdocumentsTemplates(
+                templateType: typeTemplate,
+                account: session.account
+            )
+            indicator.stopAnimating()
 
-            NextcloudKit.shared.getTemplatesRichdocuments(typeTemplate: typeTemplate, account: session.account) { account, templates, _, error in
-
-                self.indicator.stopAnimating()
-
-                if error == .success && account == self.session.account {
-
-                    for template in templates! {
-
-                        var temp = NKEditorTemplate()
-
-                        temp.identifier = "\(template.templateId)"
-//                        temp.delete = template.delete
-                        temp.ext = template.ext
-                        temp.name = template.name
-                        temp.preview = template.preview
-//                        temp.type = template.type
-
-                        self.listOfTemplate.append(temp)
-
-                        // default: template empty
-                        if temp.preview.isEmpty {
-                            self.selectTemplate = temp
-                            self.fileNameExtension = temp.ext
-                            self.navigationItem.rightBarButtonItem?.isEnabled = true
-                        }
-                    }
-                }
-
-                if self.listOfTemplate.isEmpty {
-
-                    var temp = NKEditorTemplate()
-
-                    temp.identifier = ""
-                    if self.typeTemplate == NCGlobal.shared.templateDocument {
-                        temp.ext = "docx"
-                    } else if self.typeTemplate == NCGlobal.shared.templateSpreadsheet {
-                        temp.ext = "xlsx"
-                    } else if self.typeTemplate == NCGlobal.shared.templatePresentation {
-                        temp.ext = "pptx"
-                    }
-                    temp.name = "Empty"
-                    temp.preview = ""
-
-                    self.listOfTemplate.append(temp)
-
-                    self.selectTemplate = temp
-                    self.fileNameExtension = temp.ext
-                    self.navigationItem.rightBarButtonItem?.isEnabled = true
-                }
-
-                self.collectionView.reloadData()
+            guard result.error == .success,
+                  let selectedTemplate = result.selectedTemplate else {
+                NCContentPresenter().showError(error: result.error)
+                return
             }
+
+            listOfTemplate = result.templates.map { template in
+                TemplateOption(
+                    identifier: "\(template.templateId)",
+                    ext: template.ext,
+                    name: template.name,
+                    preview: template.preview
+                )
+            }
+            selectTemplate = listOfTemplate.first {
+                $0.identifier == "\(selectedTemplate.templateId)"
+            }
+            fileNameExtension = result.ext
+            navigationItem.rightBarButtonItem?.isEnabled = selectTemplate != nil
+            collectionView.reloadData()
         }
     }
 
@@ -590,7 +512,7 @@ import XLForm
         case NCGlobal.shared.templatePresentation:
             return "pptx"
         default:
-            return ""
+            return fileNameExtension
         }
     }
 }

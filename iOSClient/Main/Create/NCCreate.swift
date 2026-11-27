@@ -39,7 +39,8 @@ class NCCreate: NSObject {
                                     editorId: String,
                                     creatorId: String,
                                     templateId: String,
-                                    session: NCSession.Session) async {
+                                    session: NCSession.Session,
+                                    setupViewController: UIViewController? = nil) async {
         let windowScene = SceneManager.shared.getWindowScene(controller: controller)
         guard let viewController = controller.currentViewController(),
               let adapter = NCDirectEditorAdapter.resolve(from: [editorId]) else {
@@ -66,14 +67,29 @@ class NCCreate: NSObject {
             return
         }
 
-        await openCreatedFile(
-            serverUrlFileName: serverUrlFileName,
-            editorId: editorId,
-            editorURL: editorURL,
-            session: session,
-            controller: controller,
-            viewController: viewController
-        )
+        if let setupViewController {
+            setupViewController.dismiss(animated: true) {
+                Task { @MainActor in
+                    await self.openCreatedFile(
+                        serverUrlFileName: serverUrlFileName,
+                        editorId: editorId,
+                        editorURL: editorURL,
+                        session: session,
+                        controller: controller,
+                        viewController: viewController
+                    )
+                }
+            }
+        } else {
+            await openCreatedFile(
+                serverUrlFileName: serverUrlFileName,
+                editorId: editorId,
+                editorURL: editorURL,
+                session: session,
+                controller: controller,
+                viewController: viewController
+            )
+        }
     }
 
     @MainActor
@@ -81,7 +97,8 @@ class NCCreate: NSObject {
                                        serverUrl: String,
                                        fileName: String,
                                        templateId: String,
-                                       session: NCSession.Session) async {
+                                       session: NCSession.Session,
+                                       setupViewController: UIViewController? = nil) async {
         let windowScene = SceneManager.shared.getWindowScene(controller: controller)
         guard let viewController = controller.currentViewController() else {
             return
@@ -103,14 +120,29 @@ class NCCreate: NSObject {
             return
         }
 
-        await openCreatedFile(
-            serverUrlFileName: serverUrlFileName,
-            editorId: NCGlobal.shared.editorCollabora,
-            editorURL: editorURL,
-            session: session,
-            controller: controller,
-            viewController: viewController
-        )
+        if let setupViewController {
+            setupViewController.dismiss(animated: true) {
+                Task { @MainActor in
+                    await self.openCreatedFile(
+                        serverUrlFileName: serverUrlFileName,
+                        editorId: NCGlobal.shared.editorCollabora,
+                        editorURL: editorURL,
+                        session: session,
+                        controller: controller,
+                        viewController: viewController
+                    )
+                }
+            }
+        } else {
+            await openCreatedFile(
+                serverUrlFileName: serverUrlFileName,
+                editorId: NCGlobal.shared.editorCollabora,
+                editorURL: editorURL,
+                session: session,
+                controller: controller,
+                viewController: viewController
+            )
+        }
     }
 
     func getDirectEditingTemplates(editorId: String,

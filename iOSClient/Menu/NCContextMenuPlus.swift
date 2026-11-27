@@ -257,43 +257,25 @@ class NCContextMenuPlus: NSObject {
                 ) { _ in
                     Task { @MainActor in
                         if let directEditingCreator {
-                            let createDocument = NCCreate()
-                            let fileExt: String
-                            let templateId: String
-                            if directEditingCreator.templates {
-                                let result = await createDocument.getDirectEditingTemplates(
-                                    editorId: directEditingCreator.editor,
-                                    creatorId: directEditingCreator.identifier,
-                                    fallbackExtension: directEditingCreator.ext,
-                                    account: session.account
-                                )
-                                fileExt = result.ext
-                                templateId = result.selectedTemplate.identifier
-                            } else {
-                                fileExt = directEditingCreator.ext
-                                templateId = ""
-                            }
-
-                            let fileName = await NCNetworking.shared.createFileName(
-                                fileNameBase: NSLocalizedString("_untitled_", comment: "") + "." + fileExt,
-                                account: session.account,
-                                serverUrl: serverUrl
-                            )
-                            await createDocument.createFileForDirectEditing(
-                                controller: controller,
-                                serverUrl: serverUrl,
-                                fileName: fileName,
+                            self.presentDocumentSetupForm(
+                                title: NSLocalizedString(documentType.titleKey, comment: ""),
                                 editorId: directEditingCreator.editor,
                                 creatorId: directEditingCreator.identifier,
-                                templateId: templateId,
-                                session: session
+                                templateType: documentType.templateType,
+                                serverUrl: serverUrl,
+                                fallbackExtension: directEditingCreator.ext,
+                                usesDirectEditingAPI: true,
+                                usesTemplates: directEditingCreator.templates,
+                                controller: controller
                             )
                         } else {
-                            await self.createLegacyCollaboraFile(
+                            self.presentDocumentSetupForm(
+                                title: NSLocalizedString(documentType.titleKey, comment: ""),
+                                editorId: global.editorCollabora,
                                 templateType: documentType.templateType,
-                                controller: controller,
                                 serverUrl: serverUrl,
-                                session: session
+                                usesDirectEditingAPI: false,
+                                controller: controller
                             )
                         }
                     }
@@ -341,8 +323,7 @@ class NCContextMenuPlus: NSObject {
                             utility.loadImage(named: $0.icon)//, colors: [$0.iconColor])
                         } ?? NCImageCache.shared.getImageFile(),
                         controller: controller,
-                        serverUrl: serverUrl,
-                        session: session
+                        serverUrl: serverUrl
                     )
 
                     if info == nil {
@@ -391,7 +372,6 @@ class NCContextMenuPlus: NSObject {
                     image: image,
                     controller: controller,
                     serverUrl: serverUrl,
-                    session: session,
                     useTemplates: false
                 )
 
@@ -404,20 +384,16 @@ class NCContextMenuPlus: NSObject {
                 menuNextcloudTextAction = UIAction(title: NSLocalizedString("_create_nextcloudtext_document_", comment: ""),
                                                    image: UIImage(named: "file_txt_menu")!.image(color: NCBrandColor.shared.iconImageColor, size: 24).withTintColor(NCBrandColor.shared.iconImageColor)) { _ in
                     Task { @MainActor in
-                        let fileName = await NCNetworking.shared.createFileName(
-                            fileNameBase: NSLocalizedString("_untitled_", comment: "") + "." + creator.ext,
-                            account: session.account,
-                            serverUrl: serverUrl
-                        )
-
-                        await NCCreate().createFileForDirectEditing(
-                            controller: controller,
-                            serverUrl: serverUrl,
-                            fileName: fileName,
+                        self.presentDocumentSetupForm(
+                            title: NSLocalizedString("_create_nextcloudtext_document_", comment: ""),
                             editorId: creator.editor,
                             creatorId: creator.identifier,
-                            templateId: "",
-                            session: session)
+                            templateType: global.editorText,
+                            serverUrl: serverUrl,
+                            fallbackExtension: creator.ext,
+                            usesDirectEditingAPI: true,
+                            controller: controller
+                        )
                     }
                 }
             }
@@ -560,43 +536,49 @@ class NCContextMenuPlus: NSObject {
                                          image: UIImage?,
                                          controller: NCMainTabBarController,
                                          serverUrl: String,
-                                         session: NCSession.Session,
                                          useTemplates: Bool = true) -> UIAction {
         UIAction(title: title, image: image) { _ in
             Task { @MainActor in
-                let createDocument = NCCreate()
-                let fileExt: String
-                let templateIdentifier: String
-                if useTemplates, creator.templates {
-                    let result = await createDocument.getDirectEditingTemplates(
-                        editorId: creator.editor,
-                        creatorId: creator.identifier,
-                        fallbackExtension: creator.ext,
-                        account: session.account
-                    )
-                    fileExt = result.ext
-                    templateIdentifier = result.selectedTemplate.identifier
-                } else {
-                    fileExt = creator.ext
-                    templateIdentifier = ""
-                }
-                let fileName = await NCNetworking.shared.createFileName(
-                    fileNameBase: NSLocalizedString("_untitled_", comment: "") + "." + fileExt,
-                    account: session.account,
-                    serverUrl: serverUrl
-                )
-
-                await createDocument.createFileForDirectEditing(
-                    controller: controller,
-                    serverUrl: serverUrl,
-                    fileName: fileName,
+                self.presentDocumentSetupForm(
+                    title: title,
                     editorId: creator.editor,
                     creatorId: creator.identifier,
-                    templateId: templateIdentifier,
-                    session: session
+                    templateType: NCContextMenuPlus.menuInfo(for: creator.ext)?.documentType ?? creator.ext,
+                    serverUrl: serverUrl,
+                    fallbackExtension: creator.ext,
+                    usesDirectEditingAPI: true,
+                    usesTemplates: useTemplates && creator.templates,
+                    controller: controller
                 )
             }
         }
+    }
+
+    private func presentDocumentSetupForm(title: String,
+                                          editorId: String,
+                                          creatorId: String = "",
+                                          templateType: String,
+                                          serverUrl: String,
+                                          fallbackExtension: String = "",
+                                          usesDirectEditingAPI: Bool,
+                                          usesTemplates: Bool = false,
+                                          controller: NCMainTabBarController) {
+        guard let navigationController = UIStoryboard(name: "NCCreateFormUploadDocuments", bundle: nil).instantiateInitialViewController(),
+              let viewController = (navigationController as? UINavigationController)?.topViewController as? NCCreateFormUploadDocuments else {
+            return
+        }
+
+        navigationController.modalPresentationStyle = .formSheet
+        viewController.editorId = editorId
+        viewController.creatorId = creatorId
+        viewController.typeTemplate = templateType
+        viewController.serverUrl = serverUrl
+        viewController.titleForm = title
+        viewController.controller = controller
+        viewController.fileNameExtension = fallbackExtension
+        viewController.usesDirectEditingAPI = usesDirectEditingAPI
+        viewController.directEditingUsesTemplates = usesTemplates
+        controller.present(navigationController, animated: true)
     }
 
     private func makeMenuSignature(capabilities: NKCapabilities.Capabilities,
@@ -613,39 +595,6 @@ class NCContextMenuPlus: NSObject {
             .joined(separator: ";")
 
         return "\(account)|\(serverUrl)|\(isEndToEndEnabled)|\(capabilities.richDocumentsEnabled)|\(creators)|\(editors)"
-    }
-
-    private func createLegacyCollaboraFile(templateType: String,
-                                           controller: NCMainTabBarController,
-                                           serverUrl: String,
-                                           session: NCSession.Session) async {
-        let createDocument = NCCreate()
-        let result = await createDocument.getLegacyRichdocumentsTemplates(
-            templateType: templateType,
-            account: session.account
-        )
-        guard result.error == .success,
-              let selectedTemplate = result.selectedTemplate else {
-            await showErrorBanner(
-                windowScene: windowScene,
-                text: result.error.errorDescription,
-                errorCode: result.error.errorCode
-            )
-            return
-        }
-
-        let fileName = await NCNetworking.shared.createFileName(
-            fileNameBase: NSLocalizedString("_untitled_", comment: "") + "." + result.ext,
-            account: session.account,
-            serverUrl: serverUrl
-        )
-        await createDocument.createLegacyRichdocumentsFile(
-            controller: controller,
-            serverUrl: serverUrl,
-            fileName: fileName,
-            templateId: String(selectedTemplate.templateId),
-            session: session
-        )
     }
 
     func updatePlusButtonEnabled(session: NCSession.Session) {
