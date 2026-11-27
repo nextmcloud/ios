@@ -51,7 +51,9 @@ class AlbumsViewController: UIViewController {
     private func updateAlbumsIfNeeded(for controller: NCMainTabBarController) {
         guard controller.account != displayedAccount else { return }
 
-        initialAlbum = nil
+        if displayedAccount != nil {
+            initialAlbum = nil
+        }
         showAlbums(for: controller)
     }
 
