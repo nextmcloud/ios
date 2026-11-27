@@ -16,13 +16,10 @@ struct NoPhotosEmptyView: View {
                     Spacer(minLength: 0)
 
                     Image("EmptyAlbum")
-//                    Image(systemName: "photo.on.rectangle.angled.fill")
+                        .renderingMode(.original)
                         .resizable()
                         .scaledToFit()
-                        .foregroundStyle(
-                            Color(NCBrandColor.shared.getElement(account: localAccount))
-                        )
-                        .frame(maxWidth: .infinity, maxHeight: 75)
+                        .frame(maxWidth: .infinity, maxHeight: 150)
                         .padding(.bottom, 30)
 
                     VStack(alignment: .center, spacing: 16) {
